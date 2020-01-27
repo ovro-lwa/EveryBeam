@@ -31,11 +31,26 @@ A HBA field if a beamformer with multiple tiles as inputs.
 An HBA station is either a single HBA field (HBA0 or HBA1) or a beamformer with fields HBA0 and HBA1 as inputs.
 
 
-Markdown | Less | Pretty
+
+
+
+Classes:
+
+* Station is a thin wrapper around a Response object, with some convenience functions
+* Response - something for which a response can be computed, can be a single element (antenna) or a beamformer
+* BeamFormerResponse - response of a beamformer, has inputs that are Response objects
+* ElementResponse - response of a single element (antenna), different models can be implemented
+
+
+
+
+
+
+<!--Markdown | Less | Pretty
 --- | --- | ---
 *Still* | `renders` | **nicely**
 1 | 2 | 3
-
+-->
 
 
 
