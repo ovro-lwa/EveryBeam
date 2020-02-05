@@ -9,22 +9,22 @@ configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.
 
 add_subdirectory(external)
 
-# Add element models
-add_subdirectory(hamaker)
-add_subdirectory(lobes)
-add_subdirectory(oskar)
-
 cmake_policy(SET CMP0074 NEW)
 
-find_package(HDF5 COMPONENTS CXX REQUIRED)
+find_package(HDF5 COMPONENTS C CXX REQUIRED)
+add_definitions(${HDF5_DEFINITIONS})
 include_directories(${HDF5_INCLUDE_DIR})
-
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
 find_package(Casacore REQUIRED COMPONENTS casa ms tables measures)
 include_directories(${CASACORE_INCLUDE_DIR})
+
+# Add element models
+add_subdirectory(hamaker)
+add_subdirectory(lobes)
+add_subdirectory(oskar)
 
 add_compile_options(-std=c++11 -Wall -DNDEBUG -Wl,--no-undefined)
 
