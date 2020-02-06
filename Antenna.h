@@ -52,8 +52,6 @@ public:
         Axes        axes;
     };
 
-
-
     typedef std::shared_ptr<Antenna> Ptr;
 
     struct Options
@@ -63,7 +61,18 @@ public:
         const vector3r_t *tile0;
     };
 
-    Antenna() {}
+    Antenna() :
+        // default coordinate system
+        // no shift of origin, no rotation
+        m_coordinate_system{
+            {0.0,0.0,0.0}, // origin
+            {
+                {1.0, 0.0, 0.0},
+                {0.0, 1.0, 0.0},
+                {0.0, 0.0, 1.0}
+            } // axes = identity matrix
+        }
+    {}
 
     Antenna(CoordinateSystem &coordinate_system) :
         m_coordinate_system(coordinate_system)
@@ -93,6 +102,7 @@ public:
     }
 
     CoordinateSystem m_coordinate_system;
+    vector3r_t  m_phase_reference_position;
     bool m_enabled[2];
 
 private:

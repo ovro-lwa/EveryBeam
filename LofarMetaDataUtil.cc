@@ -167,8 +167,8 @@ BeamFormer::Ptr make_tile(std::string name, Antenna::CoordinateSystem coordinate
 
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementResponse::Ptr element_response)
 {
-    BeamFormer::Ptr beam_former(new BeamFormer());
     Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+    BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
 
     ROScalarColumn<String> c_name(table, "NAME");
     ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
@@ -299,6 +299,9 @@ Station::Ptr readStation(
         {
             // There are multiple fields
             // The Station will consist of a BeamFormer that combines the fields
+            // TODO set phase reference
+            // coordinate system is ITRF
+            // but phase reference is station position
             auto beam_former = BeamFormer::Ptr(new BeamFormer());
             for(size_t i = 0; i < tab_field.nrow(); ++i)
             {

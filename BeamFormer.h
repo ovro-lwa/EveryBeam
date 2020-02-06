@@ -16,9 +16,19 @@ public:
 
     typedef std::shared_ptr<BeamFormer> Ptr;
 
+    BeamFormer() :
+        Antenna()
+    {}
+
+    BeamFormer(CoordinateSystem &coordinate_system) :
+        Antenna(coordinate_system)
+    {}
+
     void add_antenna(Antenna::Ptr antenna) {m_antennas.push_back(antenna);}
 
 private:
+
+    vector3r_t  m_local_phase_reference_position; // in coordinate system of Antenna
 
     virtual matrix22c_t local_response(
         real_t time,
