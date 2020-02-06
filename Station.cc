@@ -101,16 +101,19 @@ matrix22c_t Station::elementResponse(real_t time, real_t freq,
 //   else
 //     return itsAntenna->response(freq, itrf2field(direction));
 //     return itsElementResponse->response(freq, direction);
+    matrix22c_t value;
+    return value;
 }
 
 matrix22c_t Station::response(real_t time, real_t freq,
     const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
     const vector3r_t &tile0, const bool rotate) const
 {
-    Antenna::Options options = {
-        .freq0 = freq0,
-        .station0 = &station0,
-        .tile0 = &tile0};
+    // TODO
+    //Antenna::Options options = {
+    //    .freq0 = freq0,
+    //    .station0 = &station0,
+    //    .tile0 = &tile0};
     return itsAntenna->response(time, freq, direction);
 }
 
@@ -118,10 +121,11 @@ diag22c_t Station::arrayFactor(real_t time, real_t freq,
     const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
     const vector3r_t &tile0) const
 {
-    Antenna::Options options = {
-        .freq0 = freq0,
-        .station0 = &station0,
-        .tile0 = &tile0};
+    // TODO
+    //Antenna::Options options = {
+    //    .freq0 = freq0,
+    //    .station0 = &station0,
+    //    .tile0 = &tile0};
     return itsAntenna->arrayFactor(time, freq, direction);
 }
 
