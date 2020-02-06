@@ -22,15 +22,16 @@ public:
         m_element_response(element_response)
     {}
 
-    virtual matrix22c_t response(
+
+private:
+
+    virtual matrix22c_t local_response(
         real_t time,
         real_t freq,
         const vector3r_t &direction,
         const Options &options) const final override;
 
-private:
     int m_id;
-    double m_orientation;
     ElementResponse::Ptr m_element_response;
 };
 

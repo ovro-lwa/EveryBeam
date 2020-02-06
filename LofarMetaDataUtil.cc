@@ -95,7 +95,7 @@ TileConfig readTileConfig(const Table &table, unsigned int row)
 }
 
 void transformToFieldCoordinates(TileConfig &config,
-    const Station::CoordinateSystem::Axes &axes)
+    const Antenna::CoordinateSystem::Axes &axes)
 {
     for(unsigned int i = 0; i < config.size(); ++i)
     {
@@ -132,7 +132,7 @@ void transformToFieldCoordinates(TileConfig &config,
 //     return system;
 // }
 
-Station::CoordinateSystem readCoordinateSystem(const Table &table,
+Antenna::CoordinateSystem readCoordinateSystem(const Table &table,
     unsigned int id)
 {
     ROArrayQuantColumn<Double> c_position(table, "POSITION", "m");
@@ -156,11 +156,11 @@ Station::CoordinateSystem readCoordinateSystem(const Table &table,
     vector3r_t r = {{aips_axes(0, 2).getValue(), aips_axes(1, 2).getValue(),
         aips_axes(2, 2).getValue()}};
 
-    Station::CoordinateSystem coordinate_system = {position, {p, q, r}};
+    Antenna::CoordinateSystem coordinate_system = {position, {p, q, r}};
     return coordinate_system;
 }
 
-BeamFormer::Ptr make_tile(std::string name, Station::CoordinateSystem coordinate_system,
+BeamFormer::Ptr make_tile(std::string name, Antenna::CoordinateSystem coordinate_system,
                           TileConfig tile_config, ElementResponse::Ptr)
 {
 }
@@ -168,7 +168,7 @@ BeamFormer::Ptr make_tile(std::string name, Station::CoordinateSystem coordinate
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementResponse::Ptr element_response)
 {
     BeamFormer::Ptr beam_former(new BeamFormer());
-    Station::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+    Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
 
     ROScalarColumn<String> c_name(table, "NAME");
     ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
@@ -197,9 +197,9 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
             // HBA, HBA0, HBA1
             antenna = make_tile(name, coordinate_system, tile_config, element_response);
         }
-        antenna->m_position[0] = aips_offset(0, i).getValue();
-        antenna->m_position[1] = aips_offset(1, i).getValue();
-        antenna->m_position[2] = aips_offset(2, i).getValue();
+        antenna->m_coordinate_system.origin[0] = aips_offset(0, i).getValue();
+        antenna->m_coordinate_system.origin[1] = aips_offset(1, i).getValue();
+        antenna->m_coordinate_system.origin[2] = aips_offset(2, i).getValue();
         antenna->m_enabled[0] = !aips_flag(0, i);
         antenna->m_enabled[1] = !aips_flag(1, i);
         beam_former->add_antenna(antenna);

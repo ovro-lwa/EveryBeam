@@ -16,13 +16,17 @@ public:
 
     typedef std::shared_ptr<BeamFormer> Ptr;
 
-    virtual matrix22c_t response(
+    void add_antenna(Antenna::Ptr antenna) {m_antennas.push_back(antenna);}
+
+private:
+
+    virtual matrix22c_t local_response(
         real_t time,
         real_t freq,
         const vector3r_t &direction,
         const Options &options) const override;
 
-    virtual diag22c_t arrayFactor(
+    virtual diag22c_t local_arrayFactor(
         real_t time,
         real_t freq,
         const vector3r_t &direction,
@@ -30,10 +34,6 @@ public:
     {
         return {1.0, 1.0};
     }
-
-    void add_antenna(Antenna::Ptr antenna) {m_antennas.push_back(antenna);}
-
-private:
 
     vector3r_t compute_local_pointing(double time) const;
     std::vector<std::complex<double>> compute_geometric_response(double freq, const vector3r_t &direction) const;

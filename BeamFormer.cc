@@ -13,9 +13,9 @@ std::vector<std::complex<double>> BeamFormer::compute_geometric_response(double 
     result.reserve(m_antennas.size());
     for (auto &antenna : m_antennas)
     {
-        double dl = direction[0] * antenna->m_position[0] +
-                    direction[1] * antenna->m_position[1] +
-                    direction[2] * antenna->m_position[2];
+        double dl = direction[0] * antenna->m_coordinate_system.origin[0] +
+                    direction[1] * antenna->m_coordinate_system.origin[1] +
+                    direction[2] * antenna->m_coordinate_system.origin[2];
 
         double phase = 2 * M_PI * dl * speed_of_light * freq;
         result.push_back({std::sin(phase), std::cos(phase)});
@@ -45,7 +45,7 @@ std::vector<std::pair<std::complex<double>,std::complex<double>>> BeamFormer::co
 }
 
 
-matrix22c_t BeamFormer::response(
+matrix22c_t BeamFormer::local_response(
     real_t time,
     real_t freq,
     const vector3r_t &direction,

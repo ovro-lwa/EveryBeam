@@ -305,45 +305,6 @@ public:
     // ===================================================================
     // New methods introduced in refactor
     // ==================================================================
-    /**
-     *  \brief Station coordinate system.
-     *
-     *  A right handed, cartesian, local coordinate system with coordinate axes
-     *  \p p, \p q, and \p r is associated with each antenna field.
-     *
-     *  The r-axis is orthogonal to the antenna field, and points towards the
-     *  local pseudo zenith.
-     *
-     *  The q-axis is the northern bisector of the \p X and \p Y dipoles, i.e.
-     *  it is the reference direction from which the orientation of the dual
-     *  dipole antennae is determined. The q-axis points towards the North at
-     *  the core. At remote sites it is defined as the intersection of the
-     *  antenna field plane and a plane parallel to the meridian plane at the
-     *  core. This ensures the reference directions at all sites are similar.
-     *
-     *  The p-axis is orthogonal to both other axes, and points towards the East
-     *  at the core.
-     *
-     *  The axes and origin of the anntena field coordinate system are expressed
-     *  as vectors in the geocentric, cartesian, ITRF coordinate system, in
-     *  meters.
-     *
-     *  \sa "LOFAR Reference Plane and Reference Direction", M.A. Brentjens,
-     *  LOFAR-ASTRON-MEM-248.
-     */
-    struct CoordinateSystem
-    {
-        struct Axes
-        {
-            vector3r_t  p;
-            vector3r_t  q;
-            vector3r_t  r;
-        };
-
-        vector3r_t  origin;
-        Axes        axes;
-    };
-
 
     const ElementResponse::Ptr get_element_response() {return itsElementResponse;}
 
