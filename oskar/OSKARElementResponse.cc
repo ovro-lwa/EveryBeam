@@ -33,6 +33,21 @@ void OSKARElementResponseSphericalWave::response(
     double phi,
     std::complex<double> (&response)[2][2]) const
 {
+    // This ElementResponse model is element specific, so an element_id is required
+    // to know for what element the response needs to be evaluated
+    // A std::invalid_argument exception is thrown although strictly speaking
+    // it are not the given arguments that are invalid, but the response(...) method with
+    // a different signature should have been called.
+    throw std::invalid_argument("OSKARElementResponseSphericalWave: missing argument element_id");
+}
+
+void OSKARElementResponseSphericalWave::response(
+    int element_id,
+    double freq,
+    double theta,
+    double phi,
+    std::complex<double> (&response)[2][2]) const
+{
     std::lock_guard<std::mutex> lock(m_mutex);
 
     // DEBUG
@@ -44,9 +59,8 @@ void OSKARElementResponseSphericalWave::response(
     }
 
     int l_max = m_coeffs->get_l_max();
-    int element = 0; // TODO
     std::complex<double>* response_ptr = (std::complex<double> *) response;
-    std::complex<double>* alpha_ptr = m_coeffs->get_alpha_ptr(element);
+    std::complex<double>* alpha_ptr = m_coeffs->get_alpha_ptr(element_id);
 
     double phi_x = phi;
     double phi_y = phi + M_PI/2;
