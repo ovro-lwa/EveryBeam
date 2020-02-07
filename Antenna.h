@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Types.h"
+#include "MathUtil.h"
 
 namespace LOFAR {
 namespace StationResponse {
@@ -47,9 +48,21 @@ public:
             vector3r_t  q;
             vector3r_t  r;
         };
-
         vector3r_t  origin;
         Axes        axes;
+
+        constexpr static Axes identity_axes = {
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}
+        };
+
+        constexpr static vector3r_t zero_origin = {0.0, 0.0, 0.0};
+    };
+
+    constexpr static CoordinateSystem identity_coordinate_system{
+        CoordinateSystem::zero_origin,
+        CoordinateSystem::identity_axes
     };
 
     typedef std::shared_ptr<Antenna> Ptr;
@@ -64,18 +77,20 @@ public:
     Antenna() :
         // default coordinate system
         // no shift of origin, no rotation
-        m_coordinate_system{
-            {0.0,0.0,0.0}, // origin
-            {
-                {1.0, 0.0, 0.0},
-                {0.0, 1.0, 0.0},
-                {0.0, 0.0, 1.0}
-            } // axes = identity matrix
-        }
+        Antenna({
+            CoordinateSystem::zero_origin, // origin
+            CoordinateSystem::identity_axes
+        })
     {}
 
-    Antenna(CoordinateSystem &coordinate_system) :
-        m_coordinate_system(coordinate_system)
+    Antenna(const CoordinateSystem &coordinate_system) :
+        // default phase reference system is the origin of the coordinate system
+        Antenna(coordinate_system, coordinate_system.origin)
+    {}
+
+    Antenna(const CoordinateSystem &coordinate_system, const vector3r_t &phase_reference_position) :
+        m_coordinate_system(coordinate_system),
+        m_phase_reference_position(phase_reference_position)
     {
     }
 
@@ -85,9 +100,9 @@ public:
         const vector3r_t &direction,
         const Options &options = {})
     {
-        // TODO
         // Transform direction and directions in options to local coordinatesystem
-        return local_response(time, freq, direction, options);
+        vector3r_t local_direction = transform_to_local_direction(direction);
+        return local_response(time, freq, local_direction, options);
     }
 
     diag22c_t arrayFactor(
@@ -96,9 +111,9 @@ public:
         const vector3r_t &direction,
         const Options &options = {})
     {
-        // TODO
         // Transform direction and directions in options to local coordinatesystem
-        return local_arrayFactor(time, freq, direction, options);
+        vector3r_t local_direction = transform_to_local_direction(direction);
+        return local_arrayFactor(time, freq, local_direction, options);
     }
 
     CoordinateSystem m_coordinate_system;
@@ -119,6 +134,17 @@ private:
         const vector3r_t &direction,
         const Options &options) const
     { return {1.0, 1.0}; }
+
+    vector3r_t transform_to_local_direction(const vector3r_t &direction) {
+        vector3r_t local_direction {
+            dot(m_coordinate_system.axes.p, direction),
+            dot(m_coordinate_system.axes.q, direction),
+            dot(m_coordinate_system.axes.r, direction),
+        };
+
+        return local_direction;
+    }
+
 
 };
 

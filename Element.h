@@ -17,7 +17,7 @@ public:
 
     typedef std::shared_ptr<Element> Ptr;
 
-    Element(int id, ElementResponse::Ptr element_response) :
+    Element(const CoordinateSystem &coordinate_system, ElementResponse::Ptr element_response, int id) :
         m_id(id),
         m_element_response(element_response)
     {}

@@ -49,7 +49,10 @@ add_library(stationresponse SHARED
   Types.cc
 )
 
-set_target_properties(stationresponse PROPERTIES VERSION 3)
+set_target_properties(stationresponse PROPERTIES
+    CXX_STANDARD 17
+    VERSION 3
+)
 
 target_include_directories(stationresponse PUBLIC ${CASACORE_INCLUDE_DIR})
 

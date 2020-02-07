@@ -6,6 +6,7 @@
 
 #include "Element.h"
 #include "Types.h"
+#include "MathUtil.h"
 
 namespace LOFAR {
 namespace StationResponse {
@@ -18,17 +19,29 @@ public:
 
     BeamFormer() :
         Antenna()
-    {}
+    {
+        m_local_phase_reference_position = transform_to_local_position(m_phase_reference_position);
+    }
 
-    BeamFormer(CoordinateSystem &coordinate_system) :
+    BeamFormer(const CoordinateSystem &coordinate_system) :
         Antenna(coordinate_system)
-    {}
+    {
+        m_local_phase_reference_position = transform_to_local_position(m_phase_reference_position);
+    }
+
+    BeamFormer(CoordinateSystem coordinate_system, vector3r_t phase_reference_position) :
+        Antenna(coordinate_system, phase_reference_position)
+    {
+        m_local_phase_reference_position = transform_to_local_position(m_phase_reference_position);
+    }
 
     void add_antenna(Antenna::Ptr antenna) {m_antennas.push_back(antenna);}
 
 private:
 
     vector3r_t  m_local_phase_reference_position; // in coordinate system of Antenna
+
+    vector3r_t transform_to_local_position(const vector3r_t &position);
 
     virtual matrix22c_t local_response(
         real_t time,

@@ -7,6 +7,22 @@ constexpr double speed_of_light = 299792458.0;
 namespace LOFAR {
 namespace StationResponse {
 
+vector3r_t BeamFormer::transform_to_local_position(const vector3r_t &position) {
+    vector3r_t dposition {
+        position[0] - m_coordinate_system.origin[0],
+        position[1] - m_coordinate_system.origin[1],
+        position[2] - m_coordinate_system.origin[2]
+    };
+    vector3r_t local_position {
+        dot(m_coordinate_system.axes.p, dposition),
+        dot(m_coordinate_system.axes.q, dposition),
+        dot(m_coordinate_system.axes.r, dposition),
+    };
+
+    return local_position;
+}
+
+
 std::vector<std::complex<double>> BeamFormer::compute_geometric_response(double freq, const vector3r_t &direction) const
 {
     std::vector<std::complex<double>> result;
