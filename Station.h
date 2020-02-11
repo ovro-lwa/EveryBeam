@@ -29,6 +29,7 @@
 #include "ElementResponse.h"
 #include "Antenna.h"
 #include "BeamFormer.h"
+#include "ITRFDirection.h"
 #include "Types.h"
 
 #include <memory>
@@ -321,7 +322,16 @@ public:
 
     void set_antenna(Antenna::Ptr antenna) {itsAntenna = antenna;}
 
+
+
+
 private:
+
+    vector3r_t ncp(real_t time) const;
+    vector3r_t ncppol0(real_t time) const;
+    /** Compute the parallactic rotation. */
+    matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
+
     std::string itsName;
     vector3r_t  itsPosition;
     vector3r_t  itsPhaseReference;
@@ -330,6 +340,21 @@ private:
     Element::Ptr itsElement;
 
     Antenna::Ptr itsAntenna;
+
+    ITRFDirection::Ptr  itsNCP;
+    /** Reference direction for NCP observations.
+     *
+     * NCP pol0 is the direction used as reference in the coordinate system
+     * when the target direction is close to/at the NCP. The regular coordinate
+     * system rotates local east to that defined with respect to the NCP,
+     * which is undefined at the NCP.
+     * It is currently defined as ITRF position (1.0, 0.0, 0.0).
+     *
+     * Added by Maaijke Mevius, December 2018.
+     */
+    ITRFDirection::Ptr  itsNCPPol0;
+
+
 };
 
 // @}

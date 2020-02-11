@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <memory>
+#include <iostream>
 
 #include "Types.h"
 #include "MathUtil.h"
@@ -70,8 +71,11 @@ public:
     struct Options
     {
         real_t freq0;
-        const vector3r_t *station0;
-        const vector3r_t *tile0;
+        vector3r_t station0;
+        vector3r_t tile0;
+        bool rotate;
+        vector3r_t east;
+        vector3r_t north;
     };
 
     Antenna() :
@@ -90,7 +94,8 @@ public:
 
     Antenna(const CoordinateSystem &coordinate_system, const vector3r_t &phase_reference_position) :
         m_coordinate_system(coordinate_system),
-        m_phase_reference_position(phase_reference_position)
+        m_phase_reference_position(phase_reference_position),
+        m_enabled{true, true}
     {
     }
 
@@ -102,7 +107,16 @@ public:
     {
         // Transform direction and directions in options to local coordinatesystem
         vector3r_t local_direction = transform_to_local_direction(direction);
-        return local_response(time, freq, local_direction, options);
+        Options local_options = {
+            .freq0 = options.freq0,
+            .station0 = transform_to_local_direction(options.station0),
+            .tile0 = transform_to_local_direction(options.tile0),
+            .rotate = options.rotate,
+            .east = transform_to_local_direction(options.east),
+            .north = transform_to_local_direction(options.north)
+        };
+        matrix22c_t response = local_response(time, freq, local_direction, local_options);
+        return response;
     }
 
     diag22c_t arrayFactor(
@@ -113,7 +127,12 @@ public:
     {
         // Transform direction and directions in options to local coordinatesystem
         vector3r_t local_direction = transform_to_local_direction(direction);
-        return local_arrayFactor(time, freq, local_direction, options);
+        Options local_options = {
+            .freq0 = options.freq0,
+            .station0 = transform_to_local_direction(options.station0),
+            .tile0 = transform_to_local_direction(options.tile0)
+        };
+        return local_arrayFactor(time, freq, local_direction, local_options);
     }
 
     CoordinateSystem m_coordinate_system;

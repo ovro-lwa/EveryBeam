@@ -58,10 +58,16 @@ namespace LOFAR {
 namespace StationResponse {
 
 constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
-    {-std::sqrt(2.0), -std::sqrt(2.0), 0.0,},
-    { std::sqrt(2.0), -std::sqrt(2.0), 0.0,},
+    {-std::sqrt(.5), -std::sqrt(.5), 0.0,},
+    { std::sqrt(.5), -std::sqrt(.5), 0.0,},
     {0.0, 0.0, 1.0},
 };
+
+// constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
+//     {1.0, 0.0, 0.0,},
+//     {0.0, 1.0, 0.0,},
+//     {0.0, 0.0, 1.0},
+// };
 
 
 using namespace casacore;
@@ -111,6 +117,16 @@ void transformToFieldCoordinates(TileConfig &config,
         config[i][1] = dot(position, axes.q);
         config[i][2] = dot(position, axes.r);
     }
+}
+
+vector3r_t transformToFieldCoordinates(const vector3r_t &position,
+    const Antenna::CoordinateSystem::Axes &axes)
+{
+    const vector3r_t result{
+        dot(position, axes.p),
+        dot(position, axes.q),
+        dot(position, axes.r)};
+    return result;
 }
 
 // AntennaField::CoordinateSystem readCoordinateSystemAartfaac(
@@ -175,6 +191,10 @@ BeamFormer::Ptr make_tile(std::string name, Antenna::CoordinateSystem coordinate
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementResponse::Ptr element_response)
 {
     Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+//     std::cout << "coordinate_system: " << std::endl;
+//     std::cout << "  axes.p: " << coordinate_system.axes.p[0] << ", " << coordinate_system.axes.p[1] << ", " << coordinate_system.axes.p[2] << std::endl;
+//     std::cout << "  axes.q: " << coordinate_system.axes.q[0] << ", " << coordinate_system.axes.q[1] << ", " << coordinate_system.axes.q[2] << std::endl;
+//     std::cout << "  axes.r: " << coordinate_system.axes.r[0] << ", " << coordinate_system.axes.r[1] << ", " << coordinate_system.axes.r[2] << std::endl;
     BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
 
     ROScalarColumn<String> c_name(table, "NAME");
@@ -201,6 +221,8 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
             aips_offset(1, i).getValue(),
             aips_offset(2, i).getValue()
         };
+        antenna_position = transformToFieldCoordinates(antenna_position, coordinate_system.axes);
+//         std::cout << "antenna_position: " << antenna_position[0] << ", " << antenna_position[1] << ", " << antenna_position[2] << std::endl;
         Antenna::Ptr antenna;
         Antenna::CoordinateSystem antenna_coordinate_system{
             antenna_position,
@@ -209,11 +231,10 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
         if(name == "LBA") {
             antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
         } else {
+            // TODO
             // HBA, HBA0, HBA1
-//             antenna = make_tile(name, coordinate_system, tile_config, element_response);
+            // antenna = make_tile(name, coordinate_system, tile_config, element_response);
         }
-
-
 
         antenna->m_enabled[0] = !aips_flag(0, i);
         antenna->m_enabled[1] = !aips_flag(1, i);
@@ -302,8 +323,6 @@ Station::Ptr readStation(
         Table tab_field = getSubTable(ms, "LOFAR_ANTENNA_FIELD");
         tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
 
-        station->phaseReference();
-
         // The Station will consist of a BeamFormer that combines the fields
         // coordinate system is ITRF
         // phase reference is station position
@@ -317,9 +336,9 @@ Station::Ptr readStation(
         }
 
         // TODO
-        // If There is only one field
-        // The Station will consist of the BeamFormer returned by readAntennaField
-        // station->set_antenna(readAntennaField(tab_field, 0, station->get_element_response()));
+        // If There is only one field, the top level beamformer is not needed
+        // and the station antenna can be set the the beamformer of the field
+
         station->set_antenna(beam_former);
 
     }

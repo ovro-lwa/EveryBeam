@@ -18,6 +18,7 @@ public:
     typedef std::shared_ptr<Element> Ptr;
 
     Element(const CoordinateSystem &coordinate_system, ElementResponse::Ptr element_response, int id) :
+        Antenna(coordinate_system),
         m_id(id),
         m_element_response(element_response)
     {}

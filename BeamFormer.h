@@ -58,13 +58,11 @@ private:
         return {1.0, 1.0};
     }
 
-    vector3r_t compute_local_pointing(double time) const;
     std::vector<std::complex<double>> compute_geometric_response(double freq, const vector3r_t &direction) const;
-    std::vector<std::pair<std::complex<double>,std::complex<double>>> compute_weights(double time, double freq) const;
+    std::vector<std::pair<std::complex<double>,std::complex<double>>> compute_weights(const vector3r_t &direction, double freq) const;
 
     std::vector<Antenna::Ptr> m_antennas;
 
-    vector2r_t m_pointing;  // ra, dec
 
 };
 
