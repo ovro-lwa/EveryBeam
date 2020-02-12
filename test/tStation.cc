@@ -6,6 +6,8 @@
 #include "LofarMetaDataUtil.h"
 #include "MathUtil.h"
 
+#include "config.h"
+
 using namespace LOFAR::StationResponse;
 
 int main()
@@ -40,8 +42,7 @@ int main()
 //     std::cout << response[0][0] << std::endl;
 //
 
-//     casacore::MeasurementSet ms("/home/vdtol/data/imagtest96.MS");
-    casacore::MeasurementSet ms("/home/vdtol/imagtest_ion1/imagtest.MS");
+    casacore::MeasurementSet ms(TEST_MEASUREMENTSET);
 
     double firstTime = casacore::ScalarColumn<double>(ms, "TIME")(0);
     std::cout << firstTime << std::endl;
