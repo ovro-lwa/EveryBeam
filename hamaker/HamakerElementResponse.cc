@@ -19,10 +19,10 @@ const double pi_2 = 1.570796326794896619231322;
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::getInstance(const std::string &name)
 {
     if (name.length() >= 3) {
-        if (name.substr(name.length()-3, 3) == "LBA") {
+        if (name.find("LBA") != std::string::npos) {
             return Singleton<HamakerElementResponseLBA>::getInstance();
         }
-        if (name.substr(name.length()-3, 3) == "HBA") {
+        if (name.find("HBA") != std::string::npos) {
             return Singleton<HamakerElementResponseHBA>::getInstance();
         }
     }
