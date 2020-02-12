@@ -61,6 +61,7 @@ private:
 
     mutable casacore::MeasFrame             itsFrame;
     mutable casacore::MDirection::Convert   itsConverter;
+    mutable std::mutex                      itsMutex;
 };
 
 // @}

@@ -80,6 +80,8 @@ ITRFDirection::ITRFDirection(const vector3r_t &direction):
 
 vector3r_t ITRFDirection::at(real_t time) const
 {
+    std::lock_guard<std::mutex> lock(itsMutex);
+
     // Cannot use MeasFrame::resetEpoch(Double), because that assumes the
     // argument is UTC in (fractional) days (MJD).
     itsFrame.resetEpoch(casacore::Quantity(time, "s"));
