@@ -34,18 +34,19 @@ namespace StationResponse
  *
  * Its purpose is to have a pointer that
  *     1. can by copied/passed by value,
- *     2. can be modified after it has been copied
+ *     2. the original can be modified after it has been copied
  *     3. the copies will dereference to the new value
  *
  * This behaviour is different from a `reset` of a std::shared_ptr
- * There the copies will keep to point to the original object
+ * There the copies will keep pointing to the original object
  *
- * This pointer does not manage the object it points to
+ * The inner pointer is a shared_ptr which manages the object it points to
  *
  * Usage:
  *
  * \code
  * #include<iostream>
+ * #include "MutablePtr.h"
  *
  * class Msg {
  * public:
@@ -57,13 +58,13 @@ namespace StationResponse
  *
  * int main()
  * {
- * Msg m1("Hello from object number one");
- * Msg m2("Greetings from object number two");
+ * auto m1 = std::make_shared<Msg>("hoi");
+ * auto m2 = std::make_shared<Msg>("hallo");
  *
- * MsgMutPtr mut_ptr(&m1);
- * MsgMutPtr mut_ptr_copy = mut_ptr;
+ * MsgPtr mut_ptr(m1);
+ * auto mut_ptr_copy = mut_ptr;
  *
- * mut_ptr.set(&m2);
+ * mut_ptr.set(m2);
  *
  * std::cout << mut_ptr->text << std::endl;
  * std::cout << mut_ptr_copy->text << std::endl;
