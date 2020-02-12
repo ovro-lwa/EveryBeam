@@ -1,5 +1,7 @@
 #include "BeamFormer.h"
 
+#include "MathUtil.h"
+
 #include <cmath>
 
 constexpr double speed_of_light = 299792458.0;

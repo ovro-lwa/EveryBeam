@@ -6,7 +6,6 @@
 
 #include "Element.h"
 #include "Types.h"
-#include "MathUtil.h"
 
 namespace LOFAR {
 namespace StationResponse {
