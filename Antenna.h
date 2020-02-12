@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Types.h"
-#include "MathUtil.h"
 
 namespace LOFAR {
 namespace StationResponse {
@@ -154,16 +153,7 @@ private:
         const Options &options) const
     { return {1.0, 1.0}; }
 
-    vector3r_t transform_to_local_direction(const vector3r_t &direction) {
-        vector3r_t local_direction {
-            dot(m_coordinate_system.axes.p, direction),
-            dot(m_coordinate_system.axes.q, direction),
-            dot(m_coordinate_system.axes.r, direction),
-        };
-
-        return local_direction;
-    }
-
+    vector3r_t transform_to_local_direction(const vector3r_t &direction);
 
 };
 

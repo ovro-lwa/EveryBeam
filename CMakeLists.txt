@@ -38,6 +38,7 @@ add_subdirectory(oskar)
 add_compile_options(-std=c++11 -Wall -DNDEBUG -Wl,--no-undefined)
 
 add_library(stationresponse SHARED
+  Antenna.cc
   ElementResponse.cc
   BeamFormer.cc
   Element.cc
