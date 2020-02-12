@@ -228,9 +228,10 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
             antenna_position,
             lofar_antenna_orientation
         };
-        if(name == "LBA") {
+        if (name == "LBA") {
             antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
         } else {
+            antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
             // TODO
             // HBA, HBA0, HBA1
             // antenna = make_tile(name, coordinate_system, tile_config, element_response);
