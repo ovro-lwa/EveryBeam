@@ -27,7 +27,7 @@ include_directories(${HDF5_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
-find_package(Casacore REQUIRED COMPONENTS casa ms tables measures)
+find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
 include_directories(${CASACORE_INCLUDE_DIR})
 
 # Add element models

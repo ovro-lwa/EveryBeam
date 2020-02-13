@@ -39,3 +39,28 @@ if (TEST_MEASUREMENTSET)
   )
   add_test(station tStation)
 endif()
+
+find_package(CFITSIO)
+
+if (CFITSIO_FOUND)
+  add_library(fitsio SHARED fitsreader.cpp fitswriter.cpp fitsiochecker.cpp)
+  target_include_directories(fitsio PUBLIC ${CFITSIO_INCLUDE_DIR})
+  target_include_directories(fitsio PUBLIC ${CASACORE_INCLUDE_DIR})
+  target_link_libraries(fitsio PUBLIC ${CFITSIO_LIBRARY})
+  target_link_libraries(fitsio PUBLIC ${CASACORE_LIBRARIES})
+  target_link_libraries(fitsio PUBLIC ${CASA_FITS_LIBRARY}) # TODO: why is this needed?
+
+  add_library(beamhelper SHARED beam-helper.cpp)
+  target_include_directories(beamhelper PUBLIC ${BEAMMODEL_INCLUDE_DIR})
+  target_link_libraries(beamhelper PUBLIC ${BEAMMODEL_LIBRARIES})
+  target_link_libraries(beamhelper PUBLIC fitsio)
+
+  add_executable(tStationBeamHamaker.x tStationBeamHamaker.cc)
+  target_link_libraries(tStationBeamHamaker.x PUBLIC beamhelper)
+  target_include_directories(tStationBeamHamaker.x PUBLIC ${CMAKE_BINARY_DIR})
+
+  find_package(OpenMP)
+  if (OpenMP_CXX_FOUND)
+      target_link_libraries(tStationBeamHamaker.x PUBLIC OpenMP::OpenMP_CXX)
+  endif()
+endif()
