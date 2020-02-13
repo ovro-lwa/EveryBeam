@@ -8,6 +8,7 @@ matrix22c_t Element::local_response(
     real_t time,
     real_t freq,
     const vector3r_t &direction,
+    size_t id,
     const Options &options) const
 {
     vector2r_t thetaphi = cart2thetaphi(direction);
@@ -26,6 +27,15 @@ matrix22c_t Element::local_response(
         result = result * rotation;
     }
     return result;
+}
+
+matrix22c_t Element::local_response(
+    real_t time,
+    real_t freq,
+    const vector3r_t &direction,
+    const Options &options) const
+{
+    return local_response(time, freq, direction, m_id, options);
 }
 
 } // namespace StationResponse

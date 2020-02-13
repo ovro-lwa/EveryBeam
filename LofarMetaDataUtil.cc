@@ -342,6 +342,13 @@ Station::Ptr readStation(
 
         station->set_antenna(beam_former);
 
+        size_t field_id = 0;
+        size_t element_id = 0;
+        Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(tab_field, field_id);
+        auto model = station->get_element_response();
+        // TODO: rotate coordinate system for antenna
+        auto element = Element::Ptr(new Element(coordinate_system, model, element_id));
+        station->set_element(element);
     }
     else if (telescope_name == "AARTFAAC")
     {

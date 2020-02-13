@@ -94,6 +94,23 @@ const vector3r_t &Station::phaseReference() const
 }
 
 // ========================================================
+matrix22c_t Station::elementResponse(real_t time, real_t freq,
+    const vector3r_t &direction, size_t id, const bool rotate) const
+{
+    Antenna::Options options = {
+          .rotate = rotate
+    };
+
+    if (rotate) {
+        vector3r_t ncp_ = ncp(time);
+        vector3r_t east = normalize(cross(ncp_, direction));
+        vector3r_t north = cross(direction, east);
+        options.east = east;
+        options.north = north;
+    }
+
+  return itsElement->local_response(time, freq, direction, id, options);
+}
 
 matrix22c_t Station::elementResponse(real_t time, real_t freq,
     const vector3r_t &direction, const bool rotate) const

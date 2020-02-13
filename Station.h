@@ -310,6 +310,9 @@ public:
     const ElementResponse::Ptr get_element_response() {return itsElementResponse;}
 
     matrix22c_t elementResponse(real_t time, real_t freq,
+        const vector3r_t &direction, size_t id, const bool rotate) const;
+
+    matrix22c_t elementResponse(real_t time, real_t freq,
         const vector3r_t &direction, const bool rotate = true) const;
 
     matrix22c_t response(
@@ -322,6 +325,7 @@ public:
 
     void set_antenna(Antenna::Ptr antenna) {itsAntenna = antenna;}
 
+    void set_element(Element::Ptr element) {itsElement = element;}
 
 
 
