@@ -51,8 +51,8 @@ if (CFITSIO_FOUND)
   target_link_libraries(fitsio PUBLIC ${CASA_FITS_LIBRARY}) # TODO: why is this needed?
 
   add_library(beamhelper SHARED beam-helper.cpp)
-  target_include_directories(beamhelper PUBLIC ${BEAMMODEL_INCLUDE_DIR})
-  target_link_libraries(beamhelper PUBLIC ${BEAMMODEL_LIBRARIES})
+  target_include_directories(beamhelper PUBLIC "${CMAKE_SOURCE_DIR}")
+  target_link_libraries(beamhelper PUBLIC stationresponse)
   target_link_libraries(beamhelper PUBLIC fitsio)
 
   add_executable(tStationBeamHamaker.x tStationBeamHamaker.cc)

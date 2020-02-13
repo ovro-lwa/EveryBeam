@@ -1,8 +1,8 @@
-#include <StationResponse/ITRFDirection.h>
-#include <StationResponse/ITRFConverter.h>
-#include <StationResponse/ElementResponse.h>
-#include <StationResponse/Station.h>
-#include <StationResponse/LofarMetaDataUtil.h>
+#include <ITRFDirection.h>
+#include <ITRFConverter.h>
+#include <ElementResponse.h>
+#include <Station.h>
+#include <LofarMetaDataUtil.h>
 
 #include <casacore/measures/Measures/MPosition.h>
 #include <casacore/measures/Measures/MEpoch.h>
