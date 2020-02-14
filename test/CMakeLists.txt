@@ -71,6 +71,14 @@ if (CFITSIO_FOUND)
   target_link_libraries(tElementBeamHamaker.x PUBLIC beamhelper)
   target_include_directories(tElementBeamHamaker.x PUBLIC ${CMAKE_BINARY_DIR})
 
+  add_executable(tElementBeamOSKARDipole.x tElementBeamOSKARDipole.cc)
+  target_link_libraries(tElementBeamOSKARDipole.x PUBLIC beamhelper)
+  target_include_directories(tElementBeamOSKARDipole.x PUBLIC ${CMAKE_BINARY_DIR})
+
+  add_executable(tElementBeamOSKARSphericalWave.x tElementBeamOSKARSphericalWave.cc)
+  target_link_libraries(tElementBeamOSKARSphericalWave.x PUBLIC beamhelper)
+  target_include_directories(tElementBeamOSKARSphericalWave.x PUBLIC ${CMAKE_BINARY_DIR})
+
   find_package(OpenMP)
   if (OpenMP_CXX_FOUND)
       target_link_libraries(tStationBeamHamaker.x PUBLIC OpenMP::OpenMP_CXX)
