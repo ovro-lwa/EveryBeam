@@ -59,9 +59,8 @@ void run(
     std::cout << ">> Opening measurementset: " << input_filename << std::endl;
     casacore::MeasurementSet ms(input_filename);
 
-    // Read centre frequency
-    double centreFrequency = 132e6; // Mhz
-    std::clog << "Centre frequency: " << centreFrequency * 1e-6 << " Mhz" << std::endl;
+    // Print frequency
+    std::clog << "Frequency: " << frequency * 1e-6 << " Mhz" << std::endl;
 
     // Read number of stations
     size_t nr_stations = ms.antenna().nrow();
@@ -114,7 +113,7 @@ void run(
     std::cout << ">>> Computing station beams" << std::endl;
 	std::vector<std::complex<float>> aTermBuffer;
     aTermBuffer.resize(subgrid_size*subgrid_size*4*nr_stations);
-    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, useDifferentialBeam, diffBeamDirection, subgrid_size, aTermBuffer, currentTime, centreFrequency);
+    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, useDifferentialBeam, diffBeamDirection, subgrid_size, aTermBuffer, currentTime, frequency);
 
     // Store aterm
     std::cout << ">>> Writing beam images to: " << output_filename << std::endl;
