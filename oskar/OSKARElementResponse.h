@@ -1,7 +1,7 @@
 #include "../ElementResponse.h"
 #include "../Singleton.h"
 
-#include "OskarSphericalWaveCoeff.h"
+#include "OSKARSphericalWaveCoeff.h"
 
 #include <memory>
 

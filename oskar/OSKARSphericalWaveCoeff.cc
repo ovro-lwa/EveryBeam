@@ -1,4 +1,4 @@
-#include "OskarSphericalWaveCoeff.h"
+#include "OSKARSphericalWaveCoeff.h"
 
 size_t OskarSphericalWaveCoefficients::get_index(
     const unsigned int element,
