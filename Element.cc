@@ -15,7 +15,7 @@ matrix22c_t Element::local_response(
 
     matrix22c_t result;
     static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t));
-    m_element_response->response(m_id, freq, thetaphi[0], thetaphi[1], reinterpret_cast<std::complex<double> (&)[2][2]>(result));
+    m_element_response->response(id, freq, thetaphi[0], thetaphi[1], reinterpret_cast<std::complex<double> (&)[2][2]>(result));
 
     if (options.rotate) {
         vector3r_t up = {0.0, 0.0, 1.0};
