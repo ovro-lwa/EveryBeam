@@ -82,6 +82,7 @@ public:
     T& operator*() const { return **(this->get()); }
     std::shared_ptr<T> operator->() const { return *(this->get()); }
     void set(std::shared_ptr<T> ptr) { *(this->get()) = ptr;}
+    explicit operator bool() const noexcept {return **this;}
 };
 
 } //# namespace StationResponse
