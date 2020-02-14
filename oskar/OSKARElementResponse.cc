@@ -48,10 +48,6 @@ void OSKARElementResponseSphericalWave::response(
     double phi,
     std::complex<double> (&response)[2][2]) const
 {
-    // DEBUG
-    // For now fix frequency
-    freq = 140e6;
-
     auto dataset = m_datafile->get(freq);
     auto l_max = dataset->get_l_max();
 
