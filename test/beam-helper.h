@@ -38,6 +38,13 @@ void StoreATermsReal(
     size_t width,
     size_t height);
 
+void StoreBeam(
+    const std::string& filename,
+    const std::complex<float>* buffer,
+    size_t nStations,
+    size_t width,
+    size_t height);
+
 void setITRFVector(
     const casacore::MDirection& itrfDir,
     vector3r_t& itrf);

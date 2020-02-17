@@ -116,5 +116,5 @@ void run(
 
     // Store aterm
     std::string aterms_filename(output_filename);
-    StoreATermsReal(aterms_filename, aTermBuffer.data(), nr_antennas, subgrid_size, subgrid_size);
+    StoreBeam(aterms_filename, aTermBuffer.data(), nr_antennas, subgrid_size, subgrid_size);
 }

@@ -116,6 +116,38 @@ void StoreATermsReal(
 	writer.Write(filename, img.data());
 }
 
+void StoreBeam(
+    const std::string& filename,
+    const std::complex<float>* buffer,
+    size_t nStations,
+    size_t width,
+    size_t height)
+{
+	size_t ny = floor(sqrt(nStations)), nx = (nStations+ny-1) / ny;
+    std::cout << "Storing " << filename << " (" << nStations << " ant, " << nx << " x " << ny << ")\n";
+    std::vector<double> img(nx*ny * width*height, 0.0);
+	for(size_t ant=0; ant!=nStations; ++ant)
+	{
+        typedef std::complex<float> Data[nStations][height][width][4];
+        Data* data_ptr = (Data *) buffer;
+
+		size_t xCorner = (ant%nx)*width, yCorner = (ant/nx)*height;
+		for(size_t y=0; y!=height; ++y)
+		{
+			for(size_t x=0; x!=width; ++x)
+			{
+				std::complex<float> xx = (*data_ptr)[ant][y][x][0];
+				std::complex<float> yy = (*data_ptr)[ant][y][x][3];
+                std::complex<float> response = xx * conj(xx) + yy*conj(yy);
+				img[(yCorner + y)*width*nx + x + xCorner] = abs(response);
+			}
+		}
+	}
+	FitsWriter writer;
+	writer.SetImageDimensions(nx*width, ny*height);
+	writer.Write(filename, img.data());
+}
+
 void setITRFVector(
     const casacore::MDirection& itrfDir,
     vector3r_t& itrf)

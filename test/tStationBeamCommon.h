@@ -117,5 +117,5 @@ void run(
 
     // Store aterm
     std::cout << ">>> Writing beam images to: " << output_filename << std::endl;
-    StoreATermsReal(output_filename, aTermBuffer.data(), nr_stations, subgrid_size, subgrid_size);
+    StoreBeam(output_filename, aTermBuffer.data(), nr_stations, subgrid_size, subgrid_size);
 }
