@@ -43,17 +43,11 @@ endif()
 find_package(CFITSIO)
 
 if (CFITSIO_FOUND)
-  add_library(fitsio SHARED fitsreader.cpp fitswriter.cpp fitsiochecker.cpp)
-  target_include_directories(fitsio PUBLIC ${CFITSIO_INCLUDE_DIR})
-  target_include_directories(fitsio PUBLIC ${CASACORE_INCLUDE_DIR})
-  target_link_libraries(fitsio PUBLIC ${CFITSIO_LIBRARY})
-  target_link_libraries(fitsio PUBLIC ${CASACORE_LIBRARIES})
-  target_link_libraries(fitsio PUBLIC ${CASA_FITS_LIBRARY}) # TODO: why is this needed?
-
   add_library(beamhelper SHARED beam-helper.cpp)
   target_include_directories(beamhelper PUBLIC "${CMAKE_SOURCE_DIR}")
+  target_include_directories(beamhelper PUBLIC ${CFITSIO_INCLUDE_DIR})
   target_link_libraries(beamhelper PUBLIC stationresponse)
-  target_link_libraries(beamhelper PUBLIC fitsio)
+  target_link_libraries(beamhelper PUBLIC ${CFITSIO_LIBRARY})
 
   add_executable(tStationBeamHamaker tStationBeamHamaker.cc)
   target_link_libraries(tStationBeamHamaker PUBLIC beamhelper)

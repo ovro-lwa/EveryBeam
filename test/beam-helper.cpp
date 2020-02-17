@@ -1,6 +1,6 @@
 #include "beam-helper.h"
 
-#include "fitswriter.h"
+#include <fitsio.h>
 
 void GetPhaseCentreInfo(
     casacore::MeasurementSet& ms,
@@ -86,6 +86,56 @@ void GetITRFDirections(
     }
 }
 
+void CheckFitsStatus(
+    int status,
+    const std::string& filename)
+{
+	if (status) {
+		/* fits_get_errstatus returns at most 30 characters */
+		char err_text[31];
+		fits_get_errstatus(status, err_text);
+		char err_msg[81];
+		std::stringstream errMsg;
+		errMsg << "CFITSIO reported error when performing IO on file '" << filename << "': " << err_text << " (";
+		while (fits_read_errmsg(err_msg))
+        {
+			errMsg << err_msg;
+        }
+		errMsg << ')';
+		throw std::runtime_error(errMsg.str());
+	}
+}
+
+template<typename  NumType>
+void WriteFits(
+    const std::string& filename,
+    const NumType* image,
+    size_t width,
+    size_t height)
+{
+	// Open file
+	fitsfile *fptr;
+	int status = 0;
+	fits_create_file(&fptr, (std::string("!") + filename).c_str(), &status);
+	CheckFitsStatus(status, filename);
+
+	// Write header
+    long axes[] = {(long) width, (long) height};
+	fits_create_img(fptr, FLOAT_IMG, 2, axes, &status);
+    CheckFitsStatus(status, filename);
+
+    // Write image
+	long pixel[4] = { 1, 1, 1, 1};
+	double nullValue = std::numeric_limits<double>::max();
+	size_t totalSize = width * height;
+	fits_write_pixnull(fptr, TDOUBLE, pixel, totalSize, (void *) image, &nullValue, &status);
+	CheckFitsStatus(status, filename);
+
+	// Close file
+	fits_close_file(fptr, &status);
+	CheckFitsStatus(status, filename);
+}
+
 void StoreATermsReal(
     const std::string& filename,
     const std::complex<float>* buffer,
@@ -111,9 +161,7 @@ void StoreATermsReal(
 			}
 		}
 	}
-	FitsWriter writer;
-	writer.SetImageDimensions(nx*width, ny*height);
-	writer.Write(filename, img.data());
+    WriteFits<double>(filename, img.data(), nx*width, ny*height);
 }
 
 void StoreBeam(
@@ -143,9 +191,7 @@ void StoreBeam(
 			}
 		}
 	}
-	FitsWriter writer;
-	writer.SetImageDimensions(nx*width, ny*height);
-	writer.Write(filename, img.data());
+    WriteFits<double>(filename, img.data(), nx*width, ny*height);
 }
 
 void setITRFVector(
