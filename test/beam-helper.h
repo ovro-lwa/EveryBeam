@@ -31,13 +31,6 @@ void GetITRFDirections(
     double phaseCentreRA,
     double phaseCentreDec);
 
-void StoreATermsReal(
-    const std::string& filename,
-    const std::complex<float>* buffer,
-    size_t nStations,
-    size_t width,
-    size_t height);
-
 void StoreBeam(
     const std::string& filename,
     const std::complex<float>* buffer,
