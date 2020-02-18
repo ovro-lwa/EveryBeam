@@ -7,51 +7,85 @@ constexpr double speed_of_light = 299792458.0;
 namespace LOFAR {
 namespace StationResponse {
 
+vector3r_t BeamFormer::transform_to_local_position(const vector3r_t &position) {
+    vector3r_t dposition {
+        position[0] - m_coordinate_system.origin[0],
+        position[1] - m_coordinate_system.origin[1],
+        position[2] - m_coordinate_system.origin[2]
+    };
+    vector3r_t local_position {
+        dot(m_coordinate_system.axes.p, dposition),
+        dot(m_coordinate_system.axes.q, dposition),
+        dot(m_coordinate_system.axes.r, dposition),
+    };
+
+    return local_position;
+}
+
+
 std::vector<std::complex<double>> BeamFormer::compute_geometric_response(double freq, const vector3r_t &direction) const
 {
     std::vector<std::complex<double>> result;
     result.reserve(m_antennas.size());
     for (auto &antenna : m_antennas)
     {
-        double dl = direction[0] * antenna->m_position[0] +
-                    direction[1] * antenna->m_position[1] +
-                    direction[2] * antenna->m_position[2];
+//         std::cout << "(" << antenna->m_phase_reference_position[0] << ", " <<
+//             antenna->m_phase_reference_position[1] << ", " <<
+//             antenna->m_phase_reference_position[2] << ")" << std::endl;
+//
+//         std::cout << "(" << m_local_phase_reference_position[0] << ", " <<
+//             m_local_phase_reference_position[1] << ", " <<
+//             m_local_phase_reference_position[2] << ")" << std::endl;
+//
+//         std::cout << "(" << (antenna->m_phase_reference_position[0] - m_local_phase_reference_position[0]) << ", " <<
+//             (antenna->m_phase_reference_position[1] - m_local_phase_reference_position[1]) << ", " <<
+//             (antenna->m_phase_reference_position[2] - m_local_phase_reference_position[2]) << ")" << std::endl;
+//
+//         std::cout << "======" << std::endl;
 
-        double phase = 2 * M_PI * dl * speed_of_light * freq;
+        double dl = direction[0] * (antenna->m_phase_reference_position[0] - m_local_phase_reference_position[0]) +
+                    direction[1] * (antenna->m_phase_reference_position[1] - m_local_phase_reference_position[1]) +
+                    direction[2] * (antenna->m_phase_reference_position[2] - m_local_phase_reference_position[2]);
+
+        double phase = -2 * M_PI * dl / (speed_of_light / freq);
         result.push_back({std::sin(phase), std::cos(phase)});
     }
     return result;
 }
 
-vector3r_t BeamFormer::compute_local_pointing(double time) const
-{
-    return {m_pointing[0], m_pointing[1], m_pointing[1]};
-}
-
-
-std::vector<std::pair<std::complex<double>,std::complex<double>>> BeamFormer::compute_weights(double time, double freq) const
+std::vector<std::pair<std::complex<double>,std::complex<double>>> BeamFormer::compute_weights(const vector3r_t &pointing, double freq) const
 {
     std::vector<std::pair<std::complex<double>,std::complex<double>>> result;
-
-    vector3r_t pointing = compute_local_pointing(time);
-
+    double weight_sum[2] = {0.0, 0.0};
     auto geometric_response = compute_geometric_response(freq, pointing);
     result.reserve(geometric_response.size());
-    for (auto phasor : geometric_response)
+    for (unsigned int antenna_idx = 0; antenna_idx < m_antennas.size(); ++antenna_idx)
     {
-        result.push_back({std::conj(phasor), std::conj(phasor)});
+        auto phasor = geometric_response[antenna_idx];
+        result.push_back({
+            std::conj(phasor) * (1.0 * m_antennas[antenna_idx]->m_enabled[0]),
+            std::conj(phasor) * (1.0 * m_antennas[antenna_idx]->m_enabled[1])
+        });
+        weight_sum[0] += (1.0 * m_antennas[antenna_idx]->m_enabled[0]);
+        weight_sum[1] += (1.0 * m_antennas[antenna_idx]->m_enabled[1]);
     }
+    for (unsigned int antenna_idx = 0; antenna_idx < m_antennas.size(); ++antenna_idx)
+    {
+        result[antenna_idx].first /= weight_sum[0];
+        result[antenna_idx].second /= weight_sum[1];
+    }
+
     return result;
 }
 
 
-matrix22c_t BeamFormer::response(
+matrix22c_t BeamFormer::local_response(
     real_t time,
     real_t freq,
     const vector3r_t &direction,
     const Options &options) const
 {
-    auto weights = compute_weights(time, freq);
+    auto weights = compute_weights(options.station0, options.freq0);
     auto geometric_response = compute_geometric_response(freq, direction);
 
     matrix22c_t result = {0};

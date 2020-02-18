@@ -57,6 +57,19 @@
 namespace LOFAR {
 namespace StationResponse {
 
+constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
+    {-std::sqrt(.5), -std::sqrt(.5), 0.0,},
+    { std::sqrt(.5), -std::sqrt(.5), 0.0,},
+    {0.0, 0.0, 1.0},
+};
+
+// constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
+//     {1.0, 0.0, 0.0,},
+//     {0.0, 1.0, 0.0,},
+//     {0.0, 0.0, 1.0},
+// };
+
+
 using namespace casacore;
 
 typedef std::array<vector3r_t, 16>    TileConfig;
@@ -95,7 +108,7 @@ TileConfig readTileConfig(const Table &table, unsigned int row)
 }
 
 void transformToFieldCoordinates(TileConfig &config,
-    const Station::CoordinateSystem::Axes &axes)
+    const Antenna::CoordinateSystem::Axes &axes)
 {
     for(unsigned int i = 0; i < config.size(); ++i)
     {
@@ -104,6 +117,16 @@ void transformToFieldCoordinates(TileConfig &config,
         config[i][1] = dot(position, axes.q);
         config[i][2] = dot(position, axes.r);
     }
+}
+
+vector3r_t transformToFieldCoordinates(const vector3r_t &position,
+    const Antenna::CoordinateSystem::Axes &axes)
+{
+    const vector3r_t result{
+        dot(position, axes.p),
+        dot(position, axes.q),
+        dot(position, axes.r)};
+    return result;
 }
 
 // AntennaField::CoordinateSystem readCoordinateSystemAartfaac(
@@ -132,7 +155,7 @@ void transformToFieldCoordinates(TileConfig &config,
 //     return system;
 // }
 
-Station::CoordinateSystem readCoordinateSystem(const Table &table,
+Antenna::CoordinateSystem readCoordinateSystem(const Table &table,
     unsigned int id)
 {
     ROArrayQuantColumn<Double> c_position(table, "POSITION", "m");
@@ -156,19 +179,23 @@ Station::CoordinateSystem readCoordinateSystem(const Table &table,
     vector3r_t r = {{aips_axes(0, 2).getValue(), aips_axes(1, 2).getValue(),
         aips_axes(2, 2).getValue()}};
 
-    Station::CoordinateSystem coordinate_system = {position, {p, q, r}};
+    Antenna::CoordinateSystem coordinate_system = {position, {p, q, r}};
     return coordinate_system;
 }
 
-BeamFormer::Ptr make_tile(std::string name, Station::CoordinateSystem coordinate_system,
+BeamFormer::Ptr make_tile(std::string name, Antenna::CoordinateSystem coordinate_system,
                           TileConfig tile_config, ElementResponse::Ptr)
 {
 }
 
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementResponse::Ptr element_response)
 {
-    BeamFormer::Ptr beam_former(new BeamFormer());
-    Station::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+    Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+//     std::cout << "coordinate_system: " << std::endl;
+//     std::cout << "  axes.p: " << coordinate_system.axes.p[0] << ", " << coordinate_system.axes.p[1] << ", " << coordinate_system.axes.p[2] << std::endl;
+//     std::cout << "  axes.q: " << coordinate_system.axes.q[0] << ", " << coordinate_system.axes.q[1] << ", " << coordinate_system.axes.q[2] << std::endl;
+//     std::cout << "  axes.r: " << coordinate_system.axes.r[0] << ", " << coordinate_system.axes.r[1] << ", " << coordinate_system.axes.r[2] << std::endl;
+    BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
 
     ROScalarColumn<String> c_name(table, "NAME");
     ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
@@ -183,23 +210,32 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
     Matrix<Bool> aips_flag = c_flag(id);
     assert(aips_flag.shape().isEqual(IPosition(2, 2, aips_offset.ncolumn())));
 
-    TileConfig tile_config;
-    if(name != "LBA") readTileConfig(table, id);
-
-    transformToFieldCoordinates(tile_config, coordinate_system.axes);
+//     TileConfig tile_config;
+//     if(name != "LBA") readTileConfig(table, id);
+//     transformToFieldCoordinates(tile_config, coordinate_system.axes);
 
     for(size_t i = 0; i < aips_offset.ncolumn(); ++i)
     {
+        vector3r_t antenna_position = {
+            aips_offset(0, i).getValue(),
+            aips_offset(1, i).getValue(),
+            aips_offset(2, i).getValue()
+        };
+        antenna_position = transformToFieldCoordinates(antenna_position, coordinate_system.axes);
+//         std::cout << "antenna_position: " << antenna_position[0] << ", " << antenna_position[1] << ", " << antenna_position[2] << std::endl;
         Antenna::Ptr antenna;
+        Antenna::CoordinateSystem antenna_coordinate_system{
+            antenna_position,
+            lofar_antenna_orientation
+        };
         if(name == "LBA") {
-            antenna = Element::Ptr(new Element(id, element_response));
+            antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
         } else {
+            // TODO
             // HBA, HBA0, HBA1
-            antenna = make_tile(name, coordinate_system, tile_config, element_response);
+            // antenna = make_tile(name, coordinate_system, tile_config, element_response);
         }
-        antenna->m_position[0] = aips_offset(0, i).getValue();
-        antenna->m_position[1] = aips_offset(1, i).getValue();
-        antenna->m_position[2] = aips_offset(2, i).getValue();
+
         antenna->m_enabled[0] = !aips_flag(0, i);
         antenna->m_enabled[1] = !aips_flag(1, i);
         beam_former->add_antenna(antenna);
@@ -239,9 +275,9 @@ BeamFormer::Ptr readAntennaFieldAartfaac(const Table &table, const string &ant_t
     return field;
 }
 
-void readStationPhaseReference(const Table &table, unsigned int id,
-    const Station::Ptr &station)
+vector3r_t readStationPhaseReference(const Table &table, unsigned int id)
 {
+    vector3r_t phase_reference = {0.0, 0.0, 0.0};
     const string columnName("LOFAR_PHASE_REFERENCE");
     if(hasColumn(table, columnName))
     {
@@ -249,11 +285,9 @@ void readStationPhaseReference(const Table &table, unsigned int id,
         MPosition mReference = MPosition::Convert(c_reference(id),
             MPosition::ITRF)();
         MVPosition mvReference = mReference.getValue();
-        vector3r_t reference = {{mvReference(0), mvReference(1),
-            mvReference(2)}};
-
-        station->setPhaseReference(reference);
+        phase_reference = {mvReference(0), mvReference(1), mvReference(2)};
     }
+    return phase_reference;
 }
 
 Station::Ptr readStation(
@@ -277,7 +311,7 @@ Station::Ptr readStation(
     Station::Ptr station(new Station(name, position, model));
 
     // Read phase reference position (if available).
-    readStationPhaseReference(ms.antenna(), id, station);
+    station->setPhaseReference(readStationPhaseReference(ms.antenna(), id));
 
     // Read antenna field information.
     ROScalarColumn<String> telescope_name_col(getSubTable(ms, "OBSERVATION"),
@@ -289,23 +323,24 @@ Station::Ptr readStation(
         Table tab_field = getSubTable(ms, "LOFAR_ANTENNA_FIELD");
         tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
 
-        if (tab_field.nrow() == 1)
+        // The Station will consist of a BeamFormer that combines the fields
+        // coordinate system is ITRF
+        // phase reference is station position
+        auto beam_former = BeamFormer::Ptr(new BeamFormer(
+            Antenna::identity_coordinate_system,
+            station->phaseReference()));
+
+        for(size_t i = 0; i < tab_field.nrow(); ++i)
         {
-            // There is only one field
-            // The Station will consist of the BeamFormer returned by readAntennaField
-            station->set_antenna(readAntennaField(tab_field, 0, station->get_element_response()));
+            beam_former->add_antenna(readAntennaField(tab_field, i, station->get_element_response()));
         }
-        else
-        {
-            // There are multiple fields
-            // The Station will consist of a BeamFormer that combines the fields
-            auto beam_former = BeamFormer::Ptr(new BeamFormer());
-            for(size_t i = 0; i < tab_field.nrow(); ++i)
-            {
-                beam_former->add_antenna(readAntennaField(tab_field, i, station->get_element_response()));
-            }
-            station->set_antenna(beam_former);
-        }
+
+        // TODO
+        // If There is only one field, the top level beamformer is not needed
+        // and the station antenna can be set the the beamformer of the field
+
+        station->set_antenna(beam_former);
+
     }
     else if (telescope_name == "AARTFAAC")
     {

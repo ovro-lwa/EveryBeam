@@ -29,6 +29,7 @@
 #include "ElementResponse.h"
 #include "Antenna.h"
 #include "BeamFormer.h"
+#include "ITRFDirection.h"
 #include "Types.h"
 
 #include <memory>
@@ -305,45 +306,6 @@ public:
     // ===================================================================
     // New methods introduced in refactor
     // ==================================================================
-    /**
-     *  \brief Station coordinate system.
-     *
-     *  A right handed, cartesian, local coordinate system with coordinate axes
-     *  \p p, \p q, and \p r is associated with each antenna field.
-     *
-     *  The r-axis is orthogonal to the antenna field, and points towards the
-     *  local pseudo zenith.
-     *
-     *  The q-axis is the northern bisector of the \p X and \p Y dipoles, i.e.
-     *  it is the reference direction from which the orientation of the dual
-     *  dipole antennae is determined. The q-axis points towards the North at
-     *  the core. At remote sites it is defined as the intersection of the
-     *  antenna field plane and a plane parallel to the meridian plane at the
-     *  core. This ensures the reference directions at all sites are similar.
-     *
-     *  The p-axis is orthogonal to both other axes, and points towards the East
-     *  at the core.
-     *
-     *  The axes and origin of the anntena field coordinate system are expressed
-     *  as vectors in the geocentric, cartesian, ITRF coordinate system, in
-     *  meters.
-     *
-     *  \sa "LOFAR Reference Plane and Reference Direction", M.A. Brentjens,
-     *  LOFAR-ASTRON-MEM-248.
-     */
-    struct CoordinateSystem
-    {
-        struct Axes
-        {
-            vector3r_t  p;
-            vector3r_t  q;
-            vector3r_t  r;
-        };
-
-        vector3r_t  origin;
-        Axes        axes;
-    };
-
 
     const ElementResponse::Ptr get_element_response() {return itsElementResponse;}
 
@@ -360,7 +322,16 @@ public:
 
     void set_antenna(Antenna::Ptr antenna) {itsAntenna = antenna;}
 
+
+
+
 private:
+
+    vector3r_t ncp(real_t time) const;
+    vector3r_t ncppol0(real_t time) const;
+    /** Compute the parallactic rotation. */
+    matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
+
     std::string itsName;
     vector3r_t  itsPosition;
     vector3r_t  itsPhaseReference;
@@ -369,6 +340,21 @@ private:
     Element::Ptr itsElement;
 
     Antenna::Ptr itsAntenna;
+
+    ITRFDirection::Ptr  itsNCP;
+    /** Reference direction for NCP observations.
+     *
+     * NCP pol0 is the direction used as reference in the coordinate system
+     * when the target direction is close to/at the NCP. The regular coordinate
+     * system rotates local east to that defined with respect to the NCP,
+     * which is undefined at the NCP.
+     * It is currently defined as ITRF position (1.0, 0.0, 0.0).
+     *
+     * Added by Maaijke Mevius, December 2018.
+     */
+    ITRFDirection::Ptr  itsNCPPol0;
+
+
 };
 
 // @}
