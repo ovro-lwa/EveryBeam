@@ -5,7 +5,7 @@
 #include "beam-helper.h"
 
 void calculateStationBeams(
-	std::vector<LOFAR::StationResponse::Station::Ptr>& stations,
+    std::vector<LOFAR::StationResponse::Station::Ptr>& stations,
     std::vector<vector3r_t>& itrfDirections,
     vector3r_t stationDirection,
     vector3r_t tileDirection,
@@ -17,7 +17,7 @@ void calculateStationBeams(
     Data* data_ptr = (Data *) buffer.data();
 
     #pragma omp parallel for
-	for (size_t s = 0; s < stations.size(); s++) {
+    for (size_t s = 0; s < stations.size(); s++) {
         for (unsigned y = 0; y < subgrid_size; y++) {
             for (unsigned x = 0; x < subgrid_size; x++) {
                 auto direction = itrfDirections[y * subgrid_size + x];
@@ -76,9 +76,9 @@ void run(
     double currentTime = timeColumn(nr_timesteps / 2);
 
     // Read stations
-	std::vector<LOFAR::StationResponse::Station::Ptr> stations;
+    std::vector<LOFAR::StationResponse::Station::Ptr> stations;
     stations.resize(nr_stations);
-	readStations(ms, stations.begin(), elementResponseModel);
+    readStations(ms, stations.begin(), elementResponseModel);
 
     // Imaging parameters
     float image_size = 0.5; // in radians
@@ -97,11 +97,11 @@ void run(
 
     // Compute station beams
     std::cout << ">>> Computing station beams" << std::endl;
-	std::vector<std::complex<float>> aTermBuffer;
-    aTermBuffer.resize(subgrid_size*subgrid_size*4*nr_stations);
-    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, subgrid_size, aTermBuffer, currentTime, frequency);
+    std::vector<std::complex<float>> beams;
+    beams.resize(subgrid_size*subgrid_size*4*nr_stations);
+    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, subgrid_size, beams, currentTime, frequency);
 
     // Store aterm
     std::cout << ">>> Writing beam images to: " << output_filename << std::endl;
-    StoreBeam(output_filename, aTermBuffer.data(), nr_stations, subgrid_size, subgrid_size);
+    StoreBeam(output_filename, beams.data(), nr_stations, subgrid_size, subgrid_size);
 }
