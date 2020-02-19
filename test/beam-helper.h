@@ -14,8 +14,7 @@
 #include <casacore/tables/Tables/TableRecord.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
-using matrix22c_t = LOFAR::StationResponse::matrix22c_t;
-using vector3r_t = LOFAR::StationResponse::vector3r_t;
+using namespace LOFAR::StationResponse;
 
 void GetPhaseCentreInfo(
     casacore::MeasurementSet& ms,
