@@ -79,3 +79,14 @@ void GetRaDecZenith(
     double& ra,
     double& dec);
 
+std::string GetFieldName(
+    casacore::MeasurementSet& ms,
+    unsigned int field_id = 0);
+
+std::string GetStationName(
+    casacore::MeasurementSet& ms,
+    unsigned int station_id);
+
+unsigned int GetNrAntennas(
+    casacore::MeasurementSet& ms,
+    unsigned int field_id);

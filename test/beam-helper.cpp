@@ -227,3 +227,31 @@ void GetRaDecZenith(
     ra = zenithRaDec.getAngle().getValue()[0];
     dec = zenithRaDec.getAngle().getValue()[1];
 }
+
+std::string GetFieldName(
+    casacore::MeasurementSet& ms,
+    unsigned int field_id)
+{
+    casacore::Table fieldTable = ms.keywordSet().asTable("LOFAR_ANTENNA_FIELD");
+    casacore::ROScalarColumn<casacore::String> nameColumn(fieldTable, "NAME");
+    return nameColumn(field_id);
+}
+
+std::string GetStationName(
+    casacore::MeasurementSet& ms,
+    unsigned int station_id)
+{
+    casacore::Table antennaTable = ms.keywordSet().asTable("ANTENNA");
+    casacore::ROScalarColumn<casacore::String> nameColumn(antennaTable, "NAME");
+    return nameColumn(station_id);
+}
+
+unsigned int GetNrAntennas(
+    casacore::MeasurementSet& ms,
+    unsigned int field_id)
+{
+    casacore::Table fieldTable = ms.keywordSet().asTable("LOFAR_ANTENNA_FIELD");
+    casacore::ROArrayQuantColumn<casacore::Double> offsetColumn(fieldTable, "ELEMENT_OFFSET", "m");
+    casacore::Matrix<casacore::Quantity> aips_offset = offsetColumn(field_id);
+    return aips_offset.ncolumn();
+}
