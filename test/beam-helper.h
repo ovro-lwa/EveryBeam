@@ -68,3 +68,10 @@ void XYToLM(
 	l = (midX - (T) x) * pixelSizeX;
 	m = ((T) y - midY) * pixelSizeY;
 }
+
+void GetRaDecZenith(
+    vector3r_t position,
+    double time,
+    double& ra,
+    double& dec);
+

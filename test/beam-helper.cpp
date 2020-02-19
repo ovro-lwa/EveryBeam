@@ -177,3 +177,23 @@ void setITRFVector(
     itrf[1] = itrfVal[1];
     itrf[2] = itrfVal[2];
 }
+
+void GetRaDecZenith(
+    vector3r_t position,
+    double time,
+    double& ra,
+    double& dec)
+{
+    casacore::MEpoch timeEpoch(casacore::Quantity(time, "s"));
+    casacore::MVPosition mvPosition(position[0], position[1], position[2]);
+    casacore::MPosition mPosition(mvPosition, casacore::MPosition::ITRF);
+    casacore::MeasFrame mFrame(timeEpoch, mPosition);
+    auto converter = casacore::MDirection::Convert(
+        casacore::MDirection::ITRF,
+        casacore::MDirection::Ref(casacore::MDirection::J2000, mFrame));
+    casacore::MVDirection mvZenith(position[0], position[1], position[2]);
+    casacore::MDirection mZenith(mvZenith, casacore::MDirection::ITRF);
+    casacore::MVDirection zenithRaDec = converter(mZenith).getValue();
+    ra = zenithRaDec.getAngle().getValue()[0];
+    dec = zenithRaDec.getAngle().getValue()[1];
+}
