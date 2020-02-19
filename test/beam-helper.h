@@ -22,6 +22,10 @@ void GetPhaseCentreInfo(
     double& ra,
     double& dec);
 
+void GetThetaPhiDirectionsZenith(
+    vector2r_t* raDecDirections,
+    size_t subgrid_size);
+
 void GetITRFDirections(
     vector3r_t* itrfDirections,
     size_t subgrid_size,

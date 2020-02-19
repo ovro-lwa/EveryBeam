@@ -2,6 +2,8 @@
 
 #include <fitsio.h>
 
+#include "MathUtil.h"
+
 void GetPhaseCentreInfo(
     casacore::MeasurementSet& ms,
     size_t fieldId,
@@ -24,6 +26,34 @@ void GetPhaseCentreInfo(
     casacore::Vector<casacore::Double> j2000Val = j2000.getValue().get();
     ra = j2000Val[0];
     dec = j2000Val[1];
+}
+
+void GetThetaPhiDirectionsZenith(
+    vector2r_t* thetaPhiDirections,
+    size_t subgrid_size)
+{
+    for (unsigned y = 0; y < subgrid_size; y++) {
+        for (unsigned x = 0; x < subgrid_size; x++) {
+            // Scale y,x to the interval -1, 1
+            double l = (((double) 2*x) - subgrid_size) / subgrid_size;
+            double m = (((double) 2*y) - subgrid_size) / subgrid_size;
+            double n = sqrt(1 - l*l - m*m);
+
+            // Compute direction in theta, phi
+            vector2r_t direction_thetaphi;
+            if (std::isfinite(n)) {
+                // Convert direction to theta, phi
+                vector3r_t direction_xyz = {(double) l, (double) m, n};
+                direction_thetaphi = cart2thetaphi(direction_xyz);
+            } else {
+                auto nan = std::numeric_limits<double>::quiet_NaN();
+                direction_thetaphi = { nan, nan };
+            }
+
+            // Set direction
+            thetaPhiDirections[y * subgrid_size + x] = direction_thetaphi;
+        }
+    }
 }
 
 void GetITRFDirections(
