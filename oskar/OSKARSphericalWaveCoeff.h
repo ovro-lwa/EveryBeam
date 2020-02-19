@@ -25,9 +25,7 @@ class Dataset {
         size_t get_nr_coeffs() const;
 
         std::complex<double>* get_alpha_ptr(
-            const unsigned int element,
-            const unsigned int l = 0,
-            const unsigned int m = 0);
+            const unsigned int element);
 
         // Debugging
         void print_alpha(

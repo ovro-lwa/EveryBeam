@@ -20,10 +20,10 @@ Dataset::Dataset(
         hsize_t dims[rank];
         dataspace.getSimpleExtentDims(dims, NULL);
         m_nr_elements = dims[0];
-        assert(dims[1] == m_nr_pols); // pola, polb
-        assert(dims[2] == m_nr_tetm); // te, tm
-        m_l_max = dims[3]; // l_max
-        assert(dims[4] == m_l_max); // m_abs
+        m_l_max = dims[1]; // l_max
+        assert(dims[2] == m_l_max);
+        assert(dims[3] == m_nr_pols); // pola, polb
+        assert(dims[4] == m_nr_tetm); // te, tm
 
         // Read coefficients into data vector
         m_data.resize(m_nr_elements * get_nr_coeffs());
@@ -43,9 +43,9 @@ size_t Dataset::get_index(
     const unsigned int l,
     const unsigned int m) const
 {
-    return element * m_nr_pols * m_nr_tetm * m_l_max * m_l_max +
-                                                   l * m_l_max +
-                                                       m;
+    return element * m_l_max * m_l_max * m_nr_pols * m_nr_tetm +
+                           l * m_l_max * m_nr_pols * m_nr_tetm +
+                                     m * m_nr_pols * m_nr_tetm;
 }
 
 size_t Dataset::get_nr_coeffs() const
@@ -58,11 +58,10 @@ void Dataset::print_alpha(
 {
     const int l_max = get_l_max();
 
-    for (int l = 1; l <= l_max; ++l) {
-        for (int abs_m = l; abs_m >=0; --abs_m) {
-            auto alpha_ptr = get_alpha_ptr(element, l, abs_m);
-            std::cout << *alpha_ptr;
-            if (abs_m > 0) {
+    for (int l = 0; l < l_max; ++l) {
+        for (int m = 0; m <= l; m++) {
+            std::cout << m_data.data()[get_index(element, l, m)];
+            if (m < l) {
                 std::cout << ", ";
             }
         }
@@ -70,14 +69,12 @@ void Dataset::print_alpha(
     }
     std::cout << std::endl;
 }
+
 std::complex<double>* Dataset::get_alpha_ptr(
-    const unsigned int element,
-    const unsigned int l,
-    const unsigned int m)
+    const unsigned int element)
 {
     assert(element < get_nr_elements());
-    assert(l <= get_l_max());
-    size_t index = get_index(element, l, m);
+    size_t index = get_index(element, 0, 0);
     return m_data.data() + index;
 }
 
