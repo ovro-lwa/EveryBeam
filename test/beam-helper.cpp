@@ -156,10 +156,12 @@ void StoreBeam(
 		{
 			for(size_t x=0; x!=width; ++x)
 			{
-				std::complex<float> xx = (*data_ptr)[ant][y][x][0];
-				std::complex<float> yy = (*data_ptr)[ant][y][x][3];
-                std::complex<float> response = xx * conj(xx) + yy*conj(yy);
-				img[(yCorner + y)*width*nx + x + xCorner] = abs(response);
+                std::complex<float> response = 0;
+                for (auto pol = 0; pol < 4; pol++) {
+				    std::complex<float> value = (*data_ptr)[ant][y][x][pol];
+                    response += value * std::conj(value);
+                }
+				img[(yCorner + y)*width*nx + x + xCorner] = abs(response) / 2;
 			}
 		}
 	}
