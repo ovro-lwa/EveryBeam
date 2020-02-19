@@ -29,7 +29,7 @@ void GetPhaseCentreInfo(
 void GetITRFDirections(
     vector3r_t* itrfDirections,
     size_t subgrid_size, float image_size,
-    double time, double phaseCentreRA, double phaseCentreDec)
+    double time, double ra, double dec)
 {
     float subgrid_pixelsize = image_size / subgrid_size;
 
@@ -49,29 +49,29 @@ void GetITRFDirections(
             m += pdm;
             n = sqrt(1.0 - l*l - m*m);
 
-	        vector3r_t _l_vector_itrf;
-	        vector3r_t _m_vector_itrf;
-	        vector3r_t _n_vector_itrf;
+            vector3r_t _l_vector_itrf;
+            vector3r_t _m_vector_itrf;
+            vector3r_t _n_vector_itrf;
 
-	        const casacore::Unit radUnit("rad");
+            const casacore::Unit radUnit("rad");
 
-	        LOFAR::StationResponse::ITRFConverter itrfConverter(time);
+            ITRFConverter itrfConverter(time);
 
             casacore::MDirection lDir(casacore::MVDirection(
-            	casacore::Quantity(phaseCentreRA + M_PI/2, radUnit),
-            	casacore::Quantity(0, radUnit)),
+                casacore::Quantity(ra + M_PI/2, radUnit),
+                casacore::Quantity(0, radUnit)),
             	casacore::MDirection::J2000);
             setITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
 
             casacore::MDirection mDir(casacore::MVDirection(
-            	casacore::Quantity(phaseCentreRA, radUnit),
-            	casacore::Quantity(phaseCentreDec + M_PI/2, radUnit)),
+                casacore::Quantity(ra, radUnit),
+                casacore::Quantity(dec + M_PI/2, radUnit)),
             	casacore::MDirection::J2000);
             setITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
 
             casacore::MDirection nDir(casacore::MVDirection(
-            	casacore::Quantity(phaseCentreRA, radUnit),
-            	casacore::Quantity(phaseCentreDec, radUnit)),
+                casacore::Quantity(ra, radUnit),
+                casacore::Quantity(dec, radUnit)),
             	casacore::MDirection::J2000);
             setITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
 
