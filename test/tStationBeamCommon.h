@@ -6,11 +6,9 @@
 
 void calculateStationBeams(
 	std::vector<LOFAR::StationResponse::Station::Ptr>& stations,
-    std::vector<vector3r_t>& itrfsDirections,
+    std::vector<vector3r_t>& itrfDirections,
     vector3r_t stationDirection,
     vector3r_t tileDirection,
-    bool useDifferentialBeam,
-    vector3r_t diffBeamCentre,
     unsigned int subgrid_size,
     std::vector<std::complex<float>>& buffer,
     double time, double frequency)
@@ -20,12 +18,9 @@ void calculateStationBeams(
 
     #pragma omp parallel for
 	for (size_t s = 0; s < stations.size(); s++) {
-        matrix22c_t inverseCentralGain =
-            stations[s]->response(time, frequency, diffBeamCentre, frequency, stationDirection, tileDirection);
-
         for (unsigned y = 0; y < subgrid_size; y++) {
             for (unsigned x = 0; x < subgrid_size; x++) {
-                auto direction = itrfsDirections[y * subgrid_size + x];
+                auto direction = itrfDirections[y * subgrid_size + x];
                 auto freq_beamformer = frequency;
                 matrix22c_t gainMatrix =
                     stations[s]->response(
@@ -34,12 +29,7 @@ void calculateStationBeams(
 
                 std::complex<float>* antBufferPtr = (*data_ptr)[s][y][x];
 
-                matrix22c_t stationGain =
-                    useDifferentialBeam ?
-                    inverseCentralGain * gainMatrix :
-                    gainMatrix;
-
-stationGain = gainMatrix;
+                matrix22c_t stationGain = gainMatrix;
                 antBufferPtr[0] = stationGain[0][0];
                 antBufferPtr[1] = stationGain[0][1];
                 antBufferPtr[2] = stationGain[1][0];
@@ -105,15 +95,11 @@ void run(
     // Set tile beam direction equal to station direction
     vector3r_t tileDirection = stationDirection;
 
-    // Set differential beam direction equal to station direction
-    bool useDifferentialBeam = true;
-    vector3r_t diffBeamDirection = stationDirection;
-
     // Compute station beams
     std::cout << ">>> Computing station beams" << std::endl;
 	std::vector<std::complex<float>> aTermBuffer;
     aTermBuffer.resize(subgrid_size*subgrid_size*4*nr_stations);
-    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, useDifferentialBeam, diffBeamDirection, subgrid_size, aTermBuffer, currentTime, frequency);
+    calculateStationBeams(stations, itrfDirections, stationDirection, tileDirection, subgrid_size, aTermBuffer, currentTime, frequency);
 
     // Store aterm
     std::cout << ">>> Writing beam images to: " << output_filename << std::endl;
