@@ -125,29 +125,23 @@ void run(
     float image_size = M_PI; // in radians
     size_t subgrid_size = 32; // in pixels
 
-    // Compute theta, phi directions
-    std::cout << ">>> Computing theta, phi directions to evaluate beam" << std::endl;
+    // Compute element beams from theta, phi
+    std::cout << ">>> Computing element beams theta, phi" << std::endl;
     std::vector<vector2r_t> thetaPhiDirections(subgrid_size * subgrid_size);
     GetThetaPhiDirectionsZenith(thetaPhiDirections.data(), subgrid_size);
-
-    // Compute itrfs directions
-    std::cout << ">>> Computing theta, phi directions to evaluate beam" << std::endl;
-    std::vector<vector3r_t> itrfDirections(subgrid_size * subgrid_size);
-    GetITRFDirections(itrfDirections.data(), subgrid_size, image_size, currentTime, zenithRA, zenithDec);
-
-    // Compute element beams from theta, phi
-    std::cout << ">>> Computing element beams" << std::endl;
     std::vector<std::complex<float>> beam_thetaphi(subgrid_size*subgrid_size*4*nr_antennas);
     calculateElementBeams(station, thetaPhiDirections, nr_antennas, subgrid_size, frequency, beam_thetaphi);
 
     // Compute element beams from itrf coordinates
-    #if 0
     // TODO: the Station::elementResponse method does not work properly
+    #if 0
+    std::cout << ">>> Computing element beams itrfs" << std::endl;
+    std::vector<vector3r_t> itrfDirections(subgrid_size * subgrid_size);
+    GetITRFDirections(itrfDirections.data(), subgrid_size, image_size, currentTime, zenithRA, zenithDec);
     std::vector<std::complex<float>> beam_itrf(subgrid_size*subgrid_size*4*nr_antennas);
     calculateElementBeams(station, itrfDirections, nr_antennas, subgrid_size, currentTime, frequency, beam_itrf);
     #endif
 
     // Store aterm
-    std::string aterms_filename(output_filename);
-    StoreBeam(aterms_filename, beam_thetaphi.data(), nr_antennas, subgrid_size, subgrid_size);
+    StoreBeam(output_filename, beam_thetaphi.data(), nr_antennas, subgrid_size, subgrid_size);
 }
