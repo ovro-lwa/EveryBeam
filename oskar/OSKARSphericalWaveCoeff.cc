@@ -32,7 +32,9 @@ Dataset::Dataset(
         assert(data_type.getSize() == sizeof(std::complex<double>));
         dataset.read(m_data.data(), data_type, dataspace);
     } catch (H5::FileIException& e) {
-        std::cerr << "Could not load dataset for frequency " << dataset_name << " Mhz" << std::endl;
+        std::stringstream message;
+        message << "Could not load dataset for frequency " << dataset_name << " Mhz";
+        throw std::runtime_error(message.str());
     }
 }
 
