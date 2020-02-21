@@ -19,15 +19,38 @@ Dataset::Dataset(
         // Get dimensions
         hsize_t dims[rank];
         dataspace.getSimpleExtentDims(dims, NULL);
-        m_nr_elements = dims[0];
-        m_l_max = dims[1]; // l_max
-        assert(dims[2] == m_l_max);
-        assert(dims[3] == m_nr_pols); // pola, polb
-        assert(dims[4] == m_nr_tetm); // te, tm
+        auto nr_elements = dims[0];
+        auto nr_coeffs = dims[1];
+        assert(dims[2] == 4); // tetm*pol
+
+        // Coefficient data stored as:
+        // [nr_elements][nr_coefficients][4],
+        // with inner dimension:
+        // (x_te_re, x_te_im), (x_tm_re, x_tm_im),
+        // (y_te_re, y_te_im), (y_tm_re, y_tm_im)
+        #if defined(DEBUG)
+        std::cout << "nr_elements: " << nr_elements << std::endl;
+        std::cout << "nr_coeffs: " << nr_coeffs << std::endl;
+        #endif
+
+        // Check total number of coefficients to find l_max
+        auto l_max_d = sqrt(nr_coeffs + 1) - 1;
+        auto l_max = (int)round(l_max_d);
+        #if defined(DEBUG)
+        std::cout << "l_max: " << l_max << std::endl;
+        #endif
+
+        // Sanity check
+        assert(l_max * (l_max+2) == nr_coeffs);
+
+        // Set members
+        m_nr_elements = nr_elements;
+        m_nr_coeffs = nr_coeffs;
+        m_l_max = l_max;
 
         // Read coefficients into data vector
-        m_data.resize(m_nr_elements * get_nr_coeffs());
-        assert(dims[0]*dims[1]*dims[2]*dims[3]*dims[4]==m_data.size());
+        m_data.resize(nr_elements * nr_coeffs * 4);
+        assert(dims[0]*dims[1]*dims[2]==m_data.size());
         H5::DataType data_type = dataset.getDataType();
         assert(data_type.getSize() == sizeof(std::complex<double>));
         dataset.read(m_data.data(), data_type, dataspace);
@@ -39,42 +62,16 @@ Dataset::Dataset(
 }
 
 size_t Dataset::get_index(
-    const unsigned int element,
-    const unsigned int l,
-    const unsigned int m) const
+    const unsigned int element) const
 {
-    return element * m_l_max * m_l_max * m_nr_pols * m_nr_tetm +
-                           l * m_l_max * m_nr_pols * m_nr_tetm +
-                                     m * m_nr_pols * m_nr_tetm;
-}
-
-size_t Dataset::get_nr_coeffs() const
-{
-    return m_nr_pols * m_nr_tetm * m_l_max * m_l_max;
-}
-
-void Dataset::print_alpha(
-    const unsigned int element)
-{
-    const int l_max = get_l_max();
-
-    for (int l = 0; l < l_max; ++l) {
-        for (int m = 0; m <= l; m++) {
-            std::cout << m_data.data()[get_index(element, l, m)];
-            if (m < l) {
-                std::cout << ", ";
-            }
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    return element * m_nr_coeffs * 4;
 }
 
 std::complex<double>* Dataset::get_alpha_ptr(
     const unsigned int element)
 {
     assert(element < get_nr_elements());
-    size_t index = get_index(element, 0, 0);
+    size_t index = get_index(element);
     return m_data.data() + index;
 }
 

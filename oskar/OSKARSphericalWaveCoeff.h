@@ -22,30 +22,22 @@ class Dataset {
         // Get
         size_t get_nr_elements() const { return m_nr_elements; };
         size_t get_l_max() const { return m_l_max; };
-        size_t get_nr_coeffs() const;
 
         std::complex<double>* get_alpha_ptr(
             const unsigned int element);
 
-        // Debugging
-        void print_alpha(
-            const unsigned int element = 0);
-
     private:
         // Methods
         size_t get_index(
-            const unsigned int element,
-            const unsigned int l,
-            const unsigned int m) const;
+            const unsigned int element) const;
 
         // Constants
-        const unsigned int m_dataset_rank = 5;
-        const unsigned int m_nr_pols = 2;
-        const unsigned int m_nr_tetm = 2;
+        const unsigned int m_dataset_rank = 3;
 
         // Members
         std::vector<std::complex<double>> m_data;
         unsigned int m_nr_elements;
+        unsigned int m_nr_coeffs;
         unsigned int m_l_max;
 };
 
