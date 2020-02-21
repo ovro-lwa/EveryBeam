@@ -16,7 +16,7 @@ void OSKARElementResponseDipole::response(
     std::complex<double>* response_ptr = (std::complex<double> *) response;
 
     double phi_x = phi;
-    double phi_y = phi + M_PI/2;
+    double phi_y = phi + M_PI_2;
     oskar_evaluate_dipole_pattern_double(1, &theta, &phi_x, freq, dipole_length_m, response_ptr);
     oskar_evaluate_dipole_pattern_double(1, &theta, &phi_y, freq, dipole_length_m, response_ptr + 2);
 }
@@ -55,7 +55,7 @@ void OSKARElementResponseSphericalWave::response(
     std::complex<double>* alpha_ptr = dataset->get_alpha_ptr(element_id);
 
     double phi_x = phi;
-    double phi_y = phi + M_PI/2;
+    double phi_y = phi + M_PI_2;
     oskar_evaluate_spherical_wave_sum_double(1, &theta, &phi_x, &phi_y, l_max, alpha_ptr, response_ptr);
 }
 
