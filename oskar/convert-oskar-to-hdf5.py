@@ -60,21 +60,21 @@ for freq in tqdm(freqs):
 
     # Get dimensions of input matrix
     # This matrix is lower triangular, e.g.:
-    # 32x65 (2080 elements), with 1088 (32x(32+2)) nonzeros
+    # 32x65 (32x(32*2+1) = 2080 elements),
+    # with 1088 (32x(32+2)) nonzeros
     shape = alpha_te_a.shape
     nr_elements = shape[0]
-    src_height = shape[1]
-    src_width = shape[2]
+    l_max = shape[1]
+    assert(shape[2] == ((l_max * 2) + 1))
     if (debug):
         print("nr_elements: ", nr_elements)
-        print("input height: ", src_height)
-        print("input width: ", src_width)
+        print("shape: ",shape)
 
     # Determine dimensions of output matrix
     # This matrix is rectangular and contains
     # all nonzero elements of the input matrix
-    dst_height = src_height + 2
-    dst_width = src_height
+    dst_height = l_max + 2
+    dst_width = l_max
     if (debug):
         print("output height: ", dst_height)
         print("output width: ", dst_width)
@@ -86,7 +86,7 @@ for freq in tqdm(freqs):
     data = np.zeros((nr_elements, dst_height * dst_width, 4), dtype=np.complex128)
 
     i = 0
-    for l in range(0,src_height):
+    for l in range(l_max):
         n = (l+1) * 2 + 1
         data[:,i:i+n,0] = alpha_tm_a[:,l,:n]
         data[:,i:i+n,1] = alpha_te_a[:,l,:n]
