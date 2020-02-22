@@ -95,6 +95,12 @@ for freq in tqdm(freqs):
             data[:,i,3] = alpha_tm_b[:,m,l]
             i += 1
 
+    # Sanity check
+    assert(np.count_nonzero(data[:,:,0]) == np.count_nonzero(alpha_te_a))
+    assert(np.count_nonzero(data[:,:,1]) == np.count_nonzero(alpha_tm_a))
+    assert(np.count_nonzero(data[:,:,2]) == np.count_nonzero(alpha_te_b))
+    assert(np.count_nonzero(data[:,:,3]) == np.count_nonzero(alpha_tm_b))
+
     # Add group for current frequency
     hf.create_dataset(str(freq), data.shape, data=data)
 
