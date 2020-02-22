@@ -86,14 +86,13 @@ for freq in tqdm(freqs):
     data = np.zeros((nr_elements, dst_height * dst_width, 4), dtype=np.complex128)
 
     i = 0
-    for m in range(0,src_height):
-        for l in range((m+1)*2, -1, -1):
-            ind0 = l * src_width + m
-            data[:,i,0] = alpha_te_a[:,m,l]
-            data[:,i,1] = alpha_tm_a[:,m,l]
-            data[:,i,2] = alpha_te_b[:,m,l]
-            data[:,i,3] = alpha_tm_b[:,m,l]
-            i += 1
+    for l in range(0,src_height):
+        n = (l+1) * 2 + 1
+        data[:,i:i+n,0] = alpha_tm_a[:,l,:n]
+        data[:,i:i+n,1] = alpha_te_a[:,l,:n]
+        data[:,i:i+n,2] = alpha_tm_b[:,l,:n]
+        data[:,i:i+n,3] = alpha_te_b[:,l,:n]
+        i += n
 
     # Sanity check
     assert(np.count_nonzero(data[:,:,0]) == np.count_nonzero(alpha_te_a))
