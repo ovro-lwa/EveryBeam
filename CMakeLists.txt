@@ -18,7 +18,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
+if (POLICY CMP0074)
 cmake_policy(SET CMP0074 NEW)
+endif()
 
 find_package(HDF5 COMPONENTS C CXX REQUIRED)
 add_definitions(${HDF5_DEFINITIONS})
