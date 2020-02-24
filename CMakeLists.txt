@@ -72,6 +72,7 @@ install (FILES
   Element.h
   ElementResponse.h
   LofarMetaDataUtil.h
+  MathUtil.h
   MutablePtr.h
   Station.h
   Types.h
