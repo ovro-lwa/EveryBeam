@@ -27,6 +27,8 @@ make
 make install
 ```
 
+A `Dockerfile` to compile a working version of DPPP and LOFARBeam is included in the `test` directory.
+
 ## Use with DPPP
 
 To use with DPPP, the streaming visibility framework used for LOFAR, currently the branch `oskar` from that repository is required.

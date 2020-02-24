@@ -20,4 +20,4 @@ RUN make -j install
 
 RUN cd && mkdir oskarbeamtest && cd oskarbeamtest
 RUN tar xf ~/opt/DP3/DPPP/test/tNDPPP-generic.in_MS.tgz
-RUN DPPP steps=applybeam applybeam.elementmodel=oskardipole msin=tNDPPP-generic.MS msout=.
+RUN DPPP msin=tNDPPP-generic.MS msout=. steps=[predict] predict.usebeammodel=True predict.elementmodel=oskardipole predict.sourcedb=tNDPPP-generic.MS/sky
