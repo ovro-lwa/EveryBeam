@@ -97,9 +97,8 @@ const vector3r_t &Station::phaseReference() const
 matrix22c_t Station::elementResponse(real_t time, real_t freq,
     const vector3r_t &direction, size_t id, const bool rotate) const
 {
-    Antenna::Options options = {
-          .rotate = rotate
-    };
+    Antenna::Options options;
+    options.rotate = rotate;
 
     if (rotate) {
         vector3r_t ncp_ = ncp(time);
