@@ -76,7 +76,7 @@ std::complex<double>* Dataset::get_alpha_ptr(
 }
 
 DataFile::DataFile(
-    std::string& filename)
+    const std::string& filename)
 {
     // Open file
     std::cout << "read oskar datafile: " << filename << std::endl;

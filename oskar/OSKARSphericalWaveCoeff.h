@@ -45,7 +45,7 @@ class DataFile {
     public:
         // Constructor for reading coeff from file
         DataFile(
-            std::string& filename);
+            const std::string& filename);
 
         std::shared_ptr<Dataset> get(
             const unsigned int freq);
