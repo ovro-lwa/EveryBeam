@@ -1,7 +1,7 @@
 #include "../ElementResponse.h"
 #include "../Singleton.h"
 
-#include "OSKARSphericalWaveCoeff.h"
+#include "OSKARDatafile.h"
 
 #include <memory>
 
@@ -50,7 +50,7 @@ public:
 protected:
     std::string get_path(const char*) const;
 
-    std::unique_ptr<DataFile> m_datafile;
+    std::unique_ptr<Datafile> m_datafile;
 };
 
 } // namespace StationResponse

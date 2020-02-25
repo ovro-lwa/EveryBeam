@@ -24,7 +24,7 @@ void OSKARElementResponseDipole::response(
 OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave()
 {
     std::string path = get_path("oskar.h5");
-    m_datafile.reset(new DataFile(path));
+    m_datafile.reset(new Datafile(path));
 }
 
 void OSKARElementResponseSphericalWave::response(
