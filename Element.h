@@ -23,6 +23,12 @@ public:
         m_element_response(element_response)
     {}
 
+    matrix22c_t local_response(
+        real_t time,
+        real_t freq,
+        const vector3r_t &direction,
+        size_t id,
+        const Options &options) const;
 
 private:
 

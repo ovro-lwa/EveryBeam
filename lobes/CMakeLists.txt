@@ -6,7 +6,7 @@ find_package(HDF5 COMPONENTS C CXX REQUIRED)
 # target_link_libraries (pylobes PUBLIC Eigen3::Eigen ${HDF5_LIBRARIES})
 
 add_library(lobes SHARED LOBESElementResponse.cc)
-install(TARGETS lobes)
+install(TARGETS lobes DESTINATION lib)
 
 configure_file(test.py test.py COPYONLY)
 
@@ -19,6 +19,3 @@ configure_file(CS302_coords.mat CS302_coords.mat COPYONLY)
 
 # TODO Too large for git repo, get file from somewhere else
 # configure_file(LBA_CS302_fine.mat LBA_CS302_fine.mat COPYONLY)
-
-
-

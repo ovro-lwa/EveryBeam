@@ -18,13 +18,11 @@ const double pi_2 = 1.570796326794896619231322;
 
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::getInstance(const std::string &name)
 {
-    if (name.length() >= 3) {
-        if (name.substr(name.length()-3, 3) == "LBA") {
-            return Singleton<HamakerElementResponseLBA>::getInstance();
-        }
-        if (name.substr(name.length()-3, 3) == "HBA") {
-            return Singleton<HamakerElementResponseHBA>::getInstance();
-        }
+    if (name.find("LBA") != std::string::npos) {
+        return Singleton<HamakerElementResponseLBA>::getInstance();
+    }
+    if (name.find("HBA") != std::string::npos) {
+        return Singleton<HamakerElementResponseHBA>::getInstance();
     }
     throw std::invalid_argument("HamakerElementResponse::getInstance: name should end in either 'LBA' or 'HBA'");
 }

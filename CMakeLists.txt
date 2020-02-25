@@ -18,7 +18,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
+if (POLICY CMP0074)
 cmake_policy(SET CMP0074 NEW)
+endif()
 
 find_package(HDF5 COMPONENTS C CXX REQUIRED)
 add_definitions(${HDF5_DEFINITIONS})
@@ -27,7 +29,7 @@ include_directories(${HDF5_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
-find_package(Casacore REQUIRED COMPONENTS casa ms tables measures)
+find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
 include_directories(${CASACORE_INCLUDE_DIR})
 
 # Add element models
@@ -38,6 +40,7 @@ add_subdirectory(oskar)
 add_compile_options(-std=c++11 -Wall -DNDEBUG -Wl,--no-undefined)
 
 add_library(stationresponse SHARED
+  Antenna.cc
   ElementResponse.cc
   BeamFormer.cc
   Element.cc
@@ -69,6 +72,7 @@ install (FILES
   Element.h
   ElementResponse.h
   LofarMetaDataUtil.h
+  MathUtil.h
   MutablePtr.h
   Station.h
   Types.h

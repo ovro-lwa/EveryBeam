@@ -228,9 +228,10 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id, ElementRes
             antenna_position,
             lofar_antenna_orientation
         };
-        if(name == "LBA") {
+        if (name == "LBA") {
             antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
         } else {
+            antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
             // TODO
             // HBA, HBA0, HBA1
             // antenna = make_tile(name, coordinate_system, tile_config, element_response);
@@ -341,6 +342,13 @@ Station::Ptr readStation(
 
         station->set_antenna(beam_former);
 
+        size_t field_id = 0;
+        size_t element_id = 0;
+        Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(tab_field, field_id);
+        auto model = station->get_element_response();
+        // TODO: rotate coordinate system for antenna
+        auto element = Element::Ptr(new Element(coordinate_system, model, element_id));
+        station->set_element(element);
     }
     else if (telescope_name == "AARTFAAC")
     {

@@ -32,19 +32,12 @@
 #include "oskar_vector_types.h"
 #include "oskar_helper.h"
 
-#include <iostream>
-namespace {
-    int greet() {std::cout << "Oskar waves spherically at you!" << std::endl;return 0;}
-}
-
-
 template<typename FP, typename FP2, typename FP4c>
 void oskar_evaluate_spherical_wave_sum(
     int num_points, const FP* theta,
     const FP* phi_x, const FP* phi_y, int l_max,
-    const FP4c* alpha, int offset, FP4c* pattern)
+    const FP4c* alpha, FP4c* pattern)
 {
-    static int dummy = greet();
     FP2 Xp, Xt, Yp, Yt;
     make_zero2(Xp); make_zero2(Xt);
     make_zero2(Yp); make_zero2(Yt);
@@ -76,8 +69,8 @@ void oskar_evaluate_spherical_wave_sum(
                     else {
                         FP d_fact = (FP)1, s_fact = (FP)1;
                         const int d_ = l - abs_m, s_ = l + abs_m;
-                        for (int i_ = 2; i_ <= d_; ++i_) d_fact *= i_;
-                        for (int i_ = 2; i_ <= s_; ++i_) s_fact *= i_;
+                        d_fact = std::tgamma(d_ + 1);
+                        s_fact = std::tgamma(s_ + 1);
                         const FP ff = f_ * d_fact / s_fact;
                         const FP nf = sqrt(ff);
                         const FP4c alpha_m = alpha[ind0 - abs_m];
@@ -98,10 +91,10 @@ void oskar_evaluate_spherical_wave_sum(
                 }
             }
         }
-        pattern[i + offset].a = Xt;
-        pattern[i + offset].b = Xp;
-        pattern[i + offset].c = Yt;
-        pattern[i + offset].d = Yp;
+        pattern[i].a = Xt;
+        pattern[i].b = Xp;
+        pattern[i].c = Yt;
+        pattern[i].d = Yp;
     }
 }
 
@@ -118,7 +111,7 @@ void oskar_evaluate_spherical_wave_sum_double(
     double4c* pattern_ptr = (double4c *) pattern;
 
     oskar_evaluate_spherical_wave_sum<double, double2, double4c>(
-        num_points, theta, phi_x, phi_y, l_max, alpha_ptr, 0, pattern_ptr);
+        num_points, theta, phi_x, phi_y, l_max, alpha_ptr, pattern_ptr);
 }
 
 void oskar_evaluate_spherical_wave_sum_float(
@@ -134,5 +127,5 @@ void oskar_evaluate_spherical_wave_sum_float(
     float4c* pattern_ptr = (float4c *) pattern;
 
     oskar_evaluate_spherical_wave_sum<float, float2, float4c>(
-        num_points, theta, phi_x, phi_y, l_max, alpha_ptr, 0, pattern_ptr);
+        num_points, theta, phi_x, phi_y, l_max, alpha_ptr, pattern_ptr);
 }

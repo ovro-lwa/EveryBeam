@@ -1,0 +1,37 @@
+#ifndef OSKAR_DATASET_H
+#define OSKAR_DATASET_H
+
+#include <complex>
+#include <vector>
+
+#include <H5Cpp.h>
+
+class Dataset {
+    public:
+        Dataset(
+            H5::H5File& h5_file,
+            const unsigned int freq);
+
+        // Get
+        size_t get_nr_elements() const { return m_nr_elements; };
+        size_t get_l_max() const { return m_l_max; };
+
+        std::complex<double>* get_alpha_ptr(
+            const unsigned int element);
+
+    private:
+        // Methods
+        size_t get_index(
+            const unsigned int element) const;
+
+        // Constants
+        const unsigned int m_dataset_rank = 3;
+
+        // Members
+        std::vector<std::complex<double>> m_data;
+        unsigned int m_nr_elements;
+        unsigned int m_nr_coeffs;
+        unsigned int m_l_max;
+};
+
+#endif
