@@ -66,12 +66,3 @@ RUN cd ${INSTALLDIR}/dp3 && tar xvf dp3-${DP3_VERSION}.tar.gz
 RUN cd ${INSTALLDIR}/dp3/build && cmake ../DP3-${DP3_VERSION} -DCASACORE_ROOT_DIR=${INSTALLDIR}/casacore -DCMAKE_PREFIX_PATH=${INSTALLDIR}/lofarbeam -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/dp3
 RUN cd ${INSTALLDIR}/dp3/build && make -j
 RUN cd ${INSTALLDIR}/dp3/build && make install
-
-#
-# prepare-test
-#
-ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/lofarbeam/lib
-ENV PATH $PATH:/opt/dp3/bin
-ENV TESTDIR /test
-RUN mkdir -p ${TESTDIR}
-RUN cd ${TESTDIR} && tar xf /opt/dp3/DP3-${DP3_VERSION}/DPPP/test/tNDPPP-generic.in_MS.tgz
