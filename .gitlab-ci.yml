@@ -1,6 +1,5 @@
 docker build:
-  script: docker build --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA -t my-image:$CI_COMMIT_SHORT_SHA test/
+  script: docker build --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA -t my-image:$CI_COMMIT_SHORT_SHA test
 
 docker-test:
-  script: docker run my-image:$CI_COMMIT_SHORT_SHA run_test.sh
-
+  script: docker run my-image:$CI_COMMIT_SHORT_SHA /opt/lofarbeam/lofarbeam/test/run_test.sh

@@ -41,7 +41,8 @@ ENV INSTALLDIR /opt
 # install-lofarbeam
 #
 RUN mkdir -p ${INSTALLDIR}/lofarbeam/build
-RUN cd ${INSTALLDIR}/lofarbeam && git clone https://github.com/lofar-astron/LOFARBeam.git lofarbeam
+RUN cd ${INSTALLDIR}/lofarbeam && git clone https://git.astron.nl/RD/LOFARBeam.git lofarbeam
+RUN cd ${INSTALLDIR}/lofarbeam/lofarbeam && git checkout $CI_COMMIT_SHORT_SHA
 RUN cd ${INSTALLDIR}/lofarbeam/build && cmake -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/lofarbeam ../lofarbeam
 RUN cd ${INSTALLDIR}/lofarbeam/build && make -j
 RUN cd ${INSTALLDIR}/lofarbeam/build && make install
