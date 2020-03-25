@@ -33,6 +33,7 @@
 #include <casacore/measures/Measures/MCDirection.h>
 
 #include <memory>
+#include <mutex>
 
 namespace LOFAR {
 namespace StationResponse {
