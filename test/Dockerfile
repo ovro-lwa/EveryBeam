@@ -67,11 +67,10 @@ RUN cd ${INSTALLDIR}/dp3/build && make -j
 RUN cd ${INSTALLDIR}/dp3/build && make install
 
 #
-# run-test
+# prepare-test
 #
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/lofarbeam/lib
 ENV PATH $PATH:/opt/dp3/bin
 ENV TESTDIR /test
 RUN mkdir -p ${TESTDIR}
-RUN cd ${TESTDIR} && tar xf /opt/dp3/DP3-4.1/DPPP/test/tNDPPP-generic.in_MS.tgz
-RUN cd ${TESTDIR} && DPPP msin=tNDPPP-generic.MS msout=. steps=[predict] predict.usebeammodel=True predict.elementmodel=oskardipole predict.sourcedb=tNDPPP-generic.MS/sky
+RUN cd ${TESTDIR} && tar xf /opt/dp3/DP3-${DP3_VERSION}/DPPP/test/tNDPPP-generic.in_MS.tgz
