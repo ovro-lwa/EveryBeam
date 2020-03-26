@@ -1,10 +1,8 @@
 stages:
   - build-base
   - build-lofarbeam
-  - build-dp3
-  - build-wsclean
-  - test-dp3
-  - test-wsclean
+  - build-dependency
+  - test-dependency
   - deploy
 
 build-base:
@@ -39,7 +37,7 @@ build-lofarbeam:
 build-dp3:
   variables:
     CI_DEBUG_TRACE: "true"
-  stage: build-dp3
+  stage: build-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
@@ -52,7 +50,7 @@ build-dp3:
 build-wsclean:
   variables:
     CI_DEBUG_TRACE: "true"
-  stage: build-wsclean
+  stage: build-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
@@ -65,7 +63,7 @@ build-wsclean:
 test-dp3:
   variables:
     GIT_STRATEGY: none
-  stage: test-dp3
+  stage: test-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
@@ -77,7 +75,7 @@ test-dp3:
 test-wsclean:
   variables:
     GIT_STRATEGY: none
-  stage: test-wsclean
+  stage: test-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
