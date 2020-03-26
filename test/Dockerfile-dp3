@@ -1,0 +1,25 @@
+#
+# base
+#
+ARG CI_REGISTRY_IMAGE
+FROM ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}
+ENV INSTALLDIR /opt
+
+#
+# install-dp3
+#
+ENV DP3_VERSION 4.1
+ENV DP3_BRANCH oskar
+RUN mkdir -p ${INSTALLDIR}/dp3/build
+RUN cd ${INSTALLDIR}/dp3 && git clone https://github.com/lofar-astron/DP3.git dp3
+RUN cd ${INSTALLDIR}/dp3/dp3 && git checkout ${DP3_BRANCH}
+RUN cd ${INSTALLDIR}/dp3/build && cmake ../dp3 -DCASACORE_ROOT_DIR=${INSTALLDIR}/casacore -DCMAKE_PREFIX_PATH=${INSTALLDIR}/lofarbeam -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/dp3
+RUN cd ${INSTALLDIR}/dp3/build && make -j
+RUN cd ${INSTALLDIR}/dp3/build && make install
+
+#
+# prepare-test
+#
+ENV TESTDIR /test
+RUN mkdir -p ${TESTDIR}
+RUN cd ${TESTDIR} && tar xf ${INSTALLDIR}/dp3/dp3/DPPP/test/tNDPPP-generic.in_MS.tgz

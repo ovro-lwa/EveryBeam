@@ -1,40 +1,90 @@
 stages:
-  - build
-  - test
+  - build-base
+  - build-lofarbeam
+  - build-dp3
+  - build-wsclean
+  - test-dp3
+  - test-wsclean
   - deploy
 
-.pre:
+build-base:
+  variables:
+    GIT_STRATEGY: none
+    CI_DEBUG_TRACE: "true"
+  stage: build-base
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-
-build:
-  stage: build
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME ||
-      docker pull $CI_REGISTRY_IMAGE:latest || true
     - >
       docker build
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --cache-from $CI_REGISTRY_IMAGE:latest
-      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-      test
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE:base
+      -f test/Dockerfile-base .
+    - docker push $CI_REGISTRY_IMAGE:base
 
-test:
+build-lofarbeam:
   variables:
-    GIT_STRATEGY: none
-  stage: test
+    CI_DEBUG_TRACE: "true"
+  stage: build-lofarbeam
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - >
+      docker build
+      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      -f test/Dockerfile-lofarbeam .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+build-dp3:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: build-dp3
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build
+      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+      --tag $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
+      -f test/Dockerfile-dp3 .
+    - docker push $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
+
+build-wsclean:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: build-wsclean
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build
+      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+      --tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
+      -f test/Dockerfile-wsclean .
+    - docker push $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
+
+test-dp3:
+  variables:
+    GIT_STRATEGY: none
+  stage: test-dp3
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
       docker run
       $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
       /opt/lofarbeam/lofarbeam/test/run-test.sh
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+test-wsclean:
+  variables:
+    GIT_STRATEGY: none
+  stage: test-wsclean
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker run
+      $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      /opt/lofarbeam/lofarbeam/test/run-test.sh
+    - docker tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 deploy:
   variables:
