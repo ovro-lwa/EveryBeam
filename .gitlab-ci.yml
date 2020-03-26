@@ -1,4 +1,49 @@
-main:
-    script:
-    - docker build --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA -t my-image:$CI_COMMIT_SHORT_SHA test
-    - docker run my-image:$CI_COMMIT_SHORT_SHA /opt/lofarbeam/lofarbeam/test/run_test.sh
+stages:
+  - build
+  - test
+  - deploy
+
+.pre:
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME ||
+      docker pull $CI_REGISTRY_IMAGE:latest || true
+    - >
+      docker build
+      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      test
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+test:
+  variables:
+    GIT_STRATEGY: none
+  stage: test
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - >
+      docker run
+      $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+      /opt/lofarbeam/lofarbeam/test/run-test.sh
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker rmi $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+deploy:
+  variables:
+    GIT_STRATEGY: none
+  only:
+    - master
+  stage: deploy
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest
