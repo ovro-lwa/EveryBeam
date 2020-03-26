@@ -70,7 +70,6 @@ test-dp3:
       docker run
       $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
       /opt/lofarbeam/lofarbeam/test/run-test.sh
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 test-wsclean:
   variables:
@@ -82,7 +81,6 @@ test-wsclean:
       docker run
       $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
       /opt/lofarbeam/lofarbeam/test/run-test.sh
-    - docker tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 deploy:
   variables:
