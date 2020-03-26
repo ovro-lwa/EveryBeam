@@ -42,9 +42,9 @@ build-dp3:
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
       -f ./test/Dockerfile-dp3 .
-    - docker push $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
 
 build-wsclean:
   variables:
@@ -56,9 +56,9 @@ build-wsclean:
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
       -f ./test/Dockerfile-wsclean .
-    - docker push $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
 
 test-dp3:
   variables:
@@ -68,7 +68,7 @@ test-dp3:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
       docker run
-      $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
+      $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
       /opt/lofarbeam/lofarbeam/test/tDockerDP3
 
 test-wsclean:
@@ -79,7 +79,7 @@ test-wsclean:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
       docker pull
-      $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
+      $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
 
 deploy:
   variables:
