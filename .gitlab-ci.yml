@@ -7,7 +7,6 @@ stages:
 
 build-base:
   variables:
-    GIT_STRATEGY: none
     CI_DEBUG_TRACE: "true"
   stage: build-base
   script:
