@@ -12,5 +12,5 @@ ENV INSTALLDIR /opt
 RUN mkdir -p ${INSTALLDIR}/wsclean/build
 RUN cd ${INSTALLDIR}/wsclean && git clone https://git.code.sf.net/p/wsclean/code wsclean
 RUN cd ${INSTALLDIR}/wsclean/build && cmake -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/wsclean -DLOFAR_STATION_RESPONSE_LIB=${INSTALLDIR}/lofarbeam/lib/libstationresponse.so -DLOFAR_STATION_RESPONSE_INCLUDE_DIR=${INSTALLDIR}/lofarbeam/include ${INSTALLDIR}/wsclean/wsclean/wsclean
-RUN cd ${INSTALLDIR}/wsclean/build && make -j
+RUN cd ${INSTALLDIR}/wsclean/build && make -j 8
 RUN cd ${INSTALLDIR}/wsclean/build && make install

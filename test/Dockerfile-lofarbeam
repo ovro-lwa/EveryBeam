@@ -14,5 +14,5 @@ RUN mkdir -p ${INSTALLDIR}/lofarbeam/build
 RUN cd ${INSTALLDIR}/lofarbeam && git clone https://git.astron.nl/RD/LOFARBeam.git lofarbeam
 RUN cd ${INSTALLDIR}/lofarbeam/lofarbeam && git checkout ${LOFARBEAM_COMMIT}
 RUN cd ${INSTALLDIR}/lofarbeam/build && cmake -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/lofarbeam ../lofarbeam
-RUN cd ${INSTALLDIR}/lofarbeam/build && make -j
+RUN cd ${INSTALLDIR}/lofarbeam/build && make -j 8
 RUN cd ${INSTALLDIR}/lofarbeam/build && make install
