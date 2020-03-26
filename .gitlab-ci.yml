@@ -41,6 +41,7 @@ build-dp3:
     - >
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
       -f ./test/Dockerfile-dp3 .
     - docker push $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
@@ -54,6 +55,7 @@ build-wsclean:
     - >
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
       -f ./test/Dockerfile-wsclean .
     - docker push $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
