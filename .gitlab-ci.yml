@@ -17,7 +17,7 @@ build-base:
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --cache-from $CI_REGISTRY_IMAGE:latest
       --tag $CI_REGISTRY_IMAGE:base
-      -f test/Dockerfile-base .
+      -f ./test/Dockerfile-base .
     - docker push $CI_REGISTRY_IMAGE:base
 
 build-lofarbeam:
@@ -31,7 +31,7 @@ build-lofarbeam:
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-      -f test/Dockerfile-lofarbeam .
+      -f ./test/Dockerfile-lofarbeam .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
 
 build-dp3:
@@ -44,7 +44,7 @@ build-dp3:
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --tag $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
-      -f test/Dockerfile-dp3 .
+      -f ./test/Dockerfile-dp3 .
     - docker push $CI_REGISTRY_IMAGE/dp3:$CI_COMMIT_SHORT_SHA
 
 build-wsclean:
@@ -57,7 +57,7 @@ build-wsclean:
       docker build
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --tag $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
-      -f test/Dockerfile-wsclean .
+      -f ./test/Dockerfile-wsclean .
     - docker push $CI_REGISTRY_IMAGE/wsclean:$CI_COMMIT_SHORT_SHA
 
 test-dp3:
