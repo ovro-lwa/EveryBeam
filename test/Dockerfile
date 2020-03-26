@@ -69,3 +69,9 @@ RUN cd ${INSTALLDIR}/dp3/dp3 && git checkout ${DP3_BRANCH}
 RUN cd ${INSTALLDIR}/dp3/build && cmake ../dp3 -DCASACORE_ROOT_DIR=${INSTALLDIR}/casacore -DCMAKE_PREFIX_PATH=${INSTALLDIR}/lofarbeam -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/dp3
 RUN cd ${INSTALLDIR}/dp3/build && make -j
 RUN cd ${INSTALLDIR}/dp3/build && make install
+
+#
+# prepare-test
+#
+ENV TESTDIR /test
+RUN mkdir -p ${TESTDIR}
