@@ -62,9 +62,10 @@ RUN cd ${INSTALLDIR}/wsclean/build && make install
 # install-dp3
 #
 ENV DP3_VERSION 4.1
+ENV DP3_BRANCH oskar
 RUN mkdir -p ${INSTALLDIR}/dp3/build
-RUN cd ${INSTALLDIR}/dp3 && wget --quiet https://github.com/lofar-astron/DP3/archive/v${DP3_VERSION}.tar.gz -O dp3-${DP3_VERSION}.tar.gz
-RUN cd ${INSTALLDIR}/dp3 && tar xvf dp3-${DP3_VERSION}.tar.gz
-RUN cd ${INSTALLDIR}/dp3/build && cmake ../DP3-${DP3_VERSION} -DCASACORE_ROOT_DIR=${INSTALLDIR}/casacore -DCMAKE_PREFIX_PATH=${INSTALLDIR}/lofarbeam -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/dp3
+RUN cd ${INSTALLDIR}/dp3 && git clone https://github.com/lofar-astron/DP3.git dp3
+RUN cd ${INSTALLDIR}/dp3/dp3 && git checkout ${DP3_BRANCH}
+RUN cd ${INSTALLDIR}/dp3/build && cmake ../dp3 -DCASACORE_ROOT_DIR=${INSTALLDIR}/casacore -DCMAKE_PREFIX_PATH=${INSTALLDIR}/lofarbeam -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/dp3
 RUN cd ${INSTALLDIR}/dp3/build && make -j
 RUN cd ${INSTALLDIR}/dp3/build && make install
