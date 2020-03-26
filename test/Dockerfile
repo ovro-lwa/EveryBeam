@@ -75,4 +75,4 @@ RUN cd ${INSTALLDIR}/dp3/build && make install
 #
 ENV TESTDIR /test
 RUN mkdir -p ${TESTDIR}
-RUN cd ${TESTDIR} && tar xf ${INSTALLDIR}/dp3/DP3-${DP3_VERSION}/DPPP/test/tNDPPP-generic.in_MS.tgz
+RUN cd ${TESTDIR} && tar xf ${INSTALLDIR}/dp3/dp3/DPPP/test/tNDPPP-generic.in_MS.tgz
