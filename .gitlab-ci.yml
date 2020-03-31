@@ -6,8 +6,6 @@ stages:
   - deploy
 
 build-base:
-  variables:
-    CI_DEBUG_TRACE: "true"
   stage: build-base
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -19,8 +17,6 @@ build-base:
     - docker push $CI_REGISTRY_IMAGE:base
 
 build-lofarbeam:
-  variables:
-    CI_DEBUG_TRACE: "true"
   stage: build-lofarbeam
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -33,8 +29,6 @@ build-lofarbeam:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
 
 build-dp3:
-  variables:
-    CI_DEBUG_TRACE: "true"
   stage: build-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -47,8 +41,6 @@ build-dp3:
     - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
 
 build-wsclean:
-  variables:
-    CI_DEBUG_TRACE: "true"
   stage: build-dependency
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
