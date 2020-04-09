@@ -17,7 +17,8 @@ RUN apt-get -y install wcslib-dev
 #
 # install misc packages
 #
-RUN apt-get -y install wget git make cmake g++
+RUN apt-get update
+RUN apt-get -y install wget git make cmake g++ doxygen graphviz
 
 #
 # install dependencies
@@ -31,4 +32,3 @@ RUN apt-get -y install libgsl-dev
 RUN apt-get -y install libxml2-dev
 RUN apt-get -y install libpng-dev
 RUN apt-get -y install libgtkmm-3.0-dev
-RUN apt-get -y install doxygen
