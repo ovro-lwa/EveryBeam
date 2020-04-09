@@ -3,32 +3,31 @@
 
 ## Objectives:
 
-* Make Beam library instrument agnostic
-
-* Allow extensions to implement their own instrument specific antenna models
-
-* Allow extensions to implement their own instrument specific beamformers: discrete time-delay beamformer, spatial nulling beamformer
+ * Make Beam library instrument agnostic
+ * Allow extensions to implement their own instrument specific antenna models
+ * Allow extensions to implement their own instrument specific beamformers:
+   discrete time-delay beamformer, spatial nulling beamformer
 
 
 
 ## Strategy to meet Objectives
 
-* Split off all LOFAR specific things from core library
+ * Split off all LOFAR specific things from core library.
+ * The core library implements `Stations`, `BeamFormers` and `Elements`,
+   independent of the instrument.
+ * The core library can use instrument specific implementations of
+   `BeamFormers` and `Elements`.
 
-* The core library implements `Stations`, `Beamformers` and `Elements`, independent of the instrument
+LOFAR specific is [LofarMetaDataUtil](@ref LofarMetaDataUtil.h) which reads
+metadata from a LOFAR MeasurementSet. Based on that thata it composes Station
+consisting of BeamFormers and Elements.
 
-* The core library can use instrument specific implementations of `Beamformers` and `Elements`
-
-
-
-LOFAR specific is LofarMetaDataUtil which reads metadata from a LOFAR MeasurementSet.
-Based on that thata it composes Station consisting of Beamformers and Elements.
-The inputs of a Beamformer are elements at a given positions.
-A Beamformer is also an Element. This allows composition of multilevel beamformers
-
-For example a HBA tile is a Beamformer with HBA elements as inputs.
-A HBA field if a beamformer with multiple tiles as inputs.
-An HBA station is either a single HBA field (HBA0 or HBA1) or a beamformer with fields HBA0 and HBA1 as inputs.
+The inputs of a BeamFormer are elements at a given positions.
+A BeamFormer is also an Element. This allows composition of multilevel
+beamformers. For example a HBA tile is a BeamFormer with HBA elements as inputs.
+An HBA field is a beamformer with multiple tiles as inputs. An HBA station is
+either a single HBA field (HBA0 or HBA1) or a beamformer with fields HBA0 and
+HBA1 as inputs.
 
 
 
@@ -36,14 +35,14 @@ An HBA station is either a single HBA field (HBA0 or HBA1) or a beamformer with 
 
 Classes:
 
-* Station is a thin wrapper around a Response object, with some convenience functions
-* Response - something for which a response can be computed, can be a single element (antenna) or a beamformer
-* BeamFormerResponse - response of a beamformer, has inputs that are Response objects
-* ElementResponse - response of a single element (antenna), different models can be implemented
-
-
-
-
+* [Station](@ref LOFAR::StationResponse::Station) is a thin wrapper around an
+  Element object, with some convenience functions.
+* [Element](@ref LOFAR::StationResponse::Element) - something for which a
+  response can be computed, can be a single element (antenna) or a beamformer.
+* [BeamFormer](@ref LOFAR::StationResponse::BeamFormer) -
+  Special kind of Element beamformer, has inputs that are Element objects.
+* [ElementResponse](@ref LOFAR::StationResponse::ElementResponse) - response of
+  a single element (antenna), different models can be implemented.
 
 
 <!--Markdown | Less | Pretty

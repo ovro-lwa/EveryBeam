@@ -31,3 +31,4 @@ RUN apt-get -y install libgsl-dev
 RUN apt-get -y install libxml2-dev
 RUN apt-get -y install libpng-dev
 RUN apt-get -y install libgtkmm-3.0-dev
+RUN apt-get -y install doxygen
