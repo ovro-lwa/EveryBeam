@@ -17,9 +17,6 @@
 namespace LOFAR {
 namespace StationResponse {
 
-// \addtogroup StationResponse
-// @{
-
 class ITRFConverter
 {
 public:
@@ -27,7 +24,7 @@ public:
     typedef std::unique_ptr<const ITRFDirection> ConstPtr;
 
     ITRFConverter(real_t time);
-    
+
     void setTime(real_t time);
     vector3r_t j2000ToITRF(const vector2r_t &j2000Direction) const;
     vector3r_t j2000ToITRF(const vector3r_t &j2000Direction) const;
@@ -40,8 +37,6 @@ private:
     casacore::MeasFrame itsFrame;
     mutable casacore::MDirection::Convert itsConverter;
 };
-
-// @}
 
 } //# namespace StationResponse
 } // namespace LOFAR

@@ -35,9 +35,6 @@ namespace LOFAR {
 namespace StationResponse
 {
 
-// \addtogroup StationResponse
-// @{
-
 /** Print the contents of a static array. */
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj);
@@ -98,8 +95,6 @@ struct raw_array_factor_t
      */
     diag22r_t   weight;
 };
-
-// @}
 
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj)

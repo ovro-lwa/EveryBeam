@@ -38,9 +38,6 @@
 namespace LOFAR {
 namespace StationResponse {
 
-// \addtogroup StationResponse
-// @{
-
 class ITRFDirection
 {
 public:
@@ -64,8 +61,6 @@ private:
     mutable casacore::MDirection::Convert   itsConverter;
     mutable std::mutex                      itsMutex;
 };
-
-// @}
 
 } //# namespace StationResponse
 } // namespace LOFAR

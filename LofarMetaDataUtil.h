@@ -38,9 +38,6 @@
 namespace LOFAR {
 namespace StationResponse {
 
-// \addtogroup StationResponse
-// @{
-
 const ElementResponseModel defaultElementResponseModel = ElementResponseModel::Hamaker;
 
 Station::Ptr readStation(
@@ -64,8 +61,6 @@ void readStations(
 // Read the tile beam direction from a LOFAR MS. If it is not defined,
 // this function returns the delay center.
 casacore::MDirection readTileBeamDirection(const casacore::MeasurementSet &ms);
-
-// @}
 
 } //# namespace StationResponse
 } // namespace LOFAR
