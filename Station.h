@@ -39,9 +39,6 @@ namespace LOFAR {
 namespace StationResponse
 {
 
-// \addtogroup StationResponse
-// @{
-
 class Station
 {
 public:
@@ -361,7 +358,6 @@ private:
 
 };
 
-// @}
 
 //# ------------------------------------------------------------------------- //
 //# - Implementation: Station                                               - //

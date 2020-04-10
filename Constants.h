@@ -32,9 +32,6 @@ namespace LOFAR {
 namespace StationResponse
 {
 
-// \addtogroup StationResponse
-// @{
-
 /** %Constants used in this library. */
 namespace Constants
 {
@@ -50,8 +47,6 @@ const real_t pi_4 = 0.7853981633974483096156608;
 /** Speed of light (m/s) */
 const real_t c = 2.99792458e+08;
 } //# namespace Constants
-
-// @}
 
 } //# namespace StationResponse
 } // namespace LOFAR

@@ -33,9 +33,6 @@ namespace LOFAR {
 namespace StationResponse
 {
 
-// \addtogroup StationResponse
-// @{
-
 inline real_t dot(const vector3r_t &arg0, const vector3r_t &arg1)
 {
     return arg0[0] * arg1[0] + arg0[1] * arg1[1] +  arg0[2] * arg1[2];
@@ -161,8 +158,6 @@ inline diag22c_t normalize(const raw_array_factor_t &raw)
 
     return af;
 }
-
-// @}
 
 } //# namespace StationResponse
 } // namespace LOFAR

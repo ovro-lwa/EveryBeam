@@ -1,6 +1,7 @@
 stages:
   - build-base
   - build-lofarbeam
+  - build-doc
   - build-dependency
   - test-dependency
   - deploy
@@ -27,6 +28,21 @@ build-lofarbeam:
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
       -f ./test/Dockerfile-lofarbeam .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+build-doc:
+  stage: build-doc
+  script:
+  - >
+    docker run
+    --name $CI_COMMIT_SHORT_SHA
+    --workdir /opt/lofarbeam/build/
+    $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    sh -c 'make doc'
+  - docker cp $CI_COMMIT_SHORT_SHA:/opt/lofarbeam/build/doc/html htmldoc
+  - docker rm $CI_COMMIT_SHORT_SHA
+  artifacts:
+    paths:
+    - htmldoc
 
 build-dp3:
   stage: build-dependency
