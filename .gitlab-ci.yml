@@ -32,20 +32,17 @@ build-lofarbeam:
 build-doc:
   stage: build-doc
   script:
-  - mkdir -p doc
-  - ls
-  - hostname
-  - pwd
   - >
     docker run
+    --name $CI_COMMIT_SHORT_SHA
     --workdir /opt/lofarbeam/build/
-    --volume=${PWD}/doc:/opt/lofarbeam/build/doc/html
     $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-    pwd
-  - ls doc
+    sh -c 'make doc'
+  - docker cp $CI_COMMIT_SHORT_SHA:/opt/lofarbeam/build/doc/html htmldoc
+  - docker rm $CI_COMMIT_SHORT_SHA
   artifacts:
     paths:
-    - doc/*
+    - htmldoc
 
 build-dp3:
   stage: build-dependency
