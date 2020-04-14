@@ -2,6 +2,7 @@ stages:
   - build-base
   - build-lofarbeam
   - build-doc
+  - deploy-doc
   - build-dependency
   - test-dependency
   - deploy
@@ -43,6 +44,21 @@ build-doc:
   artifacts:
     paths:
     - htmldoc
+
+deploy-doc:
+  stage: deploy-doc
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | base64 -d | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H dop288 > ~/.ssh/known_hosts
+  script:
+    - scp -r htmldoc/* citt@dop288:LOFARBeam
+  only:
+    refs:
+      - master
 
 build-dp3:
   stage: build-dependency
