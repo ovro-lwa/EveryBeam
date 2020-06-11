@@ -13,8 +13,6 @@
 namespace LOFAR {
 namespace StationResponse {
 
-// PI / 2.0
-const double pi_2 = 1.570796326794896619231322;
 
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::getInstance(const std::string &name)
 {
@@ -48,9 +46,9 @@ void HamakerElementResponse::response(
     response[0][1] = 0.0;
     response[1][0] = 0.0;
     response[1][1] = 0.0;
-
+    
     // Clip directions below the horizon.
-    if(theta >= pi_2)
+    if(theta >= M_PI_2)
     {
         return;
     }

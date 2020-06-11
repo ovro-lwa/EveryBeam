@@ -26,7 +26,6 @@
 // \file
 // Various mathematical operations on vectors and matrices.
 
-#include "Constants.h"
 #include "Types.h"
 
 namespace LOFAR {
@@ -57,7 +56,7 @@ inline vector3r_t normalize(const vector3r_t &arg0)
 inline vector2r_t cart2thetaphi(const vector3r_t &cart)
 {
     real_t r = sqrt(cart[0] * cart[0] + cart[1] * cart[1]);
-    vector2r_t thetaphi = {{Constants::pi_2 - atan2(cart[2], r), atan2(cart[1],
+    vector2r_t thetaphi = {{M_PI_2 - atan2(cart[2], r), atan2(cart[1],
         cart[0])}};
     return thetaphi;
 }

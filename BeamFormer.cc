@@ -1,10 +1,10 @@
 #include "BeamFormer.h"
 
 #include "MathUtil.h"
+#include "Constants.h"
 
 #include <cmath>
 
-constexpr double speed_of_light = 299792458.0;
 
 namespace LOFAR {
 namespace StationResponse {
@@ -49,7 +49,7 @@ std::vector<std::complex<double>> BeamFormer::compute_geometric_response(double 
                     direction[1] * (antenna->m_phase_reference_position[1] - m_local_phase_reference_position[1]) +
                     direction[2] * (antenna->m_phase_reference_position[2] - m_local_phase_reference_position[2]);
 
-        double phase = -2 * M_PI * dl / (speed_of_light / freq);
+        double phase = -2 * M_PI * dl / (Constants::c / freq);
         result.push_back({std::sin(phase), std::cos(phase)});
     }
     return result;
