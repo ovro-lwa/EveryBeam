@@ -35,15 +35,6 @@ namespace StationResponse
 /** %Constants used in this library. */
 namespace Constants
 {
-/** 2.0 * pi */
-const real_t _2pi = 6.283185307179586476925286;
-
-/** pi / 2.0 */
-const real_t pi_2 = 1.570796326794896619231322;
-
-/** pi / 4.0 */
-const real_t pi_4 = 0.7853981633974483096156608;
-
 /** Speed of light (m/s) */
 const real_t c = 2.99792458e+08;
 } //# namespace Constants

@@ -29,9 +29,6 @@
 // them invisible outside this translation unit.
 namespace
 {
-// PI / 2.0
-const double pi_2 = 1.570796326794896619231322;
-
 #include "DefaultCoeffLBA.cc"
 #include "DefaultCoeffHBA.cc"
 }
@@ -65,7 +62,7 @@ void element_response(double freq, double theta, double phi,
     response[1][1] = 0.0;
 
     // Clip directions below the horizon.
-    if(theta >= pi_2)
+    if(theta >= M_PI_2)
     {
         return;
     }
