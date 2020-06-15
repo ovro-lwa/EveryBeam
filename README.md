@@ -1,6 +1,6 @@
-# LOFAR beam library
+# EveryBeam library
 
-Stand alone version of the LOFAR station response library.
+Stand alone version of the LOFAR station response library (LOFARBeam).
 
 This package provides an abstract interface to a selection of beam responses, and beamformed versions thereof. Currently implemented are:
 
@@ -23,7 +23,7 @@ Installation is then typically done as:
     make
     make install
 
-A `Dockerfile` to compile a working version of DPPP and LOFARBeam is included in the `test` directory.
+A `Dockerfile` to compile a working version of DPPP and EveryBeam is included in the `test` directory.
 
 ## Usage with DPPP
 
@@ -43,6 +43,9 @@ To simulate visibilities with a certain element model, use `DPPP DPPP.parset` wh
 ## Design
 
 See [docs/design.md](docs/design.md) for design considerations.
+
+## Documentation
+The `doxygen` documentation for EveryBeam can be found at https://www.astron.nl/citt/EveryBeam/
 
 ## Compatibility note
 This package has undergone the same branching process as [the DP3 package](https://github.com/lofar-astron/DP3): it is a continuation of the LOFAR beam library at svn.astron.nl/LOFAR, and was extracted from and branched off LOFAR Release 3.2. The LOFAR beam package will likely not be maintained in the ASTRON repository.
