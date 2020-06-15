@@ -31,86 +31,72 @@
 
 #include "oskar.h"
 
-template<typename FP, typename FP2>
-inline void oskar_dipole(
-    FP theta,
-    FP phi,
-    FP kL,
-    FP2& e_theta,
-    FP2& e_phi)
-{
-    FP sin_phi, cos_phi;
-    FP sin_theta, cos_theta;
-    oskar_sincos(phi, &sin_phi, &cos_phi);
-    oskar_sincos(theta, &sin_theta, &cos_theta);
-    FP cos_kL = (FP) cos(kL);
-    const FP denom = (FP)1 + cos_phi*cos_phi * (cos_theta*cos_theta - (FP)1);
-    if (denom == (FP)0)
-        e_theta.x = e_theta.y = e_phi.x = e_phi.y = (FP)0;
-    else {
-        const FP q = kL * cos_phi * sin_theta;
-        const FP cos_q = cos(q);
-        const FP t = (cos_q - cos_kL) / denom;
-        e_theta.x = -cos_phi * cos_theta * t;
-        e_phi.x = sin_phi * t;
-        e_phi.y = e_theta.y = (FP)0;
-    }
+template <typename FP, typename FP2>
+inline void oskar_dipole(FP theta, FP phi, FP kL, FP2& e_theta, FP2& e_phi) {
+  FP sin_phi, cos_phi;
+  FP sin_theta, cos_theta;
+  oskar_sincos(phi, &sin_phi, &cos_phi);
+  oskar_sincos(theta, &sin_theta, &cos_theta);
+  FP cos_kL = (FP)cos(kL);
+  const FP denom = (FP)1 + cos_phi * cos_phi * (cos_theta * cos_theta - (FP)1);
+  if (denom == (FP)0)
+    e_theta.x = e_theta.y = e_phi.x = e_phi.y = (FP)0;
+  else {
+    const FP q = kL * cos_phi * sin_theta;
+    const FP cos_q = cos(q);
+    const FP t = (cos_q - cos_kL) / denom;
+    e_theta.x = -cos_phi * cos_theta * t;
+    e_phi.x = sin_phi * t;
+    e_phi.y = e_theta.y = (FP)0;
+  }
 }
 
-template<typename FP, typename FP2>
-void oskar_evaluate_dipole_pattern(
-    const int num_points,
-    const FP* theta,
-    const FP* phi,
-    const FP kL,
-    const int stride,
-    const int E_theta_offset,
-    const int E_phi_offset,
-    FP2* e_theta,
-    FP2* e_phi)
-{
-    for (int i = 0; i < num_points; i++) {
-        const int i_out = i * stride;\
-        const int theta_out = i_out + E_theta_offset;\
-        const int phi_out   = i_out + E_phi_offset;\
-        oskar_dipole<FP, FP2>(theta[i], phi[i], kL, e_theta[theta_out], e_phi[phi_out]);
-    }
+template <typename FP, typename FP2>
+void oskar_evaluate_dipole_pattern(const int num_points, const FP* theta,
+                                   const FP* phi, const FP kL, const int stride,
+                                   const int E_theta_offset,
+                                   const int E_phi_offset, FP2* e_theta,
+                                   FP2* e_phi) {
+  for (int i = 0; i < num_points; i++) {
+    const int i_out = i * stride;
+    const int theta_out = i_out + E_theta_offset;
+    const int phi_out = i_out + E_phi_offset;
+    oskar_dipole<FP, FP2>(theta[i], phi[i], kL, e_theta[theta_out],
+                          e_phi[phi_out]);
+  }
 }
 
-void oskar_evaluate_dipole_pattern_double(
-    const int num_points,
-    const double* theta,
-    const double* phi,
-    const double freq_hz,
-    const double dipole_length_m,
-    std::complex<double>* pattern)
-{
-    const int stride = 4;
-    const int offset = 0;
-    const int E_theta_offset = offset;
-    const int E_phi_offset = offset + 1;
-    const double kL = dipole_length_m * (M_PI * freq_hz / 299792458);
-    double2* pattern_ptr = (double2 *) pattern;
+void oskar_evaluate_dipole_pattern_double(const int num_points,
+                                          const double* theta,
+                                          const double* phi,
+                                          const double freq_hz,
+                                          const double dipole_length_m,
+                                          std::complex<double>* pattern) {
+  const int stride = 4;
+  const int offset = 0;
+  const int E_theta_offset = offset;
+  const int E_phi_offset = offset + 1;
+  const double kL = dipole_length_m * (M_PI * freq_hz / 299792458);
+  double2* pattern_ptr = (double2*)pattern;
 
-    oskar_evaluate_dipole_pattern<double, double2>(
-        num_points, theta, phi, kL, stride, E_theta_offset, E_phi_offset, pattern_ptr, pattern_ptr);
+  oskar_evaluate_dipole_pattern<double, double2>(
+      num_points, theta, phi, kL, stride, E_theta_offset, E_phi_offset,
+      pattern_ptr, pattern_ptr);
 }
 
-void oskar_evaluate_dipole_pattern_float(
-    const int num_points,
-    const float* theta,
-    const float* phi,
-    const float freq_hz,
-    const float dipole_length_m,
-    std::complex<double>* pattern)
-{
-    const int stride = 4;
-    const int offset = 0;
-    const int E_theta_offset = offset;
-    const int E_phi_offset = offset + 1;
-    const float kL = dipole_length_m * (M_PI * freq_hz / 299792458);
-    float2* pattern_ptr = (float2 *) pattern;
+void oskar_evaluate_dipole_pattern_float(const int num_points,
+                                         const float* theta, const float* phi,
+                                         const float freq_hz,
+                                         const float dipole_length_m,
+                                         std::complex<double>* pattern) {
+  const int stride = 4;
+  const int offset = 0;
+  const int E_theta_offset = offset;
+  const int E_phi_offset = offset + 1;
+  const float kL = dipole_length_m * (M_PI * freq_hz / 299792458);
+  float2* pattern_ptr = (float2*)pattern;
 
-    oskar_evaluate_dipole_pattern<float, float2>(
-        num_points, theta, phi, kL, stride, E_theta_offset, E_phi_offset, pattern_ptr, pattern_ptr);
+  oskar_evaluate_dipole_pattern<float, float2>(
+      num_points, theta, phi, kL, stride, E_theta_offset, E_phi_offset,
+      pattern_ptr, pattern_ptr);
 }
