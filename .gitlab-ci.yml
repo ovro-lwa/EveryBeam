@@ -63,7 +63,7 @@ deploy-doc:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H dop288 > ~/.ssh/known_hosts
   script:
-    - scp -r htmldoc/* citt@dop288:LOFARBeam
+    - scp -r htmldoc/* citt@dop288:EveryBeam
   only:
     refs:
       - master
