@@ -1,5 +1,6 @@
 stages:
   - build-base
+  - clang-format
   - build-lofarbeam
   - build-doc
   - deploy-doc
@@ -17,6 +18,13 @@ build-base:
       --tag $CI_REGISTRY_IMAGE:base
       -f ./test/Dockerfile-base .
     - docker push $CI_REGISTRY_IMAGE:base
+
+clang-format:
+  stage: clang-format
+  image: $CI_REGISTRY_IMAGE:base
+  script: 
+    - apt-get update && apt-get -y install clang-format
+    - ./scripts/clang-format-check.sh
 
 build-lofarbeam:
   stage: build-lofarbeam
