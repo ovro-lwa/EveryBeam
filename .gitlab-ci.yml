@@ -4,8 +4,8 @@ stages:
   - build-lofarbeam
   - build-doc
   - deploy-doc
-  - build-dependency
-  - test-dependency
+  # - build-dependency
+  # - test-dependency
   - deploy
 
 build-base:
@@ -23,7 +23,9 @@ clang-format:
   stage: clang-format
   image: $CI_REGISTRY_IMAGE:base
   script: 
-    - apt-get update && apt-get -y install clang-format
+    # - apt-get update && apt-get -y install clang-format
+    - apt-get -y install python3-pip
+    - pip3 install clang-format
     - ./scripts/clang-format-check.sh
 
 build-lofarbeam:
@@ -68,50 +70,50 @@ deploy-doc:
     refs:
       - master
 
-build-dp3:
-  stage: build-dependency
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker build
-      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
-      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-      -f ./test/Dockerfile-dp3 .
-    - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
+# build-dp3:
+#   stage: build-dependency
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - >
+#       docker build
+#       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+#       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+#       --tag $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
+#       -f ./test/Dockerfile-dp3 .
+#     - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
 
-build-wsclean:
-  stage: build-dependency
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker build
-      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
-      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
-      -f ./test/Dockerfile-wsclean .
-    - docker push $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
+# build-wsclean:
+#   stage: build-dependency
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - >
+#       docker build
+#       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
+#       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+#       --tag $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
+#       -f ./test/Dockerfile-wsclean .
+#     - docker push $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
 
-test-dp3:
-  variables:
-    GIT_STRATEGY: none
-  stage: test-dependency
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker run
-      $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-      /opt/lofarbeam/lofarbeam/test/tDockerDP3
+# test-dp3:
+#   variables:
+#     GIT_STRATEGY: none
+#   stage: test-dependency
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - >
+#       docker run
+#       $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
+#       /opt/lofarbeam/lofarbeam/test/tDockerDP3
 
-test-wsclean:
-  variables:
-    GIT_STRATEGY: none
-  stage: test-dependency
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker pull
-      $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
+# test-wsclean:
+#   variables:
+#     GIT_STRATEGY: none
+#   stage: test-dependency
+#   script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - >
+#       docker pull
+#       $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
 
 deploy:
   variables:

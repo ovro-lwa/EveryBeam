@@ -1,8 +1,7 @@
 #include "Element.h"
 #include "MathUtil.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 matrix22c_t Element::local_response(real_t time, real_t freq,
                                     const vector3r_t &direction, size_t id,
@@ -33,5 +32,4 @@ matrix22c_t Element::local_response(real_t time, real_t freq,
   return local_response(time, freq, direction, m_id, options);
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

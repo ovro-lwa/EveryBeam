@@ -1,5 +1,5 @@
-#ifndef ELEMENT_H
-#define ELEMENT_H
+#ifndef EVERYBEAM_ELEMENT_H
+#define EVERYBEAM_ELEMENT_H
 
 #include <complex>
 #include <memory>
@@ -8,8 +8,7 @@
 #include "ElementResponse.h"
 #include "Types.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class Element : public Antenna
 {
@@ -42,7 +41,6 @@ private:
     ElementResponse::Ptr m_element_response;
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

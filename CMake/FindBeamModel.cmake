@@ -9,14 +9,14 @@ find_package(PackageHandleStandardArgs)
 
 find_path(
     BEAMMODEL_INCLUDE_DIR
-    NAMES StationResponse/Station.h
+    NAMES EveryBeam/Station.h
     HINTS ${BEAMMODEL_ROOT_DIR}
     PATH_SUFFIXES include
 )
 
 find_library(
     BEAMMODEL_STATION_RESPONSE_LIBRARY
-    NAMES stationresponse
+    NAMES everybeam
     HINTS ${BEAMMODEL_ROOT_DIR}
     PATH_SUFFIXES lib
 )

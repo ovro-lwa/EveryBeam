@@ -5,7 +5,7 @@
 #include "beam-helper.h"
 
 void calculateStationBeams(
-    std::vector<LOFAR::StationResponse::Station::Ptr>& stations,
+    std::vector<everybeam::Station::Ptr>& stations,
     std::vector<vector3r_t>& itrfDirections,
     vector3r_t stationDirection,
     vector3r_t tileDirection,
@@ -40,7 +40,7 @@ void calculateStationBeams(
 }
 
 void run(
-    LOFAR::StationResponse::ElementResponseModel elementResponseModel,
+    everybeam::ElementResponseModel elementResponseModel,
     double frequency,
     std::string& input_filename,
     std::string& output_filename)
@@ -76,7 +76,7 @@ void run(
     double currentTime = timeColumn(nr_timesteps / 2);
 
     // Read stations
-    std::vector<LOFAR::StationResponse::Station::Ptr> stations;
+    std::vector<everybeam::Station::Ptr> stations;
     stations.resize(nr_stations);
     readStations(ms, stations.begin(), elementResponseModel);
 

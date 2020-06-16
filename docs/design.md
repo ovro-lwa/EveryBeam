@@ -19,7 +19,7 @@
    `BeamFormers` and `Elements`.
 
 LOFAR specific is [LofarMetaDataUtil](@ref LofarMetaDataUtil.h) which reads
-metadata from a LOFAR MeasurementSet. Based on that thata it composes Station
+metadata from a LOFAR MeasurementSet. Based on that data it composes Station
 consisting of BeamFormers and Elements.
 
 The inputs of a BeamFormer are elements at a given positions.
@@ -35,13 +35,13 @@ HBA1 as inputs.
 
 Classes:
 
-* [Station](@ref LOFAR::StationResponse::Station) is a thin wrapper around an
+* [Station](@ref everybeam::Station) is a thin wrapper around an
   Element object, with some convenience functions.
-* [Element](@ref LOFAR::StationResponse::Element) - something for which a
+* [Element](@ref everybeam::Element) - something for which a
   response can be computed, can be a single element (antenna) or a beamformer.
-* [BeamFormer](@ref LOFAR::StationResponse::BeamFormer) -
+* [BeamFormer](@ref everybeam::BeamFormer) -
   Special kind of Element beamformer, has inputs that are Element objects.
-* [ElementResponse](@ref LOFAR::StationResponse::ElementResponse) - response of
+* [ElementResponse](@ref everybeam::ElementResponse) - response of
   a single element (antenna), different models can be implemented.
 
 

@@ -1,10 +1,12 @@
+#ifndef HAMAKER_ELEMENTRESPONSE_H
+#define HAMAKER_ELEMENTRESPONSE_H
+
 #include "../ElementResponse.h"
 #include "HamakerCoeff.h"
 
 #include <memory>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class HamakerElementResponse : public ElementResponse
 {
@@ -35,5 +37,6 @@ public:
     HamakerElementResponseLBA();
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
+
+#endif

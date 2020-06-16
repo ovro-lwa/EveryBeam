@@ -14,7 +14,7 @@
 #include <casacore/tables/Tables/TableRecord.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
-using namespace LOFAR::StationResponse;
+using namespace everybeam;
 
 void GetPhaseCentreInfo(
     casacore::MeasurementSet& ms,

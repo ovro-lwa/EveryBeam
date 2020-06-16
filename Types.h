@@ -20,8 +20,8 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_TYPES_H
-#define LOFAR_STATIONRESPONSE_TYPES_H
+#ifndef EVERYBEAM_TYPES_H
+#define EVERYBEAM_TYPES_H
 
 // \file
 // Types used in this library.
@@ -31,9 +31,7 @@
 #include <ostream>
 #include <complex>
 
-namespace LOFAR {
-namespace StationResponse
-{
+namespace everybeam {
 
 /** Print the contents of a static array. */
 template <typename T, size_t N>
@@ -103,7 +101,6 @@ std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj)
   return out;
 }
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

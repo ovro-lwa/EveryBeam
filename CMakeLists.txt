@@ -39,7 +39,7 @@ add_subdirectory(oskar)
 
 add_compile_options(-std=c++11 -Wall -DNDEBUG -Wl,--no-undefined)
 
-add_library(stationresponse SHARED
+add_library(everybeam SHARED
   Antenna.cc
   ElementResponse.cc
   BeamFormer.cc
@@ -52,18 +52,18 @@ add_library(stationresponse SHARED
   Types.cc
 )
 
-set_target_properties(stationresponse PROPERTIES
+set_target_properties(everybeam PROPERTIES
     CXX_STANDARD 17
     VERSION 3
 )
 
-target_include_directories(stationresponse PUBLIC ${CASACORE_INCLUDE_DIR})
+target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 
-target_link_libraries(stationresponse PUBLIC ${CASACORE_LIBRARIES})
+target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES})
 
-target_link_libraries(stationresponse PUBLIC hamaker lobes oskar)
+target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
 
-install (TARGETS stationresponse DESTINATION lib)
+install (TARGETS everybeam DESTINATION lib)
 
 install (FILES
   Antenna.h
@@ -78,7 +78,7 @@ install (FILES
   Types.h
   ITRFConverter.h
   ITRFDirection.h
-DESTINATION include/StationResponse)
+DESTINATION include/EveryBeam)
 
 find_package(Doxygen)
 

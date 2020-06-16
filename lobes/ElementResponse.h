@@ -30,7 +30,7 @@
 
 #include <complex>
 
-namespace LOFAR
+namespace everybeam
 {
 
 // \addtogroup ElementResponse
@@ -96,6 +96,6 @@ void element_response(double freq, double theta, double phi,
 
 // @}
 
-} //# namespace LOFAR
+} //# namespace everybeam
 
 #endif

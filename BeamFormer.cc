@@ -5,8 +5,7 @@
 
 #include <cmath>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 vector3r_t BeamFormer::transform_to_local_position(const vector3r_t &position) {
   vector3r_t dposition{position[0] - m_coordinate_system.origin[0],
@@ -52,14 +51,14 @@ std::vector<std::complex<double>> BeamFormer::compute_geometric_response(
                 direction[2] * (antenna->m_phase_reference_position[2] -
                                 m_local_phase_reference_position[2]);
 
-    double phase = -2 * M_PI * dl / (Constants::c / freq);
+    double phase = -2 * M_PI * dl / (constants::c / freq);
     result.push_back({std::sin(phase), std::cos(phase)});
   }
   return result;
 }
 
 std::vector<std::pair<std::complex<double>, std::complex<double>>>
-    BeamFormer::compute_weights(const vector3r_t &pointing, double freq) const {
+BeamFormer::compute_weights(const vector3r_t &pointing, double freq) const {
   std::vector<std::pair<std::complex<double>, std::complex<double>>> result;
   double weight_sum[2] = {0.0, 0.0};
   auto geometric_response = compute_geometric_response(freq, pointing);
@@ -110,5 +109,4 @@ matrix22c_t BeamFormer::local_response(real_t time, real_t freq,
   return result;
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

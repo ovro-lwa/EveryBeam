@@ -20,17 +20,15 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_MATHUTIL_H
-#define LOFAR_STATIONRESPONSE_MATHUTIL_H
+#ifndef EVERYBEAM_MATHUTIL_H
+#define EVERYBEAM_MATHUTIL_H
 
 // \file
 // Various mathematical operations on vectors and matrices.
 
 #include "Types.h"
 
-namespace LOFAR {
-namespace StationResponse
-{
+namespace everybeam {
 
 inline real_t dot(const vector3r_t &arg0, const vector3r_t &arg1)
 {
@@ -158,7 +156,6 @@ inline diag22c_t normalize(const raw_array_factor_t &raw)
     return af;
 }
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

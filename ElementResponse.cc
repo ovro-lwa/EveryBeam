@@ -1,7 +1,6 @@
 #include "ElementResponse.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   switch (model) {
@@ -26,5 +25,4 @@ std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   return os;
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

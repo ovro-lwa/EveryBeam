@@ -1,4 +1,4 @@
-//# pystationresponse.cc: python module for StationResponse object.
+//# pyeverybeam.cc: python module for EveryBeam object.
 //# Copyright (C) 2007
 //# ASTRON (Netherlands Institute for Radio Astronomy)
 //# P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
@@ -45,20 +45,19 @@
 
 using namespace casacore;
 using namespace boost::python;
-using namespace LOFAR::StationResponse;
+using namespace everybeam;
 
-namespace LOFAR {
-namespace BBS {
+namespace everybeam {
 namespace {
 /*!
- *  \brief Convert an ITRF position given as a StationResponse::vector3r_t
+ *  \brief Convert an ITRF position given as a everybeam::vector3r_t
  *  instance to a casacore::MPosition.
  */
 MPosition toMPositionITRF(const vector3r_t &position);
 
 /*!
  *  \brief Convert a casacore::MPosition instance to a
- #  StationResponse::vector3r_t instance.
+ #  everybeam::vector3r_t instance.
  */
 vector3r_t fromMPosition(const MPosition &position);
 
@@ -139,11 +138,11 @@ MDirection readDelayReference(const MeasurementSet &ms, unsigned int idField);
 MDirection readTileReference(const MeasurementSet &ms, unsigned int idField);
 }  // namespace
 
-class PyStationResponse {
+class PyEveryBeam {
  public:
-  PyStationResponse(const string &msName, bool inverse = false,
-                    bool useElementResponse = true, bool useArrayFactor = true,
-                    bool useChanFreq = false);
+  PyEveryBeam(const string &msName, bool inverse = false,
+              bool useElementResponse = true, bool useArrayFactor = true,
+              bool useChanFreq = false);
 
   // Get the software version.
   string version(const string &type) const;
@@ -216,9 +215,9 @@ class PyStationResponse {
   ITRFDirection::Ptr itsDirection;
 };
 
-PyStationResponse::PyStationResponse(const string &name, bool inverse,
-                                     bool useElementResponse,
-                                     bool useArrayFactor, bool useChanFreq)
+PyEveryBeam::PyEveryBeam(const string &name, bool inverse,
+                         bool useElementResponse, bool useArrayFactor,
+                         bool useChanFreq)
     : itsInverse(inverse),
       itsUseElementResponse(useElementResponse),
       itsUseArrayFactor(useArrayFactor),
@@ -274,18 +273,14 @@ PyStationResponse::PyStationResponse(const string &name, bool inverse,
                                          MDirection::J2000)())));
 }
 
-string PyStationResponse::version(const string &type) const {
-  //     return Version::getInfo<pystationresponseVersion>("stationresponse",
-  //     type);
-  return "0.1";
-}
+string PyEveryBeam::version(const string &type) const { return "0.1"; }
 
-void PyStationResponse::setRefDelay(double ra, double dec) {
+void PyEveryBeam::setRefDelay(double ra, double dec) {
   vector2r_t direction = {{ra, dec}};
   itsRefDelay.reset(new ITRFDirection(itsRefPosition, direction));
 }
 
-ValueHolder PyStationResponse::getRefDelay(real_t time) {
+ValueHolder PyEveryBeam::getRefDelay(real_t time) {
   vector3r_t refDelay = itsRefDelay->at(time);
   Vector<Double> result(3);
   result(0) = refDelay[0];
@@ -295,12 +290,12 @@ ValueHolder PyStationResponse::getRefDelay(real_t time) {
   return ValueHolder(result);
 }
 
-void PyStationResponse::setRefTile(double ra, double dec) {
+void PyEveryBeam::setRefTile(double ra, double dec) {
   vector2r_t direction = {{ra, dec}};
   itsRefTile.reset(new ITRFDirection(itsRefPosition, direction));
 }
 
-ValueHolder PyStationResponse::getRefTile(real_t time) {
+ValueHolder PyEveryBeam::getRefTile(real_t time) {
   vector3r_t refTile = itsRefTile->at(time);
   Vector<Double> result(3);
   result(0) = refTile[0];
@@ -310,12 +305,12 @@ ValueHolder PyStationResponse::getRefTile(real_t time) {
   return ValueHolder(result);
 }
 
-void PyStationResponse::setDirection(double ra, double dec) {
+void PyEveryBeam::setDirection(double ra, double dec) {
   vector2r_t direction = {{ra, dec}};
   itsDirection.reset(new ITRFDirection(itsRefPosition, direction));
 }
 
-ValueHolder PyStationResponse::getDirection(real_t time) {
+ValueHolder PyEveryBeam::getDirection(real_t time) {
   vector3r_t direction = itsDirection->at(time);
   Vector<Double> result(3);
   result(0) = direction[0];
@@ -325,7 +320,7 @@ ValueHolder PyStationResponse::getDirection(real_t time) {
   return ValueHolder(result);
 }
 
-ValueHolder PyStationResponse::evaluate0(double time) {
+ValueHolder PyEveryBeam::evaluate0(double time) {
   Array<DComplex> result(
       IPosition(4, 2, 2, itsChanFreq.size(), itsStations.size()));
 
@@ -343,7 +338,7 @@ ValueHolder PyStationResponse::evaluate0(double time) {
   return ValueHolder(result);
 }
 
-ValueHolder PyStationResponse::evaluate1(double time, int station) {
+ValueHolder PyEveryBeam::evaluate1(double time, int station) {
   //     assertSTR(station >= 0 && static_cast<size_t>(station)
   //       < itsStations.size(), "invalid station number: " << station);
 
@@ -356,8 +351,7 @@ ValueHolder PyStationResponse::evaluate1(double time, int station) {
       evaluate(itsStations(station), time, itsChanFreq, itsRefFreq));
 }
 
-ValueHolder PyStationResponse::evaluate2(double time, int station,
-                                         int channel) {
+ValueHolder PyEveryBeam::evaluate2(double time, int station, int channel) {
   //     assertSTR(station >= 0 && static_cast<size_t>(station)
   //       < itsStations.size(), "invalid station number: " << station);
   //     assertSTR(channel >= 0 && static_cast<size_t>(channel)
@@ -372,8 +366,7 @@ ValueHolder PyStationResponse::evaluate2(double time, int station,
   return ValueHolder(evaluate(itsStations(station), time, freq, freq0));
 }
 
-ValueHolder PyStationResponse::evaluate3(double time, int station,
-                                         double freq) {
+ValueHolder PyEveryBeam::evaluate3(double time, int station, double freq) {
   //     assertSTR(station >= 0 && static_cast<size_t>(station)
   //       < itsStations.size(), "invalid station number: " << station);
 
@@ -385,10 +378,10 @@ ValueHolder PyStationResponse::evaluate3(double time, int station,
   return ValueHolder(evaluate(itsStations(station), time, freq, freq0));
 }
 
-ValueHolder PyStationResponse::evaluate4(double time, int station, double freq,
-                                         const ValueHolder &vh_direction,
-                                         const ValueHolder &vh_station0,
-                                         const ValueHolder &vh_tile0) {
+ValueHolder PyEveryBeam::evaluate4(double time, int station, double freq,
+                                   const ValueHolder &vh_direction,
+                                   const ValueHolder &vh_station0,
+                                   const ValueHolder &vh_tile0) {
   assert(vh_direction.dataType() == TpArrayDouble);
   assert(vh_station0.dataType() == TpArrayDouble);
   assert(vh_tile0.dataType() == TpArrayDouble);
@@ -412,10 +405,9 @@ ValueHolder PyStationResponse::evaluate4(double time, int station, double freq,
                                    direction, station0, tile0));
 }
 
-Cube<DComplex> PyStationResponse::evaluate(const Station::ConstPtr &station,
-                                           double time,
-                                           const Vector<Double> &freq,
-                                           const Vector<Double> &freq0) const {
+Cube<DComplex> PyEveryBeam::evaluate(const Station::ConstPtr &station,
+                                     double time, const Vector<Double> &freq,
+                                     const Vector<Double> &freq0) const {
   Cube<DComplex> result(2, 2, freq.size(), 0.0);
   if (itsUseArrayFactor) {
     vector3r_t direction = itsDirection->at(time);
@@ -478,10 +470,12 @@ Cube<DComplex> PyStationResponse::evaluate(const Station::ConstPtr &station,
   return result;
 }
 
-Matrix<DComplex> PyStationResponse::evaluate_itrf(
-    const Station::ConstPtr &station, double time, double freq, double freq0,
-    const vector3r_t &direction, const vector3r_t &station0,
-    const vector3r_t &tile0) const {
+Matrix<DComplex> PyEveryBeam::evaluate_itrf(const Station::ConstPtr &station,
+                                            double time, double freq,
+                                            double freq0,
+                                            const vector3r_t &direction,
+                                            const vector3r_t &station0,
+                                            const vector3r_t &tile0) const {
   Matrix<DComplex> result(2, 2, 0.0);
   if (itsUseArrayFactor) {
     if (itsUseElementResponse) {
@@ -531,9 +525,9 @@ Matrix<DComplex> PyStationResponse::evaluate_itrf(
   return result;
 }
 
-Matrix<DComplex> PyStationResponse::evaluate(const Station::ConstPtr &station,
-                                             double time, double freq,
-                                             double freq0) const {
+Matrix<DComplex> PyEveryBeam::evaluate(const Station::ConstPtr &station,
+                                       double time, double freq,
+                                       double freq0) const {
   vector3r_t direction;
   vector3r_t station0;
   vector3r_t tile0;
@@ -547,7 +541,7 @@ Matrix<DComplex> PyStationResponse::evaluate(const Station::ConstPtr &station,
   return evaluate_itrf(station, time, freq, freq0, direction, station0, tile0);
 }
 
-void PyStationResponse::invert(matrix22c_t &in) const {
+void PyEveryBeam::invert(matrix22c_t &in) const {
   complex_t invDet = 1.0 / (in[0][0] * in[1][1] - in[0][1] * in[1][0]);
 
   complex_t tmp = in[1][1];
@@ -560,7 +554,7 @@ void PyStationResponse::invert(matrix22c_t &in) const {
   in[1][1] *= invDet;
 }
 
-void PyStationResponse::invert(diag22c_t &in) const {
+void PyEveryBeam::invert(diag22c_t &in) const {
   DComplex invDet = 1.0 / (in[0] * in[1]);
   DComplex tmp = in[1];
   in[1] = in[0];
@@ -571,34 +565,31 @@ void PyStationResponse::invert(diag22c_t &in) const {
 }
 
 // Now define the interface in Boost-Python.
-void pystationresponse() {
-  class_<PyStationResponse>("StationResponse",
-                            init<std::string, bool, bool, bool, bool>())
-      .def("version", &PyStationResponse::version,
+void pyeverybeam() {
+  class_<PyEveryBeam>("EveryBeam", init<std::string, bool, bool, bool, bool>())
+      .def("version", &PyEveryBeam::version,
            (boost::python::arg("type") = "other"))
-      .def("setRefDelay", &PyStationResponse::setRefDelay,
+      .def("setRefDelay", &PyEveryBeam::setRefDelay,
            (boost::python::arg("ra"), boost::python::arg("dec")))
-      .def("getRefDelay", &PyStationResponse::getRefDelay,
+      .def("getRefDelay", &PyEveryBeam::getRefDelay,
            (boost::python::arg("time")))
-      .def("setRefTile", &PyStationResponse::setRefTile,
+      .def("setRefTile", &PyEveryBeam::setRefTile,
            (boost::python::arg("ra"), boost::python::arg("dec")))
-      .def("getRefTile", &PyStationResponse::getRefTile,
-           (boost::python::arg("time")))
-      .def("setDirection", &PyStationResponse::setDirection,
+      .def("getRefTile", &PyEveryBeam::getRefTile, (boost::python::arg("time")))
+      .def("setDirection", &PyEveryBeam::setDirection,
            (boost::python::arg("ra"), boost::python::arg("dec")))
-      .def("getDirection", &PyStationResponse::getDirection,
+      .def("getDirection", &PyEveryBeam::getDirection,
            (boost::python::arg("time")))
-      .def("evaluate0", &PyStationResponse::evaluate0,
-           (boost::python::arg("time")))
-      .def("evaluate1", &PyStationResponse::evaluate1,
+      .def("evaluate0", &PyEveryBeam::evaluate0, (boost::python::arg("time")))
+      .def("evaluate1", &PyEveryBeam::evaluate1,
            (boost::python::arg("time"), boost::python::arg("station")))
-      .def("evaluate2", &PyStationResponse::evaluate2,
+      .def("evaluate2", &PyEveryBeam::evaluate2,
            (boost::python::arg("time"), boost::python::arg("station"),
             boost::python::arg("channel")))
-      .def("evaluate3", &PyStationResponse::evaluate3,
+      .def("evaluate3", &PyEveryBeam::evaluate3,
            (boost::python::arg("time"), boost::python::arg("station"),
             boost::python::arg("freq")))
-      .def("evaluate4", &PyStationResponse::evaluate4,
+      .def("evaluate4", &PyEveryBeam::evaluate4,
            (boost::python::arg("time"), boost::python::arg("station"),
             boost::python::arg("freq"), boost::python::arg("direction"),
             boost::python::arg("station0"), boost::python::arg("tile0")));
@@ -688,14 +679,13 @@ MDirection readTileReference(const MeasurementSet &ms, unsigned int idField) {
 }
 }  // namespace
 
-}  // namespace BBS
-}  // namespace LOFAR
+}  // namespace everybeam
 
 // Define the python module itself.
-BOOST_PYTHON_MODULE(_stationresponse) {
+BOOST_PYTHON_MODULE(_everybeam) {
   casacore::python::register_convert_excp();
   casacore::python::register_convert_basicdata();
   casacore::python::register_convert_casa_valueholder();
 
-  LOFAR::BBS::pystationresponse();
+  everybeam::pyeverybeam();
 }

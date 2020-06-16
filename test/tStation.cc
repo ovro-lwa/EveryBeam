@@ -8,7 +8,7 @@
 
 #include "config.h"
 
-using namespace LOFAR::StationResponse;
+using namespace everybeam;
 
 int main() {
   std::string name = "CS001LBA";

@@ -20,14 +20,12 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_MUTABLEPTR_H
-#define LOFAR_STATIONRESPONSE_MUTABLEPTR_H
+#ifndef EVERYBEAM_MUTABLEPTR_H
+#define EVERYBEAM_MUTABLEPTR_H
 
 #include <memory>
 
-namespace LOFAR {
-namespace StationResponse
-{
+namespace everybeam {
 
 /*!
  * \brief MutablePtr is a mutable smart pointer derived from std::shared_ptr.
@@ -85,7 +83,6 @@ public:
     explicit operator bool() const noexcept {return **this;}
 };
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef BEAMFORMER_H
-#define BEAMFORMER_H
+#ifndef EVERYBEAM_BEAMFORMER_H
+#define EVERYBEAM_BEAMFORMER_H
 
 #include <complex>
 #include <vector>
@@ -7,8 +7,7 @@
 #include "Element.h"
 #include "Types.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class BeamFormer : public Antenna
 {
@@ -65,8 +64,7 @@ private:
 
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 
 #endif
