@@ -55,8 +55,8 @@ void HamakerCoefficients::set_coeffs(
 }
 
 std::pair<std::complex<double>, std::complex<double>>
-    HamakerCoefficients::get_coeff(const unsigned int n, const unsigned int t,
-                                   const unsigned int f) {
+HamakerCoefficients::get_coeff(const unsigned int n, const unsigned int t,
+                               const unsigned int f) {
   size_t index = get_index(n, t, f);
   std::pair<std::complex<double>, std::complex<double>> value;
   value.first = m_coeff[index];

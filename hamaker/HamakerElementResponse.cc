@@ -9,8 +9,7 @@
 #include "HamakerElementResponse.h"
 #include "../Singleton.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::getInstance(
     const std::string& name) {
@@ -124,5 +123,4 @@ HamakerElementResponseLBA::HamakerElementResponseLBA() {
   m_coeffs.reset(new HamakerCoefficients(path));
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

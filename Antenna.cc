@@ -2,8 +2,7 @@
 
 #include "MathUtil.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 vector3r_t Antenna::transform_to_local_direction(const vector3r_t &direction) {
   vector3r_t local_direction{
@@ -15,5 +14,4 @@ vector3r_t Antenna::transform_to_local_direction(const vector3r_t &direction) {
   return local_direction;
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

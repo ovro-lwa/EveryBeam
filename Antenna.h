@@ -1,5 +1,5 @@
-#ifndef ANTENNA_H
-#define ANTENNA_H
+#ifndef EVERYBEAM_ANTENNA_H
+#define EVERYBEAM_ANTENNA_H
 
 #include <complex>
 #include <memory>
@@ -7,8 +7,7 @@
 
 #include "Types.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class Antenna
 {
@@ -157,6 +156,5 @@ private:
 
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 #endif

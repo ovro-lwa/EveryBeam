@@ -20,8 +20,8 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_ITRFDIRECTION_H
-#define LOFAR_STATIONRESPONSE_ITRFDIRECTION_H
+#ifndef EVERYBEAM_ITRFDIRECTION_H
+#define EVERYBEAM_ITRFDIRECTION_H
 
 // \file
 // Functor that maps time to an ITRF direction.
@@ -35,8 +35,7 @@
 #include <memory>
 #include <mutex>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class ITRFDirection
 {
@@ -62,7 +61,6 @@ private:
     mutable std::mutex                      itsMutex;
 };
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

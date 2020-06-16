@@ -3,8 +3,7 @@
 #include "config.h"
 #include <iostream>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 void OSKARElementResponseDipole::response(
     double freq, double theta, double phi,
@@ -60,5 +59,4 @@ std::string OSKARElementResponseSphericalWave::get_path(
   return ss.str();
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

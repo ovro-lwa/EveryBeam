@@ -18,7 +18,7 @@ if (TEST_MEASUREMENTSET)
   )
   target_include_directories(
     tStationReference PRIVATE
-    ${BEAMMODEL_INCLUDE_DIR}/StationResponse
+    ${BEAMMODEL_INCLUDE_DIR}/EveryBeam
     ${CASACORE_INCLUDE_DIR}
     "${CMAKE_SOURCE_DIR}"
     "${CMAKE_BINARY_DIR}"
@@ -30,7 +30,7 @@ if (TEST_MEASUREMENTSET)
   add_executable(tStation tStation.cc)
   target_link_libraries(
     tStation PRIVATE
-    stationresponse
+    everybeam
   )
   target_include_directories(
     tStation PRIVATE
@@ -46,7 +46,7 @@ if (CFITSIO_FOUND)
   add_library(beamhelper SHARED beam-helper.cpp)
   target_include_directories(beamhelper PUBLIC "${CMAKE_SOURCE_DIR}")
   target_include_directories(beamhelper PUBLIC ${CFITSIO_INCLUDE_DIR})
-  target_link_libraries(beamhelper PUBLIC stationresponse)
+  target_link_libraries(beamhelper PUBLIC everybeam)
   target_link_libraries(beamhelper PUBLIC ${CFITSIO_LIBRARY})
 
   add_executable(tStationBeamHamaker tStationBeamHamaker.cc)

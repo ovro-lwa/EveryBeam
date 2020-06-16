@@ -20,26 +20,22 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_CONSTANTS_H
-#define LOFAR_STATIONRESPONSE_CONSTANTS_H
+#ifndef EVERYBEAM_CONSTANTS_H
+#define EVERYBEAM_CONSTANTS_H
 
 // \file
 // %Constants used in this library.
 
 #include "Types.h"
 
-namespace LOFAR {
-namespace StationResponse
-{
+namespace everybeam {
 
 /** %Constants used in this library. */
-namespace Constants
+namespace constants
 {
 /** Speed of light (m/s) */
 const real_t c = 2.99792458e+08;
-} //# namespace Constants
-
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace constants
+} // namespace everybeam
 
 #endif

@@ -21,8 +21,8 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_LOFARMETADATAUTIL_H
-#define LOFAR_STATIONRESPONSE_LOFARMETADATAUTIL_H
+#ifndef EVERYBEAM_LOFARMETADATAUTIL_H
+#define EVERYBEAM_LOFARMETADATAUTIL_H
 
 // \file
 // Utility functions to read the meta data relevant for simulating the beam from
@@ -35,8 +35,7 @@
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
 #include <casacore/measures/Measures/MDirection.h>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 const ElementResponseModel defaultElementResponseModel = ElementResponseModel::Hamaker;
 
@@ -62,7 +61,6 @@ void readStations(
 // this function returns the delay center.
 casacore::MDirection readTileBeamDirection(const casacore::MeasurementSet &ms);
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

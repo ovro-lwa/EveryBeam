@@ -20,8 +20,8 @@
 //#
 //# $Id$
 
-#ifndef LOFAR_STATIONRESPONSE_STATION_H
-#define LOFAR_STATIONRESPONSE_STATION_H
+#ifndef EVERYBEAM_STATION_H
+#define EVERYBEAM_STATION_H
 
 // \file
 // Representation of the station beam former.
@@ -35,9 +35,7 @@
 #include <memory>
 #include <vector>
 
-namespace LOFAR {
-namespace StationResponse
-{
+namespace everybeam {
 
 class Station
 {
@@ -411,7 +409,6 @@ void Station::arrayFactor(unsigned int count, real_t time, T freq,
     }
 }
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

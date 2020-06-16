@@ -2,7 +2,7 @@
 
 #include "tElementBeamCommon.h"
 
-using namespace LOFAR::StationResponse;
+using namespace everybeam;
 
 int main(int argc, char** argv) {
   ElementResponseModel model(Hamaker);

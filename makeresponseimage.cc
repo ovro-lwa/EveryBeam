@@ -23,8 +23,8 @@
 
 #include <lofar_config.h>
 
-#include <StationResponse/Package__Version.h>
-#include <StationResponse/LofarMetaDataUtil.h>
+#include <EveryBeam/Package__Version.h>
+#include <EveryBeam/LofarMetaDataUtil.h>
 #include <Common/InputParSet.h>
 #include <Common/lofar_sstream.h>
 #include <Common/LofarLogger.h>
@@ -57,9 +57,8 @@
 #include <iterator>
 
 using namespace casacore;
-using namespace LOFAR;
-using namespace LOFAR::StationResponse;
-using LOFAR::operator<<;
+using namespace everybeam;
+using everybeam::operator<<;
 
 namespace {
 /*!
@@ -130,20 +129,20 @@ DirectionCoordinate makeCoordinates(const MDirection &reference,
                                     unsigned int size, double delta);
 
 /*!
- *  \brief Convert an ITRF position given as a StationResponse::vector3r_t
+ *  \brief Convert an ITRF position given as a vector3r_t
  *  instance to a casacore::MPosition.
  */
 MPosition toMPositionITRF(const vector3r_t &position);
 
 /*!
  *  \brief Convert a casacore::MPosition instance to a
- *  StationResponse::vector3r_t instance.
+ *  vector3r_t instance.
  */
 vector3r_t fromMPosition(const MPosition &position);
 
 /*!
  *  \brief Convert a casacore::MDirection instance to a
- *  StationResponse::vector3r_t instance.
+ *  vector3r_t instance.
  */
 vector3r_t fromMDirection(const MDirection &direction);
 
@@ -268,12 +267,12 @@ T filter(T first, T last, int min, int max);
 }  // namespace
 
 int main(int argc, char *argv[]) {
-  TEST_SHOW_VERSION(argc, argv, StationResponse);
+  TEST_SHOW_VERSION(argc, argv, EveryBeam);
   INIT_LOGGER(basename(string(argv[0])));
-  Version::show<StationResponseVersion>(cout);
+  Version::show<EveryBeamVersion>(cout);
 
   // Parse inputs.
-  LOFAR::InputParSet inputs;
+  everybeam::InputParSet inputs;
   inputs.create("ms", "", "Name of input MeasurementSet", "string");
   inputs.create("stations", "0", "IDs of stations to process", "int vector");
   inputs.create("cellsize", "60arcsec", "Angular pixel size",

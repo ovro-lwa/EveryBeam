@@ -104,7 +104,6 @@ std::pair<Eigen::VectorXcd, Eigen::VectorXcd> F4far_new(
   Eigen::ArrayXcd exp_i_m_phi = Eigen::exp(1.0i * double(m) * phi);
 
   if (s == 1) {
-
     q2 = C * std::pow(-1.0i, -n - 1) / beta * 1.0i * double(m) /
          (sin_theta)*std::sqrt((2. * n + 1) / 2.0 *
                                std::tgamma(n - std::abs(m) + 1) /
@@ -138,7 +137,7 @@ Eigen::Array<std::complex<double>, 2, 2> element_response_lba(double freq,
   typedef std::complex<double> Response[2][2];
   Response &response_ = *((Response *)response.data());
 
-  LOFAR::element_response_lba(freq, theta, phi, response_);
+  everybeam::element_response_lba(freq, theta, phi, response_);
   return std::move(response);
 }
 
@@ -234,7 +233,6 @@ LobesBeamModel::LobesBeamModel(const std::string &data_file_name) {
 py::array_t<std::complex<double>> LobesBeamModel::eval(
     py::EigenDRef<const Eigen::ArrayXd> theta,
     py::EigenDRef<const Eigen::ArrayXd> phi) {
-
   double beta;
   for (auto [i, freq] : enumerate(m_frequencies)) {
     beta = 2.0 * M_PI * freq / 2.99792458e8;
@@ -327,7 +325,6 @@ py::array_t<std::complex<double>> LobesBeamModel::eval(
 // }
 
 PYBIND11_MODULE(lobes, m) {
-
   m.doc() = "LOBES module";  // optional module docstring
 
   m.def("plustwo", &plustwo, "A function which adds two to a number");

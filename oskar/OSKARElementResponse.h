@@ -1,3 +1,6 @@
+#ifndef OSKAR_ELEMENTRESPONSE_H
+#define OSKAR_ELEMENTRESPONSE_H
+
 #include "../ElementResponse.h"
 #include "../Singleton.h"
 
@@ -5,8 +8,7 @@
 
 #include <memory>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class OSKARElementResponseDipole : public ElementResponse
 {
@@ -53,5 +55,5 @@ protected:
     std::unique_ptr<Datafile> m_datafile;
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
+#endif

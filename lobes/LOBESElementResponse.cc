@@ -2,8 +2,7 @@
 
 #include <map>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 LOBESElementResponse::LOBESElementResponse(std::string name) {}
 
@@ -24,5 +23,4 @@ std::shared_ptr<LOBESElementResponse> LOBESElementResponse::getInstance(
   return entry->second;
 };
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

@@ -29,8 +29,7 @@
 // #include "DualDipoleAntenna.h"
 // #include "TileAntenna.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 Station::Station(const std::string &name, const vector3r_t &position,
                  const ElementResponseModel model)
@@ -237,5 +236,4 @@ vector3r_t Station::ncp(real_t time) const { return itsNCP->at(time); }
 
 vector3r_t Station::ncppol0(real_t time) const { return itsNCPPol0->at(time); }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

@@ -1,7 +1,7 @@
 //# Dir2ITRF.h: Convertor that maps time to an ITRF direction.
 
-#ifndef LOFAR_STATIONRESPONSE_DIR2ITRF_H
-#define LOFAR_STATIONRESPONSE_DIR2ITRF_H
+#ifndef EVERYBEAM_DIR2ITRF_H
+#define EVERYBEAM_DIR2ITRF_H
 
 // \file
 // Functor that maps J2000 to an ITRF direction.
@@ -14,8 +14,7 @@
 
 #include <memory>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class ITRFConverter
 {
@@ -38,7 +37,6 @@ private:
     mutable casacore::MDirection::Convert itsConverter;
 };
 
-} //# namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif

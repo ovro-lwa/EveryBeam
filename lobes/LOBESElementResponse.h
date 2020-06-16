@@ -1,9 +1,11 @@
+#ifndef LOBES_ELEMENTRESPONSE_H
+#define LOBES_ELEMENTRESPONSE_H
+
 #include "../ElementResponse.h"
 
 #include <memory>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 class LOBESElementResponse : public ElementResponse
 {
@@ -20,5 +22,6 @@ public:
     static std::shared_ptr<LOBESElementResponse> getInstance(std::string name);
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
+
+#endif

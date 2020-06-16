@@ -54,8 +54,7 @@
 #include <casacore/ms/MeasurementSets/MSSpectralWindow.h>
 #include <casacore/ms/MeasurementSets/MSSpWindowColumns.h>
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
     {
@@ -381,5 +380,4 @@ MDirection readTileBeamDirection(const casacore::MeasurementSet &ms) {
   return tileBeamDir;
 }
 
-}  // namespace StationResponse
-}  // namespace LOFAR
+}  // namespace everybeam

@@ -1,5 +1,4 @@
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 template<typename T>
 class Singleton
@@ -19,5 +18,4 @@ class Singleton
         void operator=(Singleton const&)  = delete;
 
 };
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam

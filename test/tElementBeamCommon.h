@@ -5,7 +5,7 @@
 #include "beam-helper.h"
 
 void calculateElementBeams(
-    LOFAR::StationResponse::Station::Ptr& station,
+    everybeam::Station::Ptr& station,
     std::vector<vector2r_t>& thetaPhiDirections,
     size_t nr_antennas,
     unsigned int subgrid_size,
@@ -44,7 +44,7 @@ void calculateElementBeams(
 }
 
 void calculateElementBeams(
-    LOFAR::StationResponse::Station::Ptr& station,
+    everybeam::Station::Ptr& station,
     std::vector<vector3r_t>& itrfDirections,
     size_t nr_antennas,
     unsigned int subgrid_size,
@@ -80,7 +80,7 @@ void calculateElementBeams(
 }
 
 void run(
-    LOFAR::StationResponse::ElementResponseModel elementResponseModel,
+    everybeam::ElementResponseModel elementResponseModel,
     double frequency,
     std::string& input_filename,
     std::string& output_filename)

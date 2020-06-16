@@ -32,7 +32,7 @@ namespace {
 #include "DefaultCoeffHBA.cc"
 }  // namespace
 
-namespace LOFAR {
+namespace everybeam {
 
 void element_response_lba(double freq, double theta, double phi,
                           std::complex<double> (&response)[2][2]) {
@@ -144,4 +144,4 @@ void element_response(double freq, double theta, double phi,
   }
 }
 
-}  // namespace LOFAR
+}  // namespace everybeam

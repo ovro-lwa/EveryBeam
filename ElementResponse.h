@@ -1,13 +1,12 @@
-#ifndef ELEMENTRESPONSE_H
-#define ELEMENTRESPONSE_H
+#ifndef EVERYBEAM_ELEMENTRESPONSE_H
+#define EVERYBEAM_ELEMENTRESPONSE_H
 
 #include <complex>
 #include <ostream>
 
 #include "MutablePtr.h"
 
-namespace LOFAR {
-namespace StationResponse {
+namespace everybeam {
 
 enum ElementResponseModel {
     Unknown,
@@ -43,7 +42,6 @@ public:
 
 };
 
-} // namespace StationResponse
-} // namespace LOFAR
+} // namespace everybeam
 
 #endif
