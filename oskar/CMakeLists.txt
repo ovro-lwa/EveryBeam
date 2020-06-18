@@ -9,7 +9,13 @@ add_library(oskar SHARED
     oskar_evaluate_dipole_pattern.cc
     oskar_evaluate_spherical_wave_sum.cc)
 
+string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
+set_target_properties(oskar PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-oskar")
+
 target_link_libraries(oskar ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES})
 
-# install liboskar.so
-install(TARGETS oskar DESTINATION lib)
+# install libeverybeam-oskar.so
+install(
+  TARGETS oskar
+  EXPORT EveryBeamTargets
+  DESTINATION lib)

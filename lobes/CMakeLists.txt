@@ -6,7 +6,13 @@ find_package(HDF5 COMPONENTS C CXX REQUIRED)
 # target_link_libraries (pylobes PUBLIC Eigen3::Eigen ${HDF5_LIBRARIES})
 
 add_library(lobes SHARED LOBESElementResponse.cc)
-install(TARGETS lobes DESTINATION lib)
+string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
+set_target_properties(lobes PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-lobes")
+
+install(
+  TARGETS lobes
+  EXPORT EveryBeamTargets
+  DESTINATION lib)
 
 configure_file(test.py test.py COPYONLY)
 

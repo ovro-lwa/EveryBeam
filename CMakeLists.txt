@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(lofarbeam)
+project(EveryBeam)
+
+string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 
 # Configure directory for data files
-set(CMAKE_INSTALL_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
+set(CMAKE_INSTALL_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${projectname}")
 message("Storing data in: " ${CMAKE_INSTALL_DATA_DIR})
 configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
@@ -63,7 +65,10 @@ target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES})
 
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
 
-install (TARGETS everybeam DESTINATION lib)
+install (
+  TARGETS everybeam
+  EXPORT EveryBeamTargets
+  DESTINATION lib)
 
 install (FILES
   Antenna.h
@@ -78,7 +83,14 @@ install (FILES
   Types.h
   ITRFConverter.h
   ITRFDirection.h
-DESTINATION include/EveryBeam)
+DESTINATION "include/${CMAKE_PROJECT_NAME}")
+
+install(
+  EXPORT EveryBeamTargets
+  FILE EveryBeamConfig.cmake
+  NAMESPACE EveryBeam::
+  DESTINATION "lib/${projectname}"
+)
 
 find_package(Doxygen)
 

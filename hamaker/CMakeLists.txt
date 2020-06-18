@@ -5,10 +5,14 @@ include_directories(${CMAKE_BINARY_DIR})
 add_library(hamaker SHARED
   HamakerElementResponse.cc
   HamakerCoeff.cc)
-
+string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
+set_target_properties(hamaker PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-hamaker")
 
 # install libhamaker.so
-install(TARGETS hamaker DESTINATION lib)
+install(
+  TARGETS hamaker
+  EXPORT EveryBeamTargets
+  DESTINATION lib)
 
 # install coefficients
 message("install hamaker in: " ${CMAKE_INSTALL_DATA_DIR})
