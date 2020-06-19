@@ -1,4 +1,4 @@
-//# Dir2ITRF.h: Convertor that maps time to an ITRF direction.
+// Dir2ITRF.h: Convertor that maps time to an ITRF direction.
 
 #ifndef EVERYBEAM_DIR2ITRF_H
 #define EVERYBEAM_DIR2ITRF_H
@@ -16,6 +16,11 @@
 
 namespace everybeam {
 
+/**
+ * @brief Class providing utilities for coordinate transformations 
+ * to and from ITRF (International Terrestrial Reference Frame) 
+ * 
+ */
 class ITRFConverter
 {
 public:
@@ -36,7 +41,5 @@ private:
     casacore::MeasFrame itsFrame;
     mutable casacore::MDirection::Convert itsConverter;
 };
-
 } // namespace everybeam
-
 #endif

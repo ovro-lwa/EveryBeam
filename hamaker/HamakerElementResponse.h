@@ -8,6 +8,7 @@
 
 namespace everybeam {
 
+//! Implementation of the Hamaker response model
 class HamakerElementResponse : public ElementResponse
 {
 public:

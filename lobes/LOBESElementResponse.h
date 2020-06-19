@@ -7,6 +7,7 @@
 
 namespace everybeam {
 
+//! Implementation of the Lobes response model
 class LOBESElementResponse : public ElementResponse
 {
 public:

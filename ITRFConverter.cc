@@ -1,4 +1,4 @@
-//# Dir2ITRF.cc: Convertor that maps time to an ITRF direction.
+// Dir2ITRF.cc: Convertor that maps time to an ITRF direction.
 
 #include "ITRFDirection.h"
 #include "ITRFConverter.h"

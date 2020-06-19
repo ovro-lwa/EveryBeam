@@ -2,7 +2,6 @@
 #include "MathUtil.h"
 
 namespace everybeam {
-
 matrix22c_t Element::local_response(real_t time, real_t freq,
                                     const vector3r_t &direction, size_t id,
                                     const Options &options) const {
@@ -31,5 +30,4 @@ matrix22c_t Element::local_response(real_t time, real_t freq,
                                     const Options &options) const {
   return local_response(time, freq, direction, m_id, options);
 }
-
 }  // namespace everybeam

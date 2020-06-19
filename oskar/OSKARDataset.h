@@ -6,8 +6,17 @@
 
 #include <H5Cpp.h>
 
+//! OSKAR dataset
 class Dataset {
     public:
+
+        /**
+         * @brief Construct a new Dataset object given a h5 file and a
+         * frequency
+         * 
+         * @param h5_file H5 file (.h5)
+         * @param freq Frequency to look for (Hz)
+         */
         Dataset(
             H5::H5File& h5_file,
             const unsigned int freq);

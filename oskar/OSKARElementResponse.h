@@ -10,6 +10,7 @@
 
 namespace everybeam {
 
+//! Implementation of the OSKAR dipole response model
 class OSKARElementResponseDipole : public ElementResponse
 {
 public:
@@ -26,6 +27,7 @@ public:
 
 };
 
+//! Implementation of the OSKAR spherical wave response model
 class OSKARElementResponseSphericalWave : public ElementResponse
 {
 public:

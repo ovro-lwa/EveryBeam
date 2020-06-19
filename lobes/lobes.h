@@ -4,7 +4,7 @@
 
 namespace py = pybind11;
 
-
+//! (Virtual) Beam model class 
 class BeamModel {
 
 public:
@@ -14,7 +14,7 @@ public:
     virtual py::array_t<std::complex<double>> eval(py::EigenDRef<const Eigen::ArrayXd> theta, py::EigenDRef<const Eigen::ArrayXd> phi)=0;
 };
 
-
+//! Lobes beam model, wrapped with pybind11
 class LobesBeamModel : public BeamModel {
 
 public:
@@ -31,6 +31,7 @@ private:
     py::array_t<int> m_nms;
 };
 
+//! Lobes beam model, not implemented!
 class HamakerBeamModel : public BeamModel {
 
 public:
