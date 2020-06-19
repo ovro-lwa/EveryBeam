@@ -42,7 +42,7 @@ To simulate visibilities with a certain element model, use `DPPP DPPP.parset` wh
 
 ## Design
 
-See [docs/design.md](docs/design.md) for design considerations.
+See [docs/design.md](@ref designpage) for design considerations.
 
 ## Documentation
 The `doxygen` documentation for EveryBeam can be found at https://www.astron.nl/citt/EveryBeam/

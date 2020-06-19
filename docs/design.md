@@ -1,5 +1,5 @@
-# Design
-
+Design {#designpage}
+===================
 
 ## Objectives:
 
@@ -31,7 +31,7 @@ HBA1 as inputs.
 
 ## Package outline
 
-<img src="https://git.astron.nl/RD/EveryBeam/-/raw/9de907743f64b5217fc02f998fa044dcdba3a3a5/docs/everybeam_uml.svg" alt="everybeam_uml" width="1200"/>
+<img src="https://git.astron.nl/RD/EveryBeam/-/raw/6f8f7c3e9c2e50ad14e3b1afe538b2602460f97a/docs/everybeam_uml.png" alt="everybeam_uml" width="1200"/>
 
 ## Classes:
 
