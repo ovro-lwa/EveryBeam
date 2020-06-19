@@ -10,15 +10,17 @@
 
 #include <H5Cpp.h>
 
+//! Hamaker coefficients
 class HamakerCoefficients {
     public:
+        //! Default constructor
         HamakerCoefficients();
 
-        // Constructor for reading coeff from file
+        //! Constructor for reading coeff from file
         HamakerCoefficients(
             std::string& filename);
 
-        // Constructor for writing coeff to file
+        //! Constructor for writing coeff to file
         HamakerCoefficients(
             const double freq_center,
             const double freq_range,
@@ -26,7 +28,14 @@ class HamakerCoefficients {
             const unsigned int nPowerTheta,
             const unsigned int nPowerFreq);
 
-        // Set
+        /**
+         * @brief Set Hamaker coefficients
+         * 
+         * @param n 
+         * @param t 
+         * @param f 
+         * @param value 
+         */
         void set_coeff(
             const unsigned int n,
             const unsigned int t,

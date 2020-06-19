@@ -1,24 +1,24 @@
-//# Station.h: Representation of the station beam former.
-//#
-//# Copyright (C) 2013
-//# ASTRON (Netherlands Institute for Radio Astronomy)
-//# P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
-//#
-//# This file is part of the LOFAR software suite.
-//# The LOFAR software suite is free software: you can redistribute it and/or
-//# modify it under the terms of the GNU General Public License as published
-//# by the Free Software Foundation, either version 3 of the License, or
-//# (at your option) any later version.
-//#
-//# The LOFAR software suite is distributed in the hope that it will be useful,
-//# but WITHOUT ANY WARRANTY; without even the implied warranty of
-//# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details.
-//#
-//# You should have received a copy of the GNU General Public License along
-//# with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
-//#
-//# $Id$
+// Station.h: Representation of the station beam former.
+//
+// Copyright (C) 2013
+// ASTRON (Netherlands Institute for Radio Astronomy)
+// P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
+//
+// This file is part of the LOFAR software suite.
+// The LOFAR software suite is free software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The LOFAR software suite is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
+//
+// $Id$
 
 #ifndef EVERYBEAM_STATION_H
 #define EVERYBEAM_STATION_H
@@ -36,7 +36,6 @@
 #include <vector>
 
 namespace everybeam {
-
 class Station
 {
 public:
@@ -57,14 +56,10 @@ public:
 
     void setModel(const ElementResponseModel model);
 
-    /*!
-     *  \brief Return the name of the station.
-     */
+    //! Return the name of the station.
     const std::string &name() const;
 
-    /*!
-     *  \brief Return the position of the station (ITRF, m).
-     */
+    //! Return the position of the station (ITRF, m).
     const vector3r_t &position() const;
 
     /*!
@@ -79,50 +74,43 @@ public:
      */
     void setPhaseReference(const vector3r_t &reference);
 
-    /*!
-     *  \brief Return the phase reference position (ITRF, m).
-     *
-     *  \see Station::setPhaseReference()
-     */
+    //! Return the phase reference position (ITRF, m). \see Station::setPhaseReference()
     const vector3r_t &phaseReference() const;
 
     /*!
      *  \brief Add an antenna field to the station.
      *
-     *  Physical %LOFAR stations consist of an LBA field, and either one (remote
+     *  Physical (%LOFAR) stations consist of an LBA field, and either one (remote
      *  and international stations) or two (core stations) HBA fields. Virtual
-     *  %LOFAR stations can consist of a combination of the antenna fields of
+     *  (%LOFAR) stations can consist of a combination of the antenna fields of
      *  several physical stations.
      *
      *  Use this method to add the appropriate antenna fields to the station.
      */
 //     void addField(const AntennaField::ConstPtr &field);
 
-
-    /*!
-     *  \brief Return the number of available antenna fields.
-     */
+    //! Return the number of available antenna fields.
     size_t nFields() const;
 
-    /*!
-     *  \brief Return the requested antenna field.
-     *
-     *  \param i Antenna field number (0-based).
-     *  \return An AntennaField::ConstPtr to the requested AntennaField
-     *  instance, or an empty AntennaField::ConstPtr if \p i is out of bounds.
-     */
+    // /*!
+    //  *  \brief Return the requested antenna field.
+    //  *
+    //  *  \param i Antenna field number (0-based).
+    //  *  \return An AntennaField::ConstPtr to the requested AntennaField
+    //  *  instance, or an empty AntennaField::ConstPtr if \p i is out of bounds.
+    //  */
 //     AntennaField::ConstPtr field(size_t i) const;
 
-    /*!
-     *  \brief Return an iterator that points to the beginning of the list of
-     *  antenna fields.
-     */
+    // /*!
+    //  *  \brief Return an iterator that points to the beginning of the list of
+    //  *  antenna fields.
+    //  */
 //     FieldList::const_iterator beginFields() const;
 
-    /*!
-     *  \brief Return an iterator that points to the end of the list of antenna
-     *  fields.
-     */
+    // /*!
+    //  *  \brief Return an iterator that points to the end of the list of antenna
+    //  *  fields.
+    //  */
 //     FieldList::const_iterator endFields() const;
 
     /*!
@@ -141,7 +129,7 @@ public:
      *  \param rotate Boolean deciding if paralactic rotation should be applied.
      *  \return Jones matrix that represents the %station response.
      *
-     *  For any given sub-band, the %LOFAR station beam former computes weights
+     *  For any given sub-band, the (%LOFAR) station beam former computes weights
      *  for a single reference frequency. Usually, this reference frequency is
      *  the center frequency of the sub-band. For any frequency except the
      *  reference frequency, these weights are an approximation. This aspect of
@@ -174,7 +162,7 @@ public:
      *  \param rotate Boolean deciding if paralactic rotation should be applied.
      *  \return A diagonal matrix with the array factor of the X and Y antennae.
      *
-     *  For any given sub-band, the %LOFAR station beam former computes weights
+     *  For any given sub-band, the (%LOFAR) station beam former computes weights
      *  for a single reference frequency. Usually, this reference frequency is
      *  the center frequency of the sub-band. For any frequency except the
      *  reference frequency, these weights are an approximation. This aspect of
@@ -304,12 +292,32 @@ public:
 
     const ElementResponse::Ptr get_element_response() {return itsElementResponse;}
 
+    /**
+     * @brief Compute the Jones matrix for the element response
+     * 
+     * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+     * @param freq Frequency of the plane wave (Hz).
+     * @param direction Direction of arrival (ITRF, m).
+     * @param id Element id
+     * @param rotate Boolean deciding if paralactic rotation should be applied. 
+     * @return matrix22c_t Jones matrix of element response
+     */
     matrix22c_t elementResponse(real_t time, real_t freq,
         const vector3r_t &direction, size_t id, const bool rotate) const;
 
+    /**
+     * @brief Compute the Jones matrix for the element response
+     * 
+     * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+     * @param freq Frequency of the plane wave (Hz).
+     * @param direction Direction of arrival (ITRF, m).
+     * @param rotate Boolean deciding if paralactic rotation should be applied. 
+     * @return matrix22c_t Jones matrix of element response
+     */
     matrix22c_t elementResponse(real_t time, real_t freq,
         const vector3r_t &direction, const bool rotate = true) const;
 
+    //! Specialized implementation of response function. 
     matrix22c_t response(
         real_t time,
         real_t freq,
@@ -318,17 +326,17 @@ public:
         return itsAntenna->response(time, freq, direction);
     }
 
+    //! Set antenna attribute, usually a BeamFormer, but can also be an Element
     void set_antenna(Antenna::Ptr antenna) {itsAntenna = antenna;}
 
+    //! Set Element attribute
     void set_element(Element::Ptr element) {itsElement = element;}
-
-
 
 private:
 
     vector3r_t ncp(real_t time) const;
     vector3r_t ncppol0(real_t time) const;
-    /** Compute the parallactic rotation. */
+    //! Compute the parallactic rotation. 
     matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
 
     std::string itsName;
@@ -357,9 +365,9 @@ private:
 };
 
 
-//# ------------------------------------------------------------------------- //
-//# - Implementation: Station                                               - //
-//# ------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------- //
+// - Implementation: Station                                               - //
+// ------------------------------------------------------------------------- //
 
 template <typename T, typename U>
 void Station::response(unsigned int count, real_t time, T freq,
@@ -408,7 +416,5 @@ void Station::arrayFactor(unsigned int count, real_t time, T freq,
             tile0);
     }
 }
-
 } // namespace everybeam
-
 #endif

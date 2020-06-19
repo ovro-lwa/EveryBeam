@@ -10,6 +10,7 @@
 
 #include "OSKARDataset.h"
 
+//! Oskar datafile interface
 class Datafile {
     public:
         Datafile(

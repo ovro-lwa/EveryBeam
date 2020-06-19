@@ -1,7 +1,6 @@
 #include "ElementResponse.h"
 
 namespace everybeam {
-
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   switch (model) {
     case Unknown:
@@ -24,5 +23,4 @@ std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   }
   return os;
 }
-
 }  // namespace everybeam

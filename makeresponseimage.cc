@@ -1,25 +1,25 @@
-//# makeresponseimage.cc: Generate images of the station response for a given
-//# MeasurementSet.
-//#
-//# Copyright (C) 2013
-//# ASTRON (Netherlands Institute for Radio Astronomy)
-//# P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
-//#
-//# This file is part of the LOFAR software suite.
-//# The LOFAR software suite is free software: you can redistribute it and/or
-//# modify it under the terms of the GNU General Public License as published
-//# by the Free Software Foundation, either version 3 of the License, or
-//# (at your option) any later version.
-//#
-//# The LOFAR software suite is distributed in the hope that it will be useful,
-//# but WITHOUT ANY WARRANTY; without even the implied warranty of
-//# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details.
-//#
-//# You should have received a copy of the GNU General Public License along
-//# with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
-//#
-//# $Id$
+// makeresponseimage.cc: Generate images of the station response for a given
+// MeasurementSet.
+//
+// Copyright (C) 2013
+// ASTRON (Netherlands Institute for Radio Astronomy)
+// P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
+//
+// This file is part of the LOFAR software suite.
+// The LOFAR software suite is free software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The LOFAR software suite is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
+//
+// $Id$
 
 #include <lofar_config.h>
 
@@ -73,28 +73,14 @@ namespace {
  *  along with the time for which these ITRF coordinates are valid.
  */
 struct ITRFDirectionMap {
-  /*!
-   *  \brief The time for which this ITRF direction map is valid (MJD(UTC)
-   *  in seconds).
-   */
-  double_t time0;
-
-  /*!
-   *  \brief Station beam former reference direction expressed in ITRF
-   *  coordinates.
-   */
-  vector3r_t station0;
-
-  /*!
-   *  \brief Tile beam former reference direction expressed in ITRF
-   *  coordinates.
-   */
-  vector3r_t tile0;
-
-  /*!
-   *  \brief ITRF coordinates for a grid of points on the sky.
-   */
-  Matrix<vector3r_t> directions;
+  double_t time0;       //!< The time for which this ITRF direction map is valid
+                        //!< (MJD(UTC) in seconds).
+  vector3r_t station0;  //!< Station beam former reference direction expressed
+                        //!< in ITRF coordinates.
+  vector3r_t tile0;  //!< Tile beam former reference direction expressed in ITRF
+                     //!< coordinates.
+  Matrix<vector3r_t>
+      directions;  //!< ITRF coordinates for a grid of points on the sky.
 };
 
 /*!
@@ -128,22 +114,14 @@ ITRFDirectionMap makeDirectionMap(const DirectionCoordinate &coordinates,
 DirectionCoordinate makeCoordinates(const MDirection &reference,
                                     unsigned int size, double delta);
 
-/*!
- *  \brief Convert an ITRF position given as a vector3r_t
- *  instance to a casacore::MPosition.
- */
+//! Convert an ITRF position given as a vector3r_t instance to a
+//! casacore::MPosition.
 MPosition toMPositionITRF(const vector3r_t &position);
 
-/*!
- *  \brief Convert a casacore::MPosition instance to a
- *  vector3r_t instance.
- */
+//! Convert a casacore::MPosition instance to a vector3r_t instance.
 vector3r_t fromMPosition(const MPosition &position);
 
-/*!
- *  \brief Convert a casacore::MDirection instance to a
- *  vector3r_t instance.
- */
+//! Convert a casacore::MDirection instance to a vector3r_t instance.
 vector3r_t fromMDirection(const MDirection &direction);
 
 /*!
@@ -247,9 +225,7 @@ template <class T>
 void store(const Cube<T> &data, const DirectionCoordinate &coordinates,
            double frequency, const string &name);
 
-/*!
- *  \brief Convert a string to a CASA Quantity (value with unit).
- */
+//! Convert a string to a CASA Quantity (value with unit).
 Quantity readQuantity(const String &in);
 
 /*!
@@ -433,8 +409,7 @@ ITRFDirectionMap makeDirectionMap(const DirectionCoordinate &coordinates,
   Vector<Double> pixel = coordinates.referencePixel();
   for (pixel(1) = 0.0; pixel(1) < shape(1); ++pixel(1)) {
     for (pixel(0) = 0.0; pixel(0) < shape(0); ++pixel(0)) {
-      // CoordinateSystem::toWorld(): RA range [-pi,pi], DEC range
-      // [-pi/2,pi/2].
+      // CoordinateSystem::toWorld(): RA range [-pi,pi], DEC range [-pi/2,pi/2]
       if (coordinates.toWorld(world, pixel)) {
         map.directions(pixel(0), pixel(1)) = fromMDirection(convertor(world));
       }

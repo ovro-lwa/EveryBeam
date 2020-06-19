@@ -1,6 +1,6 @@
-//# HamakerElementResponse.cc:
-//# Functions to compute the (idealized) response of a LOFAR
-//# LBA or HBA dual dipole antenna.
+// HamakerElementResponse.cc:
+// Functions to compute the (idealized) response of a LOFAR
+// LBA or HBA dual dipole antenna.
 
 #include <stdexcept>
 

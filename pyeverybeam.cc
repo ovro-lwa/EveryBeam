@@ -1,23 +1,23 @@
-//# pyeverybeam.cc: python module for EveryBeam object.
-//# Copyright (C) 2007
-//# ASTRON (Netherlands Institute for Radio Astronomy)
-//# P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
-//#
-//# This file is part of the LOFAR software suite.
-//# The LOFAR software suite is free software: you can redistribute it and/or
-//# modify it under the terms of the GNU General Public License as published
-//# by the Free Software Foundation, either version 3 of the License, or
-//# (at your option) any later version.
-//#
-//# The LOFAR software suite is distributed in the hope that it will be useful,
-//# but WITHOUT ANY WARRANTY; without even the implied warranty of
-//# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details.
-//#
-//# You should have received a copy of the GNU General Public License along
-//# with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
-//#
-//# $Id: pystationresponse.cc 33141 2015-12-16 15:10:19Z dijkema $
+// pyeverybeam.cc: python module for EveryBeam object.
+// Copyright (C) 2007
+// ASTRON (Netherlands Institute for Radio Astronomy)
+// P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
+//
+// This file is part of the LOFAR software suite.
+// The LOFAR software suite is free software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The LOFAR software suite is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
+//
+// $Id: pystationresponse.cc 33141 2015-12-16 15:10:19Z dijkema $
 
 #include "ITRFDirection.h"
 #include "LofarMetaDataUtil.h"
@@ -49,22 +49,16 @@ using namespace everybeam;
 
 namespace everybeam {
 namespace {
-/*!
- *  \brief Convert an ITRF position given as a everybeam::vector3r_t
- *  instance to a casacore::MPosition.
- */
+
+//! Convert an ITRF position given as a everybeam::vector3r_t instance to a
+//! casacore::MPosition.
 MPosition toMPositionITRF(const vector3r_t &position);
 
-/*!
- *  \brief Convert a casacore::MPosition instance to a
- #  everybeam::vector3r_t instance.
- */
+//! Convert a casacore::MPosition instance to a everybeam::vector3r_t instance.
 vector3r_t fromMPosition(const MPosition &position);
 
-/*!
- *  \brief Convert a casacore::MDirection instance to a
- *  StationResponse::vector3r_t instance.
- */
+//! Convert a casacore::MDirection instance to a StationResponse::vector3r_t
+//! instance.
 vector3r_t fromMDirection(const MDirection &direction);
 
 /*!
@@ -140,44 +134,79 @@ MDirection readTileReference(const MeasurementSet &ms, unsigned int idField);
 
 class PyEveryBeam {
  public:
+  /**
+   * @brief Construct a new Py Every Beam object
+   *
+   * @param msName
+   * @param inverse
+   * @param useElementResponse
+   * @param useArrayFactor
+   * @param useChanFreq
+   */
   PyEveryBeam(const string &msName, bool inverse = false,
               bool useElementResponse = true, bool useArrayFactor = true,
               bool useChanFreq = false);
 
-  // Get the software version.
+  //! Get the software version.
   string version(const string &type) const;
 
-  // Set the delay reference direction in radians, J2000. The delay reference
-  // direction is the direction used by the station beamformer.
+  /**
+   * @brief Set the delay reference direction in radians, J2000. The delay
+   * reference direction is the direction used by the station beamformer.
+   *
+   * @param ra Right ascension (H)
+   * @param dec Declination (rad)
+   */
   void setRefDelay(double ra, double dec);
 
-  // Get the delay reference direction in meters, ITRF. The delay reference
-  // direction is the direction used by the station beamformer.
+  /**
+   * @brief Get the delay reference direction in meters, ITRF. The delay
+   * reference direction is the direction used by the station beamformer.
+   *
+   */
   ValueHolder getRefDelay(real_t time);
 
-  // Set the tile reference direction in radians, J2000. The tile reference
-  // direction is the direction used by the analog tile beamformer and is
-  // relevant only for HBA observations.
+  /**
+   * @brief Set the tile reference direction in radians, J2000. The tile
+   * reference direction is the direction used by the analog tile beamformer and
+   * is relevant only for HBA observations.
+   *
+   * @param ra Right ascension (H)
+   * @param dec Declination (rad)
+   */
   void setRefTile(double ra, double dec);
 
-  // Get the tile reference direction in meters, ITRF. The delay reference
-  // direction is the direction used by the analog tile beamformer and is
-  // relevant only for HBA observations.
+  /**
+   * @brief Get the tile reference direction in meters, ITRF. The delay
+   * reference direction is the direction used by the analog tile beamformer and
+   * is relevant only for HBA observations.
+   *
+   */
   ValueHolder getRefTile(real_t time);
 
-  // Set the direction of interest in radians, J2000. Can and often will be
-  // different than the delay and/or tile reference direction.
+  /**
+   * @brief Set the direction of interest in radians, J2000. Can and often will
+   * be different than the delay and/or tile reference direction.
+   *
+   * @param ra Right ascension (H)
+   * @param dec Declination (rad)
+   */
   void setDirection(double ra, double dec);
 
-  // Get the direction of intereset in meters, ITRF.
+  //! Get the direction of intereset in meters, ITRF.
   ValueHolder getDirection(real_t time);
 
-  // Compute the LOFAR beam Jones matrices for the given time, station, and/or
-  // channel.
+  // TODO: needs tightening and give methods more meaningful name!
+  //! Compute the beam Jones matrices for the given time
   ValueHolder evaluate0(double time);
+  //! Compute the beam Jones matrices for the given time and station
   ValueHolder evaluate1(double time, int station);
+  //! Compute the beam Jones matrices for the given time, station and channel
   ValueHolder evaluate2(double time, int station, int channel);
+  //! Compute the beam Jones matrices for the given time, station and frequency
   ValueHolder evaluate3(double time, int station, double freq);
+  //! Compute the beam Jones matrices for the given time, station, frequency and
+  //! direction
   ValueHolder evaluate4(double time, int station, double freq,
                         const ValueHolder &direction,
                         const ValueHolder &station0, const ValueHolder &tile0);
@@ -196,10 +225,11 @@ class PyEveryBeam {
                           const Vector<Double> &freq,
                           const Vector<Double> &freq0) const;
 
+  // Utilities for inverting (diagonal) matrix
   void invert(matrix22c_t &in) const;
   void invert(diag22c_t &in) const;
 
-  //# Data members.
+  // Data members.
   bool itsInverse;
   bool itsUseElementResponse;
   bool itsUseArrayFactor;
@@ -678,7 +708,6 @@ MDirection readTileReference(const MeasurementSet &ms, unsigned int idField) {
   return readDelayReference(ms, idField);
 }
 }  // namespace
-
 }  // namespace everybeam
 
 // Define the python module itself.
