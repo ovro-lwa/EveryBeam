@@ -36,334 +36,333 @@
 #include <vector>
 
 namespace everybeam {
-class Station
-{
-public:
-    typedef std::shared_ptr<Station>             Ptr;
-    typedef std::shared_ptr<const Station>       ConstPtr;
-//     typedef std::vector<AntennaField::ConstPtr>  FieldList;
+class Station {
+ public:
+  typedef std::shared_ptr<Station> Ptr;
+  typedef std::shared_ptr<const Station> ConstPtr;
+  //     typedef std::vector<AntennaField::ConstPtr>  FieldList;
 
-    /*!
-     *  \brief Construct a new Station instance.
-     *
-     *  \param name Name of the station.
-     *  \param position Position of the station (ITRF, m).
-     */
-    Station(
-        const std::string &name,
-        const vector3r_t &position,
-        const ElementResponseModel model);
+  /*!
+   *  \brief Construct a new Station instance.
+   *
+   *  \param name Name of the station.
+   *  \param position Position of the station (ITRF, m).
+   */
+  Station(const std::string &name, const vector3r_t &position,
+          const ElementResponseModel model);
 
-    void setModel(const ElementResponseModel model);
+  void setModel(const ElementResponseModel model);
 
-    //! Return the name of the station.
-    const std::string &name() const;
+  //! Return the name of the station.
+  const std::string &name() const;
 
-    //! Return the position of the station (ITRF, m).
-    const vector3r_t &position() const;
+  //! Return the position of the station (ITRF, m).
+  const vector3r_t &position() const;
 
-    /*!
-     *  \brief Set the phase reference position. This is the position where the
-     *  delay of the incoming plane wave is assumed to be zero.
-     *
-     *  \param reference Phase reference position (ITRF, m).
-     *
-     *  By default, it is assumed the position of the station is also the phase
-     *  reference position. Use this method to set the phase reference position
-     *  explicitly when this assumption is false.
-     */
-    void setPhaseReference(const vector3r_t &reference);
+  /*!
+   *  \brief Set the phase reference position. This is the position where the
+   *  delay of the incoming plane wave is assumed to be zero.
+   *
+   *  \param reference Phase reference position (ITRF, m).
+   *
+   *  By default, it is assumed the position of the station is also the phase
+   *  reference position. Use this method to set the phase reference position
+   *  explicitly when this assumption is false.
+   */
+  void setPhaseReference(const vector3r_t &reference);
 
-    //! Return the phase reference position (ITRF, m). \see Station::setPhaseReference()
-    const vector3r_t &phaseReference() const;
+  //! Return the phase reference position (ITRF, m). \see
+  //! Station::setPhaseReference()
+  const vector3r_t &phaseReference() const;
 
-    /*!
-     *  \brief Add an antenna field to the station.
-     *
-     *  Physical (%LOFAR) stations consist of an LBA field, and either one (remote
-     *  and international stations) or two (core stations) HBA fields. Virtual
-     *  (%LOFAR) stations can consist of a combination of the antenna fields of
-     *  several physical stations.
-     *
-     *  Use this method to add the appropriate antenna fields to the station.
-     */
-//     void addField(const AntennaField::ConstPtr &field);
+  /*!
+   *  \brief Add an antenna field to the station.
+   *
+   *  Physical (%LOFAR) stations consist of an LBA field, and either one (remote
+   *  and international stations) or two (core stations) HBA fields. Virtual
+   *  (%LOFAR) stations can consist of a combination of the antenna fields of
+   *  several physical stations.
+   *
+   *  Use this method to add the appropriate antenna fields to the station.
+   */
+  //     void addField(const AntennaField::ConstPtr &field);
 
-    //! Return the number of available antenna fields.
-    size_t nFields() const;
+  //! Return the number of available antenna fields.
+  size_t nFields() const;
 
-    // /*!
-    //  *  \brief Return the requested antenna field.
-    //  *
-    //  *  \param i Antenna field number (0-based).
-    //  *  \return An AntennaField::ConstPtr to the requested AntennaField
-    //  *  instance, or an empty AntennaField::ConstPtr if \p i is out of bounds.
-    //  */
-//     AntennaField::ConstPtr field(size_t i) const;
+  // /*!
+  //  *  \brief Return the requested antenna field.
+  //  *
+  //  *  \param i Antenna field number (0-based).
+  //  *  \return An AntennaField::ConstPtr to the requested AntennaField
+  //  *  instance, or an empty AntennaField::ConstPtr if \p i is out of bounds.
+  //  */
+  //     AntennaField::ConstPtr field(size_t i) const;
 
-    // /*!
-    //  *  \brief Return an iterator that points to the beginning of the list of
-    //  *  antenna fields.
-    //  */
-//     FieldList::const_iterator beginFields() const;
+  // /*!
+  //  *  \brief Return an iterator that points to the beginning of the list of
+  //  *  antenna fields.
+  //  */
+  //     FieldList::const_iterator beginFields() const;
 
-    // /*!
-    //  *  \brief Return an iterator that points to the end of the list of antenna
-    //  *  fields.
-    //  */
-//     FieldList::const_iterator endFields() const;
+  // /*!
+  //  *  \brief Return an iterator that points to the end of the list of antenna
+  //  *  fields.
+  //  */
+  //     FieldList::const_iterator endFields() const;
 
-    /*!
-     *  \brief Compute the response of the station for a plane wave of frequency
-     *  \p freq, arriving from direction \p direction, with the %station beam
-     *  former steered towards \p station0, and, for HBA stations, the analog
-     *  %tile beam former steered towards \p tile0. For LBA stations, \p tile0
-     *  has no effect.
-     *
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Frequency of the plane wave (Hz).
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 %Station beam former reference frequency (Hz).
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \return Jones matrix that represents the %station response.
-     *
-     *  For any given sub-band, the (%LOFAR) station beam former computes weights
-     *  for a single reference frequency. Usually, this reference frequency is
-     *  the center frequency of the sub-band. For any frequency except the
-     *  reference frequency, these weights are an approximation. This aspect of
-     *  the system is taken into account in the computation of the response.
-     *  Therefore, both the frequency of interest \p freq and the reference
-     *  frequency \p freq0 need to be specified.
-     *
-     *  The directions \p direction, \p station0, and \p tile0 are vectors that
-     *  represent a direction of \e arrival. These vectors have unit length and
-     *  point \e from the ground \e towards the direction from which the plane
-     *  wave arrives.
-     */
-    matrix22c_t response(real_t time, real_t freq, const vector3r_t &direction,
-        real_t freq0, const vector3r_t &station0, const vector3r_t &tile0, const bool rotate = true)
-        const;
+  /*!
+   *  \brief Compute the response of the station for a plane wave of frequency
+   *  \p freq, arriving from direction \p direction, with the %station beam
+   *  former steered towards \p station0, and, for HBA stations, the analog
+   *  %tile beam former steered towards \p tile0. For LBA stations, \p tile0
+   *  has no effect.
+   *
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Frequency of the plane wave (Hz).
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 %Station beam former reference frequency (Hz).
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \return Jones matrix that represents the %station response.
+   *
+   *  For any given sub-band, the (%LOFAR) station beam former computes weights
+   *  for a single reference frequency. Usually, this reference frequency is
+   *  the center frequency of the sub-band. For any frequency except the
+   *  reference frequency, these weights are an approximation. This aspect of
+   *  the system is taken into account in the computation of the response.
+   *  Therefore, both the frequency of interest \p freq and the reference
+   *  frequency \p freq0 need to be specified.
+   *
+   *  The directions \p direction, \p station0, and \p tile0 are vectors that
+   *  represent a direction of \e arrival. These vectors have unit length and
+   *  point \e from the ground \e towards the direction from which the plane
+   *  wave arrives.
+   */
+  matrix22c_t response(real_t time, real_t freq, const vector3r_t &direction,
+                       real_t freq0, const vector3r_t &station0,
+                       const vector3r_t &tile0, const bool rotate = true) const;
 
-    /*!
-     *  \brief Compute the array factor of the station for a plane wave of
-     *  frequency \p freq, arriving from direction \p direction, with the
-     *  %station beam former steered towards \p station0, and, for HBA stations
-     *  the analog %tile beam former steered towards \p tile0. For LBA stations,
-     *  \p tile0 has no effect.
-     *
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Frequency of the plane wave (Hz).
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 %Station beam former reference frequency (Hz).
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \return A diagonal matrix with the array factor of the X and Y antennae.
-     *
-     *  For any given sub-band, the (%LOFAR) station beam former computes weights
-     *  for a single reference frequency. Usually, this reference frequency is
-     *  the center frequency of the sub-band. For any frequency except the
-     *  reference frequency, these weights are an approximation. This aspect of
-     *  the system is taken into account in the computation of the response.
-     *  Therefore, both the frequency of interest \p freq and the reference
-     *  frequency \p freq0 need to be specified.
-     *
-     *  The directions \p direction, \p station0, and \p tile0 are vectors that
-     *  represent a direction of \e arrival. These vectors have unit length and
-     *  point \e from the ground \e towards the direction from which the plane
-     *  wave arrives.
-     */
-    diag22c_t arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
-        real_t freq0, const vector3r_t &station0, const vector3r_t &tile0)
-        const;
+  /*!
+   *  \brief Compute the array factor of the station for a plane wave of
+   *  frequency \p freq, arriving from direction \p direction, with the
+   *  %station beam former steered towards \p station0, and, for HBA stations
+   *  the analog %tile beam former steered towards \p tile0. For LBA stations,
+   *  \p tile0 has no effect.
+   *
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Frequency of the plane wave (Hz).
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 %Station beam former reference frequency (Hz).
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \return A diagonal matrix with the array factor of the X and Y antennae.
+   *
+   *  For any given sub-band, the (%LOFAR) station beam former computes weights
+   *  for a single reference frequency. Usually, this reference frequency is
+   *  the center frequency of the sub-band. For any frequency except the
+   *  reference frequency, these weights are an approximation. This aspect of
+   *  the system is taken into account in the computation of the response.
+   *  Therefore, both the frequency of interest \p freq and the reference
+   *  frequency \p freq0 need to be specified.
+   *
+   *  The directions \p direction, \p station0, and \p tile0 are vectors that
+   *  represent a direction of \e arrival. These vectors have unit length and
+   *  point \e from the ground \e towards the direction from which the plane
+   *  wave arrives.
+   */
+  diag22c_t arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+                        real_t freq0, const vector3r_t &station0,
+                        const vector3r_t &tile0) const;
 
-    /*!
-     *  \name Convenience member functions
-     *  These member functions perform the same function as the corresponding
-     *  non-template member functions, for a list of frequencies or (frequency,
-     *  reference frequency) pairs.
-     */
-    // @{
+  /*!
+   *  \name Convenience member functions
+   *  These member functions perform the same function as the corresponding
+   *  non-template member functions, for a list of frequencies or (frequency,
+   *  reference frequency) pairs.
+   */
+  // @{
 
-    /*!
-     *  \brief Convenience method to compute the response of the station for a
-     *  list of frequencies, and a fixed reference frequency.
-     *
-     *  \param count Number of frequencies.
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Input iterator for a list of frequencies (Hz) of length
-     *  \p count.
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 %Station beam former reference frequency (Hz).
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \param buffer Output iterator with room for \p count instances of type
-     *  ::matrix22c_t.
-     *
-     *  \see response(real_t time, real_t freq, const vector3r_t &direction,
-     *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
-     */
-    template <typename T, typename U>
-    void response(unsigned int count, real_t time, T freq,
-        const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
-        const vector3r_t &tile0, U buffer, const bool rotate=true) const;
+  /*!
+   *  \brief Convenience method to compute the response of the station for a
+   *  list of frequencies, and a fixed reference frequency.
+   *
+   *  \param count Number of frequencies.
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Input iterator for a list of frequencies (Hz) of length
+   *  \p count.
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 %Station beam former reference frequency (Hz).
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \param buffer Output iterator with room for \p count instances of type
+   *  ::matrix22c_t.
+   *
+   *  \see response(real_t time, real_t freq, const vector3r_t &direction,
+   *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
+   */
+  template <typename T, typename U>
+  void response(unsigned int count, real_t time, T freq,
+                const vector3r_t &direction, real_t freq0,
+                const vector3r_t &station0, const vector3r_t &tile0, U buffer,
+                const bool rotate = true) const;
 
-    /*!
-     *  \brief Convenience method to compute the array factor of the station for
-     *  a list of frequencies, and a fixed reference frequency.
-     *
-     *  \param count Number of frequencies.
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Input iterator for a list of frequencies (Hz) of length
-     *  \p count.
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 %Station beam former reference frequency (Hz).
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \param buffer Output iterator with room for \p count instances of type
-     *  ::diag22c_t.
-     *
-     *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
-     *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
-     */
-    template <typename T, typename U>
-    void arrayFactor(unsigned int count, real_t time, T freq,
-        const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
-        const vector3r_t &tile0, U buffer) const;
+  /*!
+   *  \brief Convenience method to compute the array factor of the station for
+   *  a list of frequencies, and a fixed reference frequency.
+   *
+   *  \param count Number of frequencies.
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Input iterator for a list of frequencies (Hz) of length
+   *  \p count.
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 %Station beam former reference frequency (Hz).
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \param buffer Output iterator with room for \p count instances of type
+   *  ::diag22c_t.
+   *
+   *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+   *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
+   */
+  template <typename T, typename U>
+  void arrayFactor(unsigned int count, real_t time, T freq,
+                   const vector3r_t &direction, real_t freq0,
+                   const vector3r_t &station0, const vector3r_t &tile0,
+                   U buffer) const;
 
-    /*!
-     *  \brief Convenience method to compute the response of the station for a
-     *  list of (frequency, reference frequency) pairs.
-     *
-     *  \param count Number of frequencies.
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Input iterator for a list of frequencies (Hz) of length
-     *  \p count.
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 Input iterator for a list of %Station beam former reference
-     *  frequencies (Hz) of length \p count.
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \param buffer Output iterator with room for \p count instances of type
-     *  ::matrix22c_t.
-     *
-     *  \see response(real_t time, real_t freq, const vector3r_t &direction,
-     *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
-     */
-    template <typename T, typename U>
-    void response(unsigned int count, real_t time, T freq,
-        const vector3r_t &direction, T freq0, const vector3r_t &station0,
-        const vector3r_t &tile0, U buffer, const bool rotate=true) const;
+  /*!
+   *  \brief Convenience method to compute the response of the station for a
+   *  list of (frequency, reference frequency) pairs.
+   *
+   *  \param count Number of frequencies.
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Input iterator for a list of frequencies (Hz) of length
+   *  \p count.
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 Input iterator for a list of %Station beam former reference
+   *  frequencies (Hz) of length \p count.
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \param buffer Output iterator with room for \p count instances of type
+   *  ::matrix22c_t.
+   *
+   *  \see response(real_t time, real_t freq, const vector3r_t &direction,
+   *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
+   */
+  template <typename T, typename U>
+  void response(unsigned int count, real_t time, T freq,
+                const vector3r_t &direction, T freq0,
+                const vector3r_t &station0, const vector3r_t &tile0, U buffer,
+                const bool rotate = true) const;
 
-    /*!
-     *  \brief Convenience method to compute the array factor of the station for
-     *  list of (frequency, reference frequency) pairs.
-     *
-     *  \param count Number of frequencies.
-     *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     *  \param freq Input iterator for a list of frequencies (Hz) of length
-     *  \p count.
-     *  \param direction Direction of arrival (ITRF, m).
-     *  \param freq0 %Station beam former reference frequency (Hz).
-     *  \param station0 %Station beam former reference direction (ITRF, m).
-     *  \param tile0 Tile beam former reference direction (ITRF, m).
-     *  \param rotate Boolean deciding if paralactic rotation should be applied.
-     *  \param buffer Output iterator with room for \p count instances of type
-     *  ::diag22c_t.
-     *
-     *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
-     *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
-     */
-    template <typename T, typename U>
-    void arrayFactor(unsigned int count, real_t time, T freq,
-        const vector3r_t &direction, T freq0, const vector3r_t &station0,
-        const vector3r_t &tile0, U buffer) const;
+  /*!
+   *  \brief Convenience method to compute the array factor of the station for
+   *  list of (frequency, reference frequency) pairs.
+   *
+   *  \param count Number of frequencies.
+   *  \param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   *  \param freq Input iterator for a list of frequencies (Hz) of length
+   *  \p count.
+   *  \param direction Direction of arrival (ITRF, m).
+   *  \param freq0 %Station beam former reference frequency (Hz).
+   *  \param station0 %Station beam former reference direction (ITRF, m).
+   *  \param tile0 Tile beam former reference direction (ITRF, m).
+   *  \param rotate Boolean deciding if paralactic rotation should be applied.
+   *  \param buffer Output iterator with room for \p count instances of type
+   *  ::diag22c_t.
+   *
+   *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+   *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
+   */
+  template <typename T, typename U>
+  void arrayFactor(unsigned int count, real_t time, T freq,
+                   const vector3r_t &direction, T freq0,
+                   const vector3r_t &station0, const vector3r_t &tile0,
+                   U buffer) const;
 
-    // @}
+  // @}
 
-    // ===================================================================
-    // New methods introduced in refactor
-    // ==================================================================
+  // ===================================================================
+  // New methods introduced in refactor
+  // ==================================================================
 
-    const ElementResponse::Ptr get_element_response() {return itsElementResponse;}
+  const ElementResponse::Ptr get_element_response() {
+    return itsElementResponse;
+  }
 
-    /**
-     * @brief Compute the Jones matrix for the element response
-     * 
-     * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     * @param freq Frequency of the plane wave (Hz).
-     * @param direction Direction of arrival (ITRF, m).
-     * @param id Element id
-     * @param rotate Boolean deciding if paralactic rotation should be applied. 
-     * @return matrix22c_t Jones matrix of element response
-     */
-    matrix22c_t elementResponse(real_t time, real_t freq,
-        const vector3r_t &direction, size_t id, const bool rotate) const;
+  /**
+   * @brief Compute the Jones matrix for the element response
+   *
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param freq Frequency of the plane wave (Hz).
+   * @param direction Direction of arrival (ITRF, m).
+   * @param id Element id
+   * @param rotate Boolean deciding if paralactic rotation should be applied.
+   * @return matrix22c_t Jones matrix of element response
+   */
+  matrix22c_t elementResponse(real_t time, real_t freq,
+                              const vector3r_t &direction, size_t id,
+                              const bool rotate) const;
 
-    /**
-     * @brief Compute the Jones matrix for the element response
-     * 
-     * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-     * @param freq Frequency of the plane wave (Hz).
-     * @param direction Direction of arrival (ITRF, m).
-     * @param rotate Boolean deciding if paralactic rotation should be applied. 
-     * @return matrix22c_t Jones matrix of element response
-     */
-    matrix22c_t elementResponse(real_t time, real_t freq,
-        const vector3r_t &direction, const bool rotate = true) const;
+  /**
+   * @brief Compute the Jones matrix for the element response
+   *
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param freq Frequency of the plane wave (Hz).
+   * @param direction Direction of arrival (ITRF, m).
+   * @param rotate Boolean deciding if paralactic rotation should be applied.
+   * @return matrix22c_t Jones matrix of element response
+   */
+  matrix22c_t elementResponse(real_t time, real_t freq,
+                              const vector3r_t &direction,
+                              const bool rotate = true) const;
 
-    //! Specialized implementation of response function. 
-    matrix22c_t response(
-        real_t time,
-        real_t freq,
-        const vector3r_t &direction) const
-    {
-        return itsAntenna->response(time, freq, direction);
-    }
+  //! Specialized implementation of response function.
+  matrix22c_t response(real_t time, real_t freq,
+                       const vector3r_t &direction) const {
+    return itsAntenna->response(time, freq, direction);
+  }
 
-    //! Set antenna attribute, usually a BeamFormer, but can also be an Element
-    void set_antenna(Antenna::Ptr antenna) {itsAntenna = antenna;}
+  //! Set antenna attribute, usually a BeamFormer, but can also be an Element
+  void set_antenna(Antenna::Ptr antenna) { itsAntenna = antenna; }
 
-    //! Set Element attribute
-    void set_element(Element::Ptr element) {itsElement = element;}
+  //! Set Element attribute
+  void set_element(Element::Ptr element) { itsElement = element; }
 
-private:
+ private:
+  vector3r_t ncp(real_t time) const;
+  vector3r_t ncppol0(real_t time) const;
+  //! Compute the parallactic rotation.
+  matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
 
-    vector3r_t ncp(real_t time) const;
-    vector3r_t ncppol0(real_t time) const;
-    //! Compute the parallactic rotation. 
-    matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
+  std::string itsName;
+  vector3r_t itsPosition;
+  vector3r_t itsPhaseReference;
+  ElementResponseModel itsElementResponseModel = ElementResponseModel::Unknown;
+  ElementResponse::Ptr itsElementResponse;
+  Element::Ptr itsElement;
 
-    std::string itsName;
-    vector3r_t  itsPosition;
-    vector3r_t  itsPhaseReference;
-    ElementResponseModel itsElementResponseModel = ElementResponseModel::Unknown;
-    ElementResponse::Ptr itsElementResponse;
-    Element::Ptr itsElement;
+  Antenna::Ptr itsAntenna;
 
-    Antenna::Ptr itsAntenna;
-
-    ITRFDirection::Ptr  itsNCP;
-    /** Reference direction for NCP observations.
-     *
-     * NCP pol0 is the direction used as reference in the coordinate system
-     * when the target direction is close to/at the NCP. The regular coordinate
-     * system rotates local east to that defined with respect to the NCP,
-     * which is undefined at the NCP.
-     * It is currently defined as ITRF position (1.0, 0.0, 0.0).
-     *
-     * Added by Maaijke Mevius, December 2018.
-     */
-    ITRFDirection::Ptr  itsNCPPol0;
-
-
+  ITRFDirection::Ptr itsNCP;
+  /** Reference direction for NCP observations.
+   *
+   * NCP pol0 is the direction used as reference in the coordinate system
+   * when the target direction is close to/at the NCP. The regular coordinate
+   * system rotates local east to that defined with respect to the NCP,
+   * which is undefined at the NCP.
+   * It is currently defined as ITRF position (1.0, 0.0, 0.0).
+   *
+   * Added by Maaijke Mevius, December 2018.
+   */
+  ITRFDirection::Ptr itsNCPPol0;
 };
-
 
 // ------------------------------------------------------------------------- //
 // - Implementation: Station                                               - //
@@ -371,50 +370,45 @@ private:
 
 template <typename T, typename U>
 void Station::response(unsigned int count, real_t time, T freq,
-    const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
-    const vector3r_t &tile0, U buffer, const bool rotate) const
-{
-    for(unsigned int i = 0; i < count; ++i)
-    {
-        *buffer++ = response(time, *freq++, direction, freq0, station0, tile0,
-            rotate);
-    }
+                       const vector3r_t &direction, real_t freq0,
+                       const vector3r_t &station0, const vector3r_t &tile0,
+                       U buffer, const bool rotate) const {
+  for (unsigned int i = 0; i < count; ++i) {
+    *buffer++ =
+        response(time, *freq++, direction, freq0, station0, tile0, rotate);
+  }
 }
 
 template <typename T, typename U>
 void Station::arrayFactor(unsigned int count, real_t time, T freq,
-    const vector3r_t &direction, real_t freq0, const vector3r_t &station0,
-    const vector3r_t &tile0, U buffer) const
-{
-    for(unsigned int i = 0; i < count; ++i)
-    {
-        *buffer++ = arrayFactor(time, *freq++, direction, freq0, station0,
-            tile0);
-    }
+                          const vector3r_t &direction, real_t freq0,
+                          const vector3r_t &station0, const vector3r_t &tile0,
+                          U buffer) const {
+  for (unsigned int i = 0; i < count; ++i) {
+    *buffer++ = arrayFactor(time, *freq++, direction, freq0, station0, tile0);
+  }
 }
 
 template <typename T, typename U>
 void Station::response(unsigned int count, real_t time, T freq,
-    const vector3r_t &direction, T freq0, const vector3r_t &station0,
-    const vector3r_t &tile0, U buffer, const bool rotate) const
-{
-    for(unsigned int i = 0; i < count; ++i)
-    {
-        *buffer++ = response(time, *freq++, direction, *freq0++, station0,
-            tile0, rotate);
-    }
+                       const vector3r_t &direction, T freq0,
+                       const vector3r_t &station0, const vector3r_t &tile0,
+                       U buffer, const bool rotate) const {
+  for (unsigned int i = 0; i < count; ++i) {
+    *buffer++ =
+        response(time, *freq++, direction, *freq0++, station0, tile0, rotate);
+  }
 }
 
 template <typename T, typename U>
 void Station::arrayFactor(unsigned int count, real_t time, T freq,
-    const vector3r_t &direction, T freq0, const vector3r_t &station0,
-    const vector3r_t &tile0, U buffer) const
-{
-    for(unsigned int i = 0; i < count; ++i)
-    {
-        *buffer++ = arrayFactor(time, *freq++, direction, *freq0++, station0,
-            tile0);
-    }
+                          const vector3r_t &direction, T freq0,
+                          const vector3r_t &station0, const vector3r_t &tile0,
+                          U buffer) const {
+  for (unsigned int i = 0; i < count; ++i) {
+    *buffer++ =
+        arrayFactor(time, *freq++, direction, *freq0++, station0, tile0);
+  }
 }
-} // namespace everybeam
+}  // namespace everybeam
 #endif

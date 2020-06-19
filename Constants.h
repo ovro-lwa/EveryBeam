@@ -31,11 +31,10 @@
 namespace everybeam {
 
 /** %Constants used in this library. */
-namespace constants
-{
+namespace constants {
 /** Speed of light (m/s) */
 const real_t c = 2.99792458e+08;
-} // namespace constants
-} // namespace everybeam
+}  // namespace constants
+}  // namespace everybeam
 
 #endif

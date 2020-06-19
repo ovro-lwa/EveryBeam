@@ -73,14 +73,15 @@ namespace everybeam {
  *
  * \endcode
  */
-template<typename T>
+template <typename T>
 class MutablePtr : public std::shared_ptr<std::shared_ptr<T>> {
-public:
-    MutablePtr(std::shared_ptr<T> ptr) : std::shared_ptr<std::shared_ptr<T>>(new std::shared_ptr<T>(ptr)) {}
-    T& operator*() const { return **(this->get()); }
-    std::shared_ptr<T> operator->() const { return *(this->get()); }
-    void set(std::shared_ptr<T> ptr) { *(this->get()) = ptr;}
-    explicit operator bool() const noexcept {return **this;}
+ public:
+  MutablePtr(std::shared_ptr<T> ptr)
+      : std::shared_ptr<std::shared_ptr<T>>(new std::shared_ptr<T>(ptr)) {}
+  T& operator*() const { return **(this->get()); }
+  std::shared_ptr<T> operator->() const { return *(this->get()); }
+  void set(std::shared_ptr<T> ptr) { *(this->get()) = ptr; }
+  explicit operator bool() const noexcept { return **this; }
 };
-} // namespace everybeam
+}  // namespace everybeam
 #endif

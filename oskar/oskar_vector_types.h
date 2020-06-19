@@ -35,21 +35,21 @@
 
 #ifdef __CUDACC__
 /* Include the CUDA vector types header first, if we're compiling with nvcc. */
-#   include <vector_types.h>
+#include <vector_types.h>
 #endif
 
 /* Memory alignment macros mirroring those used by CUDA. */
 #if !(defined(__VECTOR_TYPES_H__) || defined(__CUDACC__))
-#   if defined(__GNUC__)
-#       define __align__(n) __attribute__((aligned(n)))
-#   elif defined(_MSC_VER)
-#       define __align__(n) __declspec(align(n))
-#   endif
-#   if defined(__GNUC__) || defined(_WIN64)
-#       define __builtin_align__(a) __align__(a)
-#   else
-#       define __builtin_align__(a)
-#   endif
+#if defined(__GNUC__)
+#define __align__(n) __attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#define __align__(n) __declspec(align(n))
+#endif
+#if defined(__GNUC__) || defined(_WIN64)
+#define __builtin_align__(a) __align__(a)
+#else
+#define __builtin_align__(a)
+#endif
 
 /**
  * @brief Two-element structure (single precision).
@@ -58,7 +58,9 @@
  * Structure used to hold data for a length-2 vector.
  * This must be compatible with the CUDA float2 type.
  */
-struct __builtin_align__(8) float2 { float x, y; };
+struct __builtin_align__(8) float2 {
+  float x, y;
+};
 typedef struct float2 float2;
 
 /**
@@ -68,7 +70,9 @@ typedef struct float2 float2;
  * Structure used to hold data for a length-2 vector.
  * This must be compatible with the CUDA double2 type.
  */
-struct __builtin_align__(16) double2 { double x, y; };
+struct __builtin_align__(16) double2 {
+  double x, y;
+};
 typedef struct double2 double2;
 #endif
 
@@ -82,7 +86,9 @@ typedef struct double2 double2;
  *   ( a  b )
  *   ( c  d )
  */
-struct __align__(32) float4c { float2 a, b, c, d; };
+struct __align__(32) float4c {
+  float2 a, b, c, d;
+};
 typedef struct float4c float4c;
 
 /**
@@ -95,7 +101,9 @@ typedef struct float4c float4c;
  *   ( a  b )
  *   ( c  d )
  */
-struct __align__(64) double4c { double2 a, b, c, d; };
+struct __align__(64) double4c {
+  double2 a, b, c, d;
+};
 typedef struct double4c double4c;
 
 #endif /* include guard */

@@ -17,29 +17,28 @@
 namespace everybeam {
 
 /**
- * @brief Class providing utilities for coordinate transformations 
- * to and from ITRF (International Terrestrial Reference Frame) 
- * 
+ * @brief Class providing utilities for coordinate transformations
+ * to and from ITRF (International Terrestrial Reference Frame)
+ *
  */
-class ITRFConverter
-{
-public:
-    typedef std::unique_ptr<ITRFDirection>       Ptr;
-    typedef std::unique_ptr<const ITRFDirection> ConstPtr;
+class ITRFConverter {
+ public:
+  typedef std::unique_ptr<ITRFDirection> Ptr;
+  typedef std::unique_ptr<const ITRFDirection> ConstPtr;
 
-    ITRFConverter(real_t time);
+  ITRFConverter(real_t time);
 
-    void setTime(real_t time);
-    vector3r_t j2000ToITRF(const vector2r_t &j2000Direction) const;
-    vector3r_t j2000ToITRF(const vector3r_t &j2000Direction) const;
-    vector3r_t toITRF(const casacore::MDirection &direction) const;
-    casacore::MDirection toDirection(const vector2r_t &j2000Direction) const;
-    casacore::MDirection toDirection(const vector3r_t &j2000Direction) const;
-    casacore::MDirection toDirection(const casacore::MDirection &direction) const;
+  void setTime(real_t time);
+  vector3r_t j2000ToITRF(const vector2r_t &j2000Direction) const;
+  vector3r_t j2000ToITRF(const vector3r_t &j2000Direction) const;
+  vector3r_t toITRF(const casacore::MDirection &direction) const;
+  casacore::MDirection toDirection(const vector2r_t &j2000Direction) const;
+  casacore::MDirection toDirection(const vector3r_t &j2000Direction) const;
+  casacore::MDirection toDirection(const casacore::MDirection &direction) const;
 
-private:
-    casacore::MeasFrame itsFrame;
-    mutable casacore::MDirection::Convert itsConverter;
+ private:
+  casacore::MeasFrame itsFrame;
+  mutable casacore::MDirection::Convert itsConverter;
 };
-} // namespace everybeam
+}  // namespace everybeam
 #endif

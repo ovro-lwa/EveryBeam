@@ -12,21 +12,19 @@
 
 //! Oskar datafile interface
 class Datafile {
-    public:
-        Datafile(
-            const std::string& filename);
+ public:
+  Datafile(const std::string& filename);
 
-        std::shared_ptr<Dataset> get(
-            const unsigned int freq);
+  std::shared_ptr<Dataset> get(const unsigned int freq);
 
-    private:
-        // Coeffs;
-        std::map<unsigned int, std::shared_ptr<Dataset>> m_map;
+ private:
+  // Coeffs;
+  std::map<unsigned int, std::shared_ptr<Dataset>> m_map;
 
-        // HDF5
-        std::string m_filename;
-        std::unique_ptr<H5::H5File> m_h5_file;
-        mutable std::mutex m_mutex;
+  // HDF5
+  std::string m_filename;
+  std::unique_ptr<H5::H5File> m_h5_file;
+  mutable std::mutex m_mutex;
 };
 
 #endif

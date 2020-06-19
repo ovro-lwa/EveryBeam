@@ -38,39 +38,38 @@ template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj);
 
 /** Type used for real scalars. */
-typedef double                                      real_t;
+typedef double real_t;
 
 /** Type used for complex scalars. */
-typedef std::complex<double>                        complex_t;
+typedef std::complex<double> complex_t;
 
 /** Type used for 2-dimensional real vectors. */
-typedef std::array<real_t, 2>                     vector2r_t;
+typedef std::array<real_t, 2> vector2r_t;
 
 /** Type used for 3-dimensional real vectors. */
-typedef std::array<real_t, 3>                     vector3r_t;
+typedef std::array<real_t, 3> vector3r_t;
 
 /** Type used for 2x2 real diagonal matrices. */
-typedef std::array<real_t, 2>                     diag22r_t;
+typedef std::array<real_t, 2> diag22r_t;
 
 /** Type used for 2x2 complex diagonal matrices. */
-typedef std::array<complex_t, 2>                  diag22c_t;
+typedef std::array<complex_t, 2> diag22c_t;
 
 /** Type used for 2x2 real matrices. */
-typedef std::array<std::array<real_t, 2>, 2>    matrix22r_t;
+typedef std::array<std::array<real_t, 2>, 2> matrix22r_t;
 
 /** Type used for 2x2 complex matrices. */
 typedef std::array<std::array<complex_t, 2>, 2> matrix22c_t;
 
 /** Response of an array of antenna elements. */
-struct raw_response_t
-{
-    /** Combined response of all (enabled) antenna elements in the array. */
-    matrix22c_t response;
+struct raw_response_t {
+  /** Combined response of all (enabled) antenna elements in the array. */
+  matrix22c_t response;
 
-    /** Number of antenna elements contributing to the combined response, per
-     *  polarization.
-     */
-    diag22r_t   weight;
+  /** Number of antenna elements contributing to the combined response, per
+   *  polarization.
+   */
+  diag22r_t weight;
 };
 
 /** Array factor of an array of antenna elements. A wave front of an incident
@@ -83,24 +82,22 @@ struct raw_response_t
  *  of the phase shifts due to these delays. It describes the "sensitivity" of
  *  the array as a function of direction.
  */
-struct raw_array_factor_t
-{
-    /** Array factor due to all (enabled) antenna elements in the array. */
-    diag22c_t   factor;
+struct raw_array_factor_t {
+  /** Array factor due to all (enabled) antenna elements in the array. */
+  diag22c_t factor;
 
-    /** Number of antenna elements contributing to the array factor, per
-     *  polarization.
-     */
-    diag22r_t   weight;
+  /** Number of antenna elements contributing to the array factor, per
+   *  polarization.
+   */
+  diag22r_t weight;
 };
 
 template <typename T, size_t N>
-std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj)
-{
+std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj) {
   print(out, obj.begin(), obj.end());
   return out;
 }
 
-} // namespace everybeam
+}  // namespace everybeam
 
 #endif

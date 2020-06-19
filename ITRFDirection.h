@@ -37,30 +37,29 @@
 
 namespace everybeam {
 
-class ITRFDirection
-{
-public:
-    typedef std::shared_ptr<ITRFDirection>       Ptr;
-    typedef std::shared_ptr<const ITRFDirection> ConstPtr;
+class ITRFDirection {
+ public:
+  typedef std::shared_ptr<ITRFDirection> Ptr;
+  typedef std::shared_ptr<const ITRFDirection> ConstPtr;
 
-    ITRFDirection(const vector3r_t &position, const vector2r_t &direction);
-    ITRFDirection(const vector3r_t &position, const vector3r_t &direction);
-    ITRFDirection(const vector2r_t &direction);
-    ITRFDirection(const vector3r_t &direction);
+  ITRFDirection(const vector3r_t &position, const vector2r_t &direction);
+  ITRFDirection(const vector3r_t &position, const vector3r_t &direction);
+  ITRFDirection(const vector2r_t &direction);
+  ITRFDirection(const vector3r_t &direction);
 
-    vector3r_t at(real_t time) const;
+  vector3r_t at(real_t time) const;
 
-    const static vector3r_t& LOFARPosition() { return itsLOFARPosition; }
+  const static vector3r_t &LOFARPosition() { return itsLOFARPosition; }
 
-private:
-    //ITRF position of CS002LBA, just to use a fixed reference
-    const static vector3r_t itsLOFARPosition;
+ private:
+  // ITRF position of CS002LBA, just to use a fixed reference
+  const static vector3r_t itsLOFARPosition;
 
-    mutable casacore::MeasFrame             itsFrame;
-    mutable casacore::MDirection::Convert   itsConverter;
-    mutable std::mutex                      itsMutex;
+  mutable casacore::MeasFrame itsFrame;
+  mutable casacore::MDirection::Convert itsConverter;
+  mutable std::mutex itsMutex;
 };
 
-} // namespace everybeam
+}  // namespace everybeam
 
 #endif
