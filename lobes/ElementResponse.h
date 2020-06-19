@@ -30,8 +30,7 @@
 
 #include <complex>
 
-namespace everybeam
-{
+namespace everybeam {
 
 // \addtogroup ElementResponse
 // @{
@@ -49,7 +48,7 @@ namespace everybeam
 // phi: Azimuth in rad in the range [0.0, 2.0 * PI].
 //
 void element_response_lba(double freq, double theta, double phi,
-    std::complex<double> (&response)[2][2]);
+                          std::complex<double> (&response)[2][2]);
 
 // Compute the response of an idealized LOFAR HBA dual dipole antenna to
 // radiation at frequency freq (Hz) arriving from the direction given by theta,
@@ -64,7 +63,7 @@ void element_response_lba(double freq, double theta, double phi,
 // phi: Azimuth in rad in the range [0.0, 2.0 * PI].
 //
 void element_response_hba(double freq, double theta, double phi,
-    std::complex<double> (&response)[2][2]);
+                          std::complex<double> (&response)[2][2]);
 
 // Compute the response of an idealized LOFAR dual dipole antenna to radiation
 // at frequency freq (Hz) arriving from the direction given by theta, phi (rad).
@@ -90,12 +89,13 @@ void element_response_hba(double freq, double theta, double phi,
 // coeff_shape: Shape of the coefficient array, all dimensions should be > 0.
 //
 void element_response(double freq, double theta, double phi,
-    std::complex<double> (&response)[2][2], double freq_center,
-    double freq_range, const unsigned int (&coeff_shape)[3],
-    const std::complex<double> coeff[]);
+                      std::complex<double> (&response)[2][2],
+                      double freq_center, double freq_range,
+                      const unsigned int (&coeff_shape)[3],
+                      const std::complex<double> coeff[]);
 
 // @}
 
-} // namespace everybeam
+}  // namespace everybeam
 
 #endif

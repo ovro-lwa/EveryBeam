@@ -12,4 +12,4 @@ cd $SCRIPT_PATH
 cd ..
 
 # Find all cpp headers ("*.h") and code files ("*.cc") source tree and execute clang-format. Exclude ./external director
-find . -path ./external -prune -o -name '*.h' -prune -o -name '*.cc' -exec clang-format -i -style=file \{\} +
+find . -path ./external -prune -o -type f \( -name "*.h" -o -name "*.cc" \) -exec clang-format -i -style=file \{\} +
