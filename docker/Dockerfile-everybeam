@@ -1,0 +1,18 @@
+#
+# base
+#
+ARG CI_REGISTRY_IMAGE
+FROM ${CI_REGISTRY_IMAGE}:base
+ENV INSTALLDIR /opt
+
+#
+# install-everybeam
+#
+ARG CI_COMMIT_SHORT_SHA
+ENV EVERYBEAM_COMMIT ${CI_COMMIT_SHORT_SHA}
+RUN mkdir -p ${INSTALLDIR}/everybeam/build
+RUN cd ${INSTALLDIR}/everybeam && git clone https://git.astron.nl/RD/EveryBeam.git EveryBeam
+RUN cd ${INSTALLDIR}/everybeam/EveryBeam && git checkout ${EVERYBEAM_COMMIT}
+RUN cd ${INSTALLDIR}/everybeam/build && cmake -DCMAKE_INSTALL_PREFIX=${INSTALLDIR}/everybeam ../EveryBeam
+RUN cd ${INSTALLDIR}/everybeam/build && make -j 8
+RUN cd ${INSTALLDIR}/everybeam/build && make install
