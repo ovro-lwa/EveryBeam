@@ -1,7 +1,7 @@
 stages:
   - build-base
-  - clang-format
-  - build-lofarbeam
+  - format-and-test
+  - build-everybeam
   - build-doc
   - deploy-doc
   # - build-dependency
@@ -16,20 +16,39 @@ build-base:
       docker build
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE:base
-      -f ./test/Dockerfile-base .
+      -f ./docker/Dockerfile-base .
     - docker push $CI_REGISTRY_IMAGE:base
 
 clang-format:
-  stage: clang-format
+  stage: format-and-test
   image: $CI_REGISTRY_IMAGE:base
-  script: 
-    # - apt-get update && apt-get -y install clang-format
+  before_script:
     - apt-get -y install python3-pip
     - pip3 install clang-format
+  script: 
     - ./scripts/clang-format-check.sh
 
-build-lofarbeam:
-  stage: build-lofarbeam
+# Build a debug version of EveryBeam from the base image
+test-and-coverage:
+  stage: format-and-test
+  image: $CI_REGISTRY_IMAGE:base
+  dependencies: 
+    - build-base
+  before_script:
+    - apt-get -y install python3-pip
+    - pip3 install gcovr
+  script:
+    - mkdir -p /opt/everybeam/build
+    - cd /opt/everybeam && git clone https://git.astron.nl/RD/EveryBeam.git EveryBeam
+    - cd /opt/everybeam/EveryBeam && git checkout ${CI_COMMIT_SHORT_SHA}
+    - cd /opt/everybeam/build
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../EveryBeam/
+    - make install -j8
+    - ctest -T test
+    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
+
+build-everybeam:
+  stage: build-everybeam
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - >
@@ -37,7 +56,7 @@ build-lofarbeam:
       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-      -f ./test/Dockerfile-lofarbeam .
+      -f ./docker/Dockerfile-everybeam .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
 
 build-doc:
@@ -46,10 +65,10 @@ build-doc:
   - >
     docker run
     --name $CI_COMMIT_SHORT_SHA
-    --workdir /opt/lofarbeam/build/
+    --workdir /opt/everybeam/build/
     $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     sh -c 'make doc'
-  - docker cp $CI_COMMIT_SHORT_SHA:/opt/lofarbeam/build/doc/html htmldoc
+  - docker cp $CI_COMMIT_SHORT_SHA:/opt/everybeam/build/doc/html htmldoc
   - docker rm $CI_COMMIT_SHORT_SHA
   artifacts:
     paths:
@@ -79,7 +98,7 @@ deploy-doc:
 #       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
 #       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
 #       --tag $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-#       -f ./test/Dockerfile-dp3 .
+#       -f ./docker/Dockerfile-dp3 .
 #     - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
 
 # build-wsclean:
@@ -91,7 +110,7 @@ deploy-doc:
 #       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
 #       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
 #       --tag $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
-#       -f ./test/Dockerfile-wsclean .
+#       -f ./docker/Dockerfile-wsclean .
 #     - docker push $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
 
 # test-dp3:
@@ -103,7 +122,7 @@ deploy-doc:
 #     - >
 #       docker run
 #       $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-#       /opt/lofarbeam/lofarbeam/test/tDockerDP3
+#       /opt/everybeam/everybeam/docker/tDockerDP3
 
 # test-wsclean:
 #   variables:
