@@ -2,6 +2,7 @@ stages:
   - build-base
   - format-and-test
   - build-everybeam
+  - oskar-comparison
   - build-doc
   - deploy-doc
   # - build-dependency
@@ -58,6 +59,27 @@ build-everybeam:
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
       -f ./docker/Dockerfile-everybeam .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+build-oskar:
+  stage: oskar-comparison
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  dependencies:
+    - build-everybeam
+  before_script:
+    - apt-get -y install python3-pip
+    - pip3 install numpy
+    - mkdir -p /opt/oskar/build
+    - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
+    - cd /opt/oskar/build
+  script:
+    # CPP install
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
+    - make -j8
+    - make install
+    # Python install
+    - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
+    - cd ./../OSKAR/python && python3 setup.py install && cd $HOME
+    - python3 -c "import oskar"
 
 build-doc:
   stage: build-doc
