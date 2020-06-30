@@ -21,6 +21,8 @@ build-base:
     - docker push $CI_REGISTRY_IMAGE:base
 
 clang-format:
+  except:
+    - schedules
   stage: format-and-test
   image: $CI_REGISTRY_IMAGE:base
   before_script:
@@ -33,6 +35,8 @@ clang-format:
 test-and-coverage:
   stage: format-and-test
   image: $CI_REGISTRY_IMAGE:base
+  except:
+    - schedules
   dependencies: 
     - build-base
   before_script:
@@ -63,6 +67,8 @@ build-everybeam:
 build-oskar:
   stage: oskar-comparison
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  only:
+    - schedules
   dependencies:
     - build-everybeam
   before_script:
@@ -83,6 +89,8 @@ build-oskar:
 
 build-doc:
   stage: build-doc
+  except:
+    - schedules
   script:
   - >
     docker run
@@ -98,6 +106,8 @@ build-doc:
 
 deploy-doc:
   stage: deploy-doc
+  except:
+    - schedules
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
@@ -159,6 +169,8 @@ deploy-doc:
 deploy:
   variables:
     GIT_STRATEGY: none
+  except:
+    - schedules
   only:
     - master
   stage: deploy
