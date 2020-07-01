@@ -25,11 +25,24 @@ class OSKARElementResponseDipole : public ElementResponse {
 //! Implementation of the OSKAR spherical wave response model
 class OSKARElementResponseSphericalWave : public ElementResponse {
  public:
+  /**
+   * A constructor-like static method to instantiate the class
+   *
+   * returns a globally shared instance of the class that is instantiated
+   * in the first call
+   */
   static std::shared_ptr<OSKARElementResponseSphericalWave> getInstance() {
     return common::Singleton<OSKARElementResponseSphericalWave>::getInstance();
   }
 
+  /** Constructor loading the default coefficients file */
   OSKARElementResponseSphericalWave();
+
+  /** Constructor loading a custom coefficients file
+   *
+   * @param path Path to the coefficients file to load
+   */
+  OSKARElementResponseSphericalWave(const std::string &path);
 
   virtual void response(
       double freq, double theta, double phi,
@@ -40,7 +53,7 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
       std::complex<double> (&response)[2][2]) const final override;
 
  protected:
-  std::string get_path(const char*) const;
+  std::string get_path(const char *) const;
 
   std::unique_ptr<Datafile> m_datafile;
 };
