@@ -24,6 +24,11 @@ OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave() {
   m_datafile.reset(new Datafile(path));
 }
 
+OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave(
+    const std::string& path) {
+  m_datafile.reset(new Datafile(path));
+}
+
 void OSKARElementResponseSphericalWave::response(
     double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
