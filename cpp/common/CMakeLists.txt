@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------
 # Install headers
 install (FILES
+  casa_utils.h
   Constants.h
   MathUtil.h
   MutablePtr.h

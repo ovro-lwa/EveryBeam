@@ -1,5 +1,6 @@
 #include "beam-helper.h"
 
+#include <aocommon/imagecoordinates.h>
 #include <fitsio.h>
 
 #include "./../cpp/common/MathUtil.h"
@@ -75,7 +76,7 @@ void GetITRFDirections(
 
             double l, m, n, ra, dec;
 
-            XYToLM<double>(x, y, dl, dm, subgrid_size, subgrid_size, l, m);
+            aocommon::ImageCoordinates::XYToLM<double>(x, y, dl, dm, subgrid_size, subgrid_size, l, m);
 
             l += pdl;
             m += pdm;
@@ -93,19 +94,19 @@ void GetITRFDirections(
                 casacore::Quantity(ra + M_PI/2, radUnit),
                 casacore::Quantity(0, radUnit)),
             	casacore::MDirection::J2000);
-            setITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
+            everybeam::coords::setITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
 
             casacore::MDirection mDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec + M_PI/2, radUnit)),
             	casacore::MDirection::J2000);
-            setITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
+            everybeam::coords::setITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
 
             casacore::MDirection nDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec, radUnit)),
             	casacore::MDirection::J2000);
-            setITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
+            everybeam::coords::setITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
 
             vector3r_t itrfDirection;
 
@@ -198,16 +199,6 @@ void StoreBeam(
 		}
 	}
     WriteFits<double>(filename, img.data(), nx*width, ny*height);
-}
-
-void setITRFVector(
-    const casacore::MDirection& itrfDir,
-    vector3r_t& itrf)
-{
-    const casacore::Vector<double>& itrfVal = itrfDir.getValue().getValue();
-    itrf[0] = itrfVal[0];
-    itrf[1] = itrfVal[1];
-    itrf[2] = itrfVal[2];
 }
 
 void GetRaDecZenith(

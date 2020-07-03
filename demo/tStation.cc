@@ -1,10 +1,8 @@
 #include <iostream>
 
-#include "Station.h"
-
-// #include "BeamFormer.h"
-#include "LofarMetaDataUtil.h"
-#include "MathUtil.h"
+#include "./../cpp/Station.h"
+#include "./../cpp/LofarMetaDataUtil.h"
+#include "./../cpp/common/MathUtil.h"
 
 #include "config.h"
 

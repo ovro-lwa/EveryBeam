@@ -13,10 +13,13 @@ add_library(everybeam SHARED
   ElementResponse.cc
   BeamFormer.cc
   Element.cc
+  load.cc
   coords/ITRFConverter.cc
   coords/ITRFDirection.cc
   LofarMetaDataUtil.cc
   Station.cc
+  telescope/lofar.cc
+  gridded_response/lofargrid.cc
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
@@ -37,6 +40,10 @@ install (FILES
   ElementResponse.h
   LofarMetaDataUtil.h
   Station.h
+  # Related to new API:
+  load.h
+  # Not needed as yet:
+  # options.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}")
 
 install(

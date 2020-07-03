@@ -61,7 +61,11 @@ cmake_policy(SET CMP0074 NEW)
 endif()
 
 # Set compile options
-add_compile_options(-std=c++11 "${OpenMP_CXX_FLAGS}" -Wall -DNDEBUG -Wl,--no-undefined)
+add_compile_options(-std=c++11 "${OpenMP_CXX_FLAGS}" -Wall -Wl,--no-undefined)
+
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(-DNDEBUG)
+endif()
 
 #------------------------------------------------------------------------------
 # Find/load top level dependencies
