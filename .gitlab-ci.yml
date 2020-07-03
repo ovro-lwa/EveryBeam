@@ -46,8 +46,13 @@ test-and-coverage:
     - mkdir -p /opt/everybeam/build
     - cd /opt/everybeam && git clone https://git.astron.nl/RD/EveryBeam.git EveryBeam
     - cd /opt/everybeam/EveryBeam && git checkout ${CI_COMMIT_SHORT_SHA}
+    # Download LOFAR Mock measurement set
+    - ./scripts/download_lofar_ms.sh
+    - LOFAR_MOCK_MS=/opt/everybeam/EveryBeam/test_data/LOFAR_MOCK.ms/
+    # Change to build dir
     - cd /opt/everybeam/build
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../EveryBeam/
+    # Build in Debug mode and add LOFAR_MOCK_MS
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../EveryBeam/
     - make install -j8
     - ctest -T test
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'

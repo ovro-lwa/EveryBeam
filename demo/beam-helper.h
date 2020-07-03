@@ -1,6 +1,7 @@
 #include "./../cpp/ElementResponse.h"
 #include "./../cpp/Station.h"
 #include "./../cpp/LofarMetaDataUtil.h"
+#include "./../cpp/coords/coord_utils.h"
 
 #include <casacore/measures/Measures/MPosition.h>
 #include <casacore/measures/Measures/MEpoch.h>
@@ -27,8 +28,6 @@ void GetITRFDirections(vector3r_t* itrfDirections, size_t subgrid_size,
 void StoreBeam(const std::string& filename, const std::complex<float>* buffer,
                size_t nStations, size_t width, size_t height);
 
-void setITRFVector(const casacore::MDirection& itrfDir, vector3r_t& itrf);
-
 inline matrix22c_t operator*(const matrix22c_t& arg0, const matrix22c_t& arg1) {
   matrix22c_t result;
   result[0][0] = arg0[0][0] * arg1[0][0] + arg0[0][1] * arg1[1][0];
@@ -36,14 +35,6 @@ inline matrix22c_t operator*(const matrix22c_t& arg0, const matrix22c_t& arg1) {
   result[1][0] = arg0[1][0] * arg1[0][0] + arg0[1][1] * arg1[1][0];
   result[1][1] = arg0[1][0] * arg1[0][1] + arg0[1][1] * arg1[1][1];
   return result;
-}
-
-template <typename T>
-void XYToLM(size_t x, size_t y, T pixelSizeX, T pixelSizeY, size_t width,
-            size_t height, T& l, T& m) {
-  T midX = (T)width / 2.0, midY = (T)height / 2.0;
-  l = (midX - (T)x) * pixelSizeX;
-  m = ((T)y - midY) * pixelSizeY;
 }
 
 void GetRaDecZenith(vector3r_t position, double time, double& ra, double& dec);

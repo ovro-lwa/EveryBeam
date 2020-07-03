@@ -1,5 +1,6 @@
 #include "./../Station.h"
 
+// TODO: make a test out of this
 int main() {
   const everybeam::vector3r_t position = {{1.0, 2.0, 3.0}};
 

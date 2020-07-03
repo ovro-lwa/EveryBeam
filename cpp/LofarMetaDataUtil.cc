@@ -76,14 +76,17 @@ using namespace casacore;
 
 typedef std::array<vector3r_t, 16> TileConfig;
 
+// TODO: can be deprecated in favor of common::hasColumn from CasaUtil.h
 bool hasColumn(const Table &table, const string &column) {
   return table.tableDesc().isColumn(column);
 }
 
+// TODO: utility is not used at all
 bool hasSubTable(const Table &table, const string &name) {
   return table.keywordSet().isDefined(name);
 }
 
+// TODO: can be deprecated in favor of common::getSubTable from CasaUtil.h
 Table getSubTable(const Table &table, const string &name) {
   return table.keywordSet().asTable(name);
 }

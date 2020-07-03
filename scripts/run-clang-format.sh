@@ -1,4 +1,3 @@
-
 #!/bin/sh
 #
 # Author: Jakob Maljaars

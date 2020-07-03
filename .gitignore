@@ -3,3 +3,4 @@
 # Directories
 .vscode/
 build/
+test_data/
