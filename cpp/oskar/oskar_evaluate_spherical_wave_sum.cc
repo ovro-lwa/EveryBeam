@@ -62,7 +62,7 @@ void oskar_evaluate_spherical_wave_sum(int num_points, const FP* theta,
           oskar_legendre2(l, abs_m, cos_t, sin_t, p, pds, dpms);
           if (abs_m == 0) {
             sin_p = (FP)0;
-            cos_p = sqrt(f_);
+            cos_p = -sqrt(f_);
             const FP4c alpha_ = alpha[ind0];
             oskar_sph_wave(pds, dpms, sin_p, cos_p, 0, alpha_.a, alpha_.b, Xt,
                            Xp);
@@ -74,9 +74,9 @@ void oskar_evaluate_spherical_wave_sum(int num_points, const FP* theta,
             d_fact = std::tgamma(d_ + 1);
             s_fact = std::tgamma(s_ + 1);
             const FP ff = f_ * d_fact / s_fact;
-            const FP nf = sqrt(ff);
-            const FP4c alpha_m = alpha[ind0 - abs_m];
-            const FP4c alpha_p = alpha[ind0 + abs_m];
+            const FP nf = sqrt(ff) * (2 * (abs_m & 1) - 1);
+            const FP4c alpha_m = alpha[ind0 + abs_m];
+            const FP4c alpha_p = alpha[ind0 - abs_m];
             p = -abs_m * phi_x_;
             oskar_sincos(p, &sin_p, &cos_p);
             sin_p *= nf;

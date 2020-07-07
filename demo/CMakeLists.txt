@@ -1,3 +1,5 @@
+add_subdirectory(comparison-oskar)
+
 set(TEST_MEASUREMENTSET CACHE STRING "measurement set used for testing")
 
 if (TEST_MEASUREMENTSET)

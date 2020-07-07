@@ -14,6 +14,12 @@ add_library(oskar SHARED
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 set_target_properties(oskar PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-oskar")
 
+# Make sure that when other targets within this project link against the oskar target,
+# they can find the include files.
+target_include_directories(oskar PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
 #------------------------------------------------------------------------------
 # Link against HDF5 and OpenMP
 target_link_libraries(oskar ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES} ${OpenMP_CXX_FLAGS})
