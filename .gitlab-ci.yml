@@ -74,23 +74,29 @@ build-oskar:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   only:
     - schedules
+    - master
   dependencies:
     - build-everybeam
   before_script:
     - apt-get -y install python3-pip
-    - pip3 install numpy
+    # Install python requirements for the OSKAR "integration" test
+    - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     - cd /opt/oskar/build
   script:
-    # CPP install
+    # OSKAR cpp install
     - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
     - make -j8
     - make install
     # Python install
     - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
     - cd ./../OSKAR/python && python3 setup.py install && cd $HOME
-    - python3 -c "import oskar"
+    - export PATH=/opt/oskar/bin:$PATH
+    # Run OSKAR comparison, set some env variables for this session
+    - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
+    - cd /opt/everybeam/build
+    - make VERBOSE=1 comparison-oskar
 
 build-doc:
   stage: build-doc
