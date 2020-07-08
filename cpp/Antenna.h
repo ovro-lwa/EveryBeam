@@ -109,6 +109,12 @@ class Antenna {
         m_phase_reference_position(phase_reference_position),
         m_enabled{true, true} {}
 
+  Antenna(const vector3r_t &phase_reference_position)
+      : m_coordinate_system({phase_reference_position,  // origin
+                             CoordinateSystem::identity_axes}),
+        m_phase_reference_position(phase_reference_position),
+        m_enabled{true, true} {}
+
   /**
    * @brief Compute the %Antenna response
    *
