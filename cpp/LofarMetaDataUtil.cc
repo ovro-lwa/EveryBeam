@@ -180,9 +180,25 @@ Antenna::CoordinateSystem readCoordinateSystem(const Table &table,
   return coordinate_system;
 }
 
-BeamFormer::Ptr make_tile(std::string name,
-                          Antenna::CoordinateSystem coordinate_system,
-                          TileConfig tile_config, ElementResponse::Ptr) {}
+BeamFormer::Ptr make_tile(unsigned int id, const vector3r_t &position,
+                          const TileConfig &tile_config,
+                          ElementResponse::Ptr element_response) {
+  BeamFormer::Ptr tile = BeamFormer::Ptr(new BeamFormer(position));
+
+  for (unsigned int id = 0; id < tile_config.size(); id++) {
+    vector3r_t antenna_position = tile_config[id];
+
+    Antenna::CoordinateSystem antenna_coordinate_system;
+    antenna_coordinate_system.origin = antenna_position;
+    antenna_coordinate_system.axes = lofar_antenna_orientation;
+
+    Antenna::Ptr antenna = Element::Ptr(
+        new Element(antenna_coordinate_system, element_response, id));
+    tile->add_antenna(antenna);
+  }
+
+  return tile;
+}
 
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
                                  ElementResponse::Ptr element_response) {
@@ -210,9 +226,9 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
   Matrix<Bool> aips_flag = c_flag(id);
   assert(aips_flag.shape().isEqual(IPosition(2, 2, aips_offset.ncolumn())));
 
-  //     TileConfig tile_config;
-  //     if(name != "LBA") readTileConfig(table, id);
-  //     transformToFieldCoordinates(tile_config, coordinate_system.axes);
+  TileConfig tile_config;
+  if (name != "LBA") readTileConfig(table, id);
+  transformToFieldCoordinates(tile_config, coordinate_system.axes);
 
   for (size_t i = 0; i < aips_offset.ncolumn(); ++i) {
     vector3r_t antenna_position = {aips_offset(0, i).getValue(),
@@ -220,9 +236,6 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
                                    aips_offset(2, i).getValue()};
     antenna_position =
         transformToFieldCoordinates(antenna_position, coordinate_system.axes);
-    //         std::cout << "antenna_position: " << antenna_position[0] << ", "
-    //         << antenna_position[1] << ", " << antenna_position[2] <<
-    //         std::endl;
     Antenna::Ptr antenna;
     Antenna::CoordinateSystem antenna_coordinate_system{
         antenna_position, lofar_antenna_orientation};
@@ -230,12 +243,8 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
       antenna = Element::Ptr(
           new Element(antenna_coordinate_system, element_response, id));
     } else {
-      antenna = Element::Ptr(
-          new Element(antenna_coordinate_system, element_response, id));
-      // TODO
-      // HBA, HBA0, HBA1
-      // antenna = make_tile(name, coordinate_system, tile_config,
-      // element_response);
+      // name is HBA, HBA0, HBA1
+      antenna = make_tile(id, antenna_position, tile_config, element_response);
     }
 
     antenna->m_enabled[0] = !aips_flag(0, i);

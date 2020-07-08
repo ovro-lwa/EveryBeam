@@ -46,6 +46,12 @@ class BeamFormer : public Antenna {
         transform_to_local_position(m_phase_reference_position);
   }
 
+  BeamFormer(vector3r_t phase_reference_position)
+      : Antenna(phase_reference_position) {
+    m_local_phase_reference_position =
+        transform_to_local_position(m_phase_reference_position);
+  }
+
   /**
    * @brief Add an antenna to the m_antenna array.
    *
