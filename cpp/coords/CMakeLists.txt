@@ -1,5 +1,3 @@
-#------------------------------------------------------------------------------
-# Install headers
 install (FILES
   ITRFConverter.h
   ITRFDirection.h

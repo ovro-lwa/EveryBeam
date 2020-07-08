@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
-# Add relevant subdirs
 add_subdirectory(common)
 add_subdirectory(coords)
-
+add_subdirectory(gridded_response)
 add_subdirectory(hamaker)
 add_subdirectory(lobes)
 add_subdirectory(oskar)
+add_subdirectory(telescope)
 
 #------------------------------------------------------------------------------
 add_library(everybeam SHARED
@@ -31,8 +31,6 @@ install (
   EXPORT EveryBeamTargets
   DESTINATION lib)
 
-#------------------------------------------------------------------------------
-# Install headers  
 install (FILES
   Antenna.h
   BeamFormer.h
@@ -42,8 +40,7 @@ install (FILES
   Station.h
   # Related to new API:
   load.h
-  # Not needed as yet:
-  # options.h
+  options.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}")
 
 install(
