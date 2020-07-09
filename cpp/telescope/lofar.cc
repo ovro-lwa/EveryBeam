@@ -1,5 +1,5 @@
 #include "lofar.h"
-#include "./../common/MathUtil.h"
+#include "./../common/math_utils.h"
 #include "./../common/casa_utils.h"
 #include <cassert>
 
@@ -94,7 +94,7 @@ BeamFormer::Ptr readAntennaField(const Table &table, std::size_t id,
 
     antenna->m_enabled[0] = !aips_flag(0, i);
     antenna->m_enabled[1] = !aips_flag(1, i);
-    beam_former->add_antenna(antenna);
+    beam_former->AddAntenna(antenna);
   }
   return beam_former;
 }
@@ -146,17 +146,17 @@ Station::Ptr LOFAR::ReadStation(const MeasurementSet &ms, std::size_t id,
   // coordinate system is ITRF
   // phase reference is station position
   auto beam_former = BeamFormer::Ptr(new BeamFormer(
-      Antenna::identity_coordinate_system, station->phaseReference()));
+      Antenna::IdentityCoordinateSystem, station->phaseReference()));
 
   for (std::size_t i = 0; i < tab_field.nrow(); ++i) {
-    beam_former->add_antenna(
+    beam_former->AddAntenna(
         readAntennaField(tab_field, i, station->get_element_response()));
   }
 
   // TODO
   // If There is only one field, the top level beamformer is not needed
   // and the station antenna can be set the the beamformer of the field
-  station->set_antenna(beam_former);
+  station->SetAntenna(beam_former);
 
   size_t field_id = 0;
   size_t element_id = 0;
@@ -166,7 +166,7 @@ Station::Ptr LOFAR::ReadStation(const MeasurementSet &ms, std::size_t id,
   // TODO: rotate coordinate system for antenna
   auto element = Element::Ptr(new Element(
       coordinate_system, station->get_element_response(), element_id));
-  station->set_element(element);
+  station->SetElement(element);
 
   return station;
 }

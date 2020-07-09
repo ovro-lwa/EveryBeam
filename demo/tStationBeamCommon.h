@@ -21,7 +21,7 @@ void calculateStationBeams(std::vector<everybeam::Station::Ptr>& stations,
         auto direction = itrfDirections[y * subgrid_size + x];
         auto freq_beamformer = frequency;
         matrix22c_t gainMatrix =
-            stations[s]->response(time, frequency, direction, freq_beamformer,
+            stations[s]->Response(time, frequency, direction, freq_beamformer,
                                   stationDirection, tileDirection);
 
         std::complex<float>* antBufferPtr = (*data_ptr)[s][y][x];

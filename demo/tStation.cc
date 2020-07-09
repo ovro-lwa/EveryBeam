@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "./../cpp/Station.h"
+#include "./../cpp/station.h"
 #include "./../cpp/LofarMetaDataUtil.h"
-#include "./../cpp/common/MathUtil.h"
+#include "./../cpp/common/math_utils.h"
 
 #include "config.h"
 
@@ -24,19 +24,19 @@ int main() {
   //     Element(station.get_element_response(),0)); auto antenna1 =
   //     Element::Ptr(new Element(station.get_element_response(),1));
   //
-  //     station.set_antenna(antenna0);
+  //     station.SetAntenna(antenna0);
   //
   //     std::cout << response[0][0] << std::endl;
   //
-  //     response = station.response(time, freq, direction);
+  //     Response = station.Response(time, freq, direction);
   //
   //     std::cout << response[0][0] << std::endl;
   //
   //     auto beam_former = BeamFormer::Ptr(new BeamFormer());
-  //     beam_former->add_antenna(antenna0);
-  //     beam_former->add_antenna(antenna1);
-  //     station.set_antenna(beam_former);
-  //     response = station.response(time, freq, direction);
+  //     beam_former->AddAntenna(antenna0);
+  //     beam_former->AddAntenna(antenna1);
+  //     station.SetAntenna(beam_former);
+  //     Response = station.Response(time, freq, direction);
   //     std::cout << response[0][0] << std::endl;
   //
 
@@ -61,7 +61,7 @@ int main() {
     auto d = direction;
     d[1] = -0.2 + 0.04 * i;
     d = normalize(d);
-    response = station->response(time, freq, d, freq_beamformer,
+    response = station->Response(time, freq, d, freq_beamformer,
                                  station_pointing, tile_pointing);
     std::cout << response[0][0] << " " << response[0][1] << " "
               << response[1][0] << " " << response[1][1] << " " << std::endl;

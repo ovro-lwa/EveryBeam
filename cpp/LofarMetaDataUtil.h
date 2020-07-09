@@ -28,8 +28,8 @@
 // Utility functions to read the meta data relevant for simulating the beam from
 // LOFAR observations stored in MS format.
 
-#include "Station.h"
-#include "ElementResponse.h"
+#include "station.h"
+#include "element_response.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
@@ -77,4 +77,4 @@ casacore::MDirection readTileBeamDirection(const casacore::MeasurementSet &ms);
 
 }  // namespace everybeam
 
-#endif
+#endif  // EVERYBEAM_LOFARMETADATAUTIL_H

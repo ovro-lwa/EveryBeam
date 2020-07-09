@@ -1,4 +1,4 @@
-// MathUtil.h: Various mathematical operations on vectors and matrices.
+// math_utils.h: Various mathematical operations on vectors and matrices.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -26,7 +26,7 @@
 // \file
 // Various mathematical operations on vectors and matrices.
 
-#include "Types.h"
+#include "types.h"
 
 namespace everybeam {
 

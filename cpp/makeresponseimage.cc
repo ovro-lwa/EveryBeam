@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
 
       for (size_t y = 0; y < size; ++y) {
         for (size_t x = 0; x < size; ++x) {
-          matrix22c_t E = station->response(
+          matrix22c_t E = station->Response(
               directionMap.time0, refFrequency, directionMap.directions(x, y),
               refFrequency, directionMap.station0, directionMap.tile0);
 

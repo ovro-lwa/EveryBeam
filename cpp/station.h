@@ -1,4 +1,4 @@
-// Station.h: Representation of the station beam former.
+// station.h: Representation of the station beam former.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -27,11 +27,11 @@
 // \file
 // Representation of the station beam former.
 
-#include "ElementResponse.h"
-#include "Antenna.h"
-#include "BeamFormer.h"
+#include "element_response.h"
+#include "antenna.h"
+#include "beamformer.h"
 #include "coords/ITRFDirection.h"
-#include "common/Types.h"
+#include "common/types.h"
 
 #include <memory>
 #include <vector>
@@ -142,7 +142,7 @@ class Station {
    *  point \e from the ground \e towards the direction from which the plane
    *  wave arrives.
    */
-  matrix22c_t response(real_t time, real_t freq, const vector3r_t &direction,
+  matrix22c_t Response(real_t time, real_t freq, const vector3r_t &direction,
                        real_t freq0, const vector3r_t &station0,
                        const vector3r_t &tile0, const bool rotate = true) const;
 
@@ -175,7 +175,7 @@ class Station {
    *  point \e from the ground \e towards the direction from which the plane
    *  wave arrives.
    */
-  diag22c_t arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+  diag22c_t ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
                         real_t freq0, const vector3r_t &station0,
                         const vector3r_t &tile0) const;
 
@@ -207,7 +207,7 @@ class Station {
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
    */
   template <typename T, typename U>
-  void response(unsigned int count, real_t time, T freq,
+  void Response(unsigned int count, real_t time, T freq,
                 const vector3r_t &direction, real_t freq0,
                 const vector3r_t &station0, const vector3r_t &tile0, U buffer,
                 const bool rotate = true) const;
@@ -228,11 +228,11 @@ class Station {
    *  \param buffer Output iterator with room for \p count instances of type
    *  ::diag22c_t.
    *
-   *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+   *  \see ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
    */
   template <typename T, typename U>
-  void arrayFactor(unsigned int count, real_t time, T freq,
+  void ArrayFactor(unsigned int count, real_t time, T freq,
                    const vector3r_t &direction, real_t freq0,
                    const vector3r_t &station0, const vector3r_t &tile0,
                    U buffer) const;
@@ -258,7 +258,7 @@ class Station {
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
    */
   template <typename T, typename U>
-  void response(unsigned int count, real_t time, T freq,
+  void Response(unsigned int count, real_t time, T freq,
                 const vector3r_t &direction, T freq0,
                 const vector3r_t &station0, const vector3r_t &tile0, U buffer,
                 const bool rotate = true) const;
@@ -279,11 +279,11 @@ class Station {
    *  \param buffer Output iterator with room for \p count instances of type
    *  ::diag22c_t.
    *
-   *  \see arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+   *  \see ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
    */
   template <typename T, typename U>
-  void arrayFactor(unsigned int count, real_t time, T freq,
+  void ArrayFactor(unsigned int count, real_t time, T freq,
                    const vector3r_t &direction, T freq0,
                    const vector3r_t &station0, const vector3r_t &tile0,
                    U buffer) const;
@@ -326,16 +326,16 @@ class Station {
                               const bool rotate = true) const;
 
   //! Specialized implementation of response function.
-  matrix22c_t response(real_t time, real_t freq,
+  matrix22c_t Response(real_t time, real_t freq,
                        const vector3r_t &direction) const {
-    return itsAntenna->response(time, freq, direction);
+    return itsAntenna->Response(time, freq, direction);
   }
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element
-  void set_antenna(Antenna::Ptr antenna) { itsAntenna = antenna; }
+  void SetAntenna(Antenna::Ptr antenna) { itsAntenna = antenna; }
 
   //! Set Element attribute
-  void set_element(Element::Ptr element) { itsElement = element; }
+  void SetElement(Element::Ptr element) { itsElement = element; }
 
  private:
   vector3r_t ncp(real_t time) const;
@@ -371,45 +371,45 @@ class Station {
 // ------------------------------------------------------------------------- //
 
 template <typename T, typename U>
-void Station::response(unsigned int count, real_t time, T freq,
+void Station::Response(unsigned int count, real_t time, T freq,
                        const vector3r_t &direction, real_t freq0,
                        const vector3r_t &station0, const vector3r_t &tile0,
                        U buffer, const bool rotate) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =
-        response(time, *freq++, direction, freq0, station0, tile0, rotate);
+        Response(time, *freq++, direction, freq0, station0, tile0, rotate);
   }
 }
 
 template <typename T, typename U>
-void Station::arrayFactor(unsigned int count, real_t time, T freq,
+void Station::ArrayFactor(unsigned int count, real_t time, T freq,
                           const vector3r_t &direction, real_t freq0,
                           const vector3r_t &station0, const vector3r_t &tile0,
                           U buffer) const {
   for (unsigned int i = 0; i < count; ++i) {
-    *buffer++ = arrayFactor(time, *freq++, direction, freq0, station0, tile0);
+    *buffer++ = ArrayFactor(time, *freq++, direction, freq0, station0, tile0);
   }
 }
 
 template <typename T, typename U>
-void Station::response(unsigned int count, real_t time, T freq,
+void Station::Response(unsigned int count, real_t time, T freq,
                        const vector3r_t &direction, T freq0,
                        const vector3r_t &station0, const vector3r_t &tile0,
                        U buffer, const bool rotate) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =
-        response(time, *freq++, direction, *freq0++, station0, tile0, rotate);
+        Response(time, *freq++, direction, *freq0++, station0, tile0, rotate);
   }
 }
 
 template <typename T, typename U>
-void Station::arrayFactor(unsigned int count, real_t time, T freq,
+void Station::ArrayFactor(unsigned int count, real_t time, T freq,
                           const vector3r_t &direction, T freq0,
                           const vector3r_t &station0, const vector3r_t &tile0,
                           U buffer) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =
-        arrayFactor(time, *freq++, direction, *freq0++, station0, tile0);
+        ArrayFactor(time, *freq++, direction, *freq0++, station0, tile0);
   }
 }
 }  // namespace everybeam

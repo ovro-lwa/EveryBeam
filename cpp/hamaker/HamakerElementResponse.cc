@@ -7,31 +7,31 @@
 #include "config.h"
 
 #include "HamakerElementResponse.h"
-#include "../common/Singleton.h"
+#include "../common/singleton.h"
 
 namespace everybeam {
 
-std::shared_ptr<HamakerElementResponse> HamakerElementResponse::getInstance(
+std::shared_ptr<HamakerElementResponse> HamakerElementResponse::GetInstance(
     const std::string& name) {
   if (name.find("LBA") != std::string::npos) {
-    return common::Singleton<HamakerElementResponseLBA>::getInstance();
+    return common::Singleton<HamakerElementResponseLBA>::GetInstance();
   }
   if (name.find("HBA") != std::string::npos) {
-    return common::Singleton<HamakerElementResponseHBA>::getInstance();
+    return common::Singleton<HamakerElementResponseHBA>::GetInstance();
   }
   throw std::invalid_argument(
-      "HamakerElementResponse::getInstance: name should end in either 'LBA' or "
+      "HamakerElementResponse::GetInstance: name should end in either 'LBA' or "
       "'HBA'");
 }
 
-std::string HamakerElementResponse::get_path(const char* filename) const {
+std::string HamakerElementResponse::GetPath(const char* filename) const {
   std::stringstream ss;
   ss << EVERYBEAM_DATA_DIR << "/";
   ss << filename;
   return ss.str();
 }
 
-void HamakerElementResponse::response(
+void HamakerElementResponse::Response(
     double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
   // Initialize the response to zero.
@@ -45,11 +45,11 @@ void HamakerElementResponse::response(
     return;
   }
 
-  const double freq_center = m_coeffs->get_freq_center();
-  const double freq_range = m_coeffs->get_freq_range();
-  const unsigned int nHarmonics = m_coeffs->get_nHarmonics();
-  const unsigned int nPowerTheta = m_coeffs->get_nPowerTheta();
-  const unsigned int nPowerFreq = m_coeffs->get_nPowerFreq();
+  const double freq_center = m_coeffs->GetFreqCenter();
+  const double freq_range = m_coeffs->GetFreqRange();
+  const unsigned int nHarmonics = m_coeffs->Get_nHarmonics();
+  const unsigned int nPowerTheta = m_coeffs->Get_nPowerTheta();
+  const unsigned int nPowerFreq = m_coeffs->Get_nPowerFreq();
   ;
 
   // The model is parameterized in terms of a normalized frequency in the
@@ -114,12 +114,12 @@ void HamakerElementResponse::response(
 }
 
 HamakerElementResponseHBA::HamakerElementResponseHBA() {
-  std::string path = get_path("HamakerHBACoeff.h5");
+  std::string path = GetPath("HamakerHBACoeff.h5");
   m_coeffs.reset(new HamakerCoefficients(path));
 }
 
 HamakerElementResponseLBA::HamakerElementResponseLBA() {
-  std::string path = get_path("HamakerLBACoeff.h5");
+  std::string path = GetPath("HamakerLBACoeff.h5");
   m_coeffs.reset(new HamakerCoefficients(path));
 }
 }  // namespace everybeam

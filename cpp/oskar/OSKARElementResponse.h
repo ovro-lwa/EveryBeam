@@ -1,8 +1,8 @@
 #ifndef OSKAR_ELEMENTRESPONSE_H
 #define OSKAR_ELEMENTRESPONSE_H
 
-#include "../ElementResponse.h"
-#include "../common/Singleton.h"
+#include "../element_response.h"
+#include "../common/singleton.h"
 
 #include "OSKARDatafile.h"
 
@@ -13,11 +13,11 @@ namespace everybeam {
 //! Implementation of the OSKAR dipole response model
 class OSKARElementResponseDipole : public ElementResponse {
  public:
-  static std::shared_ptr<OSKARElementResponseDipole> getInstance() {
-    return common::Singleton<OSKARElementResponseDipole>::getInstance();
+  static std::shared_ptr<OSKARElementResponseDipole> GetInstance() {
+    return common::Singleton<OSKARElementResponseDipole>::GetInstance();
   }
 
-  virtual void response(
+  virtual void Response(
       double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;
 };
@@ -31,8 +31,8 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
    * returns a globally shared instance of the class that is instantiated
    * in the first call
    */
-  static std::shared_ptr<OSKARElementResponseSphericalWave> getInstance() {
-    return common::Singleton<OSKARElementResponseSphericalWave>::getInstance();
+  static std::shared_ptr<OSKARElementResponseSphericalWave> GetInstance() {
+    return common::Singleton<OSKARElementResponseSphericalWave>::GetInstance();
   }
 
   /** Constructor loading the default coefficients file */
@@ -44,16 +44,16 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
    */
   OSKARElementResponseSphericalWave(const std::string &path);
 
-  virtual void response(
+  virtual void Response(
       double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;
 
-  virtual void response(
+  virtual void Response(
       int element_id, double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;
 
  protected:
-  std::string get_path(const char *) const;
+  std::string GetPath(const char *) const;
 
   std::unique_ptr<Datafile> m_datafile;
 };

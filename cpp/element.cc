@@ -1,15 +1,15 @@
-#include "Element.h"
-#include "common/MathUtil.h"
+#include "element.h"
+#include "common/math_utils.h"
 
 namespace everybeam {
-matrix22c_t Element::local_response(real_t time, real_t freq,
-                                    const vector3r_t &direction, size_t id,
-                                    const Options &options) const {
+matrix22c_t Element::LocalResponse(real_t time, real_t freq,
+                                   const vector3r_t &direction, size_t id,
+                                   const Options &options) const {
   vector2r_t thetaphi = cart2thetaphi(direction);
 
   matrix22c_t result;
   static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t));
-  m_element_response->response(
+  m_element_response->Response(
       id, freq, thetaphi[0], thetaphi[1],
       reinterpret_cast<std::complex<double>(&)[2][2]>(result));
 
@@ -25,9 +25,9 @@ matrix22c_t Element::local_response(real_t time, real_t freq,
   return result;
 }
 
-matrix22c_t Element::local_response(real_t time, real_t freq,
-                                    const vector3r_t &direction,
-                                    const Options &options) const {
-  return local_response(time, freq, direction, m_id, options);
+matrix22c_t Element::LocalResponse(real_t time, real_t freq,
+                                   const vector3r_t &direction,
+                                   const Options &options) const {
+  return LocalResponse(time, freq, direction, m_id, options);
 }
 }  // namespace everybeam

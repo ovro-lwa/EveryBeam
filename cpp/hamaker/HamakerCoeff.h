@@ -33,57 +33,57 @@ class HamakerCoefficients {
    * @param f
    * @param value
    */
-  void set_coeff(const unsigned int n, const unsigned int t,
+  void SetCoeffs(const unsigned int n, const unsigned int t,
                  const unsigned int f,
                  std::pair<std::complex<double>, std::complex<double>> value);
 
-  void set_coeffs(const std::complex<double>* coeff);
+  void SetCoeffs(const std::complex<double>* coeff);
 
-  void set_coeffs(const std::vector<std::complex<double>> coeff);
+  void SetCoeffs(const std::vector<std::complex<double>> coeff);
 
   // Get
-  size_t get_nr_coeffs() const;
+  size_t GetNumCoeffs() const;
 
-  double get_freq_center() const { return m_freq_center; }
+  double GetFreqCenter() const { return freq_center_; }
 
-  double get_freq_range() const { return m_freq_range; }
+  double GetFreqRange() const { return freq_range_; }
 
-  unsigned int get_nHarmonics() const { return m_nHarmonics; }
+  unsigned int Get_nHarmonics() const { return nHarmonics_; }
 
-  unsigned int get_nPowerTheta() const { return m_nPowerTheta; }
+  unsigned int Get_nPowerTheta() const { return nPowerTheta_; }
 
-  unsigned int get_nPowerFreq() const { return m_nPowerFreq; }
+  unsigned int Get_nPowerFreq() const { return nPowerFreq_; }
 
   std::pair<std::complex<double>, std::complex<double>> get_coeff(
       const unsigned int n, const unsigned int t, const unsigned int f);
 
   // HDF5 I/O
-  void read_coeffs(std::string& filename);
+  void ReadCoeffs(std::string& filename);
 
-  void write_coeffs(std::string& filename);
+  void WriteCoeffs(std::string& filename);
 
   // Debugging
-  void print_coeffs();
+  void PrintCoeffs();
 
  private:
   // Methods
-  size_t get_index(const unsigned int n, const unsigned int t,
-                   const unsigned int f);
+  size_t GetIndex(const unsigned int n, const unsigned int t,
+                  const unsigned int f);
 
   // Parameters
-  double m_freq_center;
-  double m_freq_range;
-  unsigned int m_nHarmonics;
-  unsigned int m_nPowerTheta;
-  unsigned int m_nPowerFreq;
-  const unsigned int m_nInner = 2;
+  double freq_center_;
+  double freq_range_;
+  unsigned int nHarmonics_;
+  unsigned int nPowerTheta_;
+  unsigned int nPowerFreq_;
+  const unsigned int nInner_ = 2;
 
   // Data
-  std::vector<std::complex<double>> m_coeff;
+  std::vector<std::complex<double>> coeff_;
 
   // HDF5
-  std::string m_dataset_name = "coeff";
-  const unsigned int m_dataset_rank = 4;
+  std::string dataset_name_ = "coeff";
+  const unsigned int dataset_rank_ = 4;
 };
 
 #endif

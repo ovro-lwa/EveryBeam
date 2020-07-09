@@ -5,7 +5,7 @@
 
 namespace everybeam {
 
-void OSKARElementResponseDipole::response(
+void OSKARElementResponseDipole::Response(
     double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
   double dipole_length_m = 1;  // TODO
@@ -20,7 +20,7 @@ void OSKARElementResponseDipole::response(
 }
 
 OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave() {
-  std::string path = get_path("oskar.h5");
+  std::string path = GetPath("oskar.h5");
   m_datafile.reset(new Datafile(path));
 }
 
@@ -29,26 +29,26 @@ OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave(
   m_datafile.reset(new Datafile(path));
 }
 
-void OSKARElementResponseSphericalWave::response(
+void OSKARElementResponseSphericalWave::Response(
     double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
   // This ElementResponse model is element specific, so an element_id is
   // required to know for what element the response needs to be evaluated A
   // std::invalid_argument exception is thrown although strictly speaking it are
-  // not the given arguments that are invalid, but the response(...) method with
+  // not the given arguments that are invalid, but the Response(...) method with
   // a different signature should have been called.
   throw std::invalid_argument(
       "OSKARElementResponseSphericalWave: missing argument element_id");
 }
 
-void OSKARElementResponseSphericalWave::response(
+void OSKARElementResponseSphericalWave::Response(
     int element_id, double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
   auto dataset = m_datafile->get(freq);
-  auto l_max = dataset->get_l_max();
+  auto l_max = dataset->GetLMax();
 
   std::complex<double>* response_ptr = (std::complex<double>*)response;
-  std::complex<double>* alpha_ptr = dataset->get_alpha_ptr(element_id);
+  std::complex<double>* alpha_ptr = dataset->GetAlphaPtr(element_id);
 
   double phi_x = phi;
   double phi_y = phi + M_PI_2;
@@ -56,7 +56,7 @@ void OSKARElementResponseSphericalWave::response(
                                            alpha_ptr, response_ptr);
 }
 
-std::string OSKARElementResponseSphericalWave::get_path(
+std::string OSKARElementResponseSphericalWave::GetPath(
     const char* filename) const {
   std::stringstream ss;
   ss << EVERYBEAM_DATA_DIR << "/";

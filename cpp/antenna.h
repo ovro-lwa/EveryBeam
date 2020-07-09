@@ -5,13 +5,13 @@
 #include <memory>
 #include <iostream>
 
-#include "common/Types.h"
+#include "common/types.h"
 
 namespace everybeam {
 
 /**
  * @brief (Virtual) class describing an antenna, and computing the corresponding
- * response() and arrayFactor().
+ * Response() and ArrayFactor().
  *
  */
 class Antenna {
@@ -57,7 +57,7 @@ class Antenna {
     constexpr static vector3r_t zero_origin = {0.0, 0.0, 0.0};
   };
 
-  constexpr static CoordinateSystem identity_coordinate_system{
+  constexpr static CoordinateSystem IdentityCoordinateSystem{
       CoordinateSystem::zero_origin, CoordinateSystem::identity_axes};
 
   typedef std::shared_ptr<Antenna> Ptr;
@@ -116,7 +116,7 @@ class Antenna {
         m_enabled{true, true} {}
 
   /**
-   * @brief Compute the %Antenna response
+   * @brief Compute the %Antenna Response
    *
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency of the plane wave (Hz).
@@ -124,20 +124,20 @@ class Antenna {
    * @param options
    * @return matrix22c_t Jones matrix
    */
-  matrix22c_t response(real_t time, real_t freq, const vector3r_t &direction,
+  matrix22c_t Response(real_t time, real_t freq, const vector3r_t &direction,
                        const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
-    vector3r_t local_direction = transform_to_local_direction(direction);
+    vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options = {
         .freq0 = options.freq0,
-        .station0 = transform_to_local_direction(options.station0),
-        .tile0 = transform_to_local_direction(options.tile0),
+        .station0 = TransformToLocalDirection(options.station0),
+        .tile0 = TransformToLocalDirection(options.tile0),
         .rotate = options.rotate,
-        .east = transform_to_local_direction(options.east),
-        .north = transform_to_local_direction(options.north)};
-    matrix22c_t response =
-        local_response(time, freq, local_direction, local_options);
-    return response;
+        .east = TransformToLocalDirection(options.east),
+        .north = TransformToLocalDirection(options.north)};
+    matrix22c_t Response =
+        LocalResponse(time, freq, local_direction, local_options);
+    return Response;
   }
 
   /**
@@ -149,15 +149,15 @@ class Antenna {
    * @param options
    * @return diag22c_t
    */
-  diag22c_t arrayFactor(real_t time, real_t freq, const vector3r_t &direction,
+  diag22c_t ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
                         const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
-    vector3r_t local_direction = transform_to_local_direction(direction);
+    vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options = {
         .freq0 = options.freq0,
-        .station0 = transform_to_local_direction(options.station0),
-        .tile0 = transform_to_local_direction(options.tile0)};
-    return local_arrayFactor(time, freq, local_direction, local_options);
+        .station0 = TransformToLocalDirection(options.station0),
+        .tile0 = TransformToLocalDirection(options.tile0)};
+    return LocalArrayFactor(time, freq, local_direction, local_options);
   }
 
   CoordinateSystem m_coordinate_system;
@@ -165,17 +165,17 @@ class Antenna {
   bool m_enabled[2];
 
  private:
-  virtual matrix22c_t local_response(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     const Options &options) const = 0;
+  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
+                                    const vector3r_t &direction,
+                                    const Options &options) const = 0;
 
-  virtual diag22c_t local_arrayFactor(real_t time, real_t freq,
-                                      const vector3r_t &direction,
-                                      const Options &options) const {
+  virtual diag22c_t LocalArrayFactor(real_t time, real_t freq,
+                                     const vector3r_t &direction,
+                                     const Options &options) const {
     return {1.0, 1.0};
   }
 
-  vector3r_t transform_to_local_direction(const vector3r_t &direction);
+  vector3r_t TransformToLocalDirection(const vector3r_t &direction);
 };
 
 }  // namespace everybeam

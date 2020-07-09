@@ -1,4 +1,4 @@
-#include "ElementResponse.h"
+#include "element_response.h"
 
 namespace everybeam {
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {

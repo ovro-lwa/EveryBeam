@@ -22,7 +22,8 @@
 // $Id$
 
 #include "LofarMetaDataUtil.h"
-#include "common/MathUtil.h"
+#include "common/math_utils.h"
+#include "common/casa_utils.h"
 
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MPosition.h>
@@ -76,19 +77,9 @@ using namespace casacore;
 
 typedef std::array<vector3r_t, 16> TileConfig;
 
-// TODO: can be deprecated in favor of common::hasColumn from CasaUtil.h
-bool hasColumn(const Table &table, const string &column) {
-  return table.tableDesc().isColumn(column);
-}
-
 // TODO: utility is not used at all
 bool hasSubTable(const Table &table, const string &name) {
   return table.keywordSet().isDefined(name);
-}
-
-// TODO: can be deprecated in favor of common::getSubTable from CasaUtil.h
-Table getSubTable(const Table &table, const string &name) {
-  return table.keywordSet().asTable(name);
 }
 
 TileConfig readTileConfig(const Table &table, unsigned int row) {
@@ -194,7 +185,7 @@ BeamFormer::Ptr make_tile(unsigned int id, const vector3r_t &position,
 
     Antenna::Ptr antenna = Element::Ptr(
         new Element(antenna_coordinate_system, element_response, id));
-    tile->add_antenna(antenna);
+    tile->AddAntenna(antenna);
   }
 
   return tile;
@@ -202,7 +193,8 @@ BeamFormer::Ptr make_tile(unsigned int id, const vector3r_t &position,
 
 BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
                                  ElementResponse::Ptr element_response) {
-  Antenna::CoordinateSystem coordinate_system = readCoordinateSystem(table, id);
+  Antenna::CoordinateSystem coordinate_system =
+      common::readCoordinateSystem(table, id);
   //     std::cout << "coordinate_system: " << std::endl;
   //     std::cout << "  axes.p: " << coordinate_system.axes.p[0] << ", " <<
   //     coordinate_system.axes.p[1] << ", " << coordinate_system.axes.p[2] <<
@@ -249,7 +241,7 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
 
     antenna->m_enabled[0] = !aips_flag(0, i);
     antenna->m_enabled[1] = !aips_flag(1, i);
-    beam_former->add_antenna(antenna);
+    beam_former->AddAntenna(antenna);
   }
   return beam_former;
 }
@@ -290,7 +282,7 @@ BeamFormer::Ptr readAntennaFieldAartfaac(const Table &table,
 vector3r_t readStationPhaseReference(const Table &table, unsigned int id) {
   vector3r_t phase_reference = {0.0, 0.0, 0.0};
   const string columnName("LOFAR_PHASE_REFERENCE");
-  if (hasColumn(table, columnName)) {
+  if (common::hasColumn(table, columnName)) {
     ROScalarMeasColumn<MPosition> c_reference(table, columnName);
     MPosition mReference =
         MPosition::Convert(c_reference(id), MPosition::ITRF)();
@@ -321,22 +313,22 @@ Station::Ptr readStation(const MeasurementSet &ms, unsigned int id,
   station->setPhaseReference(readStationPhaseReference(ms.antenna(), id));
 
   // Read antenna field information.
-  ROScalarColumn<String> telescope_name_col(getSubTable(ms, "OBSERVATION"),
-                                            "TELESCOPE_NAME");
+  ROScalarColumn<String> telescope_name_col(
+      common::getSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
   string telescope_name = telescope_name_col(0);
 
   if (telescope_name == "LOFAR") {
-    Table tab_field = getSubTable(ms, "LOFAR_ANTENNA_FIELD");
+    Table tab_field = common::getSubTable(ms, "LOFAR_ANTENNA_FIELD");
     tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
 
     // The Station will consist of a BeamFormer that combines the fields
     // coordinate system is ITRF
     // phase reference is station position
     auto beam_former = BeamFormer::Ptr(new BeamFormer(
-        Antenna::identity_coordinate_system, station->phaseReference()));
+        Antenna::IdentityCoordinateSystem, station->phaseReference()));
 
     for (size_t i = 0; i < tab_field.nrow(); ++i) {
-      beam_former->add_antenna(
+      beam_former->AddAntenna(
           readAntennaField(tab_field, i, station->get_element_response()));
     }
 
@@ -344,24 +336,24 @@ Station::Ptr readStation(const MeasurementSet &ms, unsigned int id,
     // If There is only one field, the top level beamformer is not needed
     // and the station antenna can be set the the beamformer of the field
 
-    station->set_antenna(beam_former);
+    station->SetAntenna(beam_former);
 
     size_t field_id = 0;
     size_t element_id = 0;
     Antenna::CoordinateSystem coordinate_system =
-        readCoordinateSystem(tab_field, field_id);
+        common::readCoordinateSystem(tab_field, field_id);
     auto model = station->get_element_response();
     // TODO: rotate coordinate system for antenna
     auto element =
         Element::Ptr(new Element(coordinate_system, model, element_id));
-    station->set_element(element);
+    station->SetElement(element);
   } else if (telescope_name == "AARTFAAC") {
-    ROScalarColumn<String> ant_type_col(getSubTable(ms, "OBSERVATION"),
+    ROScalarColumn<String> ant_type_col(common::getSubTable(ms, "OBSERVATION"),
                                         "AARTFAAC_ANTENNA_TYPE");
     string ant_type = ant_type_col(0);
 
-    Table tab_field = getSubTable(ms, "ANTENNA");
-    station->set_antenna(readAntennaFieldAartfaac(tab_field, ant_type, id));
+    Table tab_field = common::getSubTable(ms, "ANTENNA");
+    station->SetAntenna(readAntennaFieldAartfaac(tab_field, ant_type, id));
   }
 
   return station;
@@ -370,7 +362,7 @@ Station::Ptr readStation(const MeasurementSet &ms, unsigned int id,
 MDirection readTileBeamDirection(const casacore::MeasurementSet &ms) {
   MDirection tileBeamDir;
 
-  Table fieldTable = getSubTable(ms, "FIELD");
+  Table fieldTable = common::getSubTable(ms, "FIELD");
 
   if (fieldTable.nrow() != 1) {
     throw std::runtime_error(
@@ -378,7 +370,7 @@ MDirection readTileBeamDirection(const casacore::MeasurementSet &ms) {
         "library.");
   }
 
-  if (hasColumn(fieldTable, "LOFAR_TILE_BEAM_DIR")) {
+  if (common::hasColumn(fieldTable, "LOFAR_TILE_BEAM_DIR")) {
     ROArrayMeasColumn<MDirection> tileBeamCol(fieldTable,
                                               "LOFAR_TILE_BEAM_DIR");
     tileBeamDir = *(tileBeamCol(0).data());

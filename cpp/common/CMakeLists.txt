@@ -1,7 +1,7 @@
 install (FILES
+  constants.h
   casa_utils.h
-  Constants.h
-  MathUtil.h
-  MutablePtr.h
-  Types.h
+  math_utils.h
+  mutable_ptr.h
+  types.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}/common")

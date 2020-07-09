@@ -1,4 +1,4 @@
-#include "./../Station.h"
+#include "./../station.h"
 
 // TODO: make a test out of this
 int main() {
@@ -33,7 +33,7 @@ int main() {
 
       double az = M_PI - phi;
       double el = M_PI_2 - theta;
-      element_response->response(0, freq, theta, phi, result_arr[i][j]);
+      element_response->Response(0, freq, theta, phi, result_arr[i][j]);
     }
   }
   return 0;

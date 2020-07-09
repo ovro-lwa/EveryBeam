@@ -24,9 +24,9 @@
 #ifndef EVERYBEAM_TELESCOPE_TELESCOPE_H_
 #define EVERYBEAM_TELESCOPE_TELESCOPE_H_
 
-#include "./../Station.h"
+#include "./../station.h"
 #include "./../options.h"
-#include "./../ElementResponse.h"
+#include "./../element_response.h"
 #include "./../gridded_response/griddedresponse.h"
 
 #include <vector>

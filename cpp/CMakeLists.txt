@@ -9,15 +9,15 @@ add_subdirectory(telescope)
 
 #------------------------------------------------------------------------------
 add_library(everybeam SHARED
-  Antenna.cc
-  ElementResponse.cc
-  BeamFormer.cc
-  Element.cc
+  antenna.cc
+  element_response.cc
+  beamformer.cc
+  element.cc
   load.cc
   coords/ITRFConverter.cc
   coords/ITRFDirection.cc
   LofarMetaDataUtil.cc
-  Station.cc
+  station.cc
   telescope/lofar.cc
   gridded_response/lofargrid.cc
 )
@@ -32,12 +32,12 @@ install (
   DESTINATION lib)
 
 install (FILES
-  Antenna.h
-  BeamFormer.h
-  Element.h
-  ElementResponse.h
+  antenna.h
+  beamformer.h
+  element.h
+  element_response.h
   LofarMetaDataUtil.h
-  Station.h
+  station.h
   # Related to new API:
   load.h
   options.h

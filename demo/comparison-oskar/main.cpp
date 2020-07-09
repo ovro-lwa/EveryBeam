@@ -29,7 +29,7 @@ int main(int argc, char** argv){
             double y = (2.0*j)/(N-1) - 1.0;
             double theta = asin(sqrt(x*x + y*y));
             double phi = atan2(y,x);
-            element_response.response(0, freq, theta, phi, result_arr[i][j]);
+            element_response.Response(0, freq, theta, phi, result_arr[i][j]);
         }
     }
 

@@ -1,7 +1,7 @@
 #ifndef HAMAKER_ELEMENTRESPONSE_H
 #define HAMAKER_ELEMENTRESPONSE_H
 
-#include "../ElementResponse.h"
+#include "../element_response.h"
 #include "HamakerCoeff.h"
 
 #include <memory>
@@ -11,15 +11,15 @@ namespace everybeam {
 //! Implementation of the Hamaker response model
 class HamakerElementResponse : public ElementResponse {
  public:
-  virtual void response(
+  virtual void Response(
       double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;
 
-  static std::shared_ptr<HamakerElementResponse> getInstance(
+  static std::shared_ptr<HamakerElementResponse> GetInstance(
       const std::string &name);
 
  protected:
-  std::string get_path(const char *) const;
+  std::string GetPath(const char *) const;
 
   std::unique_ptr<HamakerCoefficients> m_coeffs;
 };

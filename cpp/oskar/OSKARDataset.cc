@@ -14,7 +14,7 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
     // Read dataset dimensions
     H5::DataSpace dataspace = dataset.getSpace();
     unsigned int rank = dataspace.getSimpleExtentNdims();
-    assert(rank == m_dataset_rank);
+    assert(rank == dataset_rank_);
 
     // Get dimensions
     hsize_t dims[rank];
@@ -62,12 +62,12 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
   }
 }
 
-size_t Dataset::get_index(const unsigned int element) const {
+size_t Dataset::GetIndex(const unsigned int element) const {
   return element * m_nr_coeffs * 4;
 }
 
-std::complex<double>* Dataset::get_alpha_ptr(const unsigned int element) {
+std::complex<double>* Dataset::GetAlphaPtr(const unsigned int element) {
   assert(element < get_nr_elements());
-  size_t index = get_index(element);
+  size_t index = GetIndex(element);
   return m_data.data() + index;
 }

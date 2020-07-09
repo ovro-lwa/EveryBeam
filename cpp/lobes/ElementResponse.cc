@@ -21,7 +21,7 @@
 //
 // $Id$
 
-#include "ElementResponse.h"
+#include "element_response.h"
 
 #include <cmath>
 
