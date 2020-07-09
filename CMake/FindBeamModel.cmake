@@ -9,7 +9,7 @@ find_package(PackageHandleStandardArgs)
 
 find_path(
     BEAMMODEL_INCLUDE_DIR
-    NAMES EveryBeam/Station.h
+    NAMES EveryBeam/station.h
     HINTS ${BEAMMODEL_ROOT_DIR}
     PATH_SUFFIXES include
 )

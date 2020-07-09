@@ -1,4 +1,4 @@
-// MutablePtr.h: Representation of an LBA antenna field.
+// mutableptr.h: Representation of an LBA antenna field.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -44,7 +44,7 @@ namespace common {
  *
  * \code
  * #include<iostream>
- * #include "MutablePtr.h"
+ * #include "mutable_ptr.h"
  *
  * class Msg {
  * public:

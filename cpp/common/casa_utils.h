@@ -24,8 +24,8 @@
 #ifndef EVERYBEAM_COMMON_CASAUTIL_H_
 #define EVERYBEAM_COMMON_CASAUTIL_H_
 
-#include "Types.h"
-#include "./../Antenna.h"
+#include "types.h"
+#include "./../antenna.h"
 
 #include <cassert>
 
@@ -49,8 +49,8 @@ namespace common {
  * @param id Id of the antenna field in the station (int)
  * @return Antenna::CoordinateSystem
  */
-Antenna::CoordinateSystem readCoordinateSystem(const casacore::Table &table,
-                                               unsigned int id) {
+inline Antenna::CoordinateSystem readCoordinateSystem(
+    const casacore::Table &table, unsigned int id) {
   casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
                                                           "m");
   casacore::ArrayQuantColumn<casacore::Double> c_axes(table, "COORDINATE_AXES",
@@ -88,7 +88,7 @@ Antenna::CoordinateSystem readCoordinateSystem(const casacore::Table &table,
  * @return true If column present
  * @return false If column not present
  */
-bool hasColumn(const casacore::Table &table, const string &column) {
+inline bool hasColumn(const casacore::Table &table, const string &column) {
   return table.tableDesc().isColumn(column);
 }
 
@@ -99,7 +99,8 @@ bool hasColumn(const casacore::Table &table, const string &column) {
  * @param name Name of sub table (str)
  * @return Table (casacore::Table)
  */
-casacore::Table getSubTable(const casacore::Table &table, const string &name) {
+inline casacore::Table getSubTable(const casacore::Table &table,
+                                   const string &name) {
   return table.keywordSet().asTable(name);
 }
 }  // namespace common

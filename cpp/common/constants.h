@@ -1,4 +1,4 @@
-// Constants.h: %Constants used in this library.
+// constants.h: %Constants used in this library.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -26,7 +26,7 @@
 // \file
 // %Constants used in this library.
 
-#include "Types.h"
+#include "types.h"
 
 namespace everybeam {
 namespace common {

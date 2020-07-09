@@ -3,7 +3,7 @@ namespace common {
 template <typename T>
 class Singleton {
  public:
-  static std::shared_ptr<T> getInstance() {
+  static std::shared_ptr<T> GetInstance() {
     static std::shared_ptr<T> instance(new T());  // Guaranteed to be destroyed.
                                                   // Instantiated on first use.
     return instance;

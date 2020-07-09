@@ -6,11 +6,11 @@ namespace everybeam {
 
 LOBESElementResponse::LOBESElementResponse(std::string name) {}
 
-void LOBESElementResponse::response(
+void LOBESElementResponse::Response(
     double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {}
 
-std::shared_ptr<LOBESElementResponse> LOBESElementResponse::getInstance(
+std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(
     std::string name) {
   static std::map<std::string, std::shared_ptr<LOBESElementResponse>>
       name_response_map;

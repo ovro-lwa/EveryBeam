@@ -4,7 +4,7 @@
 #include <complex>
 #include <ostream>
 
-#include "common/MutablePtr.h"
+#include "common/mutable_ptr.h"
 
 namespace everybeam {
 
@@ -34,18 +34,18 @@ class ElementResponse {
       Ptr;  //!< Pointer to ElementResponse object
 
   /**
-   * @brief Virtual implementation of response method
+   * @brief Virtual implementation of Response method
    *
    * @param freq Frequency of the plane wave (Hz).
    * @param theta Angle wrt. z-axis (rad)
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual void response(double freq, double theta, double phi,
+  virtual void Response(double freq, double theta, double phi,
                         std::complex<double> (&result)[2][2]) const = 0;
 
   /**
-   * @brief Virtual implementation of response method
+   * @brief Virtual implementation of Response method
    *
    * @param element_id ID of element
    * @param freq Frequency of the plane wave (Hz).
@@ -53,9 +53,9 @@ class ElementResponse {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual void response(int element_id, double freq, double theta, double phi,
+  virtual void Response(int element_id, double freq, double theta, double phi,
                         std::complex<double> (&result)[2][2]) const {
-    response(freq, theta, phi, result);
+    Response(freq, theta, phi, result);
   }
 };
 }  // namespace everybeam

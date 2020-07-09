@@ -20,16 +20,16 @@ class Dataset {
 
   // Get
   size_t get_nr_elements() const { return m_nr_elements; };
-  size_t get_l_max() const { return m_l_max; };
+  size_t GetLMax() const { return m_l_max; };
 
-  std::complex<double>* get_alpha_ptr(const unsigned int element);
+  std::complex<double>* GetAlphaPtr(const unsigned int element);
 
  private:
   // Methods
-  size_t get_index(const unsigned int element) const;
+  size_t GetIndex(const unsigned int element) const;
 
   // Constants
-  const unsigned int m_dataset_rank = 3;
+  const unsigned int dataset_rank_ = 3;
 
   // Members
   std::vector<std::complex<double>> m_data;

@@ -3,7 +3,7 @@
 #include <aocommon/imagecoordinates.h>
 #include <fitsio.h>
 
-#include "./../cpp/common/MathUtil.h"
+#include "./../cpp/common/math_utils.h"
 // #include "./../cpp/coords/ITRFDirection.h"
 #include "./../cpp/coords/ITRFConverter.h"
 

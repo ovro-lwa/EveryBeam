@@ -26,7 +26,7 @@ void calculateElementBeams(everybeam::Station::Ptr& station,
         // Compute gain
         std::complex<double> gainMatrix[2][2] = {0.0};
         if (std::isfinite(theta) && std::isfinite(phi)) {
-          elementResponse->response(a, frequency, theta, phi, gainMatrix);
+          elementResponse->Response(a, frequency, theta, phi, gainMatrix);
         }
 
         // Store gain

@@ -20,8 +20,8 @@
 //
 // $Id$
 
-#include "Station.h"
-#include "common/MathUtil.h"
+#include "station.h"
+#include "common/math_utils.h"
 
 #include "hamaker/HamakerElementResponse.h"
 #include "oskar/OSKARElementResponse.h"
@@ -45,16 +45,16 @@ Station::Station(const std::string &name, const vector3r_t &position,
 void Station::setModel(const ElementResponseModel model) {
   switch (model) {
     case Hamaker:
-      itsElementResponse.set(HamakerElementResponse::getInstance(itsName));
+      itsElementResponse.set(HamakerElementResponse::GetInstance(itsName));
       break;
     case OSKARDipole:
-      itsElementResponse.set(OSKARElementResponseDipole::getInstance());
+      itsElementResponse.set(OSKARElementResponseDipole::GetInstance());
       break;
     case OSKARSphericalWave:
-      itsElementResponse.set(OSKARElementResponseSphericalWave::getInstance());
+      itsElementResponse.set(OSKARElementResponseSphericalWave::GetInstance());
       break;
     case LOBES:
-      itsElementResponse.set(LOBESElementResponse::getInstance(itsName));
+      itsElementResponse.set(LOBESElementResponse::GetInstance(itsName));
       break;
     default:
       std::stringstream message;
@@ -89,7 +89,7 @@ matrix22c_t Station::elementResponse(real_t time, real_t freq,
     options.north = north;
   }
 
-  return itsElement->local_response(time, freq, direction, id, options);
+  return itsElement->LocalResponse(time, freq, direction, id, options);
 }
 
 matrix22c_t Station::elementResponse(real_t time, real_t freq,
@@ -101,10 +101,10 @@ matrix22c_t Station::elementResponse(real_t time, real_t freq,
   //     else
   //       return itsElement->response(time, freq, direction);
 
-  return itsElement->response(time, freq, direction);
+  return itsElement->Response(time, freq, direction);
 }
 
-matrix22c_t Station::response(real_t time, real_t freq,
+matrix22c_t Station::Response(real_t time, real_t freq,
                               const vector3r_t &direction, real_t freq0,
                               const vector3r_t &station0,
                               const vector3r_t &tile0,
@@ -120,7 +120,7 @@ matrix22c_t Station::response(real_t time, real_t freq,
     options.north = north;
   }
 
-  matrix22c_t response = itsAntenna->response(time, freq, direction, options);
+  matrix22c_t response = itsAntenna->Response(time, freq, direction, options);
 
   //     if (rotate) {
   //         std::cout << "rotate" << std::endl;
@@ -133,13 +133,13 @@ matrix22c_t Station::response(real_t time, real_t freq,
   return response;
 }
 
-diag22c_t Station::arrayFactor(real_t time, real_t freq,
+diag22c_t Station::ArrayFactor(real_t time, real_t freq,
                                const vector3r_t &direction, real_t freq0,
                                const vector3r_t &station0,
                                const vector3r_t &tile0) const {
   Antenna::Options options = {
       .freq0 = freq0, .station0 = station0, .tile0 = tile0};
-  return itsAntenna->arrayFactor(time, freq, direction, options);
+  return itsAntenna->ArrayFactor(time, freq, direction, options);
 }
 
 matrix22r_t Station::rotation(real_t time, const vector3r_t &direction) const {

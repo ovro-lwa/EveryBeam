@@ -1,4 +1,4 @@
-// Types.h: Types used in this library.
+// types.h: Types used in this library.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -102,4 +102,4 @@ std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj) {
 
 }  // namespace everybeam
 
-#endif
+#endif  // EVERYBEAM_TYPES_H

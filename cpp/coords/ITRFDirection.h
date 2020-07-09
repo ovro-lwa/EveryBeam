@@ -26,7 +26,7 @@
 // \file
 // Functor that maps time to an ITRF direction.
 
-#include "./../common/Types.h"
+#include "./../common/types.h"
 
 #include <casacore/measures/Measures/MeasFrame.h>
 #include <casacore/measures/Measures/MeasConvert.h>

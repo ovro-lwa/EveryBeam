@@ -1,7 +1,7 @@
 #ifndef EVERYBEAM_COORDS_COORDUTILS_H_
 #define EVERYBEAM_COORDS_COORDUTILS_H_
 
-#include "./../common/Types.h"
+#include "./../common/types.h"
 #include <casacore/measures/Measures/MCDirection.h>
 
 namespace everybeam {

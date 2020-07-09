@@ -1,5 +1,5 @@
-#include "./../cpp/ElementResponse.h"
-#include "./../cpp/Station.h"
+#include "./../cpp/element_response.h"
+#include "./../cpp/station.h"
 #include "./../cpp/LofarMetaDataUtil.h"
 #include "./../cpp/coords/coord_utils.h"
 
