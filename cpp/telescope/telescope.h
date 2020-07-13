@@ -27,15 +27,22 @@
 #include "./../station.h"
 #include "./../options.h"
 #include "./../element_response.h"
-#include "./../gridded_response/griddedresponse.h"
 
 #include <vector>
+#include <memory>
+#include <cassert>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
 
 namespace everybeam {
 
+namespace gridded_response {
+class GriddedResponse;
+}
+
+namespace coords {
 struct CoordinateSystem;
+}
 
 namespace telescope {
 
@@ -45,19 +52,14 @@ namespace telescope {
  */
 class Telescope {
  public:
-  typedef std::unique_ptr<Telescope> Ptr;
-
-  // Will be filled by the private read_all_stations() method
-  std::vector<Station::Ptr> stations;
-
   /**
    * @brief Return the gridded response object
    *
    * @param coordinate_system Coordinate system struct
    * @return GriddedResponse::Ptr
    */
-  virtual gridded_response::GriddedResponse::Ptr GetGriddedResponse(
-      const CoordinateSystem &coordinate_system) = 0;
+  virtual std::unique_ptr<gridded_response::GriddedResponse> GetGriddedResponse(
+      const coords::CoordinateSystem &coordinate_system) = 0;
 
   /**
    * @brief Get station by index
@@ -65,11 +67,13 @@ class Telescope {
    * @param station_id Station index to retrieve
    * @return Station::Ptr
    */
-  Station::Ptr GetStation(std::size_t station_id) const {
-    // TODO: throw exception if idx >_nstations
-
-    return stations[station_id];
+  Station::Ptr GetStation(std::size_t station_idx) const {
+    // Assert only in DEBUG mode
+    assert(station_idx < nstations_);
+    return stations_[station_idx];
   }
+
+  std::size_t GetNrStations() const { return nstations_; };
 
  protected:
   /**
@@ -79,10 +83,10 @@ class Telescope {
    * @param model ElementResponse model
    * @param options telescope options
    */
-  Telescope(const casacore::MeasurementSet &ms,
-            const ElementResponseModel model, const Options &options)
-      : _nstations(ms.antenna().nrow()), _options(options) {
-    stations.resize(_nstations);
+  Telescope(casacore::MeasurementSet &ms, const ElementResponseModel model,
+            const Options &options)
+      : nstations_(ms.antenna().nrow()), options_(options) {
+    stations_.resize(nstations_);
   };
 
   /**
@@ -97,12 +101,13 @@ class Telescope {
     casacore::ROMSAntennaColumns antenna(ms.antenna());
 
     for (std::size_t i = 0; i < antenna.nrow(); ++i) {
-      this->stations[i] = ReadStation(ms, i, model);
+      stations_[i] = ReadStation(ms, i, model);
     }
   };
 
-  std::size_t _nstations;
-  Options _options;
+  std::size_t nstations_;
+  Options options_;
+  std::vector<Station::Ptr> stations_;
 
  private:
   // Virtual method for reading a single telescope station

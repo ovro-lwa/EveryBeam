@@ -15,14 +15,11 @@ TelescopeType Convert(const std::string &str) {
   else
     return UNKNOWN_TELESCOPE;
 }
-
-// Default options
-// Options defaultOptions;
 }  // namespace
 
-telescope::Telescope::Ptr Load(const casacore::MeasurementSet &ms,
-                               const ElementResponseModel model,
-                               const Options &options) {
+std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
+                                           const ElementResponseModel model,
+                                           const Options &options) {
   // Read Telescope name and convert to enum
   casacore::ScalarColumn<casacore::String> telescope_name_col(ms.observation(),
                                                               "TELESCOPE_NAME");
@@ -30,8 +27,9 @@ telescope::Telescope::Ptr Load(const casacore::MeasurementSet &ms,
   TelescopeType telescope_name = Convert(telescope_name_col(0));
   switch (telescope_name) {
     case LOFAR_TELESCOPE: {
-      auto telescope =
-          telescope::Telescope::Ptr(new telescope::LOFAR(ms, model, options));
+      std::unique_ptr<telescope::Telescope> telescope =
+          std::unique_ptr<telescope::Telescope>(
+              new telescope::LOFAR(ms, model, options));
       return telescope;
     }
     default:

@@ -24,6 +24,8 @@
 #ifndef EVERYBEAM_OPTIONS_H_
 #define EVERYBEAM_OPTIONS_H_
 
+#include <string>
+
 namespace everybeam {
 
 /**
@@ -33,7 +35,7 @@ namespace everybeam {
  */
 class Options {
  public:
-  Options(){};
+  Options() : useDifferentialBeam(false), useChannelFrequency(true){};
 
   //! Default - empty - options class
   static Options GetDefault() { return Options(); };
@@ -41,8 +43,10 @@ class Options {
   // Scratch list of potential options
   // Specify path to element response coefficients file
   // std::string coeff_path;
-  // bool useDifferentialBeam
-  // bool useChannelFrequency
+  bool useDifferentialBeam;
+  bool useChannelFrequency;
+  std::string data_column_name;
+  vector3r_t diff_beam_centre;
   //
 };
 }  // namespace everybeam

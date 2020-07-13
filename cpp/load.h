@@ -39,8 +39,8 @@ namespace everybeam {
  * @param options Options
  * @return telescope::Telescope::Ptr
  */
-telescope::Telescope::Ptr Load(const casacore::MeasurementSet &ms,
-                               const ElementResponseModel model,
-                               const Options &options = Options::GetDefault());
+std::unique_ptr<telescope::Telescope> Load(
+    casacore::MeasurementSet &ms, const ElementResponseModel model,
+    const Options &options = Options::GetDefault());
 }  // namespace everybeam
 #endif  // EVERYBEAM_LOAD_H_
