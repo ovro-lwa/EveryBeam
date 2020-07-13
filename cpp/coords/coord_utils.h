@@ -7,17 +7,23 @@
 namespace everybeam {
 namespace coords {
 
+struct CoordinateSystem {
+  std::size_t width, height;
+  double ra, dec, dl, dm, phase_centre_dl, phase_centre_dm;
+};
+
 /**
  * @brief Convert Casacore itrfDir to vector3r_t
  *
- * @param itrfDir
+ * @param itrf_dir
  * @param itrf
  */
-void setITRFVector(const casacore::MDirection& itrfDir, vector3r_t& itrf) {
-  const casacore::Vector<double>& itrfVal = itrfDir.getValue().getValue();
-  itrf[0] = itrfVal[0];
-  itrf[1] = itrfVal[1];
-  itrf[2] = itrfVal[2];
+inline void SetITRFVector(const casacore::MDirection& itrf_dir,
+                          vector3r_t& itrf) {
+  const casacore::Vector<double>& itrf_val = itrf_dir.getValue().getValue();
+  itrf[0] = itrf_val[0];
+  itrf[1] = itrf_val[1];
+  itrf[2] = itrf_val[2];
 }
 }  // namespace coords
 }  // namespace everybeam

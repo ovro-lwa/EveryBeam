@@ -24,19 +24,21 @@
 #ifndef EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 #define EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 
+#include "./../coords/coord_utils.h"
+#include "./../coords/ITRFDirection.h"
+#include "./../coords/ITRFConverter.h"
+
 #include <memory>
+#include <vector>
+#include <thread>
+#include <aocommon/lane.h>
+#include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
 
 namespace telescope {
 class Telescope;
 }
-
-// TODO: just temporary location!
-struct CoordinateSystem {
-  std::size_t width, height;
-  double ra, dec, dl, dm, phaseCentreDL, phaseCentreDM;
-};
 
 namespace gridded_response {
 
@@ -46,42 +48,50 @@ namespace gridded_response {
  */
 class GriddedResponse {
  public:
-  typedef std::unique_ptr<GriddedResponse> Ptr;
+  /**
+   * @brief Compute the Beam response for a single station
+   *
+   * @param buffer Output buffer
+   * @param station_idx Station index, must be smaller than number of stations
+   * in the Telescope
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   */
+  virtual bool CalculateStation(std::complex<float>* buffer, double time,
+                                double freq, const size_t station_idx) = 0;
 
-  // TODO: can be deprecated in a later stage
-  virtual void CalculateStation(std::size_t station_id) = 0;
-  virtual void CalculateStation() = 0;
-  virtual void CalculateAllStations() = 0;
-
-  // TODO: complete!
-  virtual void CalculateStation(std::complex<float>* buffer, size_t station_id,
-                                double time, double freq) = 0;
-  // Repeated call of calculate single?
-  virtual void CalculateAllStations(std::complex<float>* buffer, double time,
-                                    double freq) = 0;
+  /**
+   * @brief Compute the Beam response for all stations in a Telescope
+   *
+   * @param buffer Output buffer
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   */
+  virtual bool CalculateAllStations(std::complex<float>* buffer, double time,
+                                    double frequency) = 0;
 
  protected:
   /**
    * @brief Construct a new Gridded Response object
    *
    * @param telescope_ptr Pointer to telescope::Telescope object
-   * @param coordinateSystem CoordinateSystem struct
+   * @param coordinate_system CoordinateSystem struct
    */
-  GriddedResponse(const telescope::Telescope* telescope_ptr,
-                  const CoordinateSystem& coordinateSystem)
-      : _telescope(telescope_ptr),
-        _width(coordinateSystem.width),
-        _height(coordinateSystem.height),
-        _ra(coordinateSystem.ra),
-        _dec(coordinateSystem.dec),
-        _dl(coordinateSystem.dl),
-        _dm(coordinateSystem.dm),
-        _phaseCentreDL(coordinateSystem.phaseCentreDL),
-        _phaseCentreDM(coordinateSystem.phaseCentreDM){};
+  GriddedResponse(const telescope::Telescope* const telescope_ptr,
+                  const coords::CoordinateSystem& coordinate_system)
+      : telescope_(telescope_ptr),
+        width_(coordinate_system.width),
+        height_(coordinate_system.height),
+        ra_(coordinate_system.ra),
+        dec_(coordinate_system.dec),
+        dl_(coordinate_system.dl),
+        dm_(coordinate_system.dm),
+        phase_centre_dl_(coordinate_system.phase_centre_dl),
+        phase_centre_dm_(coordinate_system.phase_centre_dm){};
 
-  const telescope::Telescope* _telescope;
-  size_t _width, _height;
-  double _ra, _dec, _dl, _dm, _phaseCentreDL, _phaseCentreDM;
+  const telescope::Telescope* const telescope_;
+  size_t width_, height_;
+  double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
 };
 }  // namespace gridded_response
 }  // namespace everybeam

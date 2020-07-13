@@ -94,19 +94,19 @@ void GetITRFDirections(
                 casacore::Quantity(ra + M_PI/2, radUnit),
                 casacore::Quantity(0, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::setITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
 
             casacore::MDirection mDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec + M_PI/2, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::setITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
 
             casacore::MDirection nDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::setITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
 
             vector3r_t itrfDirection;
 

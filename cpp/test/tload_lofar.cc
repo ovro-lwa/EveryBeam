@@ -2,6 +2,7 @@
 
 #include "./../load.h"
 #include "./../options.h"
+#include "./../gridded_response/lofargrid.h"
 #include "./../element_response.h"
 
 #include "config.h"
@@ -21,19 +22,19 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   // Assert if correct number of stations
   std::size_t nstations = 70;
-  BOOST_CHECK_EQUAL(telescope->stations.size(), nstations);
+  BOOST_CHECK_EQUAL(telescope->GetNrStations(), nstations);
 
   // Assert if GetStation(stationd_id) behaves properly
   BOOST_CHECK_EQUAL(telescope->GetStation(0)->name(), "CS001HBA0");
 
   // Get gridded response
-  CoordinateSystem coord_system;
+  coords::CoordinateSystem coord_system;
   auto grrp = telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr !=
               dynamic_cast<gridded_response::LOFARGrid*>(grrp.get()));
 
   // TODO: add test
-  //   grrp->CalculateStation(0);
+  // grrp->CalculateStation(0);
   //   grrp->CalculateStation();
   //   grrp->CalculateAllStations();
 }

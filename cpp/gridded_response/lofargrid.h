@@ -26,7 +26,9 @@
 
 #include "griddedresponse.h"
 #include <iostream>
+#include <aocommon/matrix2x2.h>
 #include <complex>
+#include <limits>
 
 namespace everybeam {
 namespace gridded_response {
@@ -37,41 +39,17 @@ namespace gridded_response {
  */
 class LOFARGrid final : public GriddedResponse {
  public:
-  typedef std::unique_ptr<LOFARGrid> Ptr;
+  // typedef std::unique_ptr<LOFARGrid> Ptr;
 
   /**
    * @brief Construct a new LOFARGrid object
    *
    * @param telescope_ptr Pointer to telescope::LOFAR object
-   * @param coordinateSystem CoordinateSystem struct
+   * @param coordinate_system CoordinateSystem struct
    */
   LOFARGrid(telescope::Telescope* telescope_ptr,
-            const CoordinateSystem& coordinateSystem)
-      : GriddedResponse(telescope_ptr, coordinateSystem){};
+            const coords::CoordinateSystem& coordinate_system);
 
-  // TODO: remove this placeholders
-  void CalculateStation() { std::cout << "One is good" << std::endl; };
-
-  // TODO: remove this placeholder
-  void CalculateStation(std::size_t station_id) {
-    auto station_tmp = _telescope->GetStation(station_id);
-    std::cout << "Station name for index " << station_id << " is "
-              << station_tmp->name() << std::endl;
-  };
-
-  // TODO: remove this placeholder
-  void CalculateAllStations() {
-    std::size_t val = 0;
-    for (std::size_t station_id = 0; station_id < _telescope->stations.size();
-         ++station_id) {
-      val++;
-      // Repeated call to CalculateStation?
-      auto station_tmp = _telescope->GetStation(station_id);
-    };
-    std::cout << "I just read " << val << " stations" << std::endl;
-  };
-
-  // Geared towards implementation
   /**
    * @brief Compute the Beam response for a single station
    *
@@ -81,9 +59,9 @@ class LOFARGrid final : public GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
-  void CalculateStation(std::complex<float>* buffer, size_t stationIdx,
-                        double time, double freq) override{};
-  // Repeated call of calculate single?
+  bool CalculateStation(std::complex<float>* buffer, double time,
+                        double frequency, const size_t station_idx) override;
+
   /**
    * @brief Compute the Beam response for all stations in a Telescope
    *
@@ -91,8 +69,26 @@ class LOFARGrid final : public GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
-  void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double freq) override{};
+  bool CalculateAllStations(std::complex<float>* buffer, double time,
+                            double frequency) override;
+
+ private:
+  casacore::MDirection delay_dir_, tile_beam_dir_;
+  vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_;
+  bool use_channel_frequency_;
+  double subband_frequency_;
+
+  std::size_t nthreads_;
+  std::vector<std::thread> threads_;
+
+  struct Job {
+    size_t y, antenna_idx;
+  };
+  aocommon::Lane<Job>* lane_;
+
+  void SetITRFVectors(double time);
+
+  void CalcThread(std::complex<float>* buffer, double time, double frequency);
 };
 }  // namespace gridded_response
 }  // namespace everybeam

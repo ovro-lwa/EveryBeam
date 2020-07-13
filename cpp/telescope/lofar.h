@@ -26,16 +26,26 @@
 #define EVERYBEAM_TELESCOPE_LOFAR_H_
 
 #include "telescope.h"
-#include "./../gridded_response/lofargrid.h"
+
+#include <casacore/measures/Measures/MPosition.h>
+#include <casacore/measures/Measures/MDirection.h>
+#include <casacore/measures/Measures/MEpoch.h>
+#include <memory>
 
 namespace everybeam {
+
+namespace gridded_response {
+class LOFARGrid;
+class GriddedResponse;
+}  // namespace gridded_response
+
 namespace telescope {
 
 //! LOFAR telescope class
 class LOFAR final : public Telescope {
- public:
-  typedef std::unique_ptr<LOFAR> Ptr;
+  friend class gridded_response::LOFARGrid;
 
+ public:
   /**
    * @brief Construct a new LOFAR object
    *
@@ -43,22 +53,21 @@ class LOFAR final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  LOFAR(const casacore::MeasurementSet &ms, const ElementResponseModel model,
+  LOFAR(casacore::MeasurementSet &ms, const ElementResponseModel model,
         const Options &options);
 
-  // Docstrings will be inherited from telescope::Telescope
-  gridded_response::GriddedResponse::Ptr GetGriddedResponse(
-      const CoordinateSystem &coordinate_system) override {
-    // Get and return GriddedResponse ptr
-    gridded_response::GriddedResponse::Ptr grid(
-        new gridded_response::LOFARGrid(this, coordinate_system));
-    return grid;
-  };
+  std::unique_ptr<gridded_response::GriddedResponse> GetGriddedResponse(
+      const coords::CoordinateSystem &coordinate_system) override;
 
  private:
   Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                            const std::size_t id,
                            const ElementResponseModel model) const override;
+  struct MSProperties {
+    double subband_freq;
+    casacore::MDirection delay_dir, tile_beam_dir;
+  };
+  MSProperties ms_properties_;
 };
 }  // namespace telescope
 }  // namespace everybeam
