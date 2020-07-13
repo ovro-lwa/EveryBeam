@@ -28,7 +28,7 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
 // with inner dimension:
 // (x_te_re, x_te_im), (x_tm_re, x_tm_im),
 // (y_te_re, y_te_im), (y_tm_re, y_tm_im)
-#if defined(DEBUG)
+#ifndef NDEBUG
     std::cout << "nr_elements: " << nr_elements << std::endl;
     std::cout << "nr_coeffs: " << nr_coeffs << std::endl;
 #endif
@@ -36,7 +36,7 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
     // Check total number of coefficients to find l_max
     auto l_max_d = sqrt(nr_coeffs + 1) - 1;
     auto l_max = (int)round(l_max_d);
-#if defined(DEBUG)
+#ifndef NDEBUG
     std::cout << "l_max: " << l_max << std::endl;
 #endif
 
