@@ -96,7 +96,13 @@ typedef std::array<vector3r_t, 16> TileConfig;
 
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj) {
-  print(out, obj.begin(), obj.end());
+  // print(out, obj.begin(), obj.end());
+  out << "[";
+  for (auto it : obj) {
+    out << it;
+    if (it != *obj.rbegin()) out << ", ";
+  }
+  out << "]\n";
   return out;
 }
 

@@ -219,7 +219,7 @@ BeamFormer::Ptr readAntennaField(const Table &table, unsigned int id,
   assert(aips_flag.shape().isEqual(IPosition(2, 2, aips_offset.ncolumn())));
 
   TileConfig tile_config;
-  if (name != "LBA") readTileConfig(table, id);
+  if (name != "LBA") tile_config = readTileConfig(table, id);
   transformToFieldCoordinates(tile_config, coordinate_system.axes);
 
   for (size_t i = 0; i < aips_offset.ncolumn(); ++i) {

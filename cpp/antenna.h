@@ -135,9 +135,9 @@ class Antenna {
         .rotate = options.rotate,
         .east = TransformToLocalDirection(options.east),
         .north = TransformToLocalDirection(options.north)};
-    matrix22c_t Response =
+    matrix22c_t response =
         LocalResponse(time, freq, local_direction, local_options);
-    return Response;
+    return response;
   }
 
   /**

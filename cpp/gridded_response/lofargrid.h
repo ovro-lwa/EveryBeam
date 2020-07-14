@@ -53,7 +53,8 @@ class LOFARGrid final : public GriddedResponse {
   /**
    * @brief Compute the Beam response for a single station
    *
-   * @param buffer Output buffer
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetBufferSize(1)
    * @param stationIdx Station index, must be smaller than number of stations
    * in the Telescope
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
@@ -65,7 +66,8 @@ class LOFARGrid final : public GriddedResponse {
   /**
    * @brief Compute the Beam response for all stations in a Telescope
    *
-   * @param buffer Output buffer
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
@@ -82,7 +84,7 @@ class LOFARGrid final : public GriddedResponse {
   std::vector<std::thread> threads_;
 
   struct Job {
-    size_t y, antenna_idx;
+    size_t y, antenna_idx, buffer_offset;
   };
   aocommon::Lane<Job>* lane_;
 
