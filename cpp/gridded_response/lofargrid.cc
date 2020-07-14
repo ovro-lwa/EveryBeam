@@ -4,7 +4,7 @@
 
 #include <aocommon/imagecoordinates.h>
 #include <cmath>
-// #include <casacore/measures/TableMeasures/ArrayMeasColumn.h>
+#include <iostream>
 
 using namespace everybeam::gridded_response;
 
@@ -41,7 +41,7 @@ bool LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
   }
 
   for (size_t y = 0; y != height_; ++y) {
-    lane.write(Job{.y = y, .antenna_idx = station_idx});
+    lane.write(Job{.y = y, .antenna_idx = station_idx, .buffer_offset = 0});
   }
 
   lane.write_end();
@@ -73,7 +73,8 @@ bool LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
   for (size_t y = 0; y != height_; ++y) {
     for (size_t antenna_idx = 0; antenna_idx != telescope_->GetNrStations();
          ++antenna_idx) {
-      lane.write(Job{.y = y, .antenna_idx = antenna_idx});
+      lane.write(Job{
+          .y = y, .antenna_idx = antenna_idx, .buffer_offset = antenna_idx});
     }
   }
 
@@ -135,7 +136,8 @@ void LOFARGrid::CalcThread(std::complex<float>* buffer, double time,
       std::complex<float>* base_buffer = buffer + (x + job.y * height_) * 4;
 
       std::complex<float>* ant_buffer_ptr =
-          base_buffer + job.antenna_idx * values_per_ant;
+          base_buffer + job.buffer_offset * values_per_ant;
+
       matrix22c_t gain_matrix = telescope_->GetStation(job.antenna_idx)
                                     ->Response(time, frequency, itrf_direction,
                                                sb_freq, station0_, tile0_);

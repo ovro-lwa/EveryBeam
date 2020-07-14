@@ -25,16 +25,17 @@ std::vector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
     const double freq, const vector3r_t &direction) const {
   // Initialize and fill result vector by looping over antennas
   std::vector<std::complex<double>> result(antennas_.size());
-  for (auto &antenna : antennas_) {
-    const double dl = direction[0] * (antenna->m_phase_reference_position[0] -
-                                      local_phase_reference_position_[0]) +
-                      direction[1] * (antenna->m_phase_reference_position[1] -
-                                      local_phase_reference_position_[1]) +
-                      direction[2] * (antenna->m_phase_reference_position[2] -
-                                      local_phase_reference_position_[2]);
+  for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
+    const double dl =
+        direction[0] * (antennas_[idx]->m_phase_reference_position[0] -
+                        local_phase_reference_position_[0]) +
+        direction[1] * (antennas_[idx]->m_phase_reference_position[1] -
+                        local_phase_reference_position_[1]) +
+        direction[2] * (antennas_[idx]->m_phase_reference_position[2] -
+                        local_phase_reference_position_[2]);
 
     double phase = -2 * M_PI * dl / (common::c / freq);
-    result.push_back({std::sin(phase), std::cos(phase)});
+    result[idx] = {std::sin(phase), std::cos(phase)};
   }
   return result;
 }
@@ -48,23 +49,20 @@ BeamFormer::ComputeWeights(const vector3r_t &pointing, double freq) const {
   double weight_sum[2] = {0.0, 0.0};
   std::vector<std::pair<std::complex<double>, std::complex<double>>> result(
       geometric_response.size());
-  for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
-       ++antenna_idx) {
+  for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
     // Compute conjugate of geometric response
-    auto phasor_conj = std::conj(geometric_response[antenna_idx]);
+    auto phasor_conj = std::conj(geometric_response[idx]);
     // Compute the delays in x/y direction
-    result.push_back(
-        {phasor_conj * (1.0 * antennas_[antenna_idx]->m_enabled[0]),
-         phasor_conj * (1.0 * antennas_[antenna_idx]->m_enabled[1])});
-    weight_sum[0] += (1.0 * antennas_[antenna_idx]->m_enabled[0]);
-    weight_sum[1] += (1.0 * antennas_[antenna_idx]->m_enabled[1]);
+    result[idx] = {phasor_conj * (1.0 * antennas_[idx]->m_enabled[0]),
+                   phasor_conj * (1.0 * antennas_[idx]->m_enabled[1])};
+    weight_sum[0] += (1.0 * antennas_[idx]->m_enabled[0]);
+    weight_sum[1] += (1.0 * antennas_[idx]->m_enabled[1]);
   }
 
   // Normalize the weight by the number of antennas
-  for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
-       ++antenna_idx) {
-    result[antenna_idx].first /= weight_sum[0];
-    result[antenna_idx].second /= weight_sum[1];
+  for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
+    result[idx].first /= weight_sum[0];
+    result[idx].second /= weight_sum[1];
   }
 
   return result;
@@ -79,7 +77,7 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
   auto geometric_response = ComputeGeometricResponse(freq, direction);
 
   matrix22c_t result = {0};
-  for (unsigned int antenna_idx = 0; antenna_idx < antennas_.size();
+  for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
     auto antenna = antennas_[antenna_idx];
     auto antenna_weight = weights[antenna_idx];
@@ -87,7 +85,6 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
 
     matrix22c_t antenna_response =
         antenna->Response(time, freq, direction, options);
-
     result[0][0] += antenna_weight.first * antenna_geometric_reponse *
                     antenna_response[0][0];
     result[0][1] += antenna_weight.first * antenna_geometric_reponse *

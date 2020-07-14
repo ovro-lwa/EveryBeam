@@ -51,7 +51,8 @@ class GriddedResponse {
   /**
    * @brief Compute the Beam response for a single station
    *
-   * @param buffer Output buffer
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetBufferSize(1)
    * @param station_idx Station index, must be smaller than number of stations
    * in the Telescope
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
@@ -63,12 +64,17 @@ class GriddedResponse {
   /**
    * @brief Compute the Beam response for all stations in a Telescope
    *
-   * @param buffer Output buffer
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
   virtual bool CalculateAllStations(std::complex<float>* buffer, double time,
                                     double frequency) = 0;
+
+  std::size_t GetBufferSize(std::size_t nstations) {
+    return std::size_t(nstations * width_ * height_ * 2 * 2);
+  }
 
  protected:
   /**
