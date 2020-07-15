@@ -105,15 +105,15 @@ class Antenna {
    */
   Antenna(const CoordinateSystem &coordinate_system,
           const vector3r_t &phase_reference_position)
-      : m_coordinate_system(coordinate_system),
-        m_phase_reference_position(phase_reference_position),
-        m_enabled{true, true} {}
+      : coordinate_system_(coordinate_system),
+        phase_reference_position_(phase_reference_position),
+        enabled_{true, true} {}
 
   Antenna(const vector3r_t &phase_reference_position)
-      : m_coordinate_system({phase_reference_position,  // origin
-                             CoordinateSystem::identity_axes}),
-        m_phase_reference_position(phase_reference_position),
-        m_enabled{true, true} {}
+      : coordinate_system_({phase_reference_position,  // origin
+                            CoordinateSystem::identity_axes}),
+        phase_reference_position_(phase_reference_position),
+        enabled_{true, true} {}
 
   /**
    * @brief Compute the %Antenna Response
@@ -160,9 +160,9 @@ class Antenna {
     return LocalArrayFactor(time, freq, local_direction, local_options);
   }
 
-  CoordinateSystem m_coordinate_system;
-  vector3r_t m_phase_reference_position;
-  bool m_enabled[2];
+  CoordinateSystem coordinate_system_;
+  vector3r_t phase_reference_position_;
+  bool enabled_[2];
 
  private:
   virtual matrix22c_t LocalResponse(real_t time, real_t freq,

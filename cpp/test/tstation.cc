@@ -5,13 +5,13 @@ int main() {
   const everybeam::vector3r_t position = {{1.0, 2.0, 3.0}};
 
   std::string name = "station0_LBA";
-  auto model = everybeam::ElementResponseModel::Hamaker;
+  auto model = everybeam::ElementResponseModel::kHamaker;
 
   // Create station.
   everybeam::Station::Ptr station(
       new everybeam::Station(name, position, model));
 
-  auto element_response = station->get_element_response();
+  auto element_response = station->GetElementResponse();
 
   double freq = 50e6;
   double theta = 0.0;

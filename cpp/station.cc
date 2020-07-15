@@ -31,30 +31,30 @@ using namespace everybeam;
 
 Station::Station(const std::string &name, const vector3r_t &position,
                  const ElementResponseModel model)
-    : itsName(name),
-      itsPosition(position),
-      itsPhaseReference(position),
-      itsElementResponse(nullptr) {
-  setModel(model);
+    : name_(name),
+      position_(position),
+      phase_reference_(position),
+      element_response_(nullptr) {
+  SetResponseModel(model);
   vector3r_t ncp = {{0.0, 0.0, 1.0}};
-  itsNCP.reset(new coords::ITRFDirection(ncp));
+  ncp_.reset(new coords::ITRFDirection(ncp));
   vector3r_t ncppol0 = {{1.0, 0.0, 0.0}};
-  itsNCPPol0.reset(new coords::ITRFDirection(ncppol0));
+  ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
 }
 
-void Station::setModel(const ElementResponseModel model) {
+void Station::SetResponseModel(const ElementResponseModel model) {
   switch (model) {
-    case Hamaker:
-      itsElementResponse.set(HamakerElementResponse::GetInstance(itsName));
+    case kHamaker:
+      element_response_.set(HamakerElementResponse::GetInstance(name_));
       break;
-    case OSKARDipole:
-      itsElementResponse.set(OSKARElementResponseDipole::GetInstance());
+    case kOSKARDipole:
+      element_response_.set(OSKARElementResponseDipole::GetInstance());
       break;
-    case OSKARSphericalWave:
-      itsElementResponse.set(OSKARElementResponseSphericalWave::GetInstance());
+    case kOSKARSphericalWave:
+      element_response_.set(OSKARElementResponseSphericalWave::GetInstance());
       break;
-    case LOBES:
-      itsElementResponse.set(LOBESElementResponse::GetInstance(itsName));
+    case kLOBES:
+      element_response_.set(LOBESElementResponse::GetInstance(name_));
       break;
     default:
       std::stringstream message;
@@ -64,44 +64,47 @@ void Station::setModel(const ElementResponseModel model) {
   }
 }
 
-const std::string &Station::name() const { return itsName; }
+const std::string &Station::GetName() const { return name_; }
 
-const vector3r_t &Station::position() const { return itsPosition; }
+const vector3r_t &Station::GetPosition() const { return position_; }
 
-void Station::setPhaseReference(const vector3r_t &reference) {
-  itsPhaseReference = reference;
+void Station::SetPhaseReference(const vector3r_t &reference) {
+  phase_reference_ = reference;
 }
 
-const vector3r_t &Station::phaseReference() const { return itsPhaseReference; }
+const vector3r_t &Station::GetPhaseReference() const {
+  return phase_reference_;
+}
 
 // ========================================================
-matrix22c_t Station::elementResponse(real_t time, real_t freq,
-                                     const vector3r_t &direction, size_t id,
-                                     const bool rotate) const {
+matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
+                                            const vector3r_t &direction,
+                                            size_t id,
+                                            const bool rotate) const {
   Antenna::Options options;
   options.rotate = rotate;
 
   if (rotate) {
-    vector3r_t ncp_ = ncp(time);
+    vector3r_t ncp_ = NCP(time);
     vector3r_t east = normalize(cross(ncp_, direction));
     vector3r_t north = cross(direction, east);
     options.east = east;
     options.north = north;
   }
 
-  return itsElement->LocalResponse(time, freq, direction, id, options);
+  return element_->LocalResponse(time, freq, direction, id, options);
 }
 
-matrix22c_t Station::elementResponse(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     const bool rotate) const {
+matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
+                                            const vector3r_t &direction,
+                                            const bool rotate) const {
   //     if (rotate)
   //       return itsElement->response(time, freq, direction)
-  //           * rotation(time, direction);
+  //           * Rotation(time, direction);
   //     else
   //       return itsElement->response(time, freq, direction);
 
-  return itsElement->Response(time, freq, direction);
+  return element_->Response(time, freq, direction);
 }
 
 matrix22c_t Station::Response(real_t time, real_t freq,
@@ -113,18 +116,18 @@ matrix22c_t Station::Response(real_t time, real_t freq,
       .freq0 = freq0, .station0 = station0, .tile0 = tile0, .rotate = rotate};
 
   if (rotate) {
-    vector3r_t ncp_ = ncp(time);
+    vector3r_t ncp_ = NCP(time);
     vector3r_t east = normalize(cross(ncp_, direction));
     vector3r_t north = cross(direction, east);
     options.east = east;
     options.north = north;
   }
 
-  matrix22c_t response = itsAntenna->Response(time, freq, direction, options);
+  matrix22c_t response = antenna_->Response(time, freq, direction, options);
 
   //     if (rotate) {
   //         std::cout << "rotate" << std::endl;
-  //         auto r = rotation(time, direction);
+  //         auto r = Rotation(time, direction);
   //         std::cout << r[0][0] << ", " << r[0][1] << std::endl;
   //         std::cout << r[1][0] << ", " << r[1][1] << std::endl;
   //         response = response * r;
@@ -139,10 +142,10 @@ diag22c_t Station::ArrayFactor(real_t time, real_t freq,
                                const vector3r_t &tile0) const {
   Antenna::Options options = {
       .freq0 = freq0, .station0 = station0, .tile0 = tile0};
-  return itsAntenna->ArrayFactor(time, freq, direction, options);
+  return antenna_->ArrayFactor(time, freq, direction, options);
 }
 
-matrix22r_t Station::rotation(real_t time, const vector3r_t &direction) const {
+matrix22r_t Station::Rotation(real_t time, const vector3r_t &direction) const {
   // rotation needs to be optional, normally you only want to rotate your
   // coordinatesytem for the center of your (mosaiced) image
   // Compute the cross product of the NCP and the target direction. This
@@ -152,13 +155,13 @@ matrix22r_t Station::rotation(real_t time, const vector3r_t &direction) const {
   // Test if the direction is equal to the NCP. If it is, take a random
   // vector orthogonal to v1 (the east is not defined here).
   vector3r_t v1;
-  if (std::abs(ncp(time)[0] - direction[0]) < 1e-9 &&
-      std::abs(ncp(time)[1] - direction[1]) < 1e-9 &&
-      std::abs(ncp(time)[2] - direction[2]) < 1e-9) {
-    // Make sure v1 is orthogonal to ncp(time). In the direction of the meridian
-    v1 = normalize(ncppol0(time));
+  if (std::abs(NCP(time)[0] - direction[0]) < 1e-9 &&
+      std::abs(NCP(time)[1] - direction[1]) < 1e-9 &&
+      std::abs(NCP(time)[2] - direction[2]) < 1e-9) {
+    // Make sure v1 is orthogonal to NCP(time). In the direction of the meridian
+    v1 = normalize(NCPPol0(time));
   } else {
-    v1 = normalize(cross(ncp(time), direction));
+    v1 = normalize(cross(NCP(time), direction));
   }
 
   // Compute the cross product of the antenna field normal (R) and the
@@ -169,16 +172,13 @@ matrix22r_t Station::rotation(real_t time, const vector3r_t &direction) const {
   // Test if the normal is equal to the target direction. If it is, take
   // a random vector orthogonal to the normal.
   vector3r_t v2;
-  if (std::abs(itsAntenna->m_coordinate_system.axes.r[0] - direction[0]) <
-          1e-9 &&
-      std::abs(itsAntenna->m_coordinate_system.axes.r[1] - direction[1]) <
-          1e-9 &&
-      std::abs(itsAntenna->m_coordinate_system.axes.r[2] - direction[2]) <
-          1e-9) {
+  if (std::abs(antenna_->coordinate_system_.axes.r[0] - direction[0]) < 1e-9 &&
+      std::abs(antenna_->coordinate_system_.axes.r[1] - direction[1]) < 1e-9 &&
+      std::abs(antenna_->coordinate_system_.axes.r[2] - direction[2]) < 1e-9) {
     // Nothing to be rotated if the direction is equal to zenith
     v2 = v1;
   } else {
-    v2 = normalize(cross(itsAntenna->m_coordinate_system.axes.r, direction));
+    v2 = normalize(cross(antenna_->coordinate_system_.axes.r, direction));
   }
 
   // Compute the cosine and sine of the parallactic angle, i.e. the angle
@@ -230,6 +230,6 @@ matrix22r_t Station::rotation(real_t time, const vector3r_t &direction) const {
   return rotation;
 }
 
-vector3r_t Station::ncp(real_t time) const { return itsNCP->at(time); }
+vector3r_t Station::NCP(real_t time) const { return ncp_->at(time); }
 
-vector3r_t Station::ncppol0(real_t time) const { return itsNCPPol0->at(time); }
+vector3r_t Station::NCPPol0(real_t time) const { return ncp_pol0_->at(time); }

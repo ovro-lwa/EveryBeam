@@ -49,7 +49,7 @@ namespace common {
  * @param id Id of the antenna field in the station (int)
  * @return Antenna::CoordinateSystem
  */
-inline Antenna::CoordinateSystem readCoordinateSystem(
+inline Antenna::CoordinateSystem ReadCoordinateSystem(
     const casacore::Table &table, unsigned int id) {
   casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
                                                           "m");
@@ -88,7 +88,7 @@ inline Antenna::CoordinateSystem readCoordinateSystem(
  * @return true If column present
  * @return false If column not present
  */
-inline bool hasColumn(const casacore::Table &table, const string &column) {
+inline bool HasColumn(const casacore::Table &table, const string &column) {
   return table.tableDesc().isColumn(column);
 }
 

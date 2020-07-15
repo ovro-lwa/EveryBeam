@@ -58,6 +58,6 @@ std::unique_ptr<gridded_response::GriddedResponse> LOFAR::GetGriddedResponse(
 
 Station::Ptr LOFAR::ReadStation(const MeasurementSet &ms, std::size_t id,
                                 const ElementResponseModel model) const {
-  Station::Ptr station = readStation(ms, id);
+  Station::Ptr station = ReadLofarStation(ms, id, model);
   return station;
 }

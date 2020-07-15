@@ -7,13 +7,13 @@
 using namespace everybeam;
 namespace everybeam {
 namespace {
-enum TelescopeType { UNKNOWN_TELESCOPE, LOFAR_TELESCOPE };
+enum TelescopeType { kUnknownTelescope, kLofarTelescope };
 
 TelescopeType Convert(const std::string &str) {
   if (str == "LOFAR")
-    return LOFAR_TELESCOPE;
+    return kLofarTelescope;
   else
-    return UNKNOWN_TELESCOPE;
+    return kUnknownTelescope;
 }
 }  // namespace
 
@@ -26,7 +26,7 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
 
   TelescopeType telescope_name = Convert(telescope_name_col(0));
   switch (telescope_name) {
-    case LOFAR_TELESCOPE: {
+    case kLofarTelescope: {
       std::unique_ptr<telescope::Telescope> telescope =
           std::unique_ptr<telescope::Telescope>(
               new telescope::LOFAR(ms, model, options));

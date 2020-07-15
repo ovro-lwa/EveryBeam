@@ -11,7 +11,7 @@ using namespace everybeam;
 int main() {
   std::string name = "CS001LBA";
   vector3r_t position;
-  //     ElementResponseModel model = ElementResponseModel::Hamaker;
+  //     ElementResponseModel model = ElementResponseModel::kHamaker;
 
   //     Station station(name, position, model);
   //
@@ -21,8 +21,8 @@ int main() {
   //     matrix22c_t response;
 
   //     auto antenna0 = Element::Ptr(new
-  //     Element(station.get_element_response(),0)); auto antenna1 =
-  //     Element::Ptr(new Element(station.get_element_response(),1));
+  //     Element(station.GetElementResponse(),0)); auto antenna1 =
+  //     Element::Ptr(new Element(station.GetElementResponse(),1));
   //
   //     station.SetAntenna(antenna0);
   //
@@ -49,9 +49,9 @@ int main() {
   matrix22c_t response;
   vector3r_t direction = {0.0, 0.0, 1.0};
 
-  //     Station::Ptr station = readStation(ms, 0,
-  //     ElementResponseModel::OSKARDipole);
-  Station::Ptr station = readStation(ms, 0);
+  //     Station::Ptr station = ReadLofarStation(ms, 0,
+  //     ElementResponseModel::kOSKARDipole);
+  Station::Ptr station = ReadLofarStation(ms, 0);
 
   auto freq_beamformer = freq;
   auto station_pointing = direction;
