@@ -73,7 +73,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read stations
   std::vector<everybeam::Station::Ptr> stations;
   stations.resize(nr_stations);
-  readStations(ms, stations.begin(), elementResponseModel);
+  ReadStations(ms, stations.begin(), elementResponseModel);
 
   // Imaging parameters
   float image_size = 0.5;    // in radians

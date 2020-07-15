@@ -18,7 +18,7 @@ class BeamFormer : public Antenna {
    */
   BeamFormer() : Antenna() {
     local_phase_reference_position_ =
-        TransformToLocalPosition(m_phase_reference_position);
+        TransformToLocalPosition(phase_reference_position_);
   }
 
   /**
@@ -29,7 +29,7 @@ class BeamFormer : public Antenna {
   BeamFormer(const CoordinateSystem &coordinate_system)
       : Antenna(coordinate_system) {
     local_phase_reference_position_ =
-        TransformToLocalPosition(m_phase_reference_position);
+        TransformToLocalPosition(phase_reference_position_);
   }
 
   /**
@@ -43,13 +43,13 @@ class BeamFormer : public Antenna {
              vector3r_t phase_reference_position)
       : Antenna(coordinate_system, phase_reference_position) {
     local_phase_reference_position_ =
-        TransformToLocalPosition(m_phase_reference_position);
+        TransformToLocalPosition(phase_reference_position_);
   }
 
   BeamFormer(vector3r_t phase_reference_position)
       : Antenna(phase_reference_position) {
     local_phase_reference_position_ =
-        TransformToLocalPosition(m_phase_reference_position);
+        TransformToLocalPosition(phase_reference_position_);
   }
 
   /**

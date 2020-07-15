@@ -14,11 +14,11 @@ class MutablePtr;
 }
 
 enum ElementResponseModel {
-  Unknown,
-  Hamaker,
-  LOBES,
-  OSKARDipole,
-  OSKARSphericalWave
+  kUnknown,
+  kHamaker,
+  kLOBES,
+  kOSKARDipole,
+  kOSKARSphericalWave
 };
 
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model);

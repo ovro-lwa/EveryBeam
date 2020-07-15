@@ -36,9 +36,8 @@
 #include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
-
 const ElementResponseModel defaultElementResponseModel =
-    ElementResponseModel::Hamaker;
+    ElementResponseModel::kHamaker;
 
 /**
  * @brief Read single station from MeasurementSet
@@ -48,13 +47,13 @@ const ElementResponseModel defaultElementResponseModel =
  * @param model Element response model
  * @return Station::Ptr
  */
-Station::Ptr readStation(
+Station::Ptr ReadLofarStation(
     const casacore::MeasurementSet &ms, unsigned int id,
     const ElementResponseModel model = defaultElementResponseModel);
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
- * Loops over readStation for all the antennas in MeasurementSet
+ * Loops over ReadLofarStation for all the antennas in MeasurementSet
  *
  * @tparam T Template type
  * @param ms Measurement set
@@ -62,19 +61,17 @@ Station::Ptr readStation(
  * @param model Element Response buffer
  */
 template <typename T>
-void readStations(
+void ReadStations(
     const casacore::MeasurementSet &ms, T out_it,
     const ElementResponseModel model = defaultElementResponseModel) {
   casacore::ROMSAntennaColumns antenna(ms.antenna());
   for (unsigned int i = 0; i < antenna.nrow(); ++i) {
-    *out_it++ = readStation(ms, i, model);
+    *out_it++ = ReadLofarStation(ms, i, model);
   }
 }
 
 // Read the tile beam direction from a LOFAR MS. If it is not defined,
 // this function returns the delay center.
-casacore::MDirection readTileBeamDirection(const casacore::MeasurementSet &ms);
-
+casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms);
 }  // namespace everybeam
-
 #endif  // EVERYBEAM_LOFARMETADATAUTIL_H

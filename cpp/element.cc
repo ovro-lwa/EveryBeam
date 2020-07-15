@@ -9,7 +9,7 @@ matrix22c_t Element::LocalResponse(real_t time, real_t freq,
 
   matrix22c_t result;
   static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t));
-  m_element_response->Response(
+  element_response_->Response(
       id, freq, thetaphi[0], thetaphi[1],
       reinterpret_cast<std::complex<double>(&)[2][2]>(result));
 
@@ -28,6 +28,6 @@ matrix22c_t Element::LocalResponse(real_t time, real_t freq,
 matrix22c_t Element::LocalResponse(real_t time, real_t freq,
                                    const vector3r_t &direction,
                                    const Options &options) const {
-  return LocalResponse(time, freq, direction, m_id, options);
+  return LocalResponse(time, freq, direction, id_, options);
 }
 }  // namespace everybeam

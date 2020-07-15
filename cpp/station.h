@@ -53,13 +53,13 @@ class Station {
   Station(const std::string &name, const vector3r_t &position,
           const ElementResponseModel model);
 
-  void setModel(const ElementResponseModel model);
+  void SetResponseModel(const ElementResponseModel model);
 
   //! Return the name of the station.
-  const std::string &name() const;
+  const std::string &GetName() const;
 
   //! Return the position of the station (ITRF, m).
-  const vector3r_t &position() const;
+  const vector3r_t &GetPosition() const;
 
   /*!
    *  \brief Set the phase reference position. This is the position where the
@@ -71,11 +71,11 @@ class Station {
    *  reference position. Use this method to set the phase reference position
    *  explicitly when this assumption is false.
    */
-  void setPhaseReference(const vector3r_t &reference);
+  void SetPhaseReference(const vector3r_t &reference);
 
   //! Return the phase reference position (ITRF, m). \see
   //! Station::setPhaseReference()
-  const vector3r_t &phaseReference() const;
+  const vector3r_t &GetPhaseReference() const;
 
   /*!
    *  \brief Add an antenna field to the station.
@@ -90,7 +90,7 @@ class Station {
   //     void addField(const AntennaField::ConstPtr &field);
 
   //! Return the number of available antenna fields.
-  size_t nFields() const;
+  size_t GetNrFields() const;
 
   // /*!
   //  *  \brief Return the requested antenna field.
@@ -294,9 +294,8 @@ class Station {
   // New methods introduced in refactor
   // ==================================================================
 
-  const ElementResponse::Ptr get_element_response() {
-    return itsElementResponse;
-  }
+  //! Returns a pointer to the ElementResponse class
+  const ElementResponse::Ptr GetElementResponse() { return element_response_; }
 
   /**
    * @brief Compute the Jones matrix for the element response
@@ -308,9 +307,9 @@ class Station {
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return matrix22c_t Jones matrix of element response
    */
-  matrix22c_t elementResponse(real_t time, real_t freq,
-                              const vector3r_t &direction, size_t id,
-                              const bool rotate) const;
+  matrix22c_t ComputeElementResponse(real_t time, real_t freq,
+                                     const vector3r_t &direction, size_t id,
+                                     const bool rotate) const;
 
   /**
    * @brief Compute the Jones matrix for the element response
@@ -321,38 +320,38 @@ class Station {
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return matrix22c_t Jones matrix of element response
    */
-  matrix22c_t elementResponse(real_t time, real_t freq,
-                              const vector3r_t &direction,
-                              const bool rotate = true) const;
+  matrix22c_t ComputeElementResponse(real_t time, real_t freq,
+                                     const vector3r_t &direction,
+                                     const bool rotate = true) const;
 
   //! Specialized implementation of response function.
   matrix22c_t Response(real_t time, real_t freq,
                        const vector3r_t &direction) const {
-    return itsAntenna->Response(time, freq, direction);
+    return antenna_->Response(time, freq, direction);
   }
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element
-  void SetAntenna(Antenna::Ptr antenna) { itsAntenna = antenna; }
+  void SetAntenna(Antenna::Ptr antenna) { antenna_ = antenna; }
 
   //! Set Element attribute
-  void SetElement(Element::Ptr element) { itsElement = element; }
+  void SetElement(Element::Ptr element) { element_ = element; }
 
  private:
-  vector3r_t ncp(real_t time) const;
-  vector3r_t ncppol0(real_t time) const;
+  vector3r_t NCP(real_t time) const;
+  vector3r_t NCPPol0(real_t time) const;
   //! Compute the parallactic rotation.
-  matrix22r_t rotation(real_t time, const vector3r_t &direction) const;
+  matrix22r_t Rotation(real_t time, const vector3r_t &direction) const;
 
-  std::string itsName;
-  vector3r_t itsPosition;
-  vector3r_t itsPhaseReference;
-  ElementResponseModel itsElementResponseModel = ElementResponseModel::Unknown;
-  ElementResponse::Ptr itsElementResponse;
-  Element::Ptr itsElement;
+  std::string name_;
+  vector3r_t position_;
+  vector3r_t phase_reference_;
+  ElementResponseModel element_response_model_ = ElementResponseModel::kUnknown;
+  ElementResponse::Ptr element_response_;
+  Element::Ptr element_;
 
-  Antenna::Ptr itsAntenna;
+  Antenna::Ptr antenna_;
 
-  coords::ITRFDirection::Ptr itsNCP;
+  coords::ITRFDirection::Ptr ncp_;
   /** Reference direction for NCP observations.
    *
    * NCP pol0 is the direction used as reference in the coordinate system
@@ -363,7 +362,7 @@ class Station {
    *
    * Added by Maaijke Mevius, December 2018.
    */
-  coords::ITRFDirection::Ptr itsNCPPol0;
+  coords::ITRFDirection::Ptr ncp_pol0_;
 };
 
 // ------------------------------------------------------------------------- //

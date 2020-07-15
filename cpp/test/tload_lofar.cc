@@ -13,7 +13,7 @@
 using namespace everybeam;
 
 BOOST_AUTO_TEST_CASE(load_lofar) {
-  ElementResponseModel response_model = ElementResponseModel::Hamaker;
+  ElementResponseModel response_model = ElementResponseModel::kHamaker;
   Options options;
   casacore::MeasurementSet ms(LOFAR_MOCK_MS);
 
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   BOOST_CHECK_EQUAL(telescope->GetNrStations(), nstations);
 
   // Assert if GetStation(stationd_id) behaves properly
-  BOOST_CHECK_EQUAL(telescope->GetStation(0)->name(), "CS001HBA0");
+  BOOST_CHECK_EQUAL(telescope->GetStation(0)->GetName(), "CS001HBA0");
 
   // Properties extracted from MS
   double time = 4929192878.008341;

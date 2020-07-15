@@ -131,7 +131,7 @@ vector3r_t fromMDirection(const MDirection &direction);
  *  \param table The Table instance to check.
  *  \param column The name of the column.
  */
-bool hasColumn(const Table &table, const string &column);
+bool HasColumn(const Table &table, const string &column);
 
 /*!
  *  \brief Check if the specified sub-table exists as a sub-table of the
@@ -140,7 +140,7 @@ bool hasColumn(const Table &table, const string &column);
  *  \param table The Table instance to check.
  *  \param name The name of the sub-table.
  */
-bool hasSubTable(const Table &table, const string &name);
+bool HasSubTable(const Table &table, const string &name);
 
 /*!
  *  \brief Provide access to a sub-table by name.
@@ -281,7 +281,7 @@ int main(int argc, char *argv[]) {
 
   // Read station meta-data.
   vector<Station::Ptr> stations;
-  readStations(ms, std::back_inserter(stations));
+  ReadStations(ms, std::back_inserter(stations));
 
   // Remove illegal station indices.
   stationIDs.erase(filter(stationIDs.begin(), stationIDs.end(), 0,
@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
   // Use the position of the first selected station as the array reference
   // position if the observatory position cannot be found.
   MPosition refPosition = readObservatoryPosition(
-      ms, idField, toMPositionITRF(stations.front()->position()));
+      ms, idField, toMPositionITRF(stations.front()->GetPosition()));
 
   // Read phase reference direction.
   MDirection refPhase = readPhaseReference(ms, idField);
@@ -344,7 +344,7 @@ int main(int argc, char *argv[]) {
                                      end = stationIDs.end();
          it != end; ++it) {
       Station::ConstPtr station = stations[*it];
-      cout << *it << ":" << station->name() << " " << flush;
+      cout << *it << ":" << station->GetName() << " " << flush;
 
       for (size_t y = 0; y < size; ++y) {
         for (size_t x = 0; x < size; ++x) {
@@ -360,7 +360,8 @@ int main(int argc, char *argv[]) {
       }
 
       std::ostringstream oss;
-      oss << "response-" << station->name() << "-frame-" << (j + 1) << ".img";
+      oss << "response-" << station->GetName() << "-frame-" << (j + 1)
+          << ".img";
 
       if (abs) {
         store(Cube<Float>(amplitude(response)), coordinates, refFrequency,
@@ -451,11 +452,11 @@ vector3r_t fromMDirection(const MDirection &direction) {
   return result;
 }
 
-bool hasColumn(const Table &table, const string &column) {
+bool HasColumn(const Table &table, const string &column) {
   return table.tableDesc().isColumn(column);
 }
 
-bool hasSubTable(const Table &table, const string &name) {
+bool HasSubTable(const Table &table, const string &name) {
   return table.keywordSet().isDefined(name);
 }
 
@@ -525,7 +526,7 @@ MDirection readTileReference(const MeasurementSet &ms, unsigned int idField) {
   Table tab_field = getSubTable(ms, "FIELD");
 
   static const String columnName = "LOFAR_TILE_BEAM_DIR";
-  if (hasColumn(tab_field, columnName)) {
+  if (HasColumn(tab_field, columnName)) {
     ROArrayMeasColumn<MDirection> c_direction(tab_field, columnName);
     if (c_direction.isDefined(idField)) {
       return c_direction(idField)(IPosition(1, 0));

@@ -3,19 +3,19 @@
 namespace everybeam {
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   switch (model) {
-    case Unknown:
+    case kUnknown:
       os << "Unknown";
       break;
-    case Hamaker:
+    case kHamaker:
       os << "Hamaker";
       break;
-    case LOBES:
+    case kLOBES:
       os << "LOBES";
       break;
-    case OSKARDipole:
+    case kOSKARDipole:
       os << "OSKARDipole";
       break;
-    case OSKARSphericalWave:
+    case kOSKARSphericalWave:
       os << "OSKARSphericalWave";
       break;
     default:

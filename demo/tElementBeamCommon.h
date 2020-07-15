@@ -12,7 +12,7 @@ void calculateElementBeams(everybeam::Station::Ptr& station,
   typedef std::complex<float> Data[nr_antennas][subgrid_size][subgrid_size][4];
   Data* data_ptr = (Data*)buffer.data();
 
-  auto elementResponse = station->get_element_response();
+  auto elementResponse = station->GetElementResponse();
 
 #pragma omp parallel for
   for (size_t a = 0; a < nr_antennas; a++) {
@@ -58,8 +58,8 @@ void calculateElementBeams(everybeam::Station::Ptr& station,
         // Compute gain
         matrix22c_t gainMatrix = {0.0};
         if (std::isfinite(direction[0])) {
-          gainMatrix =
-              station->elementResponse(time, frequency, direction, a, true);
+          gainMatrix = station->ComputeElementResponse(time, frequency,
+                                                       direction, a, true);
         }
 
         // Store gain
@@ -97,7 +97,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read station
   size_t field_id = 0;
   size_t station_id = 0;
-  auto station = readStation(ms, station_id, elementResponseModel);
+  auto station = ReadLofarStation(ms, station_id, elementResponseModel);
   auto field_name = GetFieldName(ms, field_id);
   auto station_name = GetStationName(ms, station_id);
   auto nr_antennas = GetNrAntennas(ms, field_id);
@@ -107,7 +107,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
 
   // Compute RA and DEC of zenith at currentTime
   double zenithRA, zenithDec;
-  GetRaDecZenith(station->position(), currentTime, zenithRA, zenithDec);
+  GetRaDecZenith(station->GetPosition(), currentTime, zenithRA, zenithDec);
   std::clog << "RA:  " << zenithRA << std::endl;
   std::clog << "DEC: " << zenithDec << std::endl;
 
@@ -125,7 +125,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
                         frequency, beam_thetaphi);
 
 // Compute element beams from itrf coordinates
-// TODO: the Station::elementResponse method does not work properly
+// TODO: the Station::ComputeElementResponse method does not work properly
 #if 0
     std::cout << ">>> Computing element beams itrfs" << std::endl;
     std::vector<vector3r_t> itrfDirections(subgrid_size * subgrid_size);
