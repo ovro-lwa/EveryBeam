@@ -15,6 +15,7 @@ using namespace everybeam;
 BOOST_AUTO_TEST_CASE(load_lofar) {
   ElementResponseModel response_model = ElementResponseModel::kHamaker;
   Options options;
+
   casacore::MeasurementSet ms(LOFAR_MOCK_MS);
 
   // Load LOFAR Telescope
@@ -92,6 +93,28 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   BOOST_CHECK_EQUAL(
       antenna_buffer_all.size(),
       std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
+
+  // Test with differential beam, single
+  Options options_diff_beam;
+  options_diff_beam.use_differential_beam = true;
+
+  // Load LOFAR Telescope
+  std::unique_ptr<telescope::Telescope> telescope_diff_beam =
+      Load(ms, response_model, options_diff_beam);
+
+  std::unique_ptr<gridded_response::GriddedResponse> grid_response_diff_beam =
+      telescope_diff_beam->GetGriddedResponse(coord_system);
+
+  std::vector<std::complex<float>> antenna_buffer_diff_beam(
+      grid_response_diff_beam->GetBufferSize(1));
+  grid_response_diff_beam->CalculateStation(antenna_buffer_diff_beam.data(),
+                                            time, frequency, 15);
+
+  double norm_jones_mat = 0.;
+  for (std::size_t i = 0; i < 4; ++i) {
+    norm_jones_mat += std::norm(antenna_buffer_diff_beam[offset_22 + i]);
+  }
+  BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
 
   // Print to np array
   // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};

@@ -58,7 +58,7 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual bool CalculateStation(std::complex<float>* buffer, double time,
+  virtual void CalculateStation(std::complex<float>* buffer, double time,
                                 double freq, const size_t station_idx) = 0;
 
   /**
@@ -69,7 +69,7 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual bool CalculateAllStations(std::complex<float>* buffer, double time,
+  virtual void CalculateAllStations(std::complex<float>* buffer, double time,
                                     double frequency) = 0;
 
   std::size_t GetBufferSize(std::size_t nstations) {

@@ -60,7 +60,7 @@ class LOFARGrid final : public GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
-  bool CalculateStation(std::complex<float>* buffer, double time,
+  void CalculateStation(std::complex<float>* buffer, double time,
                         double frequency, const size_t station_idx) override;
 
   /**
@@ -71,14 +71,17 @@ class LOFARGrid final : public GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
-  bool CalculateAllStations(std::complex<float>* buffer, double time,
+  void CalculateAllStations(std::complex<float>* buffer, double time,
                             double frequency) override;
 
  private:
-  casacore::MDirection delay_dir_, tile_beam_dir_;
-  vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_;
+  casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
+  vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_,
+      diff_beam_centre_;
   bool use_channel_frequency_;
   double subband_frequency_;
+
+  std::vector<aocommon::MC2x2F> inverse_central_gain_;
 
   std::size_t nthreads_;
   std::vector<std::thread> threads_;
