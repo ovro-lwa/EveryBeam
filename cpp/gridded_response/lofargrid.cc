@@ -20,11 +20,12 @@ LOFARGrid::LOFARGrid(telescope::Telescope* telescope_ptr,
   threads_.resize(nthreads_);
   delay_dir_ = lofartelescope.ms_properties_.delay_dir;
   tile_beam_dir_ = lofartelescope.ms_properties_.tile_beam_dir;
+  preapplied_beam_dir_ = lofartelescope.ms_properties_.preapplied_beam_dir;
   subband_frequency_ = lofartelescope.ms_properties_.subband_freq;
-  use_channel_frequency_ = lofartelescope.options_.useChannelFrequency;
+  use_channel_frequency_ = lofartelescope.options_.use_channel_frequency;
 };
 
-bool LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
+void LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
                                  double frequency, const size_t station_idx) {
   aocommon::Lane<Job> lane(nthreads_);
   lane_ = &lane;
@@ -32,8 +33,18 @@ bool LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
   SetITRFVectors(time);
   double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
   // Dummy calculation of gain matrix, needed for multi-threading
-  telescope_->GetStation(station_idx)
-      ->Response(time, frequency, station0_, sb_freq, station0_, tile0_);
+  inverse_central_gain_.resize(1);
+  matrix22c_t gain_matrix = telescope_->GetStation(station_idx)
+                                ->Response(time, frequency, diff_beam_centre_,
+                                           sb_freq, station0_, tile0_);
+
+  inverse_central_gain_[0][0] = gain_matrix[0][0];
+  inverse_central_gain_[0][1] = gain_matrix[0][1];
+  inverse_central_gain_[0][2] = gain_matrix[1][0];
+  inverse_central_gain_[0][3] = gain_matrix[1][1];
+  if (!inverse_central_gain_[0].Invert()) {
+    inverse_central_gain_[0] = aocommon::MC2x2F::Zero();
+  }
 
   for (size_t i = 0; i != nthreads_; ++i) {
     threads_[i] =
@@ -46,10 +57,9 @@ bool LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
 
   lane.write_end();
   for (size_t i = 0; i != nthreads_; ++i) threads_[i].join();
-  return true;
 }
 
-bool LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
+void LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
                                      double frequency) {
   aocommon::Lane<Job> lane(nthreads_);
   lane_ = &lane;
@@ -59,9 +69,19 @@ bool LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
   double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
 
   // Dummy loop, needed for multi-threading
+  inverse_central_gain_.resize(telescope_->GetNrStations());
   for (size_t i = 0; i != telescope_->GetNrStations(); ++i) {
-    telescope_->GetStation(i)->Response(time, frequency, station0_, sb_freq,
-                                        station0_, tile0_);
+    matrix22c_t gain_matrix = telescope_->GetStation(i)->Response(
+        time, frequency, diff_beam_centre_, sb_freq, station0_, tile0_);
+    if (telescope_->GetOptions().use_differential_beam) {
+      inverse_central_gain_[i][0] = gain_matrix[0][0];
+      inverse_central_gain_[i][1] = gain_matrix[0][1];
+      inverse_central_gain_[i][2] = gain_matrix[1][0];
+      inverse_central_gain_[i][3] = gain_matrix[1][1];
+      if (!inverse_central_gain_[i].Invert()) {
+        inverse_central_gain_[i] = aocommon::MC2x2F::Zero();
+      }
+    }
   }
 
   // Prepare threads
@@ -80,7 +100,6 @@ bool LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
 
   lane.write_end();
   for (size_t i = 0; i != nthreads_; ++i) threads_[i].join();
-  return true;
 }
 
 void LOFARGrid::SetITRFVectors(double time) {
@@ -107,6 +126,9 @@ void LOFARGrid::SetITRFVectors(double time) {
                             casacore::Quantity(dec_, rad_unit)),
       casacore::MDirection::J2000);
   coords::SetITRFVector(itrf_converter.toDirection(n_dir), n_vector_itrf_);
+
+  coords::SetITRFVector(itrf_converter.toDirection(preapplied_beam_dir_),
+                        diff_beam_centre_);
 }
 
 void LOFARGrid::CalcThread(std::complex<float>* buffer, double time,
@@ -142,11 +164,21 @@ void LOFARGrid::CalcThread(std::complex<float>* buffer, double time,
                                     ->Response(time, frequency, itrf_direction,
                                                sb_freq, station0_, tile0_);
 
-      // (Optional) differential beam logic is handled at WSClean level
-      ant_buffer_ptr[0] = gain_matrix[0][0];
-      ant_buffer_ptr[1] = gain_matrix[0][1];
-      ant_buffer_ptr[2] = gain_matrix[1][0];
-      ant_buffer_ptr[3] = gain_matrix[1][1];
+      if (telescope_->GetOptions().use_differential_beam) {
+        aocommon::MC2x2F station_gains;
+        station_gains[0] = gain_matrix[0][0];
+        station_gains[1] = gain_matrix[0][1];
+        station_gains[2] = gain_matrix[1][0];
+        station_gains[3] = gain_matrix[1][1];
+        aocommon::MC2x2F::ATimesB(ant_buffer_ptr,
+                                  inverse_central_gain_[job.buffer_offset],
+                                  station_gains);
+      } else {
+        ant_buffer_ptr[0] = gain_matrix[0][0];
+        ant_buffer_ptr[1] = gain_matrix[0][1];
+        ant_buffer_ptr[2] = gain_matrix[1][0];
+        ant_buffer_ptr[3] = gain_matrix[1][1];
+      }
     }
   }
 }

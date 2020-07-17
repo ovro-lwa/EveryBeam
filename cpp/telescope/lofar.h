@@ -65,7 +65,7 @@ class LOFAR final : public Telescope {
                            const ElementResponseModel model) const override;
   struct MSProperties {
     double subband_freq;
-    casacore::MDirection delay_dir, tile_beam_dir;
+    casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
   };
   MSProperties ms_properties_;
 };

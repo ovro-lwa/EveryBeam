@@ -75,6 +75,8 @@ class Telescope {
 
   std::size_t GetNrStations() const { return nstations_; };
 
+  Options GetOptions() const { return options_; };
+
  protected:
   /**
    * @brief Construct a new Telescope object

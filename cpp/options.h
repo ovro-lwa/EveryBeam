@@ -35,19 +35,19 @@ namespace everybeam {
  */
 class Options {
  public:
-  Options() : useDifferentialBeam(false), useChannelFrequency(true){};
+  Options()
+      : use_differential_beam(false),
+        use_channel_frequency(true),
+        data_column_name("DATA"){};
 
   //! Default - empty - options class
   static Options GetDefault() { return Options(); };
 
-  // Scratch list of potential options
-  // Specify path to element response coefficients file
+  // TODO? Specify path to element response coefficients file
   // std::string coeff_path;
-  bool useDifferentialBeam;
-  bool useChannelFrequency;
+  bool use_differential_beam;
+  bool use_channel_frequency;
   std::string data_column_name;
-  vector3r_t diff_beam_centre;
-  //
 };
 }  // namespace everybeam
 #endif  // EVERYBEAM_OPTIONS_H_
