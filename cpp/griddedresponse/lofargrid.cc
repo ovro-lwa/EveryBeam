@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 
-using namespace everybeam::gridded_response;
+using namespace everybeam::griddedresponse;
 
 LOFARGrid::LOFARGrid(telescope::Telescope* telescope_ptr,
                      const coords::CoordinateSystem& coordinate_system)
@@ -104,8 +104,8 @@ void LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
 
 void LOFARGrid::SetITRFVectors(double time) {
   coords::ITRFConverter itrf_converter(time);
-  coords::SetITRFVector(itrf_converter.toDirection(delay_dir_), station0_);
-  coords::SetITRFVector(itrf_converter.toDirection(tile_beam_dir_), tile0_);
+  coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
+  coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
 
   const casacore::Unit rad_unit("rad");
 
@@ -113,21 +113,21 @@ void LOFARGrid::SetITRFVectors(double time) {
       casacore::MVDirection(casacore::Quantity(ra_ + M_PI / 2, rad_unit),
                             casacore::Quantity(0, rad_unit)),
       casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.toDirection(l_dir), l_vector_itrf_);
+  coords::SetITRFVector(itrf_converter.ToDirection(l_dir), l_vector_itrf_);
 
   casacore::MDirection m_dir(
       casacore::MVDirection(casacore::Quantity(ra_, rad_unit),
                             casacore::Quantity(dec_ + M_PI / 2, rad_unit)),
       casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.toDirection(m_dir), m_vector_itrf_);
+  coords::SetITRFVector(itrf_converter.ToDirection(m_dir), m_vector_itrf_);
 
   casacore::MDirection n_dir(
       casacore::MVDirection(casacore::Quantity(ra_, rad_unit),
                             casacore::Quantity(dec_, rad_unit)),
       casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.toDirection(n_dir), n_vector_itrf_);
+  coords::SetITRFVector(itrf_converter.ToDirection(n_dir), n_vector_itrf_);
 
-  coords::SetITRFVector(itrf_converter.toDirection(preapplied_beam_dir_),
+  coords::SetITRFVector(itrf_converter.ToDirection(preapplied_beam_dir_),
                         diff_beam_centre_);
 }
 

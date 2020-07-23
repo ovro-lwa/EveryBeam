@@ -1,4 +1,4 @@
-// LofarMetaDataUtil.h: Utility functions to read the meta data relevant for
+// lofarreadutils.h: Utility functions to read the meta data relevant for
 // simulating the beam from LOFAR observations stored in MS format.
 //
 // Copyright (C) 2013
@@ -21,15 +21,15 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_LOFARMETADATAUTIL_H
-#define EVERYBEAM_LOFARMETADATAUTIL_H
+#ifndef EVERYBEAM_LOFARREADUTILS_H_
+#define EVERYBEAM_LOFARREADUTILS_H_
 
 // \file
 // Utility functions to read the meta data relevant for simulating the beam from
 // LOFAR observations stored in MS format.
 
 #include "station.h"
-#include "element_response.h"
+#include "elementresponse.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
@@ -74,4 +74,4 @@ void ReadStations(
 // this function returns the delay center.
 casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms);
 }  // namespace everybeam
-#endif  // EVERYBEAM_LOFARMETADATAUTIL_H
+#endif  // EVERYBEAM_LOFARREADUTILS_H_

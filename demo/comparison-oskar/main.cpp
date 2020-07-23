@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <OSKARElementResponse.h>
+#include <oskarelementresponse.h>
 
 #include "../../external/npy.hpp"
 // #include "npy.hpp"  // to save arrays in numpy format

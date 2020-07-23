@@ -31,7 +31,7 @@
 #include <limits>
 
 namespace everybeam {
-namespace gridded_response {
+namespace griddedresponse {
 
 /**
  * @brief Class for computing the LOFAR gridded response
@@ -95,6 +95,6 @@ class LOFARGrid final : public GriddedResponse {
 
   void CalcThread(std::complex<float>* buffer, double time, double frequency);
 };
-}  // namespace gridded_response
+}  // namespace griddedresponse
 }  // namespace everybeam
 #endif  // EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_

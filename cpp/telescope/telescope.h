@@ -24,9 +24,9 @@
 #ifndef EVERYBEAM_TELESCOPE_TELESCOPE_H_
 #define EVERYBEAM_TELESCOPE_TELESCOPE_H_
 
-#include "./../station.h"
-#include "./../options.h"
-#include "./../element_response.h"
+#include "../station.h"
+#include "../options.h"
+#include "../elementresponse.h"
 
 #include <vector>
 #include <memory>
@@ -36,7 +36,7 @@
 
 namespace everybeam {
 
-namespace gridded_response {
+namespace griddedresponse {
 class GriddedResponse;
 }
 
@@ -58,7 +58,7 @@ class Telescope {
    * @param coordinate_system Coordinate system struct
    * @return GriddedResponse::Ptr
    */
-  virtual std::unique_ptr<gridded_response::GriddedResponse> GetGriddedResponse(
+  virtual std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) = 0;
 
   /**

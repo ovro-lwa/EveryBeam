@@ -24,7 +24,7 @@
 #include <lofar_config.h>
 
 #include <EveryBeam/Package__Version.h>
-#include <EveryBeam/LofarMetaDataUtil.h>
+#include <EveryBeam/lofarreadutils.h>
 #include <Common/InputParSet.h>
 #include <Common/lofar_sstream.h>
 #include <Common/LofarLogger.h>
@@ -148,7 +148,7 @@ bool HasSubTable(const Table &table, const string &name);
  *  \param table The Table instance to which the sub-table is associated.
  *  \param name The name of the sub-table.
  */
-Table getSubTable(const Table &table, const string &name);
+Table GetSubTable(const Table &table, const string &name);
 
 /*!
  *  \brief Attempt to read the position of the observatory. If the
@@ -460,7 +460,7 @@ bool HasSubTable(const Table &table, const string &name) {
   return table.keywordSet().isDefined(name);
 }
 
-Table getSubTable(const Table &table, const string &name) {
+Table GetSubTable(const Table &table, const string &name) {
   return table.keywordSet().asTable(name);
 }
 
@@ -523,7 +523,7 @@ MDirection readDelayReference(const MeasurementSet &ms, unsigned int idField) {
 MDirection readTileReference(const MeasurementSet &ms, unsigned int idField) {
   // The MeasurementSet class does not support LOFAR specific columns, so
   // we use ROArrayMeasColumn to read the tile beam reference direction.
-  Table tab_field = getSubTable(ms, "FIELD");
+  Table tab_field = GetSubTable(ms, "FIELD");
 
   static const String columnName = "LOFAR_TILE_BEAM_DIR";
   if (HasColumn(tab_field, columnName)) {

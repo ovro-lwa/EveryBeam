@@ -1,4 +1,4 @@
-// ITRFDirection.h: Functor that maps time to an ITRF direction.
+// itrfdirection.h: Functor that maps time to an ITRF direction.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -49,14 +49,14 @@ class ITRFDirection {
 
   vector3r_t at(real_t time) const;
 
-  const static vector3r_t &LOFARPosition() { return itsLOFARPosition; }
+  const static vector3r_t &LOFARPosition() { return lofar_position_; }
 
  private:
   // ITRF position of CS002LBA, just to use a fixed reference
-  const static vector3r_t itsLOFARPosition;
+  const static vector3r_t lofar_position_;
 
-  mutable casacore::MeasFrame itsFrame;
-  mutable casacore::MDirection::Convert itsConverter;
+  mutable casacore::MeasFrame frame_;
+  mutable casacore::MDirection::Convert converter_;
   mutable std::mutex itsMutex;
 };
 }  // namespace coords

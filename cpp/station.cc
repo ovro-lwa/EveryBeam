@@ -21,11 +21,11 @@
 // $Id$
 
 #include "station.h"
-#include "common/math_utils.h"
+#include "common/mathutils.h"
 
-#include "hamaker/HamakerElementResponse.h"
-#include "oskar/OSKARElementResponse.h"
-#include "lobes/LOBESElementResponse.h"
+#include "hamaker/hamakerelementresponse.h"
+#include "oskar/oskarelementresponse.h"
+#include "lobes/lobeselementresponse.h"
 
 using namespace everybeam;
 

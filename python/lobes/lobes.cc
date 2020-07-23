@@ -129,15 +129,15 @@ std::pair<Eigen::VectorXcd, Eigen::VectorXcd> F4far_new(
   return std::make_pair(q2, q3);
 }
 
-Eigen::Array<std::complex<double>, 2, 2> element_response_lba(double freq,
-                                                              double theta,
-                                                              double phi) {
+Eigen::Array<std::complex<double>, 2, 2> ElementResponseLBA(double freq,
+                                                            double theta,
+                                                            double phi) {
   Eigen::Array<std::complex<double>, 2, 2> response;
 
   typedef std::complex<double> Response[2][2];
   Response &response_ = *((Response *)response.data());
 
-  everybeam::element_response_lba(freq, theta, phi, response_);
+  everybeam::ElementResponseLBA(freq, theta, phi, response_);
   return std::move(response);
 }
 
@@ -339,7 +339,7 @@ PYBIND11_MODULE(lobes, m) {
   m.def("P", &P, "Legendre");
   m.def("Pacc", &Pacc, "Legendre");
   m.def("F4far_new", &F4far_new, "F4far_new");
-  m.def("element_response_lba", &element_response_lba, "element_response_lba");
+  m.def("ElementResponseLBA", &ElementResponseLBA, "ElementResponseLBA");
 
   py::class_<LobesBeamModel>(m, "LobesBeamModel")
       .def(py::init<const std::string &>())

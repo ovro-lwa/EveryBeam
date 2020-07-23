@@ -1,5 +1,5 @@
 install (FILES
-  ITRFConverter.h
-  ITRFDirection.h
-  coord_utils.h
+  itrfconverter.h
+  itrfdirection.h
+  coordutils.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}/coords")

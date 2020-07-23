@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
-#include "./../load.h"
-#include "./../options.h"
-#include "./../gridded_response/lofargrid.h"
-#include "./../element_response.h"
+#include "../load.h"
+#include "../options.h"
+#include "../griddedresponse/lofargrid.h"
+#include "../elementresponse.h"
 #include "../../external/npy.hpp"
 
 #include "config.h"
@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                            .dm = dm,
                                            .phase_centre_dl = shift_l,
                                            .phase_centre_dm = shift_m};
-  std::unique_ptr<gridded_response::GriddedResponse> grid_response =
+  std::unique_ptr<griddedresponse::GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr !=
-              dynamic_cast<gridded_response::LOFARGrid*>(grid_response.get()));
+              dynamic_cast<griddedresponse::LOFARGrid*>(grid_response.get()));
 
   // Define buffer and get gridded responses
   std::vector<std::complex<float>> antenna_buffer_single(
@@ -86,13 +86,13 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                 1e-4);
   }
 
-  std::vector<std::complex<float>> antenna_buffer_all(
-      grid_response->GetBufferSize(telescope->GetNrStations()));
-  grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
-                                      frequency);
-  BOOST_CHECK_EQUAL(
-      antenna_buffer_all.size(),
-      std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
+  //   std::vector<std::complex<float>> antenna_buffer_all(
+  //       grid_response->GetBufferSize(telescope->GetNrStations()));
+  //   grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
+  //                                       frequency);
+  //   BOOST_CHECK_EQUAL(
+  //       antenna_buffer_all.size(),
+  //       std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
 
   // Test with differential beam, single
   Options options_diff_beam;
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   std::unique_ptr<telescope::Telescope> telescope_diff_beam =
       Load(ms, response_model, options_diff_beam);
 
-  std::unique_ptr<gridded_response::GriddedResponse> grid_response_diff_beam =
+  std::unique_ptr<griddedresponse::GriddedResponse> grid_response_diff_beam =
       telescope_diff_beam->GetGriddedResponse(coord_system);
 
   std::vector<std::complex<float>> antenna_buffer_diff_beam(

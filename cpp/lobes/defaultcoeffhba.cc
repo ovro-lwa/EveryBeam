@@ -1,6 +1,6 @@
 // Beam model coefficients converted by convert_coeff.py.
 // Conversion performed on 2011/09/14/08:23:16 UTC using:
-//     convert_coeff.py element_beam_HBA.coeff DefaultCoeffHBA.cc default_hba
+//     convert_coeff.py element_beam_HBA.coeff defaultcoeffhba.cc default_hba
 
 #include <complex>
 

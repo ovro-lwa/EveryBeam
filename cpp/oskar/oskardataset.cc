@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "OSKARDataset.h"
+#include "oskardataset.h"
 
 Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
   // Try to read coefficients for this frequency
@@ -44,16 +44,16 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
     assert(l_max * (l_max + 2) == nr_coeffs);
 
     // Set members
-    m_nr_elements = nr_elements;
-    m_nr_coeffs = nr_coeffs;
-    m_l_max = l_max;
+    nr_elements_ = nr_elements;
+    nr_coeffs_ = nr_coeffs;
+    l_max_ = l_max;
 
     // Read coefficients into data vector
-    m_data.resize(nr_elements * nr_coeffs * 4);
-    assert(dims[0] * dims[1] * dims[2] == m_data.size());
+    data_.resize(nr_elements * nr_coeffs * 4);
+    assert(dims[0] * dims[1] * dims[2] == data_.size());
     H5::DataType data_type = dataset.getDataType();
     assert(data_type.getSize() == sizeof(std::complex<double>));
-    dataset.read(m_data.data(), data_type, dataspace);
+    dataset.read(data_.data(), data_type, dataspace);
   } catch (H5::FileIException& e) {
     std::stringstream message;
     message << "Could not load dataset for frequency " << dataset_name
@@ -63,11 +63,11 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
 }
 
 size_t Dataset::GetIndex(const unsigned int element) const {
-  return element * m_nr_coeffs * 4;
+  return element * nr_coeffs_ * 4;
 }
 
 std::complex<double>* Dataset::GetAlphaPtr(const unsigned int element) {
-  assert(element < get_nr_elements());
+  assert(element < GetNrElements());
   size_t index = GetIndex(element);
-  return m_data.data() + index;
+  return data_.data() + index;
 }

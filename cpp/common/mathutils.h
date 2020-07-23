@@ -1,4 +1,4 @@
-// math_utils.h: Various mathematical operations on vectors and matrices.
+// mathutils.h: Various mathematical operations on vectors and matrices.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)

@@ -19,8 +19,8 @@ class Dataset {
   Dataset(H5::H5File& h5_file, const unsigned int freq);
 
   // Get
-  size_t get_nr_elements() const { return m_nr_elements; };
-  size_t GetLMax() const { return m_l_max; };
+  size_t GetNrElements() const { return nr_elements_; };
+  size_t GetLMax() const { return l_max_; };
 
   std::complex<double>* GetAlphaPtr(const unsigned int element);
 
@@ -32,10 +32,10 @@ class Dataset {
   const unsigned int dataset_rank_ = 3;
 
   // Members
-  std::vector<std::complex<double>> m_data;
-  unsigned int m_nr_elements;
-  unsigned int m_nr_coeffs;
-  unsigned int m_l_max;
+  std::vector<std::complex<double>> data_;
+  unsigned int nr_elements_;
+  unsigned int nr_coeffs_;
+  unsigned int l_max_;
 };
 
 #endif

@@ -1,6 +1,6 @@
-#include "HamakerCoeff.h"
+#include "hamakercoeff.h"
 
-H5::CompType get_complex_double_type() {
+H5::CompType GetComplexDoubleType() {
   H5::CompType complex_type(sizeof(std::complex<double>));
   complex_type.insertMember("r", 0, H5::PredType::NATIVE_DOUBLE);
   complex_type.insertMember("i", sizeof(double), H5::PredType::NATIVE_DOUBLE);
@@ -15,7 +15,7 @@ size_t HamakerCoefficients::GetIndex(const unsigned int n, const unsigned int t,
 
 // Constructor for reading coeff from file
 HamakerCoefficients::HamakerCoefficients(std::string& filename) {
-  ReadCoeffs(filename);
+  ReadCoefficients(filename);
 };
 
 // Constructor for writing coeff to file
@@ -29,13 +29,13 @@ HamakerCoefficients::HamakerCoefficients(const double freq_center,
       nHarmonics_(nHarmonics),
       nPowerTheta_(nPowerTheta),
       nPowerFreq_(nPowerFreq),
-      coeff_(GetNumCoeffs()) {}
+      coeff_(GetNrCoefficients()) {}
 
-size_t HamakerCoefficients::GetNumCoeffs() const {
+size_t HamakerCoefficients::GetNrCoefficients() const {
   return nHarmonics_ * nPowerTheta_ * nPowerFreq_ * nInner_;
 }
 
-void HamakerCoefficients::SetCoeffs(
+void HamakerCoefficients::SetCoefficients(
     const unsigned int n, const unsigned int t, const unsigned int f,
     std::pair<std::complex<double>, std::complex<double>> value) {
   size_t index = GetIndex(n, t, f);
@@ -43,19 +43,19 @@ void HamakerCoefficients::SetCoeffs(
   coeff_[index + 1] = value.second;
 }
 
-void HamakerCoefficients::SetCoeffs(const std::complex<double>* coeff) {
+void HamakerCoefficients::SetCoefficients(const std::complex<double>* coeff) {
   memcpy(coeff_.data(), coeff, coeff_.size() * sizeof(std::complex<double>));
 }
 
-void HamakerCoefficients::SetCoeffs(
+void HamakerCoefficients::SetCoefficients(
     const std::vector<std::complex<double>> coeff) {
   assert(coeff.size() == coeff_.size());
   std::copy(coeff.begin(), coeff.end(), coeff_.begin());
 }
 
 std::pair<std::complex<double>, std::complex<double>>
-HamakerCoefficients::get_coeff(const unsigned int n, const unsigned int t,
-                               const unsigned int f) {
+HamakerCoefficients::GetCoefficient(const unsigned int n, const unsigned int t,
+                                    const unsigned int f) {
   size_t index = GetIndex(n, t, f);
   std::pair<std::complex<double>, std::complex<double>> value;
   value.first = coeff_[index];
@@ -63,7 +63,7 @@ HamakerCoefficients::get_coeff(const unsigned int n, const unsigned int t,
   return value;
 }
 
-void HamakerCoefficients::ReadCoeffs(std::string& filename) {
+void HamakerCoefficients::ReadCoefficients(std::string& filename) {
   // Open file
   H5::H5File file(filename, H5F_ACC_RDONLY);
 
@@ -87,13 +87,13 @@ void HamakerCoefficients::ReadCoeffs(std::string& filename) {
   nPowerFreq_ = dims[2];
 
   // Read coeffs
-  coeff_.resize(GetNumCoeffs());
+  coeff_.resize(GetNrCoefficients());
   H5::DataType data_type = dataset.getDataType();
   assert(data_type.getSize() == sizeof(std::complex<double>));
   dataset.read(coeff_.data(), data_type, dataspace);
 }
 
-void HamakerCoefficients::WriteCoeffs(std::string& filename) {
+void HamakerCoefficients::WriteCoefficients(std::string& filename) {
   // Open file
   H5::H5File file(filename, H5F_ACC_TRUNC);
 
@@ -108,7 +108,7 @@ void HamakerCoefficients::WriteCoeffs(std::string& filename) {
   coeff_type* coeff_ptr = (coeff_type*)coeff_.data();
 
   // Create complex type
-  H5::CompType complex_type = get_complex_double_type();
+  H5::CompType complex_type = GetComplexDoubleType();
 
   // Write dataset
   H5::DataSet dataset =
@@ -131,11 +131,11 @@ void HamakerCoefficients::WriteCoeffs(std::string& filename) {
   file.flush(H5F_SCOPE_LOCAL);
 }
 
-void HamakerCoefficients::PrintCoeffs() {
+void HamakerCoefficients::PrintCoefficients() {
   for (unsigned int h = 0; h < nHarmonics_; h++) {
     for (unsigned int t = 0; t < nPowerTheta_; t++) {
       for (unsigned int f = 0; f < nPowerFreq_; f++) {
-        auto coeff = get_coeff(h, t, f);
+        auto coeff = GetCoefficient(h, t, f);
         std::cout << coeff.first << ", " << coeff.second << std::endl;
       }
     }

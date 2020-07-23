@@ -3,9 +3,9 @@
 #include <aocommon/imagecoordinates.h>
 #include <fitsio.h>
 
-#include "./../cpp/common/math_utils.h"
-// #include "./../cpp/coords/ITRFDirection.h"
-#include "./../cpp/coords/ITRFConverter.h"
+#include "./../cpp/common/mathutils.h"
+// #include "./../cpp/coords/itrfdirection.h"
+#include "./../cpp/coords/itrfconverter.h"
 
 void GetPhaseCentreInfo(
     casacore::MeasurementSet& ms,
@@ -94,19 +94,19 @@ void GetITRFDirections(
                 casacore::Quantity(ra + M_PI/2, radUnit),
                 casacore::Quantity(0, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::SetITRFVector(itrfConverter.toDirection(lDir), _l_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.ToDirection(lDir), _l_vector_itrf);
 
             casacore::MDirection mDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec + M_PI/2, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::SetITRFVector(itrfConverter.toDirection(mDir), _m_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.ToDirection(mDir), _m_vector_itrf);
 
             casacore::MDirection nDir(casacore::MVDirection(
                 casacore::Quantity(ra, radUnit),
                 casacore::Quantity(dec, radUnit)),
             	casacore::MDirection::J2000);
-            everybeam::coords::SetITRFVector(itrfConverter.toDirection(nDir), _n_vector_itrf);
+            everybeam::coords::SetITRFVector(itrfConverter.ToDirection(nDir), _n_vector_itrf);
 
             vector3r_t itrfDirection;
 

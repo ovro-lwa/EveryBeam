@@ -33,16 +33,16 @@ class HamakerCoefficients {
    * @param f
    * @param value
    */
-  void SetCoeffs(const unsigned int n, const unsigned int t,
-                 const unsigned int f,
-                 std::pair<std::complex<double>, std::complex<double>> value);
+  void SetCoefficients(
+      const unsigned int n, const unsigned int t, const unsigned int f,
+      std::pair<std::complex<double>, std::complex<double>> value);
 
-  void SetCoeffs(const std::complex<double>* coeff);
+  void SetCoefficients(const std::complex<double>* coeff);
 
-  void SetCoeffs(const std::vector<std::complex<double>> coeff);
+  void SetCoefficients(const std::vector<std::complex<double>> coeff);
 
   // Get
-  size_t GetNumCoeffs() const;
+  size_t GetNrCoefficients() const;
 
   double GetFreqCenter() const { return freq_center_; }
 
@@ -54,16 +54,16 @@ class HamakerCoefficients {
 
   unsigned int Get_nPowerFreq() const { return nPowerFreq_; }
 
-  std::pair<std::complex<double>, std::complex<double>> get_coeff(
+  std::pair<std::complex<double>, std::complex<double>> GetCoefficient(
       const unsigned int n, const unsigned int t, const unsigned int f);
 
   // HDF5 I/O
-  void ReadCoeffs(std::string& filename);
+  void ReadCoefficients(std::string& filename);
 
-  void WriteCoeffs(std::string& filename);
+  void WriteCoefficients(std::string& filename);
 
   // Debugging
-  void PrintCoeffs();
+  void PrintCoefficients();
 
  private:
   // Methods

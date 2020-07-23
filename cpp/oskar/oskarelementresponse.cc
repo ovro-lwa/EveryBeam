@@ -1,4 +1,4 @@
-#include "OSKARElementResponse.h"
+#include "oskarelementresponse.h"
 #include "oskar.h"
 #include "config.h"
 #include <iostream>
@@ -21,12 +21,12 @@ void OSKARElementResponseDipole::Response(
 
 OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave() {
   std::string path = GetPath("oskar.h5");
-  m_datafile.reset(new Datafile(path));
+  datafile_.reset(new Datafile(path));
 }
 
 OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave(
     const std::string& path) {
-  m_datafile.reset(new Datafile(path));
+  datafile_.reset(new Datafile(path));
 }
 
 void OSKARElementResponseSphericalWave::Response(
@@ -44,7 +44,7 @@ void OSKARElementResponseSphericalWave::Response(
 void OSKARElementResponseSphericalWave::Response(
     int element_id, double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
-  auto dataset = m_datafile->get(freq);
+  auto dataset = datafile_->Get(freq);
   auto l_max = dataset->GetLMax();
 
   std::complex<double>* response_ptr = (std::complex<double>*)response;

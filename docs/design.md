@@ -18,7 +18,7 @@ Design {#designpage}
  * The core library can use instrument specific implementations of
    `BeamFormers` and `Elements`.
 
-LOFAR specific is [LofarMetaDataUtil](@ref LofarMetaDataUtil.h) which reads
+LOFAR specific is [lofarreadutils](@ref lofarreadutils.h) which reads
 metadata from a LOFAR MeasurementSet. Based on that data it composes Station
 consisting of BeamFormers and Elements.
 
