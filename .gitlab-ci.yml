@@ -1,30 +1,19 @@
 stages:
-  - build-base
-  - format-and-test
-  - build-everybeam
+  - prepare
+  - build
   - oskar-comparison
-  - build-doc
-  - deploy-doc
-  # - build-dependency
-  # - test-dependency
   - deploy
 
 build-base:
-  stage: build-base
+  stage: prepare
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker build
-      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE:base
-      -f ./docker/Dockerfile-base .
-    - docker push $CI_REGISTRY_IMAGE:base
+    - docker build --tag everybeam_base:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-base .
 
 clang-format:
   except:
     - schedules
-  stage: format-and-test
-  image: $CI_REGISTRY_IMAGE:base
+  stage: build
+  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   before_script:
     - apt-get -y install python3-pip
     - pip3 install clang-format
@@ -33,45 +22,54 @@ clang-format:
 
 # Build a debug version of EveryBeam from the base image
 test-and-coverage:
-  stage: format-and-test
-  image: $CI_REGISTRY_IMAGE:base
   except:
     - schedules
-  dependencies: 
-    - build-base
+  stage: build
+  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   before_script:
     - apt-get -y install python3-pip
     - pip3 install gcovr
   script:
-    - mkdir -p /opt/everybeam/build
-    - cd /opt/everybeam && git clone https://git.astron.nl/RD/EveryBeam.git EveryBeam
-    - cd /opt/everybeam/EveryBeam && git checkout ${CI_COMMIT_SHORT_SHA}
+    - mkdir build
     # Download LOFAR Mock measurement set
     - ./scripts/download_lofar_ms.sh
-    - LOFAR_MOCK_MS=/opt/everybeam/EveryBeam/test_data/LOFAR_MOCK.ms/
-    # Change to build dir
-    - cd /opt/everybeam/build
+    - cd test_data/LOFAR_MOCK.ms/ && export LOFAR_MOCK_MS=$PWD
+    - cd ../../build
     # Build in Debug mode and add LOFAR_MOCK_MS
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../EveryBeam/
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
     - make install -j8
     - ctest -T test
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
+    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
+  artifacts:
+    reports:
+      # NOE: artifacts only work with relative paths...
+      cobertura: build/coverage.xml
 
 build-everybeam:
-  stage: build-everybeam
+  stage: build
+  dependencies:
+    - build-base
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - >
-      docker build
-      --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
-      --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-      -f ./docker/Dockerfile-everybeam .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker build --build-arg BASE_TAG=${CI_COMMIT_SHORT_SHA} --tag everybeam:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-everybeam .
 
-build-oskar:
+build-doc:
+  stage: build
+  except:
+    - schedules
+  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
+  script:
+    - EVERYBEAM_PATH=$PWD
+    - mkdir build && cd build
+    - cmake $EVERYBEAM_PATH
+    - make doc
+  artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
+    paths:
+    - build/doc/html
+
+build-compare-oskar:
   stage: oskar-comparison
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  image: everybeam:${CI_COMMIT_SHORT_SHA}
   only:
     - schedules
     - master
@@ -91,32 +89,15 @@ build-oskar:
     - make install
     # Python install
     - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
-    - cd ./../OSKAR/python && python3 setup.py install && cd $HOME
+    - cd ./../OSKAR/python && python3 setup.py install 
     - export PATH=/opt/oskar/bin:$PATH
     # Run OSKAR comparison, set some env variables for this session
     - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
     - cd /opt/everybeam/build
     - make VERBOSE=1 comparison-oskar
 
-build-doc:
-  stage: build-doc
-  except:
-    - schedules
-  script:
-  - >
-    docker run
-    --name $CI_COMMIT_SHORT_SHA
-    --workdir /opt/everybeam/build/
-    $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-    sh -c 'make doc'
-  - docker cp $CI_COMMIT_SHORT_SHA:/opt/everybeam/build/doc/html htmldoc
-  - docker rm $CI_COMMIT_SHORT_SHA
-  artifacts:
-    paths:
-    - htmldoc
-
 deploy-doc:
-  stage: deploy-doc
+  stage: deploy
   except:
     - schedules
   before_script:
@@ -127,57 +108,12 @@ deploy-doc:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H dop288 > ~/.ssh/known_hosts
   script:
-    - scp -r htmldoc/* citt@dop288:EveryBeam
+    - scp -r build/doc/html/* citt@dop288:EveryBeam
   only:
     refs:
       - master
 
-# build-dp3:
-#   stage: build-dependency
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - >
-#       docker build
-#       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
-#       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-#       --tag $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-#       -f ./docker/Dockerfile-dp3 .
-#     - docker push $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-
-# build-wsclean:
-#   stage: build-dependency
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - >
-#       docker build
-#       --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE
-#       --build-arg CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
-#       --tag $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
-#       -f ./docker/Dockerfile-wsclean .
-#     - docker push $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
-
-# test-dp3:
-#   variables:
-#     GIT_STRATEGY: none
-#   stage: test-dependency
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - >
-#       docker run
-#       $CI_REGISTRY_IMAGE:dp3-$CI_COMMIT_SHORT_SHA
-#       /opt/everybeam/everybeam/docker/tDockerDP3
-
-# test-wsclean:
-#   variables:
-#     GIT_STRATEGY: none
-#   stage: test-dependency
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - >
-#       docker pull
-#       $CI_REGISTRY_IMAGE:wsclean-$CI_COMMIT_SHORT_SHA
-
-deploy:
+deploy-image:
   variables:
     GIT_STRATEGY: none
   except:
@@ -187,6 +123,5 @@ deploy:
   stage: deploy
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker tag everybeam:${CI_COMMIT_SHORT_SHA} everybeam:latest
+    - docker push everybeam:latest
