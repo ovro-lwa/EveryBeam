@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "antenna.h"
-#include "element_response.h"
+#include "elementresponse.h"
 #include "common/types.h"
 
 namespace everybeam {

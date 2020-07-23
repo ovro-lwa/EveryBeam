@@ -47,8 +47,8 @@ namespace everybeam {
 // theta: Zenith angle in rad in the range [0.0, PI / 2.0].
 // phi: Azimuth in rad in the range [0.0, 2.0 * PI].
 //
-void element_response_lba(double freq, double theta, double phi,
-                          std::complex<double> (&response)[2][2]);
+void ElementResponseLBA(double freq, double theta, double phi,
+                        std::complex<double> (&response)[2][2]);
 
 // Compute the response of an idealized LOFAR HBA dual dipole antenna to
 // radiation at frequency freq (Hz) arriving from the direction given by theta,
@@ -62,8 +62,8 @@ void element_response_lba(double freq, double theta, double phi,
 // theta: Zenith angle in rad in the range [0.0, PI / 2.0].
 // phi: Azimuth in rad in the range [0.0, 2.0 * PI].
 //
-void element_response_hba(double freq, double theta, double phi,
-                          std::complex<double> (&response)[2][2]);
+void ElementResponseHBA(double freq, double theta, double phi,
+                        std::complex<double> (&response)[2][2]);
 
 // Compute the response of an idealized LOFAR dual dipole antenna to radiation
 // at frequency freq (Hz) arriving from the direction given by theta, phi (rad).
@@ -88,11 +88,10 @@ void element_response_hba(double freq, double theta, double phi,
 // freq_range, freq_center: Frequency center and range in Hz, should be > 0.
 // coeff_shape: Shape of the coefficient array, all dimensions should be > 0.
 //
-void element_response(double freq, double theta, double phi,
-                      std::complex<double> (&response)[2][2],
-                      double freq_center, double freq_range,
-                      const unsigned int (&coeff_shape)[3],
-                      const std::complex<double> coeff[]);
+void ElementResponse(double freq, double theta, double phi,
+                     std::complex<double> (&response)[2][2], double freq_center,
+                     double freq_range, const unsigned int (&coeff_shape)[3],
+                     const std::complex<double> coeff[]);
 
 // @}
 

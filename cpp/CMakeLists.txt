@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 add_subdirectory(common)
 add_subdirectory(coords)
-add_subdirectory(gridded_response)
+add_subdirectory(griddedresponse)
 add_subdirectory(hamaker)
 add_subdirectory(lobes)
 add_subdirectory(oskar)
@@ -10,16 +10,16 @@ add_subdirectory(telescope)
 #------------------------------------------------------------------------------
 add_library(everybeam SHARED
   antenna.cc
-  element_response.cc
+  elementresponse.cc
   beamformer.cc
   element.cc
   load.cc
-  coords/ITRFConverter.cc
-  coords/ITRFDirection.cc
-  LofarMetaDataUtil.cc
+  coords/itrfconverter.cc
+  coords/itrfdirection.cc
+  lofarreadutils.cc
   station.cc
   telescope/lofar.cc
-  gridded_response/lofargrid.cc
+  griddedresponse/lofargrid.cc
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
@@ -35,8 +35,8 @@ install (FILES
   antenna.h
   beamformer.h
   element.h
-  element_response.h
-  LofarMetaDataUtil.h
+  elementresponse.h
+  lofarreadutils.h
   station.h
   # Related to new API:
   load.h

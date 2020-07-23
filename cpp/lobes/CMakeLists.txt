@@ -7,7 +7,7 @@
 # pybind11_add_module(pylobes SHARED lobes.cc ElementResponse.cc LOBESElementResponse.cc)
 # target_link_libraries (pylobes PUBLIC Eigen3::Eigen ${HDF5_LIBRARIES})
 
-add_library(lobes SHARED LOBESElementResponse.cc)
+add_library(lobes SHARED lobeselementresponse.cc)
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 set_target_properties(lobes PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-lobes")
 

@@ -1,4 +1,4 @@
-// casa_utils.h: CasaCore utilities.
+// casautils.h: CasaCore utilities.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -99,7 +99,7 @@ inline bool HasColumn(const casacore::Table &table, const string &column) {
  * @param name Name of sub table (str)
  * @return Table (casacore::Table)
  */
-inline casacore::Table getSubTable(const casacore::Table &table,
+inline casacore::Table GetSubTable(const casacore::Table &table,
                                    const string &name) {
   return table.keywordSet().asTable(name);
 }

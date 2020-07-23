@@ -61,8 +61,8 @@ def main(args):
 
     Examples:
 
-    ./convert_coeff.py element_beam_LBA.coeff DefaultCoeffLBA.cc default_lba 
-    ./convert_coeff.py element_beam_HBA.coeff DefaultCoeffHBA.cc default_hba 
+    ./convert_coeff.py element_beam_LBA.coeff defaultcoefflba.cc default_lba 
+    ./convert_coeff.py element_beam_HBA.coeff defaultcoeffhba.cc default_hba 
     """
     print "converting %s -> %s (variable name: %s)" % (args[0], args[1], args[2])
 

@@ -1,4 +1,4 @@
-// HamakerElementResponse.cc:
+// hamakerelementresponse.cc:
 // Functions to compute the (idealized) response of a LOFAR
 // LBA or HBA dual dipole antenna.
 
@@ -6,7 +6,7 @@
 
 #include "config.h"
 
-#include "HamakerElementResponse.h"
+#include "hamakerelementresponse.h"
 #include "../common/singleton.h"
 
 namespace everybeam {
@@ -73,21 +73,22 @@ void HamakerElementResponse::Response(
     // start indexing the block of coefficients at the last element
 
     // Evaluate the highest order term.
-    P = m_coeffs->get_coeff(k, nPowerTheta - 1, nPowerFreq - 1);
+    P = m_coeffs->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1);
 
     for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-      auto Pk = m_coeffs->get_coeff(k, nPowerTheta - 1, nPowerFreq - i - 2);
+      auto Pk =
+          m_coeffs->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2);
       P.first = P.first * freq + Pk.first;
       P.second = P.second * freq + Pk.second;
     }
 
     // Evaluate the remaining terms.
     for (unsigned int j = 0; j < nPowerTheta - 1; ++j) {
-      Pj = m_coeffs->get_coeff(k, nPowerTheta - j - 2, nPowerFreq - 1);
+      Pj = m_coeffs->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1);
 
       for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-        auto Pk =
-            m_coeffs->get_coeff(k, nPowerTheta - j - 2, nPowerFreq - i - 2);
+        auto Pk = m_coeffs->GetCoefficient(k, nPowerTheta - j - 2,
+                                           nPowerFreq - i - 2);
         Pj.first = Pj.first * freq + Pk.first;
         Pj.second = Pj.second * freq + Pk.second;
       }

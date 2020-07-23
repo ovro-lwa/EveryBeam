@@ -1,7 +1,7 @@
-#include "./../cpp/element_response.h"
-#include "./../cpp/station.h"
-#include "./../cpp/LofarMetaDataUtil.h"
-#include "./../cpp/coords/coord_utils.h"
+#include "../cpp/elementresponse.h"
+#include "../cpp/station.h"
+#include "../cpp/lofarreadutils.h"
+#include "../cpp/coords/coordutils.h"
 
 #include <casacore/measures/Measures/MPosition.h>
 #include <casacore/measures/Measures/MEpoch.h>

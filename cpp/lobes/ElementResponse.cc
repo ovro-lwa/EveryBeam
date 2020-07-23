@@ -21,38 +21,37 @@
 //
 // $Id$
 
-#include "element_response.h"
+#include "ElementResponse.h"
 
 #include <cmath>
 
 // The coefficients are kept in an unnamed namespace which effectively makes
 // them invisible outside this translation unit.
 namespace {
-#include "DefaultCoeffLBA.cc"
-#include "DefaultCoeffHBA.cc"
+#include "defaultcoefflba.cc"
+#include "defaultcoeffhba.cc"
 }  // namespace
 
 namespace everybeam {
 
-void element_response_lba(double freq, double theta, double phi,
-                          std::complex<double> (&response)[2][2]) {
-  element_response(freq, theta, phi, response, default_lba_freq_center,
-                   default_lba_freq_range, default_lba_coeff_shape,
-                   default_lba_coeff);
+void ElementResponseLBA(double freq, double theta, double phi,
+                        std::complex<double> (&response)[2][2]) {
+  ElementResponse(freq, theta, phi, response, default_lba_freq_center,
+                  default_lba_freq_range, default_lba_coeff_shape,
+                  default_lba_coeff);
 }
 
-void element_response_hba(double freq, double theta, double phi,
-                          std::complex<double> (&response)[2][2]) {
-  element_response(freq, theta, phi, response, default_hba_freq_center,
-                   default_hba_freq_range, default_hba_coeff_shape,
-                   default_hba_coeff);
+void ElementResponseHBA(double freq, double theta, double phi,
+                        std::complex<double> (&response)[2][2]) {
+  ElementResponse(freq, theta, phi, response, default_hba_freq_center,
+                  default_hba_freq_range, default_hba_coeff_shape,
+                  default_hba_coeff);
 }
 
-void element_response(double freq, double theta, double phi,
-                      std::complex<double> (&response)[2][2],
-                      double freq_center, double freq_range,
-                      const unsigned int (&coeff_shape)[3],
-                      const std::complex<double> coeff[]) {
+void ElementResponse(double freq, double theta, double phi,
+                     std::complex<double> (&response)[2][2], double freq_center,
+                     double freq_range, const unsigned int (&coeff_shape)[3],
+                     const std::complex<double> coeff[]) {
   // Initialize the response to zero.
   response[0][0] = 0.0;
   response[0][1] = 0.0;

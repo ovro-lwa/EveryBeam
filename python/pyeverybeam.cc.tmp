@@ -19,9 +19,9 @@
 //
 // $Id: pystationresponse.cc 33141 2015-12-16 15:10:19Z dijkema $
 
-#include "ITRFDirection.h"
-#include "LofarMetaDataUtil.h"
-#include "Station.h"
+#include "itrfdirection.h"
+#include "lofarreadutils.h"
+#include "station.h"
 
 #include <casacore/casa/Arrays/Array.h>
 #include <casacore/casa/Arrays/Matrix.h>

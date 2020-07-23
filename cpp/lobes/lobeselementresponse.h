@@ -1,7 +1,7 @@
 #ifndef LOBES_ELEMENTRESPONSE_H
 #define LOBES_ELEMENTRESPONSE_H
 
-#include "../element_response.h"
+#include "../elementresponse.h"
 
 #include <memory>
 

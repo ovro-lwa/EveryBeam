@@ -24,9 +24,9 @@
 #ifndef EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 #define EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 
-#include "./../coords/coord_utils.h"
-#include "./../coords/ITRFDirection.h"
-#include "./../coords/ITRFConverter.h"
+#include "./../coords/coordutils.h"
+#include "./../coords/itrfdirection.h"
+#include "./../coords/itrfconverter.h"
 
 #include <memory>
 #include <vector>
@@ -40,7 +40,7 @@ namespace telescope {
 class Telescope;
 }
 
-namespace gridded_response {
+namespace griddedresponse {
 
 /**
  * @brief Virtual base class to compute the gridded response
@@ -99,6 +99,6 @@ class GriddedResponse {
   size_t width_, height_;
   double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
 };
-}  // namespace gridded_response
+}  // namespace griddedresponse
 }  // namespace everybeam
 #endif  // EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_

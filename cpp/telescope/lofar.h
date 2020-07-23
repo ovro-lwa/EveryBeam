@@ -34,16 +34,16 @@
 
 namespace everybeam {
 
-namespace gridded_response {
+namespace griddedresponse {
 class LOFARGrid;
 class GriddedResponse;
-}  // namespace gridded_response
+}  // namespace griddedresponse
 
 namespace telescope {
 
 //! LOFAR telescope class
 class LOFAR final : public Telescope {
-  friend class gridded_response::LOFARGrid;
+  friend class griddedresponse::LOFARGrid;
 
  public:
   /**
@@ -56,7 +56,7 @@ class LOFAR final : public Telescope {
   LOFAR(casacore::MeasurementSet &ms, const ElementResponseModel model,
         const Options &options);
 
-  std::unique_ptr<gridded_response::GriddedResponse> GetGriddedResponse(
+  std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
  private:

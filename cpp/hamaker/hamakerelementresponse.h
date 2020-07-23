@@ -1,8 +1,8 @@
 #ifndef HAMAKER_ELEMENTRESPONSE_H
 #define HAMAKER_ELEMENTRESPONSE_H
 
-#include "../element_response.h"
-#include "HamakerCoeff.h"
+#include "../elementresponse.h"
+#include "hamakercoeff.h"
 
 #include <memory>
 

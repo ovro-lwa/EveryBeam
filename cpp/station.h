@@ -27,10 +27,10 @@
 // \file
 // Representation of the station beam former.
 
-#include "element_response.h"
+#include "elementresponse.h"
 #include "antenna.h"
 #include "beamformer.h"
-#include "coords/ITRFDirection.h"
+#include "coords/itrfdirection.h"
 #include "common/types.h"
 
 #include <memory>

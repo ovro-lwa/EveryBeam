@@ -1,6 +1,6 @@
 #include "antenna.h"
 
-#include "common/math_utils.h"
+#include "common/mathutils.h"
 
 namespace everybeam {
 vector3r_t Antenna::TransformToLocalDirection(const vector3r_t &direction) {

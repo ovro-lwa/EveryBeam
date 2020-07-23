@@ -1,8 +1,8 @@
 #include "lofar.h"
-#include "./../gridded_response/lofargrid.h"
-#include "./../common/math_utils.h"
-#include "./../common/casa_utils.h"
-#include "../LofarMetaDataUtil.h"
+#include "../griddedresponse/lofargrid.h"
+#include "../common/mathutils.h"
+#include "../common/casautils.h"
+#include "../lofarreadutils.h"
 
 #include <aocommon/banddata.h>
 #include <cassert>
@@ -97,12 +97,12 @@ LOFAR::LOFAR(MeasurementSet &ms, const ElementResponseModel model,
                     .preapplied_beam_dir = preapplied_beam_dir};
 }
 
-std::unique_ptr<gridded_response::GriddedResponse> LOFAR::GetGriddedResponse(
+std::unique_ptr<griddedresponse::GriddedResponse> LOFAR::GetGriddedResponse(
     const coords::CoordinateSystem &coordinate_system) {
   // Get and return GriddedResponse ptr
-  std::unique_ptr<gridded_response::GriddedResponse> grid(
-      new gridded_response::LOFARGrid(this, coordinate_system));
-  // gridded_response::GriddedResponse grid(LOFARGrid(this, coordinate_system));
+  std::unique_ptr<griddedresponse::GriddedResponse> grid(
+      new griddedresponse::LOFARGrid(this, coordinate_system));
+  // griddedresponse::GriddedResponse grid(LOFARGrid(this, coordinate_system));
   return grid;
 };
 

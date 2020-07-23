@@ -1,10 +1,10 @@
 #ifndef OSKAR_ELEMENTRESPONSE_H
 #define OSKAR_ELEMENTRESPONSE_H
 
-#include "../element_response.h"
+#include "../elementresponse.h"
 #include "../common/singleton.h"
 
-#include "OSKARDatafile.h"
+#include "oskardatafile.h"
 
 #include <memory>
 
@@ -55,7 +55,7 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
  protected:
   std::string GetPath(const char *) const;
 
-  std::unique_ptr<Datafile> m_datafile;
+  std::unique_ptr<Datafile> datafile_;
 };
 
 }  // namespace everybeam

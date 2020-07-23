@@ -3,8 +3,8 @@ include_directories(${CMAKE_BINARY_DIR})
 
 # build libhamaker.so
 add_library(hamaker SHARED
-  HamakerElementResponse.cc
-  HamakerCoeff.cc)
+  hamakerelementresponse.cc
+  hamakercoeff.cc)
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 set_target_properties(hamaker PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-hamaker")
 

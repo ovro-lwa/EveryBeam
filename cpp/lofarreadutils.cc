@@ -1,4 +1,4 @@
-// LofarMetaDataUtil.cc: Utility functions to read the meta data relevant for
+// lofarreadutils.cc: Utility functions to read the meta data relevant for
 // simulating the beam from LOFAR observations stored in MS format.
 //
 // Copyright (C) 2013
@@ -21,9 +21,9 @@
 //
 // $Id$
 
-#include "LofarMetaDataUtil.h"
-#include "common/math_utils.h"
-#include "common/casa_utils.h"
+#include "lofarreadutils.h"
+#include "common/mathutils.h"
+#include "common/casautils.h"
 
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MPosition.h>
@@ -286,11 +286,11 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
 
   // Read antenna field information.
   ROScalarColumn<String> telescope_name_col(
-      common::getSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
+      common::GetSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
   string telescope_name = telescope_name_col(0);
 
   if (telescope_name == "LOFAR") {
-    Table tab_field = common::getSubTable(ms, "LOFAR_ANTENNA_FIELD");
+    Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
     tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
 
     // The Station will consist of a BeamFormer that combines the fields
@@ -320,11 +320,11 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
         Element::Ptr(new Element(coordinate_system, model, element_id));
     station->SetElement(element);
   } else if (telescope_name == "AARTFAAC") {
-    ROScalarColumn<String> ant_type_col(common::getSubTable(ms, "OBSERVATION"),
+    ROScalarColumn<String> ant_type_col(common::GetSubTable(ms, "OBSERVATION"),
                                         "AARTFAAC_ANTENNA_TYPE");
     string ant_type = ant_type_col(0);
 
-    Table tab_field = common::getSubTable(ms, "ANTENNA");
+    Table tab_field = common::GetSubTable(ms, "ANTENNA");
     station->SetAntenna(ReadAntennaFieldAartfaac(tab_field, ant_type, id));
   }
 
@@ -334,7 +334,7 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
 MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms) {
   MDirection tileBeamDir;
 
-  Table fieldTable = common::getSubTable(ms, "FIELD");
+  Table fieldTable = common::GetSubTable(ms, "FIELD");
 
   if (fieldTable.nrow() != 1) {
     throw std::runtime_error(

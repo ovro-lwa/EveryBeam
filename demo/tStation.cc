@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "./../cpp/station.h"
-#include "./../cpp/LofarMetaDataUtil.h"
-#include "./../cpp/common/math_utils.h"
+#include "./../cpp/lofarreadutils.h"
+#include "./../cpp/common/mathutils.h"
 
 #include "config.h"
 
