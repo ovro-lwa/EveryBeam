@@ -1,4 +1,5 @@
 set(LOFAR_MOCK_MS CACHE STRING "LOFAR measurement set used for testing")
+set(VLA_MOCK_MS CACHE STRING "VLA measurement set used for testing")
 
 #------------------------------------------------------------------------------
 # Find boost
@@ -20,13 +21,21 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIR})
     set(TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/runtests.cc)
 
-    # Test loading of LOFAR
+    # Test LOFAR beamforming
     if( LOFAR_MOCK_MS )        
         set(TEST_SOURCES 
             ${TEST_SOURCES}
             ${CMAKE_CURRENT_SOURCE_DIR}/tload_lofar.cc
         )
-    endif()    
+    endif()
+
+    # Test VLA beamforming
+    if( VLA_MOCK_MS )
+        set(TEST_SOURCES 
+            ${TEST_SOURCES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tvla.cc
+        )
+    endif()
 
     # Add test executable
     add_executable(runtests ${TEST_SOURCES})

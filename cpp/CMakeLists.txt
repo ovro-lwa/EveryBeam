@@ -6,6 +6,7 @@ add_subdirectory(hamaker)
 add_subdirectory(lobes)
 add_subdirectory(oskar)
 add_subdirectory(telescope)
+add_subdirectory(circularsymmetric)
 
 #------------------------------------------------------------------------------
 add_library(everybeam SHARED
@@ -19,7 +20,11 @@ add_library(everybeam SHARED
   lofarreadutils.cc
   station.cc
   telescope/lofar.cc
+  telescope/dish.cc
   griddedresponse/lofargrid.cc
+  griddedresponse/dishgrid.cc
+  circularsymmetric/voltagepattern.cc
+  circularsymmetric/vlabeam.cc
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})

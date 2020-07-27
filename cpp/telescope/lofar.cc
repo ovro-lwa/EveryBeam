@@ -58,7 +58,8 @@ bool GetPreappliedBeamDirection(casacore::MeasurementSet &ms,
 
 LOFAR::LOFAR(MeasurementSet &ms, const ElementResponseModel model,
              const Options &options)
-    : Telescope(ms, model, options) {
+    : Telescope(ms, options) {
+  stations_.resize(nstations_);
   ReadAllStations(ms, model);
 
   // Populate MeasurementSet properties struct
@@ -102,7 +103,6 @@ std::unique_ptr<griddedresponse::GriddedResponse> LOFAR::GetGriddedResponse(
   // Get and return GriddedResponse ptr
   std::unique_ptr<griddedresponse::GriddedResponse> grid(
       new griddedresponse::LOFARGrid(this, coordinate_system));
-  // griddedresponse::GriddedResponse grid(LOFARGrid(this, coordinate_system));
   return grid;
 };
 

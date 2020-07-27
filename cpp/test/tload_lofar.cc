@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   // Load LOFAR Telescope
   std::unique_ptr<telescope::Telescope> telescope =
-      Load(ms, response_model, options);
+      Load(ms, options, response_model);
 
   // Assert if we indeed have a LOFAR pointer
   BOOST_CHECK(nullptr != dynamic_cast<telescope::LOFAR*>(telescope.get()));
@@ -30,7 +30,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   BOOST_CHECK_EQUAL(telescope->GetNrStations(), nstations);
 
   // Assert if GetStation(stationd_id) behaves properly
-  BOOST_CHECK_EQUAL(telescope->GetStation(0)->GetName(), "CS001HBA0");
+  const telescope::LOFAR& lofartelescope =
+      static_cast<const telescope::LOFAR&>(*telescope.get());
+  BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001HBA0");
 
   // Properties extracted from MS
   double time = 4929192878.008341;
@@ -86,13 +88,13 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                 1e-4);
   }
 
-  //   std::vector<std::complex<float>> antenna_buffer_all(
-  //       grid_response->GetBufferSize(telescope->GetNrStations()));
-  //   grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
-  //                                       frequency);
-  //   BOOST_CHECK_EQUAL(
-  //       antenna_buffer_all.size(),
-  //       std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
+  std::vector<std::complex<float>> antenna_buffer_all(
+      grid_response->GetBufferSize(telescope->GetNrStations()));
+  grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
+                                      frequency);
+  BOOST_CHECK_EQUAL(
+      antenna_buffer_all.size(),
+      std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
 
   // Test with differential beam, single
   Options options_diff_beam;
@@ -100,7 +102,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   // Load LOFAR Telescope
   std::unique_ptr<telescope::Telescope> telescope_diff_beam =
-      Load(ms, response_model, options_diff_beam);
+      Load(ms, options_diff_beam, response_model);
 
   std::unique_ptr<griddedresponse::GriddedResponse> grid_response_diff_beam =
       telescope_diff_beam->GetGriddedResponse(coord_system);
@@ -115,9 +117,4 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
     norm_jones_mat += std::norm(antenna_buffer_diff_beam[offset_22 + i]);
   }
   BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
-
-  // Print to np array
-  // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
-  // npy::SaveArrayAsNumpy("station_responses.npy", false, 4, leshape,
-  //                       antenna_buffer_single);
 }

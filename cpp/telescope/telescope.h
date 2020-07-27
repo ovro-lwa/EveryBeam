@@ -24,9 +24,7 @@
 #ifndef EVERYBEAM_TELESCOPE_TELESCOPE_H_
 #define EVERYBEAM_TELESCOPE_TELESCOPE_H_
 
-#include "../station.h"
 #include "../options.h"
-#include "../elementresponse.h"
 
 #include <vector>
 #include <memory>
@@ -61,18 +59,6 @@ class Telescope {
   virtual std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) = 0;
 
-  /**
-   * @brief Get station by index
-   *
-   * @param station_id Station index to retrieve
-   * @return Station::Ptr
-   */
-  Station::Ptr GetStation(std::size_t station_idx) const {
-    // Assert only in DEBUG mode
-    assert(station_idx < nstations_);
-    return stations_[station_idx];
-  }
-
   std::size_t GetNrStations() const { return nstations_; };
 
   Options GetOptions() const { return options_; };
@@ -82,40 +68,13 @@ class Telescope {
    * @brief Construct a new Telescope object
    *
    * @param ms MeasurementSet
-   * @param model ElementResponse model
    * @param options telescope options
    */
-  Telescope(casacore::MeasurementSet &ms, const ElementResponseModel model,
-            const Options &options)
-      : nstations_(ms.antenna().nrow()), options_(options) {
-    stations_.resize(nstations_);
-  };
-
-  /**
-   * @brief Read stations into vector
-   *
-   * @param out_it std::vector of stations
-   * @param ms measurement set
-   * @param model model
-   */
-  void ReadAllStations(const casacore::MeasurementSet &ms,
-                       const ElementResponseModel model) {
-    casacore::ROMSAntennaColumns antenna(ms.antenna());
-
-    for (std::size_t i = 0; i < antenna.nrow(); ++i) {
-      stations_[i] = ReadStation(ms, i, model);
-    }
-  };
+  Telescope(casacore::MeasurementSet &ms, const Options &options)
+      : nstations_(ms.antenna().nrow()), options_(options){};
 
   std::size_t nstations_;
   Options options_;
-  std::vector<Station::Ptr> stations_;
-
- private:
-  // Virtual method for reading a single telescope station
-  virtual Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
-                                   const std::size_t id,
-                                   const ElementResponseModel model) const = 0;
 };
 }  // namespace telescope
 }  // namespace everybeam
