@@ -61,7 +61,8 @@ class LOFARGrid final : public GriddedResponse {
    * @param freq Frequency (Hz)
    */
   void CalculateStation(std::complex<float>* buffer, double time,
-                        double frequency, const size_t station_idx) override;
+                        double frequency, const size_t station_idx,
+                        const size_t) override;
 
   /**
    * @brief Compute the Beam response for all stations in a Telescope
@@ -72,7 +73,7 @@ class LOFARGrid final : public GriddedResponse {
    * @param freq Frequency (Hz)
    */
   void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency) override;
+                            double frequency, const size_t) override;
 
  private:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;

@@ -1,4 +1,4 @@
-// load_telescope.h: Main interface function for loading a telescope
+// vlagrid.h: Class for computing the VLA circular symmetric (gridded) response.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -21,28 +21,27 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_LOAD_H_
-#define EVERYBEAM_LOAD_H_
+#ifndef EVERYBEAM_GRIDDEDRESPONSE_DISHGRID_H_
+#define EVERYBEAM_GRIDDEDRESPONSE_DISHGRID_H_
 
-#include "./telescope/telescope.h"
-#include "./telescope/lofar.h"
-#include "./telescope/dish.h"
-#include "options.h"
+#include "griddedresponse.h"
 
 namespace everybeam {
+namespace griddedresponse {
 
-/**
- * @brief Load telescope given a measurement set. Telescope is determined
- * from MeasurementSet meta-data.
- *
- * @param ms MeasurementSet
- * @param model Element response model
- * @param options Options
- * @return telescope::Telescope::Ptr
- */
-std::unique_ptr<telescope::Telescope> Load(
-    casacore::MeasurementSet &ms,
-    const Options &options = Options::GetDefault(),
-    const ElementResponseModel model = ElementResponseModel::kHamaker);
+class DishGrid final : public GriddedResponse {
+ public:
+  DishGrid(telescope::Telescope* telescope_ptr,
+           const coords::CoordinateSystem coordinate_system)
+      : GriddedResponse(telescope_ptr, coordinate_system){};
+
+  void CalculateStation(std::complex<float>* buffer, double time,
+                        double frequency, const size_t field_id,
+                        const size_t station_idx) override;
+
+  void CalculateAllStations(std::complex<float>* buffer, double time,
+                            double frequency, const size_t field_id) override;
+};
+}  // namespace griddedresponse
 }  // namespace everybeam
-#endif  // EVERYBEAM_LOAD_H_
+#endif  // EVERYBEAM_GRIDDEDRESPONSE_DISHGRID_H_

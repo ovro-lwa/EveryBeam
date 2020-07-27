@@ -59,7 +59,8 @@ class GriddedResponse {
    * @param frequency Frequency (Hz)
    */
   virtual void CalculateStation(std::complex<float>* buffer, double time,
-                                double freq, const size_t station_idx) = 0;
+                                double freq, const size_t station_idx,
+                                const size_t field_id = 0) = 0;
 
   /**
    * @brief Compute the Beam response for all stations in a Telescope
@@ -70,7 +71,8 @@ class GriddedResponse {
    * @param frequency Frequency (Hz)
    */
   virtual void CalculateAllStations(std::complex<float>* buffer, double time,
-                                    double frequency) = 0;
+                                    double frequency,
+                                    const size_t field_id = 0) = 0;
 
   std::size_t GetBufferSize(std::size_t nstations) {
     return std::size_t(nstations * width_ * height_ * 2 * 2);

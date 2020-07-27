@@ -1,4 +1,5 @@
-// load_telescope.h: Main interface function for loading a telescope
+// dishtelescope.h: Base class for dish telescopes (VLA, ATCA, ...).
+// Inherits from Telescope class.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -21,28 +22,42 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_LOAD_H_
-#define EVERYBEAM_LOAD_H_
+#ifndef EVERYBEAM_TELESCOPE_DISH_H_
+#define EVERYBEAM_TELESCOPE_DISH_H_
 
-#include "./telescope/telescope.h"
-#include "./telescope/lofar.h"
-#include "./telescope/dish.h"
-#include "options.h"
+#include "telescope.h"
+
+#include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
 
+namespace griddedresponse {
+class DishGrid;
+class GriddedResponse;
+}  // namespace griddedresponse
+
+namespace telescope {
+
 /**
- * @brief Load telescope given a measurement set. Telescope is determined
- * from MeasurementSet meta-data.
- *
- * @param ms MeasurementSet
- * @param model Element response model
- * @param options Options
- * @return telescope::Telescope::Ptr
+ * This class calculates the a-terms for dishes with a circularly symmetric
+ * response.
  */
-std::unique_ptr<telescope::Telescope> Load(
-    casacore::MeasurementSet &ms,
-    const Options &options = Options::GetDefault(),
-    const ElementResponseModel model = ElementResponseModel::kHamaker);
+class Dish : public Telescope {
+  friend class griddedresponse::DishGrid;
+
+ public:
+  Dish(casacore::MeasurementSet &ms, const Options &options);
+
+  std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
+      const coords::CoordinateSystem &coordinate_system) override;
+
+ private:
+  struct MSProperties {
+    std::vector<std::pair<double, double>> field_pointing;
+  };
+  MSProperties ms_properties_;
+};
+}  // namespace telescope
 }  // namespace everybeam
-#endif  // EVERYBEAM_LOAD_H_
+
+#endif  // EVERYBEAM_TELESCOPE_DISH_H_

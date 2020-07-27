@@ -31,14 +31,15 @@ test-and-coverage:
     - pip3 install gcovr
   script:
     - mkdir build
-    # Download LOFAR Mock measurement set
-    - ./scripts/download_lofar_ms.sh
-    - cd test_data/LOFAR_MOCK.ms/ && export LOFAR_MOCK_MS=$PWD
-    - cd ../../build
+    # Download LOFAR/VLA Mock measurement set
+    - ./scripts/download_lofar_ms.sh && cd test_data/LOFAR_MOCK.ms/ && export LOFAR_MOCK_MS=$PWD && cd ../../
+    - ./scripts/download_vla_ms.sh && cd test_data/VLA_MOCK.ms/ && export VLA_MOCK_MS=$PWD && cd ../../build
     # Build in Debug mode and add LOFAR_MOCK_MS
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS -DVLA_MOCK_MS=$VLA_MOCK_MS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
     - make install -j8
     - ctest -T test
+    # Explicit test that vla is checked
+    - ./cpp/test/runtests --log_level=test_suite --run_test=load_vla
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
   artifacts:
