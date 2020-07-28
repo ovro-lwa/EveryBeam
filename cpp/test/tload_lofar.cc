@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   std::vector<std::complex<float>> antenna_buffer_single(
       grid_response->GetBufferSize(1));
   grid_response->CalculateStation(antenna_buffer_single.data(), time, frequency,
-                                  23);
+                                  23, 0);
   BOOST_CHECK_EQUAL(antenna_buffer_single.size(),
                     std::size_t(width * height * 2 * 2));
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   std::vector<std::complex<float>> antenna_buffer_all(
       grid_response->GetBufferSize(telescope->GetNrStations()));
   grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
-                                      frequency);
+                                      frequency, 0);
   BOOST_CHECK_EQUAL(
       antenna_buffer_all.size(),
       std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   std::vector<std::complex<float>> antenna_buffer_diff_beam(
       grid_response_diff_beam->GetBufferSize(1));
   grid_response_diff_beam->CalculateStation(antenna_buffer_diff_beam.data(),
-                                            time, frequency, 15);
+                                            time, frequency, 15, 0);
 
   double norm_jones_mat = 0.;
   for (std::size_t i = 0; i < 4; ++i) {

@@ -45,7 +45,8 @@ BOOST_AUTO_TEST_CASE(load_vla) {
 
   std::vector<std::complex<float>> antenna_buffer(
       grid_response->GetBufferSize(telescope->GetNrStations()));
-  grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency);
+  grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
+                                      0);
 
   // Check that XX/YY are equal
   // Loop over pixels to check that off-diagonals are 0
