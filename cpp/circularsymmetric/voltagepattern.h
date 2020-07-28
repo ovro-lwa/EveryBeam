@@ -24,12 +24,6 @@ class VoltagePattern {
   void EvaluatePolynomial(const aocommon::UVector<double>& coefficients,
                           bool invert);
 
-  //   void Render(class PrimaryBeamImageSet& beamImages, double pixel_scale_x,
-  //               double pixel_scale_y, double phase_centre_ra, double
-  //               phase_centre_dec, double pointing_ra, double pointing_dec,
-  //               double phase_centre_dl, double phase_centre_dm, double
-  //               frequency_hz) const;
-
   void Render(std::complex<float>* aterm, size_t width, size_t height,
               double pixel_scale_x, double pixel_scale_y,
               double phase_centre_ra, double phase_centre_dec,

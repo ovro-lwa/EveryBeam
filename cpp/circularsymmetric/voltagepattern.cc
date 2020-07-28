@@ -89,61 +89,6 @@ double VoltagePattern::LmMaxSquared(double frequency_hz) const {
   return rmax * rmax;
 }
 
-// void VoltagePattern::Render(PrimaryBeamImageSet& beamImages, double
-// pixel_scale_x,
-//                             double pixel_scale_y, double phase_centre_ra,
-//                             double phase_centre_dec, double pointing_ra,
-//                             double pointing_dec, double phase_centre_dl,
-//                             double phase_centre_dm, double frequency_hz)
-//                             const {
-//   size_t width = beamImages.Width(), height = beamImages.Height();
-//   double lmMaxSq = LmMaxSquared(frequency_hz);
-
-//   UVector<double> interpolated_values;
-//   const double* vp = InterpolateValues(frequency_hz, interpolated_values);
-
-//   double factor =
-//       (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
-//   double l0, m0;
-//   ImageCoordinates::RaDecToLM(pointing_ra, pointing_dec, phase_centre_ra,
-//                               phase_centre_dec, l0, m0);
-//   l0 += phase_centre_dl;
-//   m0 += phase_centre_dm;
-//   size_t imgIndex = 0;
-// //   Logger::Debug << "Interpolating 1D voltage pattern to output
-// image...\n";
-//   for (size_t iy = 0; iy != height; ++iy) {
-//     for (size_t ix = 0; ix != width; ++ix) {
-//       double l, m, ra, dec;
-//       ImageCoordinates::XYToLM(ix, iy, pixel_scale_x, pixel_scale_y, width,
-//       height,
-//                                l, m);
-//       l += phase_centre_dl;
-//       m += m0;
-//       ImageCoordinates::LMToRaDec(l, m, phase_centre_ra, phase_centre_dec,
-//       ra, dec); ImageCoordinates::RaDecToLM(ra, dec, pointing_ra,
-//       pointing_dec, l, m); l -= l0; m -= m0; double r2 = l * l + m * m;
-//       double out; if (r2 > lmMaxSq) {
-//         out = 0.0;
-//       } else {
-//         double r = std::sqrt(r2) * factor;
-//         int indx = int(r * inverse_increment_radius_);
-//         out = vp[indx];
-//       }
-
-//       beamImages[0][imgIndex] = out;
-//       beamImages[1][imgIndex] = 0.0;
-//       beamImages[2][imgIndex] = 0.0;
-//       beamImages[3][imgIndex] = 0.0;
-//       beamImages[4][imgIndex] = 0.0;
-//       beamImages[5][imgIndex] = 0.0;
-//       beamImages[6][imgIndex] = out;
-//       beamImages[7][imgIndex] = 0.0;
-//       ++imgIndex;
-//     }
-//   }
-// }
-
 void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
                             size_t height, double pixel_scale_x,
                             double pixel_scale_y, double phase_centre_ra,

@@ -15,7 +15,7 @@ class VLABeam {
  private:
   static std::map<int, std::array<double, 5>> GetCoefficients();
   static std::map<char, double> GetFeedConf();
-  static char DetermineFeed(double freq, double freqCenter = 0.0);
+  static char DetermineFeed(double freq, double freq_center = 0.0);
   static void LimitFreqForBand(char band, double& freq);
 };
 }  // namespace circularsymmetric
