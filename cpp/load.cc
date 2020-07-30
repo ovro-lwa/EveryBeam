@@ -13,7 +13,8 @@ enum TelescopeType {
   kUnknownTelescope,
   kLofarTelescope,
   kVLATelescope,
-  kATCATelescope
+  kATCATelescope,
+  kMWATelescope
 };
 
 TelescopeType Convert(const std::string &telescope_name) {
@@ -23,6 +24,8 @@ TelescopeType Convert(const std::string &telescope_name) {
     return kVLATelescope;
   else if (telescope_name.compare(0, 4, "ATCA") == 0)
     return kATCATelescope;
+  else if (telescope_name == "MWA")
+    return kMWATelescope;
   else
     return kUnknownTelescope;
 }
@@ -53,6 +56,12 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
       std::unique_ptr<telescope::Telescope> telescope =
           std::unique_ptr<telescope::Telescope>(
               new telescope::Dish(ms, options));
+      return telescope;
+    }
+    case kMWATelescope: {
+      std::unique_ptr<telescope::Telescope> telescope =
+          std::unique_ptr<telescope::Telescope>(
+              new telescope::MWA(ms, options));
       return telescope;
     }
     default:

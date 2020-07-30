@@ -1,4 +1,4 @@
-// dish.h: Base class for dish telescopes (VLA, ATCA, ...).
+// mwa.h: Class for MWA telescopes.
 // Inherits from Telescope class.
 //
 // Copyright (C) 2020
@@ -22,42 +22,46 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_TELESCOPE_DISH_H_
-#define EVERYBEAM_TELESCOPE_DISH_H_
+#ifndef EVERYBEAM_TELESCOPE_MWA_H_
+#define EVERYBEAM_TELESCOPE_MWA_H_
 
 #include "telescope.h"
 
-#include <casacore/measures/Measures/MDirection.h>
+#include <casacore/measures/Measures/MPosition.h>
 
 namespace everybeam {
 
 namespace griddedresponse {
-class DishGrid;
+class MWAGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
 namespace telescope {
 
-/**
- * This class calculates the a-terms for dishes with a circularly symmetric
- * response.
- */
-class Dish : public Telescope {
-  friend class griddedresponse::DishGrid;
+class MWA final : public Telescope {
+  friend class griddedresponse::MWAGrid;
 
  public:
-  Dish(casacore::MeasurementSet &ms, const Options &options);
+  /**
+   * @brief Construct a new MWA object
+   *
+   * @param ms MeasurementSet
+   * @param model Element Response model
+   * @param options telescope options
+   */
+  MWA(casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
  private:
   struct MSProperties {
-    std::vector<std::pair<double, double>> field_pointing;
+    double delays[16];
+    casacore::MPosition array_position;
   };
   MSProperties ms_properties_;
 };
+
 }  // namespace telescope
 }  // namespace everybeam
-
-#endif  // EVERYBEAM_TELESCOPE_DISH_H_
+#endif  // EVERYBEAM_TELESCOPE_MWA_H_

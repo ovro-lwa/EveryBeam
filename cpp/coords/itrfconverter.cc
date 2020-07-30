@@ -7,9 +7,8 @@
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MEpoch.h>
 
-using namespace everybeam;
-using namespace everybeam::coords;
-
+namespace everybeam {
+namespace coords {
 // TODO: Initialize converter with a time (and fixed position) and convert
 // specific directions.
 //      Needed for wslean as well as for the makeeverybeam executable.
@@ -79,3 +78,5 @@ casacore::MDirection ITRFConverter::ToDirection(
     const casacore::MDirection &direction) const {
   return converter_(direction);
 }
+}  // namespace coords
+}  // namespace everybeam

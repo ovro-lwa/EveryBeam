@@ -50,6 +50,10 @@ include_directories(${CASACORE_INCLUDE_DIR})
 # Find and include OpenMP
 find_package(OpenMP REQUIRED)
 
+# Find and include Boost headers (boost::math required for MWA beam)
+find_package(Boost REQUIRED) 
+include_directories(${Boost_INCLUDE_DIR})
+
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

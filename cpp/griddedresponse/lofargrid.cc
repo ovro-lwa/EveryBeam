@@ -1,19 +1,19 @@
 #include "lofargrid.h"
 #include "./../telescope/lofar.h"
-#include "./../common/system.h"
 
 #include <aocommon/imagecoordinates.h>
+#include <aocommon/threadpool.h>
 #include <cmath>
 #include <iostream>
 
-using namespace everybeam::griddedresponse;
+using everybeam::griddedresponse::LOFARGrid;
 
 LOFARGrid::LOFARGrid(telescope::Telescope* telescope_ptr,
                      const coords::CoordinateSystem& coordinate_system)
     : GriddedResponse(telescope_ptr, coordinate_system) {
   const telescope::LOFAR& lofartelescope =
       static_cast<const telescope::LOFAR&>(*telescope_);
-  size_t ncpus = common::System::ProcessorCount();
+  size_t ncpus = aocommon::ThreadPool::NCPUs();
 
   // Set private members
   nthreads_ = std::min(ncpus, lofartelescope.nstations_);
@@ -26,8 +26,7 @@ LOFARGrid::LOFARGrid(telescope::Telescope* telescope_ptr,
 };
 
 void LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
-                                 double frequency, const size_t station_idx,
-                                 const size_t) {
+                                 double frequency, size_t station_idx, size_t) {
   const telescope::LOFAR& lofartelescope =
       static_cast<const telescope::LOFAR&>(*telescope_);
   aocommon::Lane<Job> lane(nthreads_);
@@ -63,7 +62,7 @@ void LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
 }
 
 void LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
-                                     double frequency, const size_t) {
+                                     double frequency, size_t) {
   const telescope::LOFAR& lofartelescope =
       static_cast<const telescope::LOFAR&>(*telescope_);
   aocommon::Lane<Job> lane(nthreads_);

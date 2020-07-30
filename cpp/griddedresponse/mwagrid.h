@@ -1,5 +1,4 @@
-// dish.h: Base class for dish telescopes (VLA, ATCA, ...).
-// Inherits from Telescope class.
+// mwagrid.h: Class for computing the circular symmetric (gridded) response.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -22,42 +21,32 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_TELESCOPE_DISH_H_
-#define EVERYBEAM_TELESCOPE_DISH_H_
+#ifndef EVERYBEAM_GRIDDEDRESPONSE_MWAGRID_H_
+#define EVERYBEAM_GRIDDEDRESPONSE_MWAGRID_H_
 
-#include "telescope.h"
+#include "griddedresponse.h"
+#include "../mwabeam/tilebeam2016.h"
 
-#include <casacore/measures/Measures/MDirection.h>
+#include <memory>
 
 namespace everybeam {
-
 namespace griddedresponse {
-class DishGrid;
-class GriddedResponse;
-}  // namespace griddedresponse
-
-namespace telescope {
-
-/**
- * This class calculates the a-terms for dishes with a circularly symmetric
- * response.
- */
-class Dish : public Telescope {
-  friend class griddedresponse::DishGrid;
-
+class MWAGrid final : public GriddedResponse {
  public:
-  Dish(casacore::MeasurementSet &ms, const Options &options);
+  MWAGrid(telescope::Telescope* telescope_ptr,
+          const coords::CoordinateSystem coordinate_system)
+      : GriddedResponse(telescope_ptr, coordinate_system){};
 
-  std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) override;
+  void CalculateStation(std::complex<float>* buffer, double time,
+                        double frequency, size_t station_idx,
+                        size_t field_id) override;
+
+  void CalculateAllStations(std::complex<float>* buffer, double time,
+                            double frequency, const size_t field_id) override;
 
  private:
-  struct MSProperties {
-    std::vector<std::pair<double, double>> field_pointing;
-  };
-  MSProperties ms_properties_;
+  std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;
 };
-}  // namespace telescope
+}  // namespace griddedresponse
 }  // namespace everybeam
-
-#endif  // EVERYBEAM_TELESCOPE_DISH_H_
+#endif  // EVERYBEAM_GRIDDEDRESPONSE_MWAGRID_H_

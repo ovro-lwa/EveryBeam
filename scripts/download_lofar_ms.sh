@@ -19,7 +19,7 @@ LOFAR_MOCK_ARCHIVE=LOFAR_ARCHIVE.tar.bz2
 LOFAR_MOCK_MS=LOFAR_MOCK.ms
 
 if [ ! -f "$LOFAR_MOCK_ARCHIVE" ]; then
-    wget https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
+    wget -q https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
 fi
 
 if [ -d $LOFAR_MOCK_MS ]

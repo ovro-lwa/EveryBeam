@@ -26,8 +26,8 @@
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MEpoch.h>
 
-using namespace everybeam;
-using namespace everybeam::coords;
+namespace everybeam {
+namespace coords {
 
 // ITRF position of CS002LBA, just to use a fixed reference
 const vector3r_t ITRFDirection::lofar_position_ = {
@@ -90,3 +90,5 @@ vector3r_t ITRFDirection::at(real_t time) const {
   vector3r_t itrf = {{mvITRF(0), mvITRF(1), mvITRF(2)}};
   return itrf;
 }
+}  // namespace coords
+}  // namespace everybeam

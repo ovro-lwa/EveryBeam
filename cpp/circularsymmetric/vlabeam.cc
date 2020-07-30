@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-using namespace everybeam::circularsymmetric;
+using everybeam::circularsymmetric::VLABeam;
 
 std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
                                                double freq) {
