@@ -15,19 +15,19 @@ cd ..
 mkdir -p test_data
 cd test_data/
 
-VLA_MOCK_ARCHIVE=VLA_ARCHIVE.tar.bz2
-VLA_MOCK_MS=VLA_MOCK.ms
+MWA_MOCK_ARCHIVE=MWA_ARCHIVE.tar.bz2
+MWA_MOCK_MS=MWA_MOCK.ms
 
-if [ ! -f "$VLA_MOCK_ARCHIVE" ]; then
-    wget -q https://www.astron.nl/citt/EveryBeam/small-vla-set.tar.bz2 -O $VLA_MOCK_ARCHIVE
+if [ ! -f "$MWA_MOCK_ARCHIVE" ]; then
+    wget -q www.astron.nl/citt/EveryBeam/MWA-single-timeslot.tar.bz2 -O $MWA_MOCK_ARCHIVE
 fi
 
-if [ -d $VLA_MOCK_MS ]
+if [ -d $MWA_MOCK_MS ]
 then
     echo "Directory already exists"
 else
-    mkdir $VLA_MOCK_MS
+    mkdir $MWA_MOCK_MS
 fi
 
-tar -xf $VLA_MOCK_ARCHIVE  -C $VLA_MOCK_MS --strip-components=1
-rm $VLA_MOCK_ARCHIVE
+tar -xf $MWA_MOCK_ARCHIVE  -C $MWA_MOCK_MS --strip-components=1
+rm $MWA_MOCK_ARCHIVE

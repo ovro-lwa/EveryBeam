@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                                 {0.108123, -5.36076e-05}};
 
   // Compare with everybeam
-  std::size_t offset_22 = (2 + 2 * height) * 4;
+  std::size_t offset_22 = (2 + 2 * width) * 4;
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer_single[offset_22 + i] - lofar_p22[i]) <
                 1e-4);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                                 {0.0936919, 0.000110673}};
 
   // Compare with everybeam
-  std::size_t offset_13 = (1 + 3 * height) * 4;
+  std::size_t offset_13 = (1 + 3 * width) * 4;
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer_single[offset_13 + i] - lofar_p13[i]) <
                 1e-4);
@@ -117,4 +117,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
     norm_jones_mat += std::norm(antenna_buffer_diff_beam[offset_22 + i]);
   }
   BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
+
+  // Print to np array
+  const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
+  npy::SaveArrayAsNumpy("lofar_station_responses.npy", false, 4, leshape,
+                        antenna_buffer_single);
 }

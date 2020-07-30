@@ -1,4 +1,4 @@
-// Telescope.h: Base class for computing the Telescope response.
+// telescope.h: Base class for computing the Telescope response.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)

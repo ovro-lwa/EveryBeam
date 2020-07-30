@@ -1,15 +1,12 @@
 #include "voltagepattern.h"
 
-// #include "../wsclean/logger.h"
-// #include "../wsclean/primarybeamimageset.h"
-
 #include <aocommon/imagecoordinates.h>
 
 #include <cmath>
 
-using namespace everybeam::circularsymmetric;
 using aocommon::ImageCoordinates;
 using aocommon::UVector;
+using everybeam::circularsymmetric::VoltagePattern;
 
 void VoltagePattern::EvaluatePolynomial(const UVector<double>& coefficients,
                                         bool invert) {

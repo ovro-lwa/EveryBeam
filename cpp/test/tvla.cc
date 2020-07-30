@@ -17,13 +17,14 @@ BOOST_AUTO_TEST_CASE(load_vla) {
 
   std::unique_ptr<telescope::Telescope> telescope = Load(ms);
 
-  // Assert if we indeed have a LOFAR pointer
+  // Assert if we indeed have a VLA pointer
   BOOST_CHECK(nullptr != dynamic_cast<telescope::Dish*>(telescope.get()));
 
   // Assert if correct number of stations
   std::size_t nstations = 25;
   BOOST_CHECK_EQUAL(telescope->GetNrStations(), nstations);
 
+  // Time is irrelevant for dish telescope
   double time = 0.5 * (4.90683119e+09 + 4.90684196e+09);
   double frequency = 0.5e+09;  // 1991000000.0;
   std::size_t width(16), height(16);
@@ -69,10 +70,10 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   std::vector<std::complex<float>> vla_p1012 = {
       {0.8672509, 0.}, {0, 0}, {0, 0}, {0.8672509, 0.}};
 
-  // Compute offsets with everybeam
-  std::size_t offset_00 = (0 + 0 * height) * 4;
-  std::size_t offset_23 = (2 + 3 * height) * 4;
-  std::size_t offset_1012 = (10 + 12 * height) * 4;
+  // Convert pixel to buffer offsets
+  std::size_t offset_00 = (0 + 0 * width) * 4;
+  std::size_t offset_23 = (2 + 3 * width) * 4;
+  std::size_t offset_1012 = (10 + 12 * width) * 4;
 
   // Check if results are reproduced
   BOOST_CHECK_EQUAL_COLLECTIONS(antenna_buffer.begin() + offset_00,
@@ -85,7 +86,7 @@ BOOST_AUTO_TEST_CASE(load_vla) {
                                 antenna_buffer.begin() + offset_1012 + 4,
                                 vla_p1012.begin(), vla_p1012.end());
 
-  // Print to np array
+  // Print to np array, note: this spits out the transposed grid
   const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
   npy::SaveArrayAsNumpy("vla_station_responses.npy", false, 4, leshape,
                         antenna_buffer);

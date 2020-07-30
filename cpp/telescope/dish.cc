@@ -3,8 +3,9 @@
 
 #include <casacore/measures/TableMeasures/ArrayMeasColumn.h>
 
-using namespace everybeam;
-using namespace everybeam::telescope;
+using everybeam::griddedresponse::DishGrid;
+using everybeam::griddedresponse::GriddedResponse;
+using everybeam::telescope::Dish;
 
 Dish::Dish(casacore::MeasurementSet &ms, const Options &options)
     : Telescope(ms, options) {
@@ -20,10 +21,9 @@ Dish::Dish(casacore::MeasurementSet &ms, const Options &options)
   }
 }
 
-std::unique_ptr<griddedresponse::GriddedResponse> Dish::GetGriddedResponse(
+std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(
     const coords::CoordinateSystem &coordinate_system) {
   // Get and return GriddedResponse ptr
-  std::unique_ptr<griddedresponse::GriddedResponse> grid(
-      new griddedresponse::DishGrid(this, coordinate_system));
+  std::unique_ptr<GriddedResponse> grid(new DishGrid(this, coordinate_system));
   return grid;
 };

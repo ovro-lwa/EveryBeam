@@ -7,12 +7,10 @@
 
 #include <algorithm>
 
-using namespace everybeam;
-using namespace everybeam::griddedresponse;
+using everybeam::griddedresponse::DishGrid;
 
 void DishGrid::CalculateStation(std::complex<float>* buffer, double,
-                                double frequency, const size_t,
-                                const size_t field_id) {
+                                double frequency, size_t, size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
@@ -29,7 +27,7 @@ void DishGrid::CalculateStation(std::complex<float>* buffer, double,
 };
 
 void DishGrid::CalculateAllStations(std::complex<float>* buffer, double,
-                                    double frequency, const size_t field_id) {
+                                    double frequency, size_t field_id) {
   CalculateStation(buffer, 0., frequency, 0, field_id);
 
   // Just repeat nstations times

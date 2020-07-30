@@ -36,18 +36,25 @@ namespace everybeam {
 class Options {
  public:
   Options()
-      : use_differential_beam(false),
+      : coeff_path("."),
+        use_differential_beam(false),
         use_channel_frequency(true),
-        data_column_name("DATA"){};
+        data_column_name("DATA"),
+        frequency_interpolation(false){};
 
   //! Default - empty - options class
   static Options GetDefault() { return Options(); };
 
-  // TODO? Specify path to element response coefficients file
-  // std::string coeff_path;
+  // Path to coefficients file
+  std::string coeff_path;
+
+  // LOFAR specific
   bool use_differential_beam;
   bool use_channel_frequency;
   std::string data_column_name;
+
+  // MWA specific (Lofar probably will follow)
+  bool frequency_interpolation;
 };
 }  // namespace everybeam
 #endif  // EVERYBEAM_OPTIONS_H_

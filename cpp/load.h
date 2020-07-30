@@ -27,6 +27,7 @@
 #include "./telescope/telescope.h"
 #include "./telescope/lofar.h"
 #include "./telescope/dish.h"
+#include "./telescope/mwa.h"
 #include "options.h"
 
 namespace everybeam {

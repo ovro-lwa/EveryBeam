@@ -1,7 +1,3 @@
-set(LOFAR_MOCK_MS CACHE STRING "LOFAR measurement set used for testing")
-set(VLA_MOCK_MS CACHE STRING "VLA measurement set used for testing")
-
-#------------------------------------------------------------------------------
 # Find boost
 find_package(Boost COMPONENTS unit_test_framework)
 
@@ -35,6 +31,16 @@ if(Boost_FOUND)
             ${TEST_SOURCES}
             ${CMAKE_CURRENT_SOURCE_DIR}/tvla.cc
         )
+    endif()
+
+    # Test MWA beamforming (assumes that mwa h5 coefficients file can be found!)
+    if( MWA_MOCK_MS AND MWA_COEFF_PATH )
+        set(TEST_SOURCES 
+            ${TEST_SOURCES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tmwa.cc
+        )
+    elseif( MWA_MOCK_MS OR MWA_COEFF_PATH )
+        message(WARNING "To compile the MWA test, both the MWA_MOCK_MS and MWA_COEFF_PATH needs to be set. Now skipping MWA test compiling.")
     endif()
 
     # Add test executable

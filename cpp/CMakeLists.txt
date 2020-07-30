@@ -21,10 +21,15 @@ add_library(everybeam SHARED
   station.cc
   telescope/lofar.cc
   telescope/dish.cc
+  telescope/mwa.cc
   griddedresponse/lofargrid.cc
   griddedresponse/dishgrid.cc
+  griddedresponse/mwagrid.cc
   circularsymmetric/voltagepattern.cc
   circularsymmetric/vlabeam.cc
+  # mwabeam related
+  mwabeam/tilebeam2016.cc
+  mwabeam/beam2016implementation.cc
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
