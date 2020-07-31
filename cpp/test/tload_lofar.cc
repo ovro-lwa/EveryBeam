@@ -10,17 +10,16 @@
 #include <complex>
 #include <cmath>
 
-using namespace everybeam;
+namespace everybeam {
 
 BOOST_AUTO_TEST_CASE(load_lofar) {
-  ElementResponseModel response_model = ElementResponseModel::kHamaker;
   Options options;
+  options.element_response_model = ElementResponseModel::kHamaker;
 
   casacore::MeasurementSet ms(LOFAR_MOCK_MS);
 
   // Load LOFAR Telescope
-  std::unique_ptr<telescope::Telescope> telescope =
-      Load(ms, options, response_model);
+  std::unique_ptr<telescope::Telescope> telescope = Load(ms, options);
 
   // Assert if we indeed have a LOFAR pointer
   BOOST_CHECK(nullptr != dynamic_cast<telescope::LOFAR*>(telescope.get()));
@@ -98,11 +97,12 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   // Test with differential beam, single
   Options options_diff_beam;
+  options_diff_beam.element_response_model = ElementResponseModel::kHamaker;
   options_diff_beam.use_differential_beam = true;
 
   // Load LOFAR Telescope
   std::unique_ptr<telescope::Telescope> telescope_diff_beam =
-      Load(ms, options_diff_beam, response_model);
+      Load(ms, options_diff_beam);
 
   std::unique_ptr<griddedresponse::GriddedResponse> grid_response_diff_beam =
       telescope_diff_beam->GetGriddedResponse(coord_system);
@@ -123,3 +123,4 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   npy::SaveArrayAsNumpy("lofar_station_responses.npy", false, 4, leshape,
                         antenna_buffer_single);
 }
+}  // namespace everybeam

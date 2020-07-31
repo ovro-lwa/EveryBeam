@@ -9,7 +9,7 @@
 #include <complex>
 #include <cmath>
 
-using namespace everybeam;
+namespace everybeam {
 
 BOOST_AUTO_TEST_CASE(load_mwa) {
   Options options;
@@ -87,3 +87,4 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   npy::SaveArrayAsNumpy("mwa_station_responses.npy", false, 4, leshape,
                         antenna_buffer);
 }
+}  // namespace everybeam

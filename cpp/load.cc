@@ -1,25 +1,24 @@
 #include "load.h"
-#include "options.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
+#include <string>
 #include <stdexcept>
 
-using namespace everybeam;
 namespace everybeam {
-namespace {
-enum TelescopeType {
-  kUnknownTelescope,
-  kLofarTelescope,
-  kVLATelescope,
-  kATCATelescope,
-  kMWATelescope
-};
+TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
+  // Read Telescope name and convert to enum
+  casacore::ScalarColumn<casacore::String> telescope_name_col(ms.observation(),
+                                                              "TELESCOPE_NAME");
+  std::string telescope_name = telescope_name_col(0);
+  std::for_each(telescope_name.begin(), telescope_name.end(),
+                [](char &c) { c = ::toupper(c); });
 
-TelescopeType Convert(const std::string &telescope_name) {
-  if (telescope_name == "LOFAR") return kLofarTelescope;
-  // Maybe more elegant with boost::to_upper_copy()?
+  if (telescope_name == "LOFAR")
+    return kLofarTelescope;
+  else if (telescope_name == "AARTFAAC")
+    return kAARTFAAC;
   else if (telescope_name.compare(0, 4, "EVLA") == 0)
     return kVLATelescope;
   else if (telescope_name.compare(0, 4, "ATCA") == 0)
@@ -29,21 +28,16 @@ TelescopeType Convert(const std::string &telescope_name) {
   else
     return kUnknownTelescope;
 }
-}  // namespace
 
 std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
-                                           const Options &options,
-                                           const ElementResponseModel model) {
-  // Read Telescope name and convert to enum
-  casacore::ScalarColumn<casacore::String> telescope_name_col(ms.observation(),
-                                                              "TELESCOPE_NAME");
-
-  TelescopeType telescope_name = Convert(telescope_name_col(0));
+                                           const Options &options) {
+  TelescopeType telescope_name = GetTelescopeType(ms);
   switch (telescope_name) {
+    case kAARTFAAC:
     case kLofarTelescope: {
       std::unique_ptr<telescope::Telescope> telescope =
           std::unique_ptr<telescope::Telescope>(
-              new telescope::LOFAR(ms, model, options));
+              new telescope::LOFAR(ms, options));
       return telescope;
     }
     case kATCATelescope: {
@@ -65,6 +59,8 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
       return telescope;
     }
     default:
+      casacore::ScalarColumn<casacore::String> telescope_name_col(
+          ms.observation(), "TELESCOPE_NAME");
       std::stringstream message;
       message << "The requested telescope type " << telescope_name_col(0)
               << " is not implemented.";

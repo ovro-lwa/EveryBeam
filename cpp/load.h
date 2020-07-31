@@ -31,6 +31,26 @@
 #include "options.h"
 
 namespace everybeam {
+/**
+ * @brief Available TelescopeType enums
+ *
+ */
+enum TelescopeType {
+  kUnknownTelescope,
+  kLofarTelescope,
+  kAARTFAAC,
+  kVLATelescope,
+  kATCATelescope,
+  kMWATelescope
+};
+
+/**
+ * @brief Derive the TelescopeType from a given MS
+ *
+ * @param ms
+ * @return TelescopeType
+ */
+TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms);
 
 /**
  * @brief Load telescope given a measurement set. Telescope is determined
@@ -41,9 +61,8 @@ namespace everybeam {
  * @param options Options
  * @return telescope::Telescope::Ptr
  */
-std::unique_ptr<telescope::Telescope> Load(
-    casacore::MeasurementSet &ms,
-    const Options &options = Options::GetDefault(),
-    const ElementResponseModel model = ElementResponseModel::kHamaker);
+std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
+                                           const Options &options);
 }  // namespace everybeam
+
 #endif  // EVERYBEAM_LOAD_H_

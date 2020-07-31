@@ -57,11 +57,10 @@ bool GetPreappliedBeamDirection(casacore::MeasurementSet &ms,
 }
 }  // namespace
 
-LOFAR::LOFAR(casacore::MeasurementSet &ms, const ElementResponseModel model,
-             const Options &options)
+LOFAR::LOFAR(casacore::MeasurementSet &ms, const Options &options)
     : Telescope(ms, options) {
   stations_.resize(nstations_);
-  ReadAllStations(ms, model);
+  ReadAllStations(ms, options_.element_response_model);
 
   // Populate MeasurementSet properties struct
   aocommon::BandData band(ms.spectralWindow());
