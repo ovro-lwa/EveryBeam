@@ -55,8 +55,7 @@ class LOFAR final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  LOFAR(casacore::MeasurementSet &ms, const ElementResponseModel model,
-        const Options &options);
+  LOFAR(casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;

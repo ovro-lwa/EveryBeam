@@ -19,6 +19,7 @@ Dish::Dish(casacore::MeasurementSet &ms, const Options &options)
     double pdir_dec = *(pdir.cbegin() + 1);
     ms_properties_.field_pointing.emplace_back(pdir_ra, pdir_dec);
   }
+  SetIsTimeRelevant(false);
 }
 
 std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(

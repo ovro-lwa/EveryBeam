@@ -10,12 +10,13 @@
 #include <complex>
 #include <cmath>
 
-using namespace everybeam;
+namespace everybeam {
 
 BOOST_AUTO_TEST_CASE(load_vla) {
+  Options options;
   casacore::MeasurementSet ms(VLA_MOCK_MS);
 
-  std::unique_ptr<telescope::Telescope> telescope = Load(ms);
+  std::unique_ptr<telescope::Telescope> telescope = Load(ms, options);
 
   // Assert if we indeed have a VLA pointer
   BOOST_CHECK(nullptr != dynamic_cast<telescope::Dish*>(telescope.get()));
@@ -91,3 +92,4 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   npy::SaveArrayAsNumpy("vla_station_responses.npy", false, 4, leshape,
                         antenna_buffer);
 }
+}  // namespace everybeam

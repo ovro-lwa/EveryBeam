@@ -59,8 +59,8 @@ class Telescope {
   virtual std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) = 0;
 
+  bool GetIsTimeRelevant() const { return is_time_relevant_; };
   std::size_t GetNrStations() const { return nstations_; };
-
   Options GetOptions() const { return options_; };
 
  protected:
@@ -73,8 +73,15 @@ class Telescope {
   Telescope(casacore::MeasurementSet &ms, const Options &options)
       : nstations_(ms.antenna().nrow()), options_(options){};
 
+  void SetIsTimeRelevant(bool is_time_relevant) {
+    is_time_relevant_ = is_time_relevant;
+  };
+
   std::size_t nstations_;
   Options options_;
+
+ private:
+  bool is_time_relevant_ = true;
 };
 }  // namespace telescope
 }  // namespace everybeam

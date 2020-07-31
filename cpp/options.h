@@ -25,6 +25,7 @@
 #define EVERYBEAM_OPTIONS_H_
 
 #include <string>
+#include "elementresponse.h"
 
 namespace everybeam {
 
@@ -33,28 +34,18 @@ namespace everybeam {
  * implementation!
  *
  */
-class Options {
- public:
-  Options()
-      : coeff_path("."),
-        use_differential_beam(false),
-        use_channel_frequency(true),
-        data_column_name("DATA"),
-        frequency_interpolation(false){};
-
-  //! Default - empty - options class
-  static Options GetDefault() { return Options(); };
-
+struct Options {
   // Path to coefficients file
-  std::string coeff_path;
+  std::string coeff_path = ".";
 
   // LOFAR specific
-  bool use_differential_beam;
-  bool use_channel_frequency;
-  std::string data_column_name;
+  bool use_differential_beam = false;
+  bool use_channel_frequency = true;
+  std::string data_column_name = "DATA";
+  ElementResponseModel element_response_model = ElementResponseModel::kHamaker;
 
   // MWA specific (Lofar probably will follow)
-  bool frequency_interpolation;
+  bool frequency_interpolation = false;
 };
 }  // namespace everybeam
 #endif  // EVERYBEAM_OPTIONS_H_
