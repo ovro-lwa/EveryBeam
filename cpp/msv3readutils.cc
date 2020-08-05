@@ -54,15 +54,21 @@
 
 namespace everybeam {
 
-
 constexpr Antenna::CoordinateSystem::Axes antenna_orientation = {
-    {1.0, 0.0, 0.0,},
-    {0.0, 1.0, 0.0,},
+    {
+        1.0,
+        0.0,
+        0.0,
+    },
+    {
+        0.0,
+        1.0,
+        0.0,
+    },
     {0.0, 0.0, 1.0},
 };
 
 using namespace casacore;
-
 
 vector3r_t TransformToFieldCoordinates(
     const vector3r_t &position, const Antenna::CoordinateSystem::Axes &axes);
@@ -71,8 +77,8 @@ inline Antenna::CoordinateSystem ReadCoordinateSystem(
     const casacore::Table &table, unsigned int id) {
   casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
                                                           "m");
-  casacore::ArrayQuantColumn<casacore::Double> c_axes(table, "COORDINATE_SYSTEM",
-                                                      "m");
+  casacore::ArrayQuantColumn<casacore::Double> c_axes(table,
+                                                      "COORDINATE_SYSTEM", "m");
 
   // Read antenna field center (ITRF).
   casacore::Vector<casacore::Quantity> aips_position = c_position(id);
@@ -98,11 +104,11 @@ inline Antenna::CoordinateSystem ReadCoordinateSystem(
 }
 
 BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
-                                 ElementResponse::Ptr element_response) {
-  Antenna::CoordinateSystem coordinate_system =
-      ReadCoordinateSystem(table, id);
-  BeamFormer::Ptr beam_former(new BeamFormerIdenticalAntennas(coordinate_system));
-//   BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
+                                     ElementResponse::Ptr element_response) {
+  Antenna::CoordinateSystem coordinate_system = ReadCoordinateSystem(table, id);
+  BeamFormer::Ptr beam_former(
+      new BeamFormerIdenticalAntennas(coordinate_system));
+  //   BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
 
   ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
   ROArrayColumn<Bool> c_flag(table, "ELEMENT_FLAG");
@@ -110,12 +116,12 @@ BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
   // Read element offsets and flags.
   Matrix<Quantity> aips_offset = c_offset(id);
   std::cout << aips_offset.shape() << std::endl;
-  std::cout << IPosition(2, aips_offset.nrow(),3) << std::endl;
+  std::cout << IPosition(2, aips_offset.nrow(), 3) << std::endl;
 
-  assert(aips_offset.shape().isEqual(IPosition(2, aips_offset.nrow(),3)));
+  assert(aips_offset.shape().isEqual(IPosition(2, aips_offset.nrow(), 3)));
 
   Matrix<Bool> aips_flag = c_flag(id);
-  assert(aips_flag.shape().isEqual(IPosition(2, aips_offset.nrow(),2)));
+  assert(aips_flag.shape().isEqual(IPosition(2, aips_offset.nrow(), 2)));
 
   for (size_t i = 0; i < aips_offset.nrow(); ++i) {
     std::cout << i << std::endl;
@@ -125,9 +131,10 @@ BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
     antenna_position =
         TransformToFieldCoordinates(antenna_position, coordinate_system.axes);
     Antenna::Ptr antenna;
-    Antenna::CoordinateSystem antenna_coordinate_system{
-        antenna_position, antenna_orientation};
-    antenna = Element::Ptr(new Element(antenna_coordinate_system, element_response, id));
+    Antenna::CoordinateSystem antenna_coordinate_system{antenna_position,
+                                                        antenna_orientation};
+    antenna = Element::Ptr(
+        new Element(antenna_coordinate_system, element_response, id));
 
     antenna->enabled_[0] = !aips_flag(i, 0);
     antenna->enabled_[1] = !aips_flag(i, 1);
@@ -151,7 +158,7 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id);
 // }
 
 Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
-                              const ElementResponseModel model) {
+                             const ElementResponseModel model) {
   ROMSAntennaColumns antenna(ms.antenna());
   assert(antenna.nrow() > id && !antenna.flagRow()(id));
 
@@ -168,14 +175,15 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
   Station::Ptr station(new Station(name, position, model));
 
   // Read phase reference position (if available).
-//   station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
+  //   station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
 
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
   // The Station will consist of a BeamFormer that combines the fields
   // coordinate system is ITRF
   // phase reference is station position
-  auto beam_former = ReadMSv3AntennaField(tab_phased_array, id, station->GetElementResponse());
+  auto beam_former =
+      ReadMSv3AntennaField(tab_phased_array, id, station->GetElementResponse());
 
   // TODO
   // If There is only one field, the top level beamformer is not needed
@@ -189,8 +197,8 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
       ReadCoordinateSystem(tab_phased_array, field_id);
   auto element_response = station->GetElementResponse();
   // TODO: rotate coordinate system for antenna
-  auto element =
-      Element::Ptr(new Element(coordinate_system, element_response, element_id));
+  auto element = Element::Ptr(
+      new Element(coordinate_system, element_response, element_id));
   station->SetElement(element);
 
   return station;

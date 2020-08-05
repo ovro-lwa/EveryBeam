@@ -34,12 +34,10 @@
 
 namespace everybeam {
 
-
 namespace telescope {
 
 //! LOFAR telescope class
 class OSKAR final : public Telescope {
-
  public:
   /**
    * @brief Construct a new OSKAR object
