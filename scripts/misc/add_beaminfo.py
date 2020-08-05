@@ -31,10 +31,9 @@ def fix_antenna(oskar_ms_name: str, telescope_center_itrf: np.array):
     """Make POSITION in ::ANTENNA subtable absolute"""
     anttable = pt.table(f"{oskar_ms_name}::ANTENNA", readonly=False, ack=False)
     if np.isclose(norm(anttable[0]["POSITION"]), 0, atol=1e-3):
-        logging.info("Positions are already absolute")
-        return
-    else:
         anttable.putcol("POSITION", anttable.getcol("POSITION") + telescope_center_itrf)
+    else:
+        logging.info("Positions are already absolute")
     anttable.close()
 
 
@@ -69,7 +68,7 @@ def add_phased_array_table(oskar_ms_name: str):
     position_coldesc['name'] = 'POSITION'
     phasedarraytable.addcols(position_coldesc)
 
-    coordinate_system_coldesc = pt.makearrcoldesc("COORDINATE_SYSTEM", 0.,
+    coordinate_system_coldesc = pt.makearrcoldesc("COORDINATE_AXES", 0.,
                                                   shape=[3, 3], comment="Local coordinate system",
                                                   valuetype='double')
     phasedarraytable.addcols(coordinate_system_coldesc)
