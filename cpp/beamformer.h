@@ -59,7 +59,7 @@ class BeamFormer : public Antenna {
    */
   void AddAntenna(Antenna::Ptr antenna) { antennas_.push_back(antenna); }
 
- private:
+ protected:
   vector3r_t
       local_phase_reference_position_;  // in coordinate system of Antenna
 
@@ -76,9 +76,7 @@ class BeamFormer : public Antenna {
   // "representation" of Jones matrix
   virtual diag22c_t LocalArrayFactor(real_t time, real_t freq,
                                      const vector3r_t &direction,
-                                     const Options &options) const override {
-    return {1.0, 1.0};
-  }
+                                     const Options &options) const override;
 
   // Compute the geometric response for all the antennas in the BeamFormer based
   // on the probing frequency and a specified direction (either pointing dir or

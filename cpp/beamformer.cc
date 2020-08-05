@@ -43,7 +43,8 @@ std::vector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
 std::vector<std::pair<std::complex<double>, std::complex<double>>>
 BeamFormer::ComputeWeights(const vector3r_t &pointing, double freq) const {
   // Get geometric response for pointing direction
-  auto geometric_response = ComputeGeometricResponse(freq, pointing);
+  std::vector<std::complex<double>> geometric_response =
+      ComputeGeometricResponse(freq, pointing);
 
   // Initialize and fill result
   double weight_sum[2] = {0.0, 0.0};
@@ -51,7 +52,7 @@ BeamFormer::ComputeWeights(const vector3r_t &pointing, double freq) const {
       geometric_response.size());
   for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
     // Compute conjugate of geometric response
-    auto phasor_conj = std::conj(geometric_response[idx]);
+    std::complex<double> phasor_conj = std::conj(geometric_response[idx]);
     // Compute the delays in x/y direction
     result[idx] = {phasor_conj * (1.0 * antennas_[idx]->enabled_[0]),
                    phasor_conj * (1.0 * antennas_[idx]->enabled_[1])};
@@ -72,16 +73,20 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
                                       const vector3r_t &direction,
                                       const Options &options) const {
   // Weights based on pointing direction of beam
-  auto weights = ComputeWeights(options.station0, options.freq0);
+  std::vector<std::pair<std::complex<double>, std::complex<double>>> weights =
+      ComputeWeights(options.station0, options.freq0);
   // Weights based on direction of interest
-  auto geometric_response = ComputeGeometricResponse(freq, direction);
+  std::vector<std::complex<double>> geometric_response =
+      ComputeGeometricResponse(freq, direction);
 
   matrix22c_t result = {0};
   for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
-    auto antenna = antennas_[antenna_idx];
-    auto antenna_weight = weights[antenna_idx];
-    auto antenna_geometric_reponse = geometric_response[antenna_idx];
+    Antenna::Ptr antenna = antennas_[antenna_idx];
+    std::pair<std::complex<double>, std::complex<double>> antenna_weight =
+        weights[antenna_idx];
+    std::complex<double> antenna_geometric_reponse =
+        geometric_response[antenna_idx];
 
     matrix22c_t antenna_response =
         antenna->Response(time, freq, direction, options);
@@ -96,4 +101,30 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
   }
   return result;
 }
+
+diag22c_t BeamFormer::LocalArrayFactor(real_t time, real_t freq,
+                                       const vector3r_t &direction,
+                                       const Options &options) const {
+  // Weights based on pointing direction of beam
+  std::vector<std::pair<std::complex<double>, std::complex<double>>> weights =
+      ComputeWeights(options.station0, options.freq0);
+  // Weights based on direction of interest
+  std::vector<std::complex<double>> geometric_response =
+      ComputeGeometricResponse(freq, direction);
+
+  diag22c_t result = {0};
+  for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
+       ++antenna_idx) {
+    Antenna::Ptr antenna = antennas_[antenna_idx];
+    std::pair<std::complex<double>, std::complex<double>> antenna_weight =
+        weights[antenna_idx];
+    std::complex<double> antenna_geometric_reponse =
+        geometric_response[antenna_idx];
+
+    result[0] += antenna_weight.first * antenna_geometric_reponse;
+    result[1] += antenna_weight.second * antenna_geometric_reponse;
+  }
+  return result;
+}
+
 }  // namespace everybeam

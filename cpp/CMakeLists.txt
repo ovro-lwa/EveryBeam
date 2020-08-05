@@ -13,6 +13,7 @@ add_library(everybeam SHARED
   antenna.cc
   elementresponse.cc
   beamformer.cc
+  beamformeridenticalantennas.cc
   element.cc
   load.cc
   coords/itrfconverter.cc
@@ -44,6 +45,7 @@ install (
 install (FILES
   antenna.h
   beamformer.h
+  beamformeridenticalantennas.h
   element.h
   elementresponse.h
   lofarreadutils.h
