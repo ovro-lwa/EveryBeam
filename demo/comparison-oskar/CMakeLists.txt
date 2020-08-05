@@ -1,8 +1,14 @@
 #------------------------------------------------------------------------------
 # CMake file for compiling a comparison between OSKAR and EveryBeam
 add_executable(comparison-oskar-generate-beampattern main.cpp)
-
 target_link_libraries(comparison-oskar-generate-beampattern oskar)
+
+add_executable(comparison-oskar-station-response stationresponse.cpp)
+target_link_libraries(comparison-oskar-station-response everybeam)
+
+# Required to get the config.h header
+target_include_directories(comparison-oskar-station-response PRIVATE "${CMAKE_BINARY_DIR}")
+
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/telescope.tm/layout.txt"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/telescope.tm")
