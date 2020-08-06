@@ -18,7 +18,8 @@ namespace everybeam {
 namespace coords {
 /**
  * @brief Class providing utilities for coordinate transformations
- * to and from ITRF (International Terrestrial Reference Frame)
+ * to and from ITRF (International Terrestrial Reference Frame).
+ * NOTE: this class is not thread-safe due to casacore dependencies.
  *
  */
 class ITRFConverter {
