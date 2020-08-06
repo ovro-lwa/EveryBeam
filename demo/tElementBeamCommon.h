@@ -82,9 +82,6 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Print frequency
   std::clog << "Frequency: " << frequency * 1e-6 << " Mhz" << std::endl;
 
-  // Set number of stations to 1
-  size_t nr_stations = 1;
-
   // Read number of timesteps
   size_t nr_timesteps = ms.nrow();
   std::clog << "Number of timesteps: " << nr_timesteps << std::endl;
@@ -112,7 +109,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   std::clog << "DEC: " << zenithDec << std::endl;
 
   // Imaging parameters
-  float image_size = M_PI;   // in radians
+  // float image_size = M_PI;   // in radians
   size_t subgrid_size = 32;  // in pixels
 
   // Compute element beams from theta, phi
