@@ -65,7 +65,8 @@ cmake_policy(SET CMP0074 NEW)
 endif()
 
 # Set compile options
-add_compile_options(-std=c++11 "${OpenMP_CXX_FLAGS}" -Wall -Wl,--no-undefined)
+add_compile_options(-std=c++11 "${OpenMP_CXX_FLAGS}" -Wall)
+string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_options(-DNDEBUG)

@@ -33,8 +33,8 @@ add_library(everybeam SHARED
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
-target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
+target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES})
 
 install (
   TARGETS everybeam

@@ -34,6 +34,6 @@ int main(int argc, char** argv){
         }
     }
 
-    const long unsigned leshape [] = {(long unsigned int) N, N, 2, 2};
+    const long unsigned leshape [] = {(long unsigned int) N, (long unsigned int) N, 2, 2};
     npy::SaveArrayAsNumpy("response.npy", false, 4, leshape, result);
 }
