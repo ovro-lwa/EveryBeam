@@ -33,19 +33,20 @@ void LOFARGrid::CalculateStation(std::complex<float>* buffer, double time,
   lane_ = &lane;
 
   SetITRFVectors(time);
-  double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
-  // Dummy calculation of gain matrix, needed for multi-threading
-  inverse_central_gain_.resize(1);
-  matrix22c_t gain_matrix = lofartelescope.GetStation(station_idx)
-                                ->Response(time, frequency, diff_beam_centre_,
-                                           sb_freq, station0_, tile0_);
 
-  inverse_central_gain_[0][0] = gain_matrix[0][0];
-  inverse_central_gain_[0][1] = gain_matrix[0][1];
-  inverse_central_gain_[0][2] = gain_matrix[1][0];
-  inverse_central_gain_[0][3] = gain_matrix[1][1];
-  if (!inverse_central_gain_[0].Invert()) {
-    inverse_central_gain_[0] = aocommon::MC2x2F::Zero();
+  if (lofartelescope.GetOptions().use_differential_beam) {
+    double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
+    inverse_central_gain_.resize(1);
+    matrix22c_t gain_matrix = lofartelescope.GetStation(station_idx)
+                                  ->Response(time, frequency, diff_beam_centre_,
+                                             sb_freq, station0_, tile0_);
+    inverse_central_gain_[0][0] = gain_matrix[0][0];
+    inverse_central_gain_[0][1] = gain_matrix[0][1];
+    inverse_central_gain_[0][2] = gain_matrix[1][0];
+    inverse_central_gain_[0][3] = gain_matrix[1][1];
+    if (!inverse_central_gain_[0].Invert()) {
+      inverse_central_gain_[0] = aocommon::MC2x2F::Zero();
+    }
   }
 
   for (size_t i = 0; i != nthreads_; ++i) {
@@ -70,14 +71,12 @@ void LOFARGrid::CalculateAllStations(std::complex<float>* buffer, double time,
 
   SetITRFVectors(time);
 
-  double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
-
-  // Dummy loop, needed for multi-threading
-  inverse_central_gain_.resize(lofartelescope.GetNrStations());
-  for (size_t i = 0; i != lofartelescope.GetNrStations(); ++i) {
-    matrix22c_t gain_matrix = lofartelescope.GetStation(i)->Response(
-        time, frequency, diff_beam_centre_, sb_freq, station0_, tile0_);
-    if (lofartelescope.GetOptions().use_differential_beam) {
+  if (lofartelescope.GetOptions().use_differential_beam) {
+    double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
+    inverse_central_gain_.resize(lofartelescope.GetNrStations());
+    for (size_t i = 0; i != lofartelescope.GetNrStations(); ++i) {
+      matrix22c_t gain_matrix = lofartelescope.GetStation(i)->Response(
+          time, frequency, diff_beam_centre_, sb_freq, station0_, tile0_);
       inverse_central_gain_[i][0] = gain_matrix[0][0];
       inverse_central_gain_[i][1] = gain_matrix[0][1];
       inverse_central_gain_[i][2] = gain_matrix[1][0];

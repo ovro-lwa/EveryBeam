@@ -16,7 +16,7 @@ clang-format:
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   before_script:
     - apt-get -y install python3-pip
-    - pip3 install clang-format
+    - pip3 install clang-format==9.0.0
   script: 
     - ./scripts/run-clang-format.sh
 

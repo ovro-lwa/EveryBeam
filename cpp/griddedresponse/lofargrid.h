@@ -92,6 +92,12 @@ class LOFARGrid final : public GriddedResponse {
   };
   aocommon::Lane<Job>* lane_;
 
+  /**
+   * @brief Method for computing the ITRF-vectors.
+   * NOTE: method not thread-safe due to casacore dependencies.
+   *
+   * @param time
+   */
   void SetITRFVectors(double time);
 
   void CalcThread(std::complex<float>* buffer, double time, double frequency);
