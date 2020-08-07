@@ -11,8 +11,7 @@ using namespace everybeam;
 using namespace everybeam::telescope;
 using namespace casacore;
 
-OSKAR::OSKAR(MeasurementSet &ms,
-             const Options &options)
+OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
     : Telescope(ms, options) {
   stations_.resize(nstations_);
   ReadAllStations(ms, options_.element_response_model);

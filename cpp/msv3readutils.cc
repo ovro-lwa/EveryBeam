@@ -78,7 +78,8 @@ vector3r_t TransformToFieldCoordinates(
 //   casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
 //                                                           "m");
 //   casacore::ArrayQuantColumn<casacore::Double> c_axes(table,
-//                                                       "COORDINATE_SYSTEM", "m");
+//                                                       "COORDINATE_SYSTEM",
+//                                                       "m");
 //
 //   // Read antenna field center (ITRF).
 //   casacore::Vector<casacore::Quantity> aips_position = c_position(id);
@@ -105,7 +106,8 @@ vector3r_t TransformToFieldCoordinates(
 
 BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
                                      ElementResponse::Ptr element_response) {
-  Antenna::CoordinateSystem coordinate_system = common::ReadCoordinateSystem(table, id);
+  Antenna::CoordinateSystem coordinate_system =
+      common::ReadCoordinateSystem(table, id);
   BeamFormer::Ptr beam_former(
       new BeamFormerIdenticalAntennas(coordinate_system));
   //   BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));

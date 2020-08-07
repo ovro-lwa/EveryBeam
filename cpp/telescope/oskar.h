@@ -48,8 +48,7 @@ class OSKAR final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  OSKAR(casacore::MeasurementSet &ms,
-        const Options &options);
+  OSKAR(casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
@@ -66,7 +65,6 @@ class OSKAR final : public Telescope {
     return stations_[station_idx];
   }
 
-
  private:
   void ReadAllStations(const casacore::MeasurementSet &ms,
                        const ElementResponseModel model) {
@@ -82,7 +80,6 @@ class OSKAR final : public Telescope {
                            const ElementResponseModel model) const;
 
   std::vector<Station::Ptr> stations_;
-
 };
 }  // namespace telescope
 }  // namespace everybeam

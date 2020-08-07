@@ -9,6 +9,8 @@
 #include "load.h"
 #include "options.h"
 #include "config.h"
+#include "coords/coordutils.h"
+#include "coords/itrfconverter.h"
 
 using namespace everybeam;
 
@@ -24,9 +26,24 @@ int main(int argc, char** argv){
         ms.field(),
         casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
 
-    auto preapplied_beam_dir = referenceDirColumn(0);
+    auto reference_dir = referenceDirColumn(0);
 
-    std::cout << preapplied_beam_dir << std::endl;
+    std::cout << ms.nrow() << std::endl;;
+    auto unique_times_table = ms.sort("TIME", casacore::Sort::Ascending, casacore::Sort::NoDuplicates);
+    std::cout << unique_times_table.nrow() << std::endl;
+
+    casacore::ScalarColumn<double> time_column(ms, "TIME");
+
+    real_t time = time_column(0);
+    std::cout << "time: " << time << std::endl;
+
+    std::cout << reference_dir << std::endl;
+
+    vector3r_t station0 ;
+    vector3r_t tile0;
+    coords::ITRFConverter itrf_converter(time);
+    coords::SetITRFVector(itrf_converter.ToDirection(reference_dir), station0);
+    coords::SetITRFVector(itrf_converter.ToDirection(reference_dir), tile0);
 
     // Load OSKAR Telescope
     auto telescope = Load(ms, options);
@@ -39,9 +56,6 @@ int main(int argc, char** argv){
     auto p = antenna->coordinate_system_.axes.p;
     auto q = antenna->coordinate_system_.axes.q;
     auto r = antenna->coordinate_system_.axes.r;
-
-    const vector3r_t station0 = r;
-    const vector3r_t tile0 = r;
 
 
     double freq = 50e6;
@@ -67,12 +81,6 @@ int main(int argc, char** argv){
 
             double z = sqrt(1.0 - x*x - y*y);
 
-
-//             double theta = asin(sqrt(x*x + y*y));
-//             double phi = atan2(y,x);
-
-            real_t time = 0;
-            real_t freq = 50e6;
             const vector3r_t direction = {
                 x*p[0] + y*q[0] + z*r[0],
                 x*p[1] + y*q[1] + z*r[1],
