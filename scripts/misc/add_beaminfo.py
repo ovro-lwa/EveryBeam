@@ -72,7 +72,7 @@ def add_phased_array_table(oskar_ms_name: str):
                                                   shape=[3, 3], comment="Local coordinate system",
                                                   valuetype='double')
     phasedarraytable.addcols(coordinate_system_coldesc)
-    pt.taql("UPDATE $phasedarraytable SET COORDINATE_SYSTEM=0.");
+    pt.taql("UPDATE $phasedarraytable SET COORDINATE_AXES=0.");
 
     element_offset_coldesc = pt.makearrcoldesc("ELEMENT_OFFSET", 0.,
                                                ndim=2, comment="Offset per element",
@@ -113,7 +113,7 @@ def fill_phased_array(oskar_ms_name: str, oskar_telescope_dir: str):
     phasedarraytable = pt.table(f"{oskar_ms_name}::PHASED_ARRAY", readonly=False, ack=False)
 
     for stationnr in range(len(phasedarraytable)):
-        phasedarraytable.putcell("COORDINATE_SYSTEM", stationnr, local_to_itrf_projection_matrix.T)
+        phasedarraytable.putcell("COORDINATE_AXES", stationnr, local_to_itrf_projection_matrix.T)
         phasedarraytable.putcell("ELEMENT_OFFSET", stationnr, element_locations_itrf)
         phasedarraytable.putcell("ELEMENT_FLAG", stationnr, all_unflagged)
 

@@ -16,14 +16,23 @@ int main(int argc, char** argv){
 
     ElementResponseModel response_model = ElementResponseModel::kOSKARSphericalWave;
     Options options;
+    options.element_response_model = response_model;
 
     casacore::MeasurementSet ms("/home/vdtol/skalowmini/skalowmini-coef1.MS");
 
-    // Load OSKAR Telescope
-    std::unique_ptr<telescope::Telescope> telescope =
-        Load(ms, response_model, options);
+    casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
+        ms.field(),
+        casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
 
-    Station::Ptr station = telescope->GetStation(0);
+    auto preapplied_beam_dir = referenceDirColumn(0);
+
+    std::cout << preapplied_beam_dir << std::endl;
+
+    // Load OSKAR Telescope
+    auto telescope = Load(ms, options);
+    auto &oskar_telescope = *dynamic_cast<telescope::OSKAR*>(telescope.get());
+
+    Station::Ptr station = oskar_telescope.GetStation(0);
 
     Antenna::Ptr antenna = station->GetAntenna();
 
@@ -77,7 +86,6 @@ int main(int argc, char** argv){
             result_arr[i][j][1][0] = result[1][0];
             result_arr[i][j][1][1] = result[1][1];
 
-//             element_response.Response(0, freq, theta, phi, result_arr[i][j]);
         }
     }
 

@@ -25,6 +25,8 @@
 #ifndef EVERYBEAM_TELESCOPE_OSKAR_H_
 #define EVERYBEAM_TELESCOPE_OSKAR_H_
 
+#include "../station.h"
+#include "../elementresponse.h"
 #include "telescope.h"
 
 #include <casacore/measures/Measures/MPosition.h>
@@ -46,16 +48,41 @@ class OSKAR final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  OSKAR(casacore::MeasurementSet &ms, const ElementResponseModel model,
+  OSKAR(casacore::MeasurementSet &ms,
         const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
+  /**
+   * @brief Get station by index
+   *
+   * @param station_id Station index to retrieve
+   * @return Station::Ptr
+   */
+  Station::Ptr GetStation(std::size_t station_idx) const {
+    // Assert only in DEBUG mode
+    assert(station_idx < nstations_);
+    return stations_[station_idx];
+  }
+
+
  private:
+  void ReadAllStations(const casacore::MeasurementSet &ms,
+                       const ElementResponseModel model) {
+    casacore::ROMSAntennaColumns antenna(ms.antenna());
+
+    for (std::size_t i = 0; i < antenna.nrow(); ++i) {
+      stations_[i] = ReadStation(ms, i, model);
+    }
+  };
+
   Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                            const std::size_t id,
-                           const ElementResponseModel model) const override;
+                           const ElementResponseModel model) const;
+
+  std::vector<Station::Ptr> stations_;
+
 };
 }  // namespace telescope
 }  // namespace everybeam

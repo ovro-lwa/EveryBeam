@@ -25,8 +25,9 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
     return kATCATelescope;
   else if (telescope_name == "MWA")
     return kMWATelescope;
-  else if (str.rfind("OSKAR", 0) == 0)
-    return kOskarTelescope;
+  // check if telescope_name starts with "OSKAR"
+  else if (telescope_name.rfind("OSKAR", 0) == 0)
+    return kOSKARTelescope;
   else
     return kUnknownTelescope;
 }
@@ -60,10 +61,10 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
               new telescope::MWA(ms, options));
       return telescope;
     }
-    case kOskarTelescope: {
+    case kOSKARTelescope: {
       std::unique_ptr<telescope::Telescope> telescope =
           std::unique_ptr<telescope::Telescope>(
-              new telescope::OSKAR(ms, model, options));
+              new telescope::OSKAR(ms, options));
       return telescope;
     }
     default:
