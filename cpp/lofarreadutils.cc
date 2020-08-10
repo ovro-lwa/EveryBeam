@@ -22,6 +22,7 @@
 // $Id$
 
 #include "lofarreadutils.h"
+#include "beamformeridenticalantennas.h"
 #include "common/mathutils.h"
 #include "common/casautils.h"
 
@@ -146,7 +147,8 @@ vector3r_t TransformToFieldCoordinates(
 BeamFormer::Ptr MakeTile(unsigned int id, const vector3r_t &position,
                          const TileConfig &tile_config,
                          ElementResponse::Ptr element_response) {
-  BeamFormer::Ptr tile = BeamFormer::Ptr(new BeamFormer(position));
+  BeamFormer::Ptr tile =
+      BeamFormer::Ptr(new BeamFormerIdenticalAntennas(position));
 
   for (unsigned int id = 0; id < tile_config.size(); id++) {
     vector3r_t antenna_position = tile_config[id];
@@ -175,7 +177,8 @@ BeamFormer::Ptr ReadAntennaField(const Table &table, unsigned int id,
   //     coordinate_system.axes.q[2] << std::endl; std::cout << "  axes.r: " <<
   //     coordinate_system.axes.r[0] << ", " << coordinate_system.axes.r[1] <<
   //     ", " << coordinate_system.axes.r[2] << std::endl;
-  BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
+  BeamFormer::Ptr beam_former(
+      new BeamFormerIdenticalAntennas(coordinate_system));
 
   ROScalarColumn<String> c_name(table, "NAME");
   ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
