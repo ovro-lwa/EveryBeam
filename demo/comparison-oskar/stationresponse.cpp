@@ -20,7 +20,8 @@ int main(int argc, char** argv){
     Options options;
     options.element_response_model = response_model;
 
-    casacore::MeasurementSet ms("/home/vdtol/skalowmini/skalowmini-coef1.MS");
+//     casacore::MeasurementSet ms("/home/vdtol/skalowmini/skalowmini-coef1.MS");
+    casacore::MeasurementSet ms("/home/vdtol//src/EveryBeam/build-release/demo/comparison-oskar/blah.ms");
 
     casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
         ms.field(),
@@ -88,11 +89,16 @@ int main(int argc, char** argv){
             };
             real_t freq0 = 50e6;
 
-            auto result = station->Response(time, freq, direction, freq0, station0, tile0);
-            result_arr[i][j][0][0] = result[0][0];
-            result_arr[i][j][0][1] = result[0][1];
-            result_arr[i][j][1][0] = result[1][0];
-            result_arr[i][j][1][1] = result[1][1];
+//             auto result = station->Response(time, freq, direction, freq0, station0, tile0);
+//             result_arr[i][j][0][0] = result[0][0];
+//             result_arr[i][j][0][1] = result[0][1];
+//             result_arr[i][j][1][0] = result[1][0];
+//             result_arr[i][j][1][1] = result[1][1];
+            auto result = station->ArrayFactor(time, freq, direction, freq0, station0, tile0);
+            result_arr[i][j][0][0] = result[0];
+            result_arr[i][j][0][1] = 0.0;
+            result_arr[i][j][1][0] = 0.0;
+            result_arr[i][j][1][1] = result[1];
 
         }
     }
