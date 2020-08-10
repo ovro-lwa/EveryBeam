@@ -39,13 +39,13 @@ def fix_antenna(oskar_ms_name: str, telescope_center_itrf: np.array):
 
 def add_array_center(oskar_ms_name: str, telescope_center_itrf: np.array):
     """Add ARRAY_CENTER column to ::OBSERVATION subtable"""
-    anttable = pt.table(f"{oskar_ms_name}::ANTENNA", ack=False)
-    coldesc = anttable.getcoldesc("POSITION")
-    coldesc["name"] = "ARRAY_CENTER"
-    coldesc["comment"] = "Reference position for array"
-
     obstable = pt.table(f"{oskar_ms_name}::OBSERVATION", readonly=False, ack=False)
-    #obstable.addcols(coldesc)
+    if 'ARRAY_CENTER' not in obstable.colnames():
+        anttable = pt.table(f"{oskar_ms_name}::ANTENNA", ack=False)
+        coldesc = anttable.getcoldesc("POSITION")
+        coldesc["name"] = "ARRAY_CENTER"
+        coldesc["comment"] = "Reference position for array"
+        obstable.addcols(coldesc)
 
     obstable.putcol("ARRAY_CENTER", np.array([telescope_center_itrf]))
     obstable.close()
