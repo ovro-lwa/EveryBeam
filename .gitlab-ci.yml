@@ -44,6 +44,7 @@ test-and-coverage:
     reports:
       # NOE: artifacts only work with relative paths...
       cobertura: build/coverage.xml
+      junit: build/cpp/test/unittests.xml
 
 build-everybeam:
   stage: build
