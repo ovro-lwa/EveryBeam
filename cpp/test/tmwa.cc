@@ -9,7 +9,15 @@
 #include <complex>
 #include <cmath>
 
-namespace everybeam {
+using everybeam::Load;
+using everybeam::Options;
+using everybeam::coords::CoordinateSystem;
+using everybeam::griddedresponse::GriddedResponse;
+using everybeam::griddedresponse::MWAGrid;
+using everybeam::telescope::MWA;
+using everybeam::telescope::Telescope;
+
+BOOST_AUTO_TEST_SUITE(tmwa)
 
 BOOST_AUTO_TEST_CASE(load_mwa) {
   Options options;
@@ -18,10 +26,10 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
 
   casacore::MeasurementSet ms(MWA_MOCK_MS);
 
-  std::unique_ptr<telescope::Telescope> telescope = Load(ms, options);
+  std::unique_ptr<Telescope> telescope = Load(ms, options);
 
   // Assert if we indeed have a MWA pointer
-  BOOST_CHECK(nullptr != dynamic_cast<telescope::MWA*>(telescope.get()));
+  BOOST_CHECK(nullptr != dynamic_cast<MWA*>(telescope.get()));
 
   // Assert if correct number of stations
   std::size_t nstations = 128;
@@ -32,19 +40,18 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   std::size_t width(16), height(16);
   double ra(2.18166148), dec(-0.74612826), dl(1. * M_PI / 180.),
       dm(1. * M_PI / 180.), shift_l(0.), shift_m(0.);
-  coords::CoordinateSystem coord_system = {.width = width,
-                                           .height = height,
-                                           .ra = ra,
-                                           .dec = dec,
-                                           .dl = dl,
-                                           .dm = dm,
-                                           .phase_centre_dl = shift_l,
-                                           .phase_centre_dm = shift_m};
+  CoordinateSystem coord_system = {.width = width,
+                                   .height = height,
+                                   .ra = ra,
+                                   .dec = dec,
+                                   .dl = dl,
+                                   .dm = dm,
+                                   .phase_centre_dl = shift_l,
+                                   .phase_centre_dm = shift_m};
 
-  std::unique_ptr<griddedresponse::GriddedResponse> grid_response =
+  std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
-  BOOST_CHECK(nullptr !=
-              dynamic_cast<griddedresponse::MWAGrid*>(grid_response.get()));
+  BOOST_CHECK(nullptr != dynamic_cast<MWAGrid*>(grid_response.get()));
 
   std::vector<std::complex<float>> antenna_buffer(
       grid_response->GetBufferSize(telescope->GetNrStations()));
@@ -87,4 +94,5 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   npy::SaveArrayAsNumpy("mwa_station_responses.npy", false, 4, leshape,
                         antenna_buffer);
 }
-}  // namespace everybeam
+
+BOOST_AUTO_TEST_SUITE_END()

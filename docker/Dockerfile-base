@@ -1,34 +1,13 @@
-#
 # base
-#
 FROM ubuntu:18.04
-RUN apt-get update
-RUN apt-get upgrade -y
-
-#
+RUN apt-get update && apt-get upgrade -y && \
 # install astronomy packages
-#
-RUN apt-get -y install casacore-dev
-RUN apt-get -y install python-casacore
-RUN apt-get -y install aoflagger-dev
-RUN apt-get -y install libcfitsio-dev
-RUN apt-get -y install wcslib-dev
-
-#
+    apt-get -y install casacore-dev python-casacore \
+        aoflagger-dev libcfitsio-dev wcslib-dev
 # install misc packages
-#
-RUN apt-get update
-RUN apt-get -y install wget git make cmake g++ doxygen graphviz
-
-#
+RUN apt-get update && \
+    apt-get -y install wget git make cmake g++ doxygen graphviz \
 # install dependencies
-#
-RUN apt-get -y install libboost-all-dev
-RUN apt-get -y install libhdf5-dev
-RUN apt-get -y install libfftw3-dev
-RUN apt-get -y install libblas-dev
-RUN apt-get -y install liblapack-dev
-RUN apt-get -y install libgsl-dev
-RUN apt-get -y install libxml2-dev
-RUN apt-get -y install libpng-dev
-RUN apt-get -y install libgtkmm-3.0-dev
+        libboost-all-dev libhdf5-dev libfftw3-dev \
+        libblas-dev liblapack-dev libgsl-dev libxml2-dev \
+        libpng-dev libgtkmm-3.0-dev

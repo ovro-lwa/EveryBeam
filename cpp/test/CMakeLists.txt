@@ -1,55 +1,68 @@
 # Find boost
 find_package(Boost COMPONENTS unit_test_framework)
 
-add_executable(taocommon taocommon.cc)
-add_executable(teigen teigen.cc)
-add_executable(tpybind11 tpybind11.cc)
-target_link_libraries(tpybind11 PRIVATE pybind11::embed)
+# Set cache values if not specified
+set(LOFAR_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/LOFAR_MOCK.ms CACHE PATH "")
+set(VLA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/VLA_MOCK.ms CACHE PATH "")
+set(MWA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/MWA_MOCK.ms CACHE PATH "")
+set(MWA_COEFF_PATH ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_pattern.h5 CACHE PATH "")
 
-# Add test
-add_test(submodule-tests taocommon)
-add_test(submodule-tests teigen)
-add_test(submodule-tests tpybind11)
+configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
 #------------------------------------------------------------------------------
-# Add tests if Boost found
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIR})
-    set(TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/runtests.cc)
+set(TEST_FILENAMES
+  runtests.cc
+  tlofar.cc
+  tmwa.cc
+  tstation.cc
+  tvla.cc
+)
 
-    # Test LOFAR beamforming
-    if( LOFAR_MOCK_MS )        
-        set(TEST_SOURCES 
-            ${TEST_SOURCES}
-            ${CMAKE_CURRENT_SOURCE_DIR}/tload_lofar.cc
-        )
-    endif()
+# Add boost dynamic link flag for all test files.
+# https://www.boost.org/doc/libs/1_66_0/libs/test/doc/html/boost_test/usage_variants.html
+# Without this flag, linking is incorrect and boost performs duplicate delete()
+# calls after running all tests, in the cleanup phase.
+set_source_files_properties(
+  ${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK"
+)
 
-    # Test VLA beamforming
-    if( VLA_MOCK_MS )
-        set(TEST_SOURCES 
-            ${TEST_SOURCES}
-            ${CMAKE_CURRENT_SOURCE_DIR}/tvla.cc
-        )
-    endif()
+add_test(
+  NAME download_lofar_ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_ms.sh
+)
+add_test(
+  NAME download_vla_ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
+)
+add_test(
+  NAME download_mwa_ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
+)
+add_test(
+  NAME download_mwa_coeff
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
+)
+set_tests_properties(
+  download_lofar_ms download_vla_ms download_mwa_ms download_mwa_coeff
+  PROPERTIES FIXTURES_SETUP mocks
+)
 
-    # Test MWA beamforming (assumes that mwa h5 coefficients file can be found!)
-    if( MWA_MOCK_MS AND MWA_COEFF_PATH )
-        set(TEST_SOURCES 
-            ${TEST_SOURCES}
-            ${CMAKE_CURRENT_SOURCE_DIR}/tmwa.cc
-        )
-    elseif( MWA_MOCK_MS OR MWA_COEFF_PATH )
-        message(WARNING "To compile the MWA test, both the MWA_MOCK_MS and MWA_COEFF_PATH needs to be set. Now skipping MWA test compiling.")
-    endif()
+add_executable(
+  unittests EXCLUDE_FROM_ALL
+  ${TEST_FILENAMES}
+)
+target_link_libraries(unittests everybeam ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+# Required to get the config.h header
+target_include_directories(unittests PRIVATE "${CMAKE_BINARY_DIR}")
 
-    # Add test executable
-    add_executable(runtests ${TEST_SOURCES})
-    target_link_libraries(runtests everybeam ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-    # Required to get the config.h header
-    target_include_directories(runtests PRIVATE "${CMAKE_BINARY_DIR}")
-
-    add_test(runtests runtests)
-endif()
-
-
+# Add tests for ctest
+add_test(buildunittests ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target unittests)
+set_tests_properties(buildunittests PROPERTIES FIXTURES_SETUP unittests)
+add_test(
+  NAME unittests
+  COMMAND unittests -f JUNIT -k unittests.xml --catch_system_error=yes
+)
+set_tests_properties(
+  unittests PROPERTIES LABELS unit
+  FIXTURES_REQUIRED "unittests;mocks"
+)

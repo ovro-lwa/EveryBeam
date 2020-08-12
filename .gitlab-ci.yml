@@ -32,21 +32,11 @@ test-and-coverage:
   script:
     # Download casacore wsrt measures
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
-    # Download LOFAR/VLA/MWA Mock measurement set
-    - ./scripts/download_lofar_ms.sh && export LOFAR_MOCK_MS=$PWD/test_data/LOFAR_MOCK.ms/
-    - ./scripts/download_vla_ms.sh && export VLA_MOCK_MS=$PWD/test_data/VLA_MOCK.ms/
-    - ./scripts/download_mwa_ms.sh && export MWA_MOCK_MS=$PWD/test_data/MWA_MOCK.ms/
-    - ./scripts/download_mwa_coeff.sh && export MWA_COEFF_PATH=$PWD/test_data/mwa_full_embedded_element_pattern.h5
-    # Build in Debug mode and add LOFAR_MOCK_MS
+    # Build in Debug mode
     - mkdir build && cd build
-    - | 
-      cmake \
-      -DCMAKE_INSTALL_PREFIX=.. -DLOFAR_MOCK_MS=$LOFAR_MOCK_MS \
-      -DVLA_MOCK_MS=$VLA_MOCK_MS \
-      -DMWA_MOCK_MS=$MWA_MOCK_MS -DMWA_COEFF_PATH=$MWA_COEFF_PATH \
-      -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
     - make install -j8
-    - ctest -T test
+    - ctest -j4 -T test
     # Capture coverage
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
