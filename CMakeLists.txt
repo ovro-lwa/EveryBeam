@@ -14,7 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 # Configure directory for data files
 set(CMAKE_INSTALL_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${projectname}")
 message("Storing data in: " ${CMAKE_INSTALL_DATA_DIR})
-configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
 # Find and include git submodules
 find_package(Git QUIET)
@@ -51,7 +50,7 @@ include_directories(${CASACORE_INCLUDE_DIR})
 find_package(OpenMP REQUIRED)
 
 # Find and include Boost headers (boost::math required for MWA beam)
-find_package(Boost REQUIRED) 
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
@@ -101,10 +100,15 @@ add_subdirectory(cpp)
 #------------------------------------------------------------------------------
 # Add tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
-   add_subdirectory(cpp/test)
-   # TODO: compiling the demos should probably be a different cmake project
-   # in which we use find_package(EveryBeam)
-   add_subdirectory(demo)
+  # TODO: compiling the demos should probably be a different cmake project
+  # in which we use find_package(EveryBeam)
+  add_subdirectory(demo)
+
+  if(Boost_FOUND)
+    add_subdirectory(cpp/test)
+  else()
+    message("Boost NOT found. This is not an error but indicates that the tests won't be built.")
+  endif()
 endif()
 
 #------------------------------------------------------------------------------

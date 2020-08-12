@@ -10,7 +10,16 @@
 #include <complex>
 #include <cmath>
 
-namespace everybeam {
+using everybeam::ElementResponseModel;
+using everybeam::Load;
+using everybeam::Options;
+using everybeam::coords::CoordinateSystem;
+using everybeam::griddedresponse::GriddedResponse;
+using everybeam::griddedresponse::LOFARGrid;
+using everybeam::telescope::LOFAR;
+using everybeam::telescope::Telescope;
+
+BOOST_AUTO_TEST_SUITE(tlofar)
 
 BOOST_AUTO_TEST_CASE(load_lofar) {
   Options options;
@@ -19,18 +28,17 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   casacore::MeasurementSet ms(LOFAR_MOCK_MS);
 
   // Load LOFAR Telescope
-  std::unique_ptr<telescope::Telescope> telescope = Load(ms, options);
+  std::unique_ptr<Telescope> telescope = Load(ms, options);
 
   // Assert if we indeed have a LOFAR pointer
-  BOOST_CHECK(nullptr != dynamic_cast<telescope::LOFAR*>(telescope.get()));
+  BOOST_CHECK(nullptr != dynamic_cast<LOFAR*>(telescope.get()));
 
   // Assert if correct number of stations
   std::size_t nstations = 70;
   BOOST_CHECK_EQUAL(telescope->GetNrStations(), nstations);
 
   // Assert if GetStation(stationd_id) behaves properly
-  const telescope::LOFAR& lofartelescope =
-      static_cast<const telescope::LOFAR&>(*telescope.get());
+  const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
   BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001HBA0");
 
   // Properties extracted from MS
@@ -40,18 +48,17 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   double ra(2.15374123), dec(0.8415521), dl(0.5 * M_PI / 180.),
       dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
 
-  coords::CoordinateSystem coord_system = {.width = width,
-                                           .height = height,
-                                           .ra = ra,
-                                           .dec = dec,
-                                           .dl = dl,
-                                           .dm = dm,
-                                           .phase_centre_dl = shift_l,
-                                           .phase_centre_dm = shift_m};
-  std::unique_ptr<griddedresponse::GriddedResponse> grid_response =
+  CoordinateSystem coord_system = {.width = width,
+                                   .height = height,
+                                   .ra = ra,
+                                   .dec = dec,
+                                   .dl = dl,
+                                   .dm = dm,
+                                   .phase_centre_dl = shift_l,
+                                   .phase_centre_dm = shift_m};
+  std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
-  BOOST_CHECK(nullptr !=
-              dynamic_cast<griddedresponse::LOFARGrid*>(grid_response.get()));
+  BOOST_CHECK(nullptr != dynamic_cast<LOFARGrid*>(grid_response.get()));
 
   // Define buffer and get gridded responses
   std::vector<std::complex<float>> antenna_buffer_single(
@@ -101,10 +108,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   options_diff_beam.use_differential_beam = true;
 
   // Load LOFAR Telescope
-  std::unique_ptr<telescope::Telescope> telescope_diff_beam =
-      Load(ms, options_diff_beam);
+  std::unique_ptr<Telescope> telescope_diff_beam = Load(ms, options_diff_beam);
 
-  std::unique_ptr<griddedresponse::GriddedResponse> grid_response_diff_beam =
+  std::unique_ptr<GriddedResponse> grid_response_diff_beam =
       telescope_diff_beam->GetGriddedResponse(coord_system);
 
   std::vector<std::complex<float>> antenna_buffer_diff_beam(
@@ -123,4 +129,5 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   npy::SaveArrayAsNumpy("lofar_station_responses.npy", false, 4, leshape,
                         antenna_buffer_single);
 }
-}  // namespace everybeam
+
+BOOST_AUTO_TEST_SUITE_END()
