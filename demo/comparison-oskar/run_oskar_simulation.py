@@ -68,6 +68,7 @@ def main(npixels):
             'telescope/aperture_array/element_pattern/enable_numerical': True,
             'telescope/aperture_array/element_pattern/swap_xy': True,
             'telescope/aperture_array/array_pattern/enable': True,
+            'telescope/aperture_array/array_pattern/normalise': True
         },
     }
 
