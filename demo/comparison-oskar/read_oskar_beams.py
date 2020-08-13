@@ -27,7 +27,7 @@ def read_oskar_beams():
             if A is None:
                 N = d.shape[-1]
                 A = np.zeros((N, N, 2, 2), dtype=np.complex128)
-            A[:, :, i, j] = d
+            A[:, :, i, j] = d[::-1, :]
         N = A.shape[0]
 
     for i in range(N):
@@ -39,7 +39,7 @@ def read_oskar_beams():
 
             # Need to swap the sign of phi to get the transformation right
             # Still need to figure out why
-            phi = -phi
+            # phi = -phi
 
             e_theta = np.array([[np.cos(phi)], [np.sin(phi)]])
             e_phi = np.array([[-np.sin(phi)], [np.cos(phi)]])
