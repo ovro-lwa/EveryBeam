@@ -51,7 +51,7 @@ void OSKARElementResponseSphericalWave::Response(
   std::complex<double>* alpha_ptr = dataset->GetAlphaPtr(element_id);
 
   double phi_x = phi;
-  double phi_y = phi + M_PI_2;
+  double phi_y = phi; //  + M_PI_2;
   oskar_evaluate_spherical_wave_sum_double(1, &theta, &phi_x, &phi_y, l_max,
                                            alpha_ptr, response_ptr);
 }
