@@ -22,7 +22,9 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/telescope.tm/station000/layout.txt"
 #------------------------------------------------------------------------------
 # comparison-oskar knits together the cpp code and the python scripts     
 add_custom_target(comparison-oskar
-     COMMAND ${CMAKE_COMMAND} -E env EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts"
+     COMMAND ${CMAKE_COMMAND} -E env
+         EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts"
+         TOLERANCE=1e-12
      "${CMAKE_CURRENT_SOURCE_DIR}/generate_basefunction_plots.sh"
      DEPENDS comparison-oskar-generate-beampattern
 )
