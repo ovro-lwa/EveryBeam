@@ -21,7 +21,7 @@ int main(int argc, char** argv){
     options.element_response_model = response_model;
 
 //     casacore::MeasurementSet ms("/home/vdtol/skalowmini/skalowmini-coef1.MS");
-    casacore::MeasurementSet ms("blah.ms");
+    casacore::MeasurementSet ms("skalowmini-coef.MS");
 
     casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
         ms.field(),

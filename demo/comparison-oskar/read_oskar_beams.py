@@ -59,12 +59,12 @@ if __name__ == "__main__":
     A = read_oskar_beams()
 
     plt.subplot(2, 2, 1)
-    plt.imshow(np.abs(A[:, :, 0, 0]).T, clim=(0, 0.25), origin="lower")
+    plt.imshow(np.abs(A[:, :, 0, 0]).T, origin="lower")
     plt.colorbar()
     plt.title("abs(Etheta)")
 
     plt.subplot(2, 2, 2)
-    plt.imshow(np.abs(A[:, :, 0, 1]).T, clim=(0, 0.25), origin="lower")
+    plt.imshow(np.abs(A[:, :, 0, 1]).T, origin="lower")
     plt.colorbar()
     plt.title("abs(Ephi)")
 

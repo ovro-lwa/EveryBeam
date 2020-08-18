@@ -21,7 +21,7 @@ import oskar
 
 def get_start_time(ra0_deg, length_sec):
     """Returns optimal start time for field RA and observation length."""
-    t = Time('2000-01-01 00:00:00', scale='utc', location=('116.764d', '0d'))
+    t = Time('2000-01-01 12:00:00', scale='utc', location=('116.764d', '0d'))
     dt_hours = (24.0 - t.sidereal_time('apparent').hour) / 1.0027379
     dt_hours += (ra0_deg / 15.0)
     start = t + TimeDelta(dt_hours * 3600.0 - length_sec / 2.0, format='sec')
@@ -37,7 +37,7 @@ def main(npixels):
     # Define some basic observation parameters.
     ra0_deg = 0.0
     dec0_deg = -27.0
-    length_sec = 3600.0*6
+    length_sec = 60 # 3600.0*6
 
     # Define base settings dictionary.
     common_settings = {
@@ -64,9 +64,9 @@ def main(npixels):
     telescopes = {
         #'stationresponse': {
         'basefunctions': {
-            'telescope/input_directory': 'telescope.tm',
+            'telescope/input_directory': 'skalowmini-coef.tm',
             'telescope/aperture_array/element_pattern/enable_numerical': True,
-            'telescope/aperture_array/element_pattern/swap_xy': True,
+            'telescope/aperture_array/element_pattern/swap_xy': False,
             'telescope/aperture_array/array_pattern/enable': True,
             'telescope/aperture_array/array_pattern/normalise': True
         },
@@ -93,7 +93,7 @@ def main(npixels):
             tel_root = re.sub(r'[^\w]', '', tel)  # Strip symbols from tel.
             root_path = tel_root + ('_%03d_MHz' % freq)
             settings['observation/start_frequency_hz'] = 1e6 * freq
-            settings['interferometer/ms_filename'] = 'blah.ms'
+            settings['interferometer/ms_filename'] = 'skalowmini-coef.MS'
 
             # Run the app with the settings file.
             subprocess.call([app1, settings_path])
@@ -120,4 +120,4 @@ def main(npixels):
 
 
 if __name__ == '__main__':
-    main(32)
+    main(256)
