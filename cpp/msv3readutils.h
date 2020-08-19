@@ -1,5 +1,5 @@
-// lofarreadutils.h: Utility functions to read the meta data relevant for
-// simulating the beam from LOFAR observations stored in MS format.
+// msv3readutils.h: Utility functions to read the meta data relevant for
+// simulating the beam from OSKAR simulations stored in MS format.
 //
 // Copyright (C) 2013
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -26,7 +26,7 @@
 
 // \file
 // Utility functions to read the meta data relevant for simulating the beam from
-// LOFAR observations stored in MS format.
+// OSKAR simulations stored in MS format.
 
 #include "station.h"
 #include "elementresponse.h"
@@ -53,7 +53,7 @@ Station::Ptr ReadMSv3Station(
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
- * Loops over ReadLofarStation for all the antennas in MeasurementSet
+ * Loops over ReadMSv3Station for all the antennas in MeasurementSet
  *
  * @tparam T Template type
  * @param ms Measurement set

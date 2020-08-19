@@ -1,4 +1,4 @@
-// LOFARTelescope.h: Base class for computing the response for the LOFAR
+// OSKARTelescope.h: Base class for computing the response for the OSKAR
 // telescope.
 //
 // Copyright (C) 2020
