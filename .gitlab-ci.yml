@@ -78,9 +78,10 @@ build-compare-oskar:
   before_script:
     - apt-get -y install python3-pip
     # Install python requirements for the OSKAR "integration" test
-    - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib
+    - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
     - mkdir -p /opt/oskar/build
-    - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
+    - cd /opt/oskar && git clone https://github.com/basvandertol/OSKAR.git
+    - cd OSKAR && git checkout fix-transformations
     - cd /opt/oskar/build
   script:
     # OSKAR cpp install
@@ -94,7 +95,10 @@ build-compare-oskar:
     # Run OSKAR comparison, set some env variables for this session
     - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
     - cd /opt/everybeam/build
-    - make VERBOSE=1 comparison-oskar
+    - make VERBOSE=1 comparison-oskar-basefunctions
+    # Run OSKAR stationresponse comparison
+    - export NPIXELS=32 TOLERANCE=1e-5
+    - make VERBOSE=1 comparison-oskar-station-response
 
 deploy-doc:
   stage: deploy

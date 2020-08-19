@@ -64,6 +64,10 @@ void Station::SetResponseModel(const ElementResponseModel model) {
   }
 }
 
+void Station::SetResponse(std::shared_ptr<ElementResponse> element_response) {
+  element_response_.set(element_response);
+}
+
 const std::string &Station::GetName() const { return name_; }
 
 const vector3r_t &Station::GetPosition() const { return position_; }

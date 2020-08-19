@@ -55,6 +55,8 @@ class Station {
 
   void SetResponseModel(const ElementResponseModel model);
 
+  void SetResponse(std::shared_ptr<ElementResponse> element_response);
+
   //! Return the name of the station.
   const std::string &GetName() const;
 
@@ -332,6 +334,8 @@ class Station {
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element
   void SetAntenna(Antenna::Ptr antenna) { antenna_ = antenna; }
+
+  Antenna::Ptr GetAntenna() { return antenna_; }
 
   //! Set Element attribute
   void SetElement(Element::Ptr element) { element_ = element; }

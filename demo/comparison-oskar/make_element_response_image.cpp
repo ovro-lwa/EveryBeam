@@ -4,8 +4,7 @@
 
 #include <oskarelementresponse.h>
 
-#include "../../external/npy.hpp"
-// #include "npy.hpp"  // to save arrays in numpy format
+#include "../../external/npy.hpp"   // to save arrays in numpy format
 
 int main(int argc, char** argv){
 // int main() {

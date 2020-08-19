@@ -30,3 +30,6 @@ install(
   TARGETS oskar
   EXPORT EveryBeamTargets
   DESTINATION lib)
+
+#install oskar coefficients
+install(FILES "${CMAKE_SOURCE_DIR}/coeffs/oskar.h5" DESTINATION ${CMAKE_INSTALL_DATA_DIR})

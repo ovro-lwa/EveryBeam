@@ -28,6 +28,7 @@
 #include "./telescope/lofar.h"
 #include "./telescope/dish.h"
 #include "./telescope/mwa.h"
+#include "./telescope/oskar.h"
 #include "options.h"
 
 namespace everybeam {
@@ -41,7 +42,8 @@ enum TelescopeType {
   kAARTFAAC,
   kVLATelescope,
   kATCATelescope,
-  kMWATelescope
+  kMWATelescope,
+  kOSKARTelescope
 };
 
 /**

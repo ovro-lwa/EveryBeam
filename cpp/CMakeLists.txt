@@ -19,10 +19,12 @@ add_library(everybeam SHARED
   coords/itrfconverter.cc
   coords/itrfdirection.cc
   lofarreadutils.cc
+  msv3readutils.cc
   station.cc
   telescope/lofar.cc
   telescope/dish.cc
   telescope/mwa.cc
+  telescope/oskar.cc
   griddedresponse/lofargrid.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
@@ -31,6 +33,12 @@ add_library(everybeam SHARED
   # mwabeam related
   mwabeam/tilebeam2016.cc
   mwabeam/beam2016implementation.cc
+)
+
+# Make sure that when other targets within this project link against the everybeam target,
+# they can find the include files.
+target_include_directories(everybeam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
@@ -49,6 +57,7 @@ install (FILES
   element.h
   elementresponse.h
   lofarreadutils.h
+  msv3readutils.h
   station.h
   # Related to new API:
   load.h

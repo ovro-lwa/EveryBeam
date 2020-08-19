@@ -125,7 +125,7 @@ def main(npixels):
         'basefunctions': {
             'telescope/input_directory': 'telescope.tm',
             'telescope/aperture_array/element_pattern/enable_numerical': True,
-            'telescope/aperture_array/element_pattern/swap_xy': True,
+            'telescope/aperture_array/element_pattern/swap_xy': False,
             'telescope/aperture_array/array_pattern/enable': False
         },
     }
@@ -167,4 +167,4 @@ def main(npixels):
 
 
 if __name__ == '__main__':
-    main()
+    main(32)
