@@ -70,14 +70,17 @@ def add_phased_array_table(oskar_ms_name: str):
 
     coordinate_system_coldesc = pt.makearrcoldesc("COORDINATE_AXES", 0.,
                                                   shape=[3, 3], comment="Local coordinate system",
-                                                  valuetype='double')
+                                                  valuetype='double',
+                                                  keywords={'QuantumUnits': ['m', 'm', 'm'],
+                                                            'MEASINFO': {'Ref': 'ITRF', 'type': 'direction'}})
     phasedarraytable.addcols(coordinate_system_coldesc)
     pt.taql("UPDATE $phasedarraytable SET COORDINATE_AXES=0.");
 
     element_offset_coldesc = pt.makearrcoldesc("ELEMENT_OFFSET", 0.,
                                                ndim=2, comment="Offset per element",
                                                valuetype='double',
-                                               keywords={"MEASINFO": {"type": "position",
+                                               keywords={'QuantumUnits': ['m', 'm', 'm'],
+                                                         "MEASINFO": {"type": "position",
                                                                       "Ref": "ITRF"}})
     phasedarraytable.addcols(element_offset_coldesc)
 
