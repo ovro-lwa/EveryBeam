@@ -38,7 +38,7 @@ namespace everybeam {
 
 namespace telescope {
 
-//! LOFAR telescope class
+//! OSKAR telescope class
 class OSKAR final : public Telescope {
  public:
   /**
