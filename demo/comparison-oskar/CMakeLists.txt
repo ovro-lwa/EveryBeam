@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------
 # CMake file for compiling a comparison between OSKAR and EveryBeam
-add_executable(comparison-oskar-generate-beampattern main.cpp)
-target_link_libraries(comparison-oskar-generate-beampattern oskar)
+add_executable(make_element_response_image make_element_response_image.cpp)
+target_link_libraries(make_element_response_image oskar)
 
-add_executable(comparison-oskar-generate-station-response stationresponse.cpp)
-target_link_libraries(comparison-oskar-generate-station-response everybeam)
+add_executable(make_station_response_image make_station_response_image.cpp)
+target_link_libraries(make_station_response_image everybeam)
 
 # Required to get the config.h header
-target_include_directories(comparison-oskar-generate-station-response PRIVATE "${CMAKE_BINARY_DIR}")
+target_include_directories(make_station_response_image PRIVATE "${CMAKE_BINARY_DIR}")
 
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/telescope.tm/layout.txt"
@@ -25,17 +25,17 @@ execute_process( COMMAND ${CMAKE_COMMAND} -E copy_directory
 
 #------------------------------------------------------------------------------
 # comparison-oskar knits together the cpp code and the python scripts     
-add_custom_target(comparison-oskar
+add_custom_target(comparison-oskar-basefunctions
      COMMAND ${CMAKE_COMMAND} -E env
          EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts"
      "${CMAKE_CURRENT_SOURCE_DIR}/generate_basefunction_plots.sh"
-     DEPENDS comparison-oskar-generate-beampattern
+     DEPENDS make_element_response_image
 )
 
 add_custom_target(comparison-oskar-station-response
      COMMAND ${CMAKE_COMMAND} -E env
          EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts:${CMAKE_SOURCE_DIR}/scripts/misc"
      "${CMAKE_CURRENT_SOURCE_DIR}/compare_stationresponse.sh"
-     DEPENDS comparison-oskar-generate-station-response
+     DEPENDS make_station_response_image
 )
 

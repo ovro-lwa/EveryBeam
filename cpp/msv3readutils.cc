@@ -73,44 +73,12 @@ using namespace casacore;
 vector3r_t TransformToFieldCoordinates(
     const vector3r_t &position, const Antenna::CoordinateSystem::Axes &axes);
 
-// inline Antenna::CoordinateSystem ReadCoordinateSystem(
-//     const casacore::Table &table, unsigned int id) {
-//   casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
-//                                                           "m");
-//   casacore::ArrayQuantColumn<casacore::Double> c_axes(table,
-//                                                       "COORDINATE_SYSTEM",
-//                                                       "m");
-//
-//   // Read antenna field center (ITRF).
-//   casacore::Vector<casacore::Quantity> aips_position = c_position(id);
-//   assert(aips_position.size() == 3);
-//
-//   vector3r_t position = {{aips_position(0).getValue(),
-//                           aips_position(1).getValue(),
-//                           aips_position(2).getValue()}};
-//
-//   // Read antenna field coordinate axes (ITRF).
-//   casacore::Matrix<casacore::Quantity> aips_axes = c_axes(id);
-//   assert(aips_axes.shape().isEqual(casacore::IPosition(2, 3, 3)));
-//
-//   vector3r_t p = {{aips_axes(0, 0).getValue(), aips_axes(1, 0).getValue(),
-//                    aips_axes(2, 0).getValue()}};
-//   vector3r_t q = {{aips_axes(0, 1).getValue(), aips_axes(1, 1).getValue(),
-//                    aips_axes(2, 1).getValue()}};
-//   vector3r_t r = {{aips_axes(0, 2).getValue(), aips_axes(1, 2).getValue(),
-//                    aips_axes(2, 2).getValue()}};
-//
-//   Antenna::CoordinateSystem coordinate_system = {position, {p, q, r}};
-//   return coordinate_system;
-// }
-
 BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
                                      ElementResponse::Ptr element_response) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, id);
   BeamFormer::Ptr beam_former(
       new BeamFormerIdenticalAntennas(coordinate_system));
-  //   BeamFormer::Ptr beam_former(new BeamFormer(coordinate_system));
 
   ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
   ROArrayColumn<Bool> c_flag(table, "ELEMENT_FLAG");
@@ -142,20 +110,6 @@ BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
   return beam_former;
 }
 
-vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id);
-// {
-//   vector3r_t phase_reference = {0.0, 0.0, 0.0};
-//   const string columnName("LOFAR_PHASE_REFERENCE");
-//   if (common::HasColumn(table, columnName)) {
-//     ROScalarMeasColumn<MPosition> c_reference(table, columnName);
-//     MPosition mReference =
-//         MPosition::Convert(c_reference(id), MPosition::ITRF)();
-//     MVPosition mvReference = mReference.getValue();
-//     phase_reference = {mvReference(0), mvReference(1), mvReference(2)};
-//   }
-//   return phase_reference;
-// }
-
 Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
                              const ElementResponseModel model) {
   ROMSAntennaColumns antenna(ms.antenna());
@@ -173,9 +127,6 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
   // Create station.
   Station::Ptr station(new Station(name, position, model));
 
-  // Read phase reference position (if available).
-  //   station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
-
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
   // The Station will consist of a BeamFormer that combines the fields
@@ -184,10 +135,6 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
   auto beam_former =
       ReadMSv3AntennaField(tab_phased_array, id, station->GetElementResponse());
 
-  // TODO
-  // If There is only one field, the top level beamformer is not needed
-  // and the station antenna can be set the the beamformer of the field
-
   station->SetAntenna(beam_former);
 
   size_t field_id = 0;
@@ -195,7 +142,6 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(tab_phased_array, field_id);
   auto element_response = station->GetElementResponse();
-  // TODO: rotate coordinate system for antenna
   auto element = Element::Ptr(
       new Element(coordinate_system, element_response, element_id));
   station->SetElement(element);

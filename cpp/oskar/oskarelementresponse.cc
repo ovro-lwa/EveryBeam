@@ -51,7 +51,15 @@ void OSKARElementResponseSphericalWave::Response(
   std::complex<double>* alpha_ptr = dataset->GetAlphaPtr(element_id);
 
   double phi_x = phi;
-  double phi_y = phi; //  + M_PI_2;
+  double phi_y = phi;
+
+  // TODO: phi_x and phi_y can have different values if there is only one set
+  // of coefficients that is is used for both dipoles.
+  // In that case it is assumed the Y dipole rotated 90deg with respect
+  // to the X dipole, so then phi_y = phi+ M_PI_2.
+  // That case needs to be detected when the coefficients are read,
+  // and here phi_y needs to be set accordingly.
+
   oskar_evaluate_spherical_wave_sum_double(1, &theta, &phi_x, &phi_y, l_max,
                                            alpha_ptr, response_ptr);
 }

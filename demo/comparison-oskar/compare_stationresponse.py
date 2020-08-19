@@ -13,7 +13,7 @@ npixels = int(os.environ["NPIXELS"]) if "NPIXELS" in os.environ else 256
 run_oskar_simulation.main(npixels)
 subprocess.check_call(["add_beaminfo.py", "skalowmini-coef.MS", "skalowmini-coef.tm"])
 subprocess.check_call(["oskar_csv_to_hdf5.py", "skalowmini-coef.tm", "oskar.h5"])
-subprocess.check_call(["./comparison-oskar-generate-station-response", str(npixels)])
+subprocess.check_call(["./make_station_response_image", str(npixels)])
 
 A = read_oskar_beams()
 B = np.load('station-response.npy')

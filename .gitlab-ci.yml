@@ -94,7 +94,7 @@ build-compare-oskar:
     # Run OSKAR comparison, set some env variables for this session
     - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
     - cd /opt/everybeam/build
-    - make VERBOSE=1 comparison-oskar
+    - make VERBOSE=1 comparison-oskar-basefunctions
     # Run OSKAR stationresponse comparison
     - export NPIXELS=32 && TOLERANCE=1e-5
     - make VERBOSE=1 comparison-oskar-stationresponse

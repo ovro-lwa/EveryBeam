@@ -18,13 +18,19 @@ OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<griddedresponse::GriddedResponse> OSKAR::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system){
-    // Get and return GriddedResponse ptr
-    //   std::unique_ptr<griddedresponse::GriddedResponse> grid(
-    //       new griddedresponse::LOFARGrid(this, coordinate_system));
-    //   // griddedresponse::GriddedResponse grid(LOFARGrid(this,
-    //   coordinate_system));
-    //   return grid;
+    const coords::CoordinateSystem &coordinate_system) {
+  throw std::runtime_error(
+      "GetGriddedResponse() is not implemented for OSKAR Telescope");
+
+  // TODO: return an OSKARGrid here, in a similar way to the commented out code
+  // below
+
+  // Get and return GriddedResponse ptr
+  //   std::unique_ptr<griddedresponse::GriddedResponse> grid(
+  //       new griddedresponse::LOFARGrid(this, coordinate_system));
+  //   // griddedresponse::GriddedResponse grid(LOFARGrid(this,
+  //   coordinate_system));
+  //   return grid;
 };
 
 Station::Ptr OSKAR::ReadStation(const MeasurementSet &ms, std::size_t id,

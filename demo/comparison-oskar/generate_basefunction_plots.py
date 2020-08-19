@@ -68,7 +68,7 @@ for em_idx in range(2):
             generate_oskar_csv(l * l - 1 + l - m, em_idx)
 
         subprocess.check_call(["oskar_csv_to_hdf5.py", "telescope.tm", "oskar.h5"])
-        subprocess.check_call(["comparison-oskar-generate-beampattern", str(npixels)])
+        subprocess.check_call(["make_element_response_image", str(npixels)])
 
         B = np.load("response.npy")
 

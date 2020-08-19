@@ -27,7 +27,12 @@ def read_oskar_beams():
             if A is None:
                 N = d.shape[-1]
                 A = np.zeros((N, N, 2, 2), dtype=np.complex128)
+
+            # One axis in the OSKAR fits files runs in opposite direction compared to the
+            # numpy arrays made by make_element_response_image.cpp
+            # we flip that axis here to make them the same
             A[:, :, i, j] = d[::-1, :]
+
         N = A.shape[0]
 
     for i in range(N):
@@ -36,10 +41,6 @@ def read_oskar_beams():
             y = 2.0 * j / (N - 1) - 1.0
             theta = np.arcsin(np.sqrt(x * x + y * y))
             phi = np.arctan2(y, x)
-
-            # Need to swap the sign of phi to get the transformation right
-            # Still need to figure out why
-            # phi = -phi
 
             e_theta = np.array([[np.cos(phi)], [np.sin(phi)]])
             e_phi = np.array([[-np.sin(phi)], [np.cos(phi)]])
