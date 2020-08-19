@@ -55,6 +55,8 @@ class Station {
 
   void SetResponseModel(const ElementResponseModel model);
 
+  void SetResponse(std::shared_ptr<ElementResponse> element_response);
+
   //! Return the name of the station.
   const std::string &GetName() const;
 
