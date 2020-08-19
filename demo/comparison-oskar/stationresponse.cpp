@@ -89,7 +89,7 @@ int main(int argc, char** argv){
             };
             real_t freq0 = 50e6;
 
-            auto result = station->Response(time, freq, direction, freq0, station0, tile0);
+            auto result = station->Response(time, freq, direction, freq0, station0, tile0, false);
             result_arr[i][j][0][0] = result[0][0];
             result_arr[i][j][0][1] = result[0][1];
             result_arr[i][j][1][0] = result[1][0];

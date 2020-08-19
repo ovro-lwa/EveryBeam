@@ -13,15 +13,15 @@ matrix22c_t Element::LocalResponse(real_t time, real_t freq,
       id, freq, thetaphi[0], thetaphi[1],
       reinterpret_cast<std::complex<double>(&)[2][2]>(result));
 
-//   if (options.rotate) {
-//     vector3r_t up = {0.0, 0.0, 1.0};
-//     vector3r_t e_phi = normalize(cross(up, direction));
-//     vector3r_t e_theta = cross(e_phi, direction);
-//     matrix22r_t rotation;
-//     rotation[0] = {dot(e_theta, options.north), dot(e_theta, options.east)};
-//     rotation[1] = {dot(e_phi, options.north), dot(e_phi, options.east)};
-//     result = result * rotation;
-//   }
+  if (options.rotate) {
+    vector3r_t up = {0.0, 0.0, 1.0};
+    vector3r_t e_phi = normalize(cross(up, direction));
+    vector3r_t e_theta = cross(e_phi, direction);
+    matrix22r_t rotation;
+    rotation[0] = {dot(e_theta, options.north), dot(e_theta, options.east)};
+    rotation[1] = {dot(e_phi, options.north), dot(e_phi, options.east)};
+    result = result * rotation;
+  }
   return result;
 }
 
