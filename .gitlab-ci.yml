@@ -80,8 +80,7 @@ build-compare-oskar:
     # Install python requirements for the OSKAR "integration" test
     - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
     - mkdir -p /opt/oskar/build
-    - cd /opt/oskar && git clone https://github.com/basvandertol/OSKAR.git
-    - cd OSKAR && git checkout fix-transformations
+    - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     - cd /opt/oskar/build
   script:
     # OSKAR cpp install
