@@ -53,6 +53,9 @@ find_package(OpenMP REQUIRED)
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
+# Find and include FFTW3 float libraries
+find_package(FFTW3 COMPONENTS single REQUIRED)
+
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -88,10 +91,6 @@ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib"
 if("${isSystemDir}" STREQUAL "-1")
    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif("${isSystemDir}" STREQUAL "-1")
-
-#------------------------------------------------------------------------------
-# Find/load top level dependencies
-# add_subdirectory(external)
 
 #------------------------------------------------------------------------------
 # Add source

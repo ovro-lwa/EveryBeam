@@ -9,6 +9,7 @@
 #include "config.h"
 #include <complex>
 #include <cmath>
+#include <iostream>
 
 using everybeam::ElementResponseModel;
 using everybeam::Load;
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   // Define buffer and get gridded responses
   std::vector<std::complex<float>> antenna_buffer_single(
-      grid_response->GetBufferSize(1));
+      grid_response->GetStationBufferSize(1));
   grid_response->CalculateStation(antenna_buffer_single.data(), time, frequency,
                                   23, 0);
   BOOST_CHECK_EQUAL(antenna_buffer_single.size(),
@@ -94,8 +95,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                 1e-4);
   }
 
+  // All stations
   std::vector<std::complex<float>> antenna_buffer_all(
-      grid_response->GetBufferSize(telescope->GetNrStations()));
+      grid_response->GetStationBufferSize(telescope->GetNrStations()));
   grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
                                       frequency, 0);
   BOOST_CHECK_EQUAL(
@@ -114,7 +116,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
       telescope_diff_beam->GetGriddedResponse(coord_system);
 
   std::vector<std::complex<float>> antenna_buffer_diff_beam(
-      grid_response_diff_beam->GetBufferSize(1));
+      grid_response_diff_beam->GetStationBufferSize(1));
   grid_response_diff_beam->CalculateStation(antenna_buffer_diff_beam.data(),
                                             time, frequency, 15, 0);
 
@@ -124,10 +126,87 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   }
   BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
 
-  // Print to np array
-  const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
-  npy::SaveArrayAsNumpy("lofar_station_responses.npy", false, 4, leshape,
-                        antenna_buffer_single);
+  // Primary beam tests
+  //
+  // Just check whether CalculateIntegratedResponse does run and reproduces
+  // results One time interval
+  std::vector<double> antenna_buffer_integrated(
+      grid_response->GetIntegratedBufferSize());
+  std::vector<double> baseline_weights(
+      telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);
+  grid_response->CalculateIntegratedResponse(antenna_buffer_integrated.data(),
+                                             time, frequency, 0, 2,
+                                             baseline_weights);
+
+  // Just check whether some (rather arbitrary) numbers are reproduced
+  BOOST_CHECK(std::abs(antenna_buffer_integrated[10] - 0.0262708) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_integrated[20] - 0.127972) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_integrated.back() - 0.00847742) < 1e-6);
+
+  // Two time intervals, should give same output as single time interval
+  std::fill(antenna_buffer_integrated.begin(), antenna_buffer_integrated.end(),
+            0);
+  std::vector<double> tarray = {time, time};
+  baseline_weights.resize(baseline_weights.size() * tarray.size());
+  std::fill(baseline_weights.begin(), baseline_weights.end(), 1.);
+  grid_response->CalculateIntegratedResponse(antenna_buffer_integrated.data(),
+                                             tarray, frequency, 0, 2,
+                                             baseline_weights);
+
+  BOOST_CHECK(std::abs(antenna_buffer_integrated[10] - 0.0262708) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_integrated[20] - 0.127972) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_integrated.back() - 0.00847742) < 1e-6);
+
+  // Primary beam response on 40 x 40 grid.
+  // Validated results were obtained with the following wsclean command
+  //
+  // wsclean -size 40 40  -scale 900asec -apply-primary-beam  LOFAR_MOCK.ms
+  //
+  // where LOFAR_MOCK.ms the MS available from
+  // https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2
+  //
+  // PLEASE NOTE: for the sake of testing, the baseline weights were set to 1
+  // in wsclean::lbeamimagemaker, i.e.
+  //
+  // --- a/lofar/lbeamimagemaker.cpp
+  // +++ b/lofar/lbeamimagemaker.cpp
+  // @@ -380,7 +380,7 @@ void LBeamImageMaker::makeBeamSnapshot(
+  //                                 MC4x4::KroneckerProduct(
+  //                                     stationGains[a1].HermTranspose().Transpose(),
+  //                                     stationGains[a2]);
+  // -          double w = weights.Value(a1, a2);
+  // +          double w = 1.;
+  //
+  std::size_t width_pb = 40, height_pb = 40;
+  CoordinateSystem coord_system_pb = {.width = width_pb,
+                                      .height = height_pb,
+                                      .ra = ra,
+                                      .dec = dec,
+                                      // 900asec
+                                      .dl = (0.25 * M_PI / 180.),
+                                      .dm = (0.25 * M_PI / 180.),
+                                      .phase_centre_dl = shift_l,
+                                      .phase_centre_dm = shift_m};
+  std::unique_ptr<GriddedResponse> grid_response_pb =
+      telescope->GetGriddedResponse(coord_system_pb);
+
+  std::vector<double> antenna_buffer_pb(
+      grid_response_pb->GetIntegratedBufferSize());
+  std::vector<double> baseline_weights_pb(
+      telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);
+  grid_response_pb->CalculateIntegratedResponse(
+      antenna_buffer_pb.data(), time, frequency, 0, 8, baseline_weights_pb);
+  // Check diagonal and off-diagonal term in component 0 and 5 of HMC4x4
+  // representation of Mueller matrix
+  std::size_t offset_01616 = 16 * width_pb + 16,
+              offset_02310 = 23 * width_pb + 10,
+              offset_52020 = 5 * width_pb * height_pb + 20 * width_pb + 20,
+              offset_51825 = 5 * width_pb * height_pb + 18 * width_pb + 25;
+
+  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_01616] - 0.020324793) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_02310] - 0.0059926948) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_52020] - 0.00018088287) < 1e-6);
+  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_51825] - 0.00013052078) < 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -16,6 +16,7 @@ add_library(everybeam SHARED
   beamformeridenticalantennas.cc
   element.cc
   load.cc
+  common/fftresampler.cc
   coords/itrfconverter.cc
   coords/itrfdirection.cc
   lofarreadutils.cc
@@ -25,6 +26,7 @@ add_library(everybeam SHARED
   telescope/dish.cc
   telescope/mwa.cc
   telescope/oskar.cc
+  griddedresponse/griddedresponse.cc
   griddedresponse/lofargrid.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
@@ -43,7 +45,7 @@ target_include_directories(everybeam PUBLIC
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
-target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES})
+target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES} ${FFTW3F_LIBRARY})
 
 install (
   TARGETS everybeam

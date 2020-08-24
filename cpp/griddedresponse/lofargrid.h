@@ -54,7 +54,7 @@ class LOFARGrid final : public GriddedResponse {
    * @brief Compute the Beam response for a single station
    *
    * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetBufferSize(1)
+   * GriddedResponse::GetStationBufferSize(1)
    * @param stationIdx Station index, must be smaller than number of stations
    * in the Telescope
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
@@ -68,7 +68,7 @@ class LOFARGrid final : public GriddedResponse {
    * @brief Compute the Beam response for all stations in a Telescope
    *
    * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetBufferSize()
+   * GriddedResponse::GetStationBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
