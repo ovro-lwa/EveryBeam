@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   BOOST_CHECK(nullptr != dynamic_cast<DishGrid*>(grid_response.get()));
 
   std::vector<std::complex<float>> antenna_buffer(
-      grid_response->GetBufferSize(telescope->GetNrStations()));
+      grid_response->GetStationBufferSize(telescope->GetNrStations()));
   grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
                                       0);
 

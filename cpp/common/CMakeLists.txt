@@ -4,4 +4,5 @@ install (FILES
   mathutils.h
   mutable_ptr.h
   types.h
+  fftresampler.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}/common")

@@ -160,7 +160,7 @@ void LOFARGrid::CalcThread(std::complex<float>* buffer, double time,
       itrf_direction[2] =
           l * l_vector_itrf_[2] + m * m_vector_itrf_[2] + n * n_vector_itrf_[2];
 
-      std::complex<float>* base_buffer = buffer + (x + job.y * height_) * 4;
+      std::complex<float>* base_buffer = buffer + (x + job.y * width_) * 4;
 
       std::complex<float>* ant_buffer_ptr =
           base_buffer + job.buffer_offset * values_per_ant;
