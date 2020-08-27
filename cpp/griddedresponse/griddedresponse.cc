@@ -26,7 +26,7 @@ void GriddedResponse::CalculateIntegratedResponse(
   }
   // Scaling factor
   double baseline_total_weight =
-      std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0);
+      std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0.0);
 
   // Copy coordinate members
   size_t width_original = width_, height_original = height_;
@@ -69,7 +69,7 @@ void GriddedResponse::CalculateIntegratedResponse(
 
   // Scaling factor
   double baseline_total_weight =
-      std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0);
+      std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0.0);
 
   // Copy coordinate members
   size_t width_original = width_, height_original = height_;
