@@ -1,4 +1,4 @@
-// OSKARTelescope.h: Base class for computing the response for the OSKAR
+// oskar.h: Base class for computing the response for the OSKAR
 // telescope.
 //
 // Copyright (C) 2020
@@ -36,10 +36,17 @@
 
 namespace everybeam {
 
+namespace griddedresponse {
+class OSKARGrid;
+class GriddedResponse;
+}  // namespace griddedresponse
+
 namespace telescope {
 
 //! OSKAR telescope class
 class OSKAR final : public Telescope {
+  friend class griddedresponse::OSKARGrid;
+
  public:
   /**
    * @brief Construct a new OSKAR object
@@ -80,6 +87,12 @@ class OSKAR final : public Telescope {
                            const ElementResponseModel model) const;
 
   std::vector<Station::Ptr> stations_;
+
+  struct MSProperties {
+    casacore::MDirection delay_dir;
+  };
+
+  MSProperties ms_properties_;
 };
 }  // namespace telescope
 }  // namespace everybeam

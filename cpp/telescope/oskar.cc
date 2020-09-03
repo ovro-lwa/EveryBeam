@@ -1,4 +1,5 @@
 #include "oskar.h"
+#include "../griddedresponse/oskargrid.h"
 #include "../common/mathutils.h"
 #include "../common/casautils.h"
 #include "../msv3readutils.h"
@@ -7,31 +8,31 @@
 #include <cassert>
 #include <casacore/measures/TableMeasures/ArrayMeasColumn.h>
 
-using namespace everybeam;
-using namespace everybeam::telescope;
-using namespace casacore;
+using casacore::MeasurementSet;
+using everybeam::Station;
+using everybeam::griddedresponse::GriddedResponse;
+using everybeam::griddedresponse::OSKARGrid;
+using everybeam::telescope::OSKAR;
 
 OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
     : Telescope(ms, options) {
   stations_.resize(nstations_);
   ReadAllStations(ms, options_.element_response_model);
+
+  casacore::ScalarMeasColumn<casacore::MDirection> delay_dir_col(
+      ms.field(),
+      casacore::MSField::columnName(casacore::MSFieldEnums::DELAY_DIR));
+
+  // Populate struct
+  ms_properties_ = {.delay_dir = delay_dir_col(0)};
 }
 
-std::unique_ptr<griddedresponse::GriddedResponse> OSKAR::GetGriddedResponse(
+std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
     const coords::CoordinateSystem &coordinate_system) {
-  throw std::runtime_error(
-      "GetGriddedResponse() is not implemented for OSKAR Telescope");
-
-  // TODO: return an OSKARGrid here, in a similar way to the commented out code
-  // below
-
   // Get and return GriddedResponse ptr
-  //   std::unique_ptr<griddedresponse::GriddedResponse> grid(
-  //       new griddedresponse::LOFARGrid(this, coordinate_system));
-  //   // griddedresponse::GriddedResponse grid(LOFARGrid(this,
-  //   coordinate_system));
-  //   return grid;
-};
+  std::unique_ptr<GriddedResponse> grid(new OSKARGrid(this, coordinate_system));
+  return grid;
+}
 
 Station::Ptr OSKAR::ReadStation(const MeasurementSet &ms, std::size_t id,
                                 const ElementResponseModel model) const {

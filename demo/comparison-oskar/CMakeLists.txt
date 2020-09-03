@@ -35,6 +35,7 @@ add_custom_target(comparison-oskar-basefunctions
 add_custom_target(comparison-oskar-station-response
      COMMAND ${CMAKE_COMMAND} -E env
          EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts:${CMAKE_SOURCE_DIR}/scripts/misc"
+         DATA_DIR=${CMAKE_SOURCE_DIR}/test_data
      "${CMAKE_CURRENT_SOURCE_DIR}/compare_stationresponse.sh"
      DEPENDS make_station_response_image
 )

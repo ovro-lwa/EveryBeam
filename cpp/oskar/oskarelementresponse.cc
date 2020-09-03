@@ -44,6 +44,8 @@ void OSKARElementResponseSphericalWave::Response(
 void OSKARElementResponseSphericalWave::Response(
     int element_id, double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
+  element_id = 0;
+
   auto dataset = datafile_->Get(freq);
   auto l_max = dataset->GetLMax();
 

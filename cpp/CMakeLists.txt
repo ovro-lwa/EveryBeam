@@ -28,6 +28,7 @@ add_library(everybeam SHARED
   telescope/oskar.cc
   griddedresponse/griddedresponse.cc
   griddedresponse/lofargrid.cc
+  griddedresponse/oskargrid.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
   circularsymmetric/voltagepattern.cc
