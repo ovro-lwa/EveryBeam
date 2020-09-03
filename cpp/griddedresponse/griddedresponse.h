@@ -1,4 +1,4 @@
-// GriddedResponse.h: Base class for computing the (gridded) telescope response.
+// griddedresponse.h: Base class for computing the (gridded) telescope response.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)

@@ -1,4 +1,4 @@
-// lofargrid.h: Class for computing the LOFAR (gridded) response.
+// oskargrid.h: Class for computing the OSKAR (gridded) response.
 //
 // Copyright (C) 2020
 // ASTRON (Netherlands Institute for Radio Astronomy)
@@ -21,8 +21,8 @@
 //
 // $Id$
 
-#ifndef EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_
-#define EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_
+#ifndef EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_
+#define EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_
 
 #include "griddedresponse.h"
 #include <iostream>
@@ -34,18 +34,18 @@ namespace everybeam {
 namespace griddedresponse {
 
 /**
- * @brief Class for computing the LOFAR gridded response
+ * @brief Class for computing the OSKAR gridded response
  *
  */
-class LOFARGrid final : public GriddedResponse {
+class OSKARGrid final : public GriddedResponse {
  public:
   /**
-   * @brief Construct a new LOFARGrid object
+   * @brief Construct a new OSKARGrid object
    *
-   * @param telescope_ptr Pointer to telescope::LOFAR object
+   * @param telescope_ptr Pointer to telescope::OSKAR object
    * @param coordinate_system CoordinateSystem struct
    */
-  LOFARGrid(telescope::Telescope* telescope_ptr,
+  OSKARGrid(telescope::Telescope* telescope_ptr,
             const coords::CoordinateSystem& coordinate_system);
 
   /**
@@ -66,7 +66,7 @@ class LOFARGrid final : public GriddedResponse {
    * @brief Compute the Beam response for all stations in a Telescope
    *
    * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetStationBufferSize()
+   * GriddedResponse::GetBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency (Hz)
    */
@@ -102,4 +102,4 @@ class LOFARGrid final : public GriddedResponse {
 };
 }  // namespace griddedresponse
 }  // namespace everybeam
-#endif  // EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_
+#endif  // EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_

@@ -1,4 +1,5 @@
 add_subdirectory(comparison-oskar)
+add_subdirectory(wsclean-oskar)
 
 set(TEST_MEASUREMENTSET CACHE STRING "measurement set used for testing")
 
