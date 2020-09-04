@@ -148,9 +148,10 @@ class GriddedResponse {
   double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
 
  private:
-  void MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
-                              double time, double frequency, size_t field_id,
-                              const double* baseline_weights_interval);
+  virtual void MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
+                                      double time, double frequency,
+                                      size_t field_id,
+                                      const double* baseline_weights_interval);
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

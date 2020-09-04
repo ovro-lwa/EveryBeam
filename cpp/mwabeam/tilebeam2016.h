@@ -21,28 +21,35 @@ class TileBeam2016 : public Beam2016Implementation {
                const std::string &coeff_path);
 
   /**
-   * @brief Array response
+   * @brief API method for computing MWA array response
    *
-   * @param time Time (MJD)
-   * @param array_position
    * @param ra right ascension (rad)
    * @param dec declination (rad)
+   * @param j2000_ref J2000 ref coordinates
+   * @param j2000_to_hadecref HADEC coordinates
+   * @param j2000_to_azelgeoref AZELGEO coordinates
+   * @param arr_lattitude Lattitude
    * @param frequency Frequency (Hz)
-   * @param gain
+   * @param gain Gain matrix
    */
-  void ArrayResponse(casacore::MEpoch &time,
-                     casacore::MPosition &array_position, double ra, double dec,
-                     double frequency, std::complex<double> *gain);
-
   void ArrayResponse(double ra, double dec,
                      const casacore::MDirection::Ref &j2000_ref,
                      casacore::MDirection::Convert &j2000_to_hadecref,
                      casacore::MDirection::Convert &j2000_to_azelgeoref,
-                     double arrLatitude, double frequency,
+                     double arr_lattitude, double frequency,
                      std::complex<double> *gain);
 
+  /**
+   * @brief Compute MWA array response in given zenith/azimuth direction
+   *
+   * @param zenith_angle Zenith angle (rad)
+   * @param azimuth Azimuthal angle (rad)
+   * @param frequency Frequency (Hz)
+   * @param gain Gain matrix
+   */
   void ArrayResponse(double zenith_angle, double azimuth, double frequency,
                      std::complex<double> *gain) {
+    // As yet, this conditional is effectively redundant
     if (frequency_interpolation_)
       GetInterpolatedResponse(azimuth, zenith_angle, frequency, gain);
     else
@@ -69,6 +76,7 @@ class TileBeam2016 : public Beam2016Implementation {
     GetTabulatedResponse(az, za, freq, result);
   }
 
+  // TODO: variables seem to be unused. Remove?
   const double mwa_lattitude_;  // Array latitude. degrees North
   const double mwa_longitude_;  // Array longitude. degrees East
   const double mwa_height_;     // Array altitude. meters above sea level
