@@ -14,27 +14,6 @@ TileBeam2016::TileBeam2016(const double* delays, bool frequency_interpolation,
       mwa_longitude_(116.67081),
       mwa_height_(377.0) {}
 
-void TileBeam2016::ArrayResponse(casacore::MEpoch& time,
-                                 casacore::MPosition& array_position, double ra,
-                                 double dec, double frequency,
-                                 std::complex<double>* gain) {
-  casacore::MeasFrame frame(array_position, time);
-  const casacore::MDirection::Ref hadec_ref(casacore::MDirection::HADEC, frame);
-  const casacore::MDirection::Ref azelgeo_ref(casacore::MDirection::AZELGEO,
-                                              frame);
-  const casacore::MDirection::Ref j2000_ref(casacore::MDirection::J2000, frame);
-  casacore::MPosition wgs = casacore::MPosition::Convert(
-      array_position, casacore::MPosition::WGS84)();
-  double arr_lattitude =
-      wgs.getValue().getLat();  // ant1Pos.getValue().getLat();
-
-  casacore::MDirection::Convert j2000_to_hadec(j2000_ref, hadec_ref),
-      j2000_to_azelgeo(j2000_ref, azelgeo_ref);
-
-  ArrayResponse(ra, dec, j2000_ref, j2000_to_hadec, j2000_to_azelgeo,
-                arr_lattitude, frequency, gain);
-}
-
 void TileBeam2016::ArrayResponse(
     double ra, double dec, const casacore::MDirection::Ref& j2000_ref,
     casacore::MDirection::Convert& j2000_to_hadec,
