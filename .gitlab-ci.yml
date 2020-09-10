@@ -42,7 +42,7 @@ test-and-coverage:
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
   artifacts:
     reports:
-      # NOE: artifacts only work with relative paths...
+      # NOTE: artifacts only work with relative paths...
       cobertura: build/coverage.xml
       junit: build/cpp/test/unittests.xml
 

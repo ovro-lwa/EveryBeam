@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
                 1e-6);
   }
 
-  // Print to np array, note: this spits out the transposed grid...
+  // Print to np array
   const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
   npy::SaveArrayAsNumpy("mwa_station_responses.npy", false, 4, leshape,
                         antenna_buffer);
