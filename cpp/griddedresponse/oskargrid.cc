@@ -10,7 +10,10 @@ using everybeam::griddedresponse::OSKARGrid;
 
 OSKARGrid::OSKARGrid(telescope::Telescope* telescope_ptr,
                      const coords::CoordinateSystem& coordinate_system)
-    : GriddedResponse(telescope_ptr, coordinate_system) {
+    : GriddedResponse(telescope_ptr, coordinate_system),
+      use_channel_frequency_(true),
+      subband_frequency_(0.0) {
+  // NOTE: subband_frequency_ will never be used for OSKAR
   const telescope::OSKAR& oskartelescope =
       dynamic_cast<const telescope::OSKAR&>(*telescope_);
   size_t ncpus = aocommon::ThreadPool::NCPUs();
@@ -106,7 +109,6 @@ void OSKARGrid::CalcThread(std::complex<float>* buffer, double time,
       static_cast<const telescope::OSKAR&>(*telescope_);
   const size_t values_per_ant = width_ * height_ * 4;
   double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
-
   Job job;
   while (lane_->read(job)) {
     for (size_t x = 0; x != width_; ++x) {
