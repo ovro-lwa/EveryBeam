@@ -1,7 +1,7 @@
 import os
-import sys
 import numpy as np
 from read_oskar_beams import read_oskar_beams
+from utils import check_tolerance
 import run_oskar_simulation
 import subprocess
 
@@ -19,12 +19,5 @@ subprocess.check_call(["./make_station_response_image", str(npixels)])
 A = read_oskar_beams()
 B = np.load('station-response.npy')
 
-if tolerance:
-    difference = np.nanmax(np.abs(A - B))
-    if difference > tolerance:
-        sys.exit(
-            "Difference between OSKAR and EveryBeam spherical wave model is {}, which is larger than the tolerance {}".format(
-                difference, tolerance
-            )
-        )
+check_tolerance(tolerance, A, B)
 

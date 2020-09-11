@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from generate_oskar_csv import generate_oskar_csv
 import run_oskar
 from read_oskar_beams import read_oskar_beams
+from utils import check_tolerance
 import subprocess
 
 # Check and set parameters
@@ -108,11 +109,4 @@ for em_idx in range(2):
         plt.gcf().suptitle("l = {}, m = {}, s = {}".format(l, m, s))
         plt.savefig("basefunction{}-{}".format(basefunction_idx, em_idx))
 
-        if tolerance:
-            difference = np.nanmax(np.abs(A - B))
-            if difference > tolerance:
-                sys.exit(
-                    "Difference between OSKAR and EveryBeam spherical wave model is {}, which is larger than the tolerance {}".format(
-                        difference, tolerance
-                    )
-                )
+        check_tolerance(tolerance, A, B)
