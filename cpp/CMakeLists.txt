@@ -27,13 +27,13 @@ add_library(everybeam SHARED
   telescope/mwa.cc
   telescope/oskar.cc
   griddedresponse/griddedresponse.cc
-  griddedresponse/lofargrid.cc
-  griddedresponse/oskargrid.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
   circularsymmetric/voltagepattern.cc
   circularsymmetric/vlabeam.cc
-  # mwabeam related
+  # Phased array telescopes (SKA, LOFAR)
+  griddedresponse/phasedarraygrid.cc
+  # MWA(beam) related
   mwabeam/tilebeam2016.cc
   mwabeam/beam2016implementation.cc
 )

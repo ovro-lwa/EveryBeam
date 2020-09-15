@@ -24,11 +24,7 @@
 #ifndef EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_
 #define EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_
 
-#include "griddedresponse.h"
-#include <iostream>
-#include <aocommon/matrix2x2.h>
-#include <complex>
-#include <limits>
+#include "phasedarraygrid.h"
 
 namespace everybeam {
 namespace griddedresponse {
@@ -37,7 +33,7 @@ namespace griddedresponse {
  * @brief Class for computing the OSKAR gridded response
  *
  */
-class OSKARGrid final : public GriddedResponse {
+class OSKARGrid final : public PhasedArrayGrid {
  public:
   /**
    * @brief Construct a new OSKARGrid object
@@ -46,59 +42,16 @@ class OSKARGrid final : public GriddedResponse {
    * @param coordinate_system CoordinateSystem struct
    */
   OSKARGrid(telescope::Telescope* telescope_ptr,
-            const coords::CoordinateSystem& coordinate_system);
+            const coords::CoordinateSystem& coordinate_system)
+      : PhasedArrayGrid(telescope_ptr, coordinate_system) {
+    const telescope::OSKAR& oskartelescope =
+        dynamic_cast<const telescope::OSKAR&>(*telescope_);
 
-  /**
-   * @brief Compute the Beam response for a single station
-   *
-   * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetBufferSize(1)
-   * @param station_idx Station index, must be smaller than number of stations
-   * in the Telescope
-   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-   * @param freq Frequency (Hz)
-   */
-  void CalculateStation(std::complex<float>* buffer, double time,
-                        double frequency, size_t station_idx,
-                        size_t field_id) override;
-
-  /**
-   * @brief Compute the Beam response for all stations in a Telescope
-   *
-   * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetBufferSize()
-   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-   * @param freq Frequency (Hz)
-   */
-  void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency, size_t field_id) override;
-
- private:
-  casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
-  vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_,
-      diff_beam_centre_;
-  bool use_channel_frequency_;
-  double subband_frequency_;
-
-  std::vector<aocommon::MC2x2F> inverse_central_gain_;
-
-  std::size_t nthreads_;
-  std::vector<std::thread> threads_;
-
-  struct Job {
-    size_t y, antenna_idx, buffer_offset;
+    delay_dir_ = oskartelescope.ms_properties_.delay_dir;
+    tile_beam_dir_ = oskartelescope.ms_properties_.delay_dir;
+    // NOTE: for OSKAR, it always holds that:
+    // use_channel_frequency_ --> true (i.e. never use the subband_frequency_)
   };
-  aocommon::Lane<Job>* lane_;
-
-  /**
-   * @brief Method for computing the ITRF-vectors.
-   * NOTE: method not thread-safe due to casacore dependencies.
-   *
-   * @param time
-   */
-  void SetITRFVectors(double time);
-
-  void CalcThread(std::complex<float>* buffer, double time, double frequency);
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

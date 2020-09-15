@@ -58,8 +58,7 @@ bool GetPreappliedBeamDirection(casacore::MeasurementSet &ms,
 }  // namespace
 
 LOFAR::LOFAR(casacore::MeasurementSet &ms, const Options &options)
-    : Telescope(ms, options) {
-  stations_.resize(nstations_);
+    : PhasedArray(ms, options) {
   ReadAllStations(ms, options_.element_response_model);
 
   // Populate MeasurementSet properties struct
