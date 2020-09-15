@@ -10,22 +10,12 @@ import re
 import subprocess
 
 from astropy.io import fits
-from astropy.time import Time, TimeDelta
 import matplotlib
 matplotlib.use('Agg')
 # pylint: disable=wrong-import-position
 import matplotlib.pyplot as plt
 import numpy
-import oskar
-
-
-def get_start_time(ra0_deg, length_sec):
-    """Returns optimal start time for field RA and observation length."""
-    t = Time('2000-01-01 00:00:00', scale='utc', location=('116.764d', '0d'))
-    dt_hours = (24.0 - t.sidereal_time('apparent').hour) / 1.0027379
-    dt_hours += (ra0_deg / 15.0)
-    start = t + TimeDelta(dt_hours * 3600.0 - length_sec / 2.0, format='sec')
-    return start.value
+from utils import create_settings, get_start_time
 
 
 def plot_panel(ax, image, title, cmap):
@@ -100,7 +90,7 @@ def main(npixels):
             'phase_centre_ra_deg': ra0_deg,
             'phase_centre_dec_deg': dec0_deg,
             #'pointing_file': 'station_pointing.txt',
-            'start_time_utc': get_start_time(ra0_deg, length_sec),
+            'start_time_utc': get_start_time(ra0_deg, length_sec, '2000-01-01 00:00:00'),
             'length': length_sec
         },
         'telescope': {
@@ -143,9 +133,7 @@ def main(npixels):
         for freq in freqs:
 
             # Create the settings file.
-            open(settings_path, 'w').close()
-            settings = oskar.SettingsTree(app, settings_path)
-            settings.from_dict(current_settings)
+            settings = create_settings(app, settings_path, current_settings)
 
             # Update output root path and frequency.
             tel_root = re.sub(r'[^\w]', '', tel)  # Strip symbols from tel.
