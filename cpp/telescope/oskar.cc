@@ -15,8 +15,7 @@ using everybeam::griddedresponse::OSKARGrid;
 using everybeam::telescope::OSKAR;
 
 OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
-    : Telescope(ms, options) {
-  stations_.resize(nstations_);
+    : PhasedArray(ms, options) {
   ReadAllStations(ms, options_.element_response_model);
 
   casacore::ScalarMeasColumn<casacore::MDirection> delay_dir_col(

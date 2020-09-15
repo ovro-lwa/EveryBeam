@@ -29,6 +29,11 @@
 namespace everybeam {
 namespace griddedresponse {
 
+/**
+ * @brief Class for computing the gridded response of dish telescopes,
+ * e.g. VLA, ATCA.
+ *
+ */
 class DishGrid final : public GriddedResponse {
  public:
   DishGrid(telescope::Telescope* telescope_ptr,

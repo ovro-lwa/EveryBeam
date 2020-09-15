@@ -27,7 +27,7 @@
 
 #include "../station.h"
 #include "../elementresponse.h"
-#include "telescope.h"
+#include "phasedarray.h"
 
 #include <casacore/measures/Measures/MPosition.h>
 #include <casacore/measures/Measures/MDirection.h>
@@ -44,7 +44,7 @@ class GriddedResponse;
 namespace telescope {
 
 //! LOFAR telescope class
-class LOFAR final : public Telescope {
+class LOFAR final : public PhasedArray {
   friend class griddedresponse::LOFARGrid;
 
  public:
@@ -60,38 +60,10 @@ class LOFAR final : public Telescope {
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
-  /**
-   * @brief Get station by index
-   *
-   * @param station_id Station index to retrieve
-   * @return Station::Ptr
-   */
-  Station::Ptr GetStation(std::size_t station_idx) const {
-    // Assert only in DEBUG mode
-    assert(station_idx < nstations_);
-    return stations_[station_idx];
-  }
-
  private:
-  /**
-   * @brief Read stations into vector
-   *
-   * @param out_it std::vector of stations
-   * @param ms measurement set
-   * @param model model
-   */
-  void ReadAllStations(const casacore::MeasurementSet &ms,
-                       const ElementResponseModel model) {
-    casacore::ROMSAntennaColumns antenna(ms.antenna());
-
-    for (std::size_t i = 0; i < antenna.nrow(); ++i) {
-      stations_[i] = ReadStation(ms, i, model);
-    }
-  };
-
   Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                            const std::size_t id,
-                           const ElementResponseModel model) const;
+                           const ElementResponseModel model) const override;
   struct MSProperties {
     double subband_freq;
     casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
