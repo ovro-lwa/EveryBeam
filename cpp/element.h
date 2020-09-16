@@ -32,6 +32,8 @@ class Element : public Antenna {
         id_(id),
         element_response_(element_response) {}
 
+  Antenna::Ptr Clone() const override;
+
   /**
    * @brief Compute the local response of the element.
    *

@@ -2,6 +2,15 @@
 #include "common/mathutils.h"
 
 namespace everybeam {
+
+Antenna::Ptr Element::Clone() const {
+  auto element_clone =
+      Element::Ptr(new Element(coordinate_system_, element_response_, id_));
+  element_clone->enabled_[0] = enabled_[0];
+  element_clone->enabled_[1] = enabled_[1];
+  return element_clone;
+}
+
 matrix22c_t Element::LocalResponse(real_t time, real_t freq,
                                    const vector3r_t &direction, size_t id,
                                    const Options &options) const {

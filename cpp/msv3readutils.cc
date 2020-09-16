@@ -137,15 +137,6 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
 
   station->SetAntenna(beam_former);
 
-  size_t field_id = 0;
-  size_t element_id = 0;
-  Antenna::CoordinateSystem coordinate_system =
-      common::ReadCoordinateSystem(tab_phased_array, field_id);
-  auto element_response = station->GetElementResponse();
-  auto element = Element::Ptr(
-      new Element(coordinate_system, element_response, element_id));
-  station->SetElement(element);
-
   return station;
 }
 

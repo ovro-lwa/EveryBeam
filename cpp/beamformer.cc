@@ -6,6 +6,25 @@
 #include <cmath>
 
 namespace everybeam {
+
+Antenna::Ptr BeamFormer::Clone() const {
+  auto beamformer_clone = BeamFormer::Ptr(
+      new BeamFormer(coordinate_system_, phase_reference_position_));
+
+  // antennas_ is a vector of pointers to Antennas, so
+  // this creates a shallow copy, in the sense that
+  // the antennas are not copied, only the pointers.
+  beamformer_clone->antennas_ = antennas_;
+
+  return beamformer_clone;
+}
+
+Antenna::Ptr BeamFormer::ExtractAntenna(size_t antenna_index) const {
+  Antenna::Ptr antenna = antennas_[antenna_index]->Clone();
+  antenna->Transform(coordinate_system_);
+  return antenna;
+}
+
 vector3r_t BeamFormer::TransformToLocalPosition(const vector3r_t &position) {
   // Get antenna position relative to coordinate system origin
   vector3r_t dposition{position[0] - coordinate_system_.origin[0],
