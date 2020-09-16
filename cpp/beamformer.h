@@ -52,12 +52,32 @@ class BeamFormer : public Antenna {
         TransformToLocalPosition(phase_reference_position_);
   }
 
+  Antenna::Ptr Clone() const override;
+
   /**
    * @brief Add an antenna to the m_antenna array.
    *
    * @param antenna
    */
   void AddAntenna(Antenna::Ptr antenna) { antennas_.push_back(antenna); }
+
+  /**
+   * @brief Extracts an antenna from the beamformer
+   *
+   * @param antenna_index index of antenna to extact
+   * @returns pointer to a copy of antenna with index antenna_index
+   *
+   * The antenna is extracted such that it can be used stand-alone,
+   * independent of the beamformer. The coordinate system of the extracted
+   * antenna is transformed from internal representation to external
+   * representation by application of the beamformer coordinate system to
+   * the antenna coordinate system.
+   *
+   * The returned antenna can be either an Element or a BeamFormer.
+   *
+   * The beamformer itself remains unchanged.
+   */
+  Antenna::Ptr ExtractAntenna(size_t antenna_index) const;
 
  protected:
   vector3r_t

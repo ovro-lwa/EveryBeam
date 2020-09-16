@@ -80,6 +80,21 @@ const vector3r_t &Station::GetPhaseReference() const {
   return phase_reference_;
 }
 
+void Station::SetAntenna(Antenna::Ptr antenna) {
+  antenna_ = antenna;
+
+  // The antenna can be either an Element or a BeamFormer
+  // If it is a BeamFormer we recursively extract the first antenna
+  // until we have an Element.
+  // The extraction returns copies so antenna_ remains unchanged.
+  // The element that is found is used in ComputeElementResponse to
+  // compute the element response.
+  while (auto beamformer = std::dynamic_pointer_cast<BeamFormer>(antenna)) {
+    antenna = beamformer->ExtractAntenna(0);
+  }
+  element_ = std::dynamic_pointer_cast<Element>(antenna);
+}
+
 // ========================================================
 matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
                                             const vector3r_t &direction,
@@ -102,13 +117,20 @@ matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
 matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
                                             const vector3r_t &direction,
                                             const bool rotate) const {
-  //     if (rotate)
-  //       return itsElement->response(time, freq, direction)
-  //           * Rotation(time, direction);
-  //     else
-  //       return itsElement->response(time, freq, direction);
+  Antenna::Options options;
+  options.rotate = rotate;
 
-  return element_->Response(time, freq, direction);
+  if (options.rotate) {
+    vector3r_t ncp_ = NCP(time);
+    vector3r_t east = normalize(cross(ncp_, direction));
+    vector3r_t north = cross(direction, east);
+    options.east = east;
+    options.north = north;
+  }
+
+  matrix22c_t response;
+  response = element_->Response(time, freq, direction, options);
+  return response;
 }
 
 matrix22c_t Station::Response(real_t time, real_t freq,
@@ -129,14 +151,6 @@ matrix22c_t Station::Response(real_t time, real_t freq,
 
   matrix22c_t response = antenna_->Response(time, freq, direction, options);
 
-  //     if (rotate) {
-  //         std::cout << "rotate" << std::endl;
-  //         auto r = Rotation(time, direction);
-  //         std::cout << r[0][0] << ", " << r[0][1] << std::endl;
-  //         std::cout << r[1][0] << ", " << r[1][1] << std::endl;
-  //         response = response * r;
-  //         std::cout << response[0][0] << std::endl;
-  //     }
   return response;
 }
 

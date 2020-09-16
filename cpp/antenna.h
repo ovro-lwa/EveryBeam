@@ -116,6 +116,37 @@ class Antenna {
         enabled_{true, true} {}
 
   /**
+   * @brief Makes a copy of this Antenna object
+   *
+   * The method is virtual, so that copies can be created from a pointer
+   * to the base (Antenna) class.
+   * The original remains unchanged, therefore the method is const.
+   * The method has no implementation in the Antenna class, because
+   * Antenna is abstract, so no copy can be instantiated.
+   *
+   * This method is used by the ExtractAntenna method of the BeamFormer
+   * class to create a copy of one of the Antennas it contains.
+   */
+  virtual Ptr Clone() const = 0;
+
+  /**
+   * @brief Transform internal coordinate systems and positions
+   *
+   * @param coordinate_system to apply in the transformation
+   *
+   * This method is used by BeamFormer::ExtractAntenna to lift
+   * an antenna out of the beamformer.
+   *
+   * The transformation is needed because the coordinate system of
+   * an antenna in a beamformer is expressed in terms of
+   * the coordinate system of the beamformer.
+   * To turn an embedded antenna into a stand-alone antenna,
+   * the coordinate system of the beamformer needs to be
+   * applied to the coordinate system of the antenna
+   */
+  void Transform(const CoordinateSystem &coordinate_system);
+
+  /**
    * @brief Compute the %Antenna Response
    *
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).

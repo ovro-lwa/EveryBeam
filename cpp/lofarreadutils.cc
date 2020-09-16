@@ -313,15 +313,6 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
 
     station->SetAntenna(beam_former);
 
-    size_t field_id = 0;
-    size_t element_id = 0;
-    Antenna::CoordinateSystem coordinate_system =
-        common::ReadCoordinateSystem(tab_field, field_id);
-    auto model = station->GetElementResponse();
-    // TODO: rotate coordinate system for antenna
-    auto element =
-        Element::Ptr(new Element(coordinate_system, model, element_id));
-    station->SetElement(element);
   } else if (telescope_name == "AARTFAAC") {
     ROScalarColumn<String> ant_type_col(common::GetSubTable(ms, "OBSERVATION"),
                                         "AARTFAAC_ANTENNA_TYPE");

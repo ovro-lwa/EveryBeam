@@ -333,12 +333,9 @@ class Station {
   }
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element
-  void SetAntenna(Antenna::Ptr antenna) { antenna_ = antenna; }
+  void SetAntenna(Antenna::Ptr antenna);
 
-  Antenna::Ptr GetAntenna() { return antenna_; }
-
-  //! Set Element attribute
-  void SetElement(Element::Ptr element) { element_ = element; }
+  Antenna::Ptr GetAntenna() const { return antenna_; }
 
  private:
   vector3r_t NCP(real_t time) const;

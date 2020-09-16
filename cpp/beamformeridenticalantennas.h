@@ -35,6 +35,8 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
   BeamFormerIdenticalAntennas(vector3r_t phase_reference_position)
       : BeamFormer(phase_reference_position) {}
 
+  Antenna::Ptr Clone() const override;
+
  private:
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
