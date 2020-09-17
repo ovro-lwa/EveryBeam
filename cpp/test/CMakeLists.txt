@@ -8,8 +8,6 @@ set(VLA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/VLA_MOCK.ms CACHE PATH "")
 set(MWA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/MWA_MOCK.ms CACHE PATH "")
 set(MWA_COEFF_PATH ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_pattern.h5 CACHE PATH "")
 
-configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
-
 #------------------------------------------------------------------------------
 set(TEST_FILENAMES
   runtests.cc

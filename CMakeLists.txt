@@ -112,6 +112,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
 endif()
 
 #------------------------------------------------------------------------------
+# Generate config.h file
+configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+
+#------------------------------------------------------------------------------
 # Documentation
 find_package(Doxygen)
 
