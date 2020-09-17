@@ -19,10 +19,6 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/telescope.tm/position.txt"
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/telescope.tm/station000/layout.txt"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/station000/telescope.tm")
 
-execute_process( COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/skalowmini-coef.tm" "${CMAKE_CURRENT_BINARY_DIR}/skalowmini-coef.tm")
-
-
 #------------------------------------------------------------------------------
 # comparison-oskar knits together the cpp code and the python scripts     
 add_custom_target(comparison-oskar-basefunctions
