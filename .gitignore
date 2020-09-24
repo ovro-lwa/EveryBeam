@@ -3,5 +3,6 @@
 # Directories
 .vscode/
 build/
+builds/
 test_data/
 __pycache__/
