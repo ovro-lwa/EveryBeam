@@ -81,6 +81,8 @@ build-compare-oskar:
     - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
+    # Check-out at specific version, before HDF5 got broken
+    - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee 
     - cd /opt/oskar/build
   script:
     # OSKAR cpp install
