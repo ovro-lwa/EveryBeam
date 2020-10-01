@@ -5,7 +5,8 @@
 
 #include <aocommon/uvector.h>
 
-namespace everybeam::mwabeam {
+namespace everybeam {
+namespace mwabeam {
 class FactorialTable {
  public:
   FactorialTable(size_t nprecalculated) : table_(nprecalculated) {
@@ -27,5 +28,6 @@ class FactorialTable {
  private:
   aocommon::UVector<double> table_;
 };
-}  // namespace everybeam::mwabeam
+}  // namespace mwabeam
+}  // namespace everybeam
 #endif  // EVERYBEAM_MWABEAM_FACTORIALTABLE_H_

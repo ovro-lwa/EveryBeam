@@ -1,6 +1,8 @@
 #include "element.h"
 #include "common/mathutils.h"
 
+#include <complex>
+
 namespace everybeam {
 
 Antenna::Ptr Element::Clone() const {
@@ -17,7 +19,8 @@ matrix22c_t Element::LocalResponse(real_t time, real_t freq,
   vector2r_t thetaphi = cart2thetaphi(direction);
 
   matrix22c_t result;
-  static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t));
+  static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t),
+                "matrix22c_t has incorrect size");
   element_response_->Response(
       id, freq, thetaphi[0], thetaphi[1],
       reinterpret_cast<std::complex<double>(&)[2][2]>(result));

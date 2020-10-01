@@ -51,10 +51,10 @@ class Antenna {
     vector3r_t origin;
     Axes axes;
 
-    constexpr static Axes identity_axes = {
-        {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+    constexpr static Axes identity_axes =
+        Axes{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
 
-    constexpr static vector3r_t zero_origin = {0.0, 0.0, 0.0};
+    constexpr static vector3r_t zero_origin = vector3r_t{0.0, 0.0, 0.0};
   };
 
   constexpr static CoordinateSystem IdentityCoordinateSystem{

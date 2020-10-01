@@ -24,7 +24,8 @@
 #include "factorialtable.h"
 #include "recursivelock.h"
 
-namespace everybeam::mwabeam {
+namespace everybeam {
+namespace mwabeam {
 
 /*
   Structure for Jones matrix :
@@ -244,5 +245,6 @@ class Beam2016Implementation {
 
   std::mutex mutex_;
 };
-}  // namespace everybeam::mwabeam
+}  // namespace mwabeam
+}  // namespace everybeam
 #endif
