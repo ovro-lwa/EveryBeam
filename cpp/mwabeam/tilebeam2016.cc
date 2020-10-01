@@ -4,7 +4,8 @@
 #include <casacore/measures/Measures/MCPosition.h>
 #include <casacore/measures/Measures/MeasConvert.h>
 
-namespace everybeam::mwabeam {
+namespace everybeam {
+namespace mwabeam {
 
 TileBeam2016::TileBeam2016(const double* delays, bool frequency_interpolation,
                            const std::string& coeff_path)
@@ -54,4 +55,5 @@ void TileBeam2016::GetTabulatedResponse(double az, double za, double freq,
   result[2] = jones.j10;
   result[3] = jones.j11;
 }
-}  // namespace everybeam::mwabeam
+}  // namespace mwabeam
+}  // namespace everybeam

@@ -5,7 +5,8 @@
 #include <mutex>
 #include <system_error>
 
-namespace everybeam::mwabeam {
+namespace everybeam {
+namespace mwabeam {
 
 template <typename Mutex>
 class RecursiveLock {
@@ -101,5 +102,6 @@ class RecursiveLock {
   Mutex* mutex_;
   size_t nlocks_;
 };
-}  // namespace everybeam::mwabeam
+}  // namespace mwabeam
+}  // namespace everybeam
 #endif  // EVERYBEAM_MWABEAM_RECURSIVELOCK_H_
