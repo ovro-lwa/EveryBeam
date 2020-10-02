@@ -2,7 +2,8 @@
 find_package(Boost COMPONENTS unit_test_framework)
 
 # Set cache values if not specified
-set(LOFAR_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/LOFAR_MOCK.ms CACHE PATH "")
+set(LOFAR_HBA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/LOFAR_HBA_MOCK.ms CACHE PATH "")
+set(LOFAR_LBA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/LOFAR_LBA_MOCK.ms CACHE PATH "")
 set(OSKAR_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/OSKAR_MOCK.ms CACHE PATH "")
 set(VLA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/VLA_MOCK.ms CACHE PATH "")
 set(MWA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/MWA_MOCK.ms CACHE PATH "")
@@ -11,7 +12,8 @@ set(MWA_COEFF_PATH ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_patte
 #------------------------------------------------------------------------------
 set(TEST_FILENAMES
   runtests.cc
-  tlofar.cc
+  tlofar_hba.cc
+  tlofar_lba.cc
   toskar.cc
   tmwa.cc
   tstation.cc
@@ -27,8 +29,12 @@ set_source_files_properties(
 )
 
 add_test(
-  NAME download_lofar_ms
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_ms.sh
+  NAME download_lofar_hba_ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
+)
+add_test(
+  NAME download_lofar_lba_ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
 )
 add_test(
   NAME download_oskar_ms
@@ -47,7 +53,7 @@ add_test(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
 )
 set_tests_properties(
-  download_lofar_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff
+  download_lofar_hba_ms download_lofar_lba_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff
   PROPERTIES FIXTURES_SETUP mocks
 )
 
