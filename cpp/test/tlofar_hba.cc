@@ -5,6 +5,8 @@
 #include "../griddedresponse/lofargrid.h"
 #include "../elementresponse.h"
 #include "../../external/npy.hpp"
+#include "../station.h"
+#include "../common/types.h"
 
 #include "config.h"
 #include <complex>
@@ -13,20 +15,23 @@
 
 using everybeam::ElementResponseModel;
 using everybeam::Load;
+using everybeam::matrix22c_t;
 using everybeam::Options;
+using everybeam::Station;
+using everybeam::vector3r_t;
 using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::Telescope;
 
-BOOST_AUTO_TEST_SUITE(tlofar)
+BOOST_AUTO_TEST_SUITE(tlofar_hba)
 
 BOOST_AUTO_TEST_CASE(load_lofar) {
   Options options;
   options.element_response_model = ElementResponseModel::kHamaker;
 
-  casacore::MeasurementSet ms(LOFAR_MOCK_MS);
+  casacore::MeasurementSet ms(LOFAR_HBA_MOCK_MS);
 
   // Load LOFAR Telescope
   std::unique_ptr<Telescope> telescope = Load(ms, options);
@@ -57,6 +62,35 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                    .dm = dm,
                                    .phase_centre_dl = shift_l,
                                    .phase_centre_dm = shift_m};
+  // Compute and check the Station::ComputeElementResponse for
+  // a "randomly selected"  station (station 11)
+  // NOTE: this is a regression test in the sense that we only check whether
+  // results are consistently reproduced. Reference solution obtained at
+  // commit sha 70a286e7dace4616417b0e973a624477f15c9ce3
+  //
+  // Direction corresponds to one of the itrf directions of the (16) pixels
+  // target_element_response is the element response corresponding to this
+  // direction
+  vector3r_t direction = {0.397408, 0.527527, 0.750855};
+  matrix22c_t target_element_response = {0};
+  target_element_response[0][0] = {-0.164112, -0.000467162};
+  target_element_response[0][1] = {-0.843709, -0.00123631};
+  target_element_response[1][0] = {-0.892528, -0.00126278};
+  target_element_response[1][1] = {0.0968527, -6.7158e-05};
+
+  const Station& station =
+      static_cast<const Station&>(*(lofartelescope.GetStation(11).get()));
+  matrix22c_t element_response =
+      station.ComputeElementResponse(time, frequency, direction, true);
+
+  // Check whether element_response and target_element_response are "equal"
+  for (size_t i = 0; i != 2; ++i) {
+    for (size_t j = 0; j != 2; ++j) {
+      BOOST_CHECK(std::abs(element_response[i][j] -
+                           target_element_response[i][j]) < 1e-6);
+    }
+  }
+
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr != dynamic_cast<LOFARGrid*>(grid_response.get()));

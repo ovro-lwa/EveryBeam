@@ -15,19 +15,19 @@ cd ..
 mkdir -p test_data
 cd test_data/
 
-LOFAR_MOCK_ARCHIVE=LOFAR_ARCHIVE.tar.bz2
-LOFAR_MOCK_MS=LOFAR_MOCK.ms
+LOFAR_MOCK_ARCHIVE=LOFAR_HBA_ARCHIVE.tar.bz2
+LOFAR_HBA_MOCK_MS=LOFAR_HBA_MOCK.ms
 
 if [ ! -f "$LOFAR_MOCK_ARCHIVE" ]; then
     wget -q https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
 fi
 
-if [ -d $LOFAR_MOCK_MS ]
+if [ -d $LOFAR_HBA_MOCK_MS ]
 then
     echo "Directory already exists"
 else
-    mkdir $LOFAR_MOCK_MS
+    mkdir $LOFAR_HBA_MOCK_MS
 fi
 
-tar -xf $LOFAR_MOCK_ARCHIVE  -C $LOFAR_MOCK_MS --strip-components=1
+tar -xf $LOFAR_MOCK_ARCHIVE  -C $LOFAR_HBA_MOCK_MS --strip-components=1
 rm $LOFAR_MOCK_ARCHIVE
