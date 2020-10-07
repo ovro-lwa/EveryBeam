@@ -55,7 +55,7 @@ class BeamFormer : public Antenna {
   Antenna::Ptr Clone() const override;
 
   /**
-   * @brief Add an antenna to the m_antenna array.
+   * @brief Add an antenna to the antennas_ array.
    *
    * @param antenna
    */

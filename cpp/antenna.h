@@ -155,8 +155,9 @@ class Antenna {
    * @param options
    * @return matrix22c_t Jones matrix
    */
-  matrix22c_t Response(real_t time, real_t freq, const vector3r_t &direction,
-                       const Options &options = {}) {
+  virtual matrix22c_t Response(real_t time, real_t freq,
+                               const vector3r_t &direction,
+                               const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options = {
@@ -206,7 +207,7 @@ class Antenna {
     return {1.0, 1.0};
   }
 
-  vector3r_t TransformToLocalDirection(const vector3r_t &direction);
+  vector3r_t TransformToLocalDirection(const vector3r_t &direction) const;
 };
 
 }  // namespace everybeam

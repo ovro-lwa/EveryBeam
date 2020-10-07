@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   // +++ b/lofar/lbeamimagemaker.cpp
   // @@ -380,7 +380,7 @@ void LBeamImageMaker::makeBeamSnapshot(
   //                                 MC4x4::KroneckerProduct(
-  //                                     stationGains[a1].HermTranspose().Transpose(),
+  // stationGains[a1].HermTranspose().Transpose(),
   //                                     stationGains[a2]);
   // -          double w = weights.Value(a1, a2);
   // +          double w = 1.;

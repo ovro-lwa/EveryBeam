@@ -14,7 +14,9 @@ add_library(everybeam SHARED
   elementresponse.cc
   beamformer.cc
   beamformeridenticalantennas.cc
+  beamformerlofarhba.cc
   element.cc
+  elementhamaker.cc
   load.cc
   common/fftresampler.cc
   coords/itrfconverter.cc
@@ -56,8 +58,10 @@ install (
 install (FILES
   antenna.h
   beamformer.h
+  beamformerlofarhba.h
   beamformeridenticalantennas.h
   element.h
+  elementhamaker.h
   elementresponse.h
   lofarreadutils.h
   msv3readutils.h

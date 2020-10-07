@@ -44,14 +44,16 @@ class Element : public Antenna {
    * @param options
    * @return matrix22c_t
    */
-  matrix22c_t LocalResponse(real_t time, real_t freq,
-                            const vector3r_t &direction, size_t id,
-                            const Options &options) const;
+  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
+                                    const vector3r_t &direction, size_t id,
+                                    const Options &options) const;
 
- private:
-  virtual matrix22c_t LocalResponse(
-      real_t time, real_t freq, const vector3r_t &direction,
-      const Options &options) const final override;
+ protected:
+  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
+                                    const vector3r_t &direction,
+                                    const Options &options) const override {
+    return LocalResponse(time, freq, direction, id_, options);
+  };
 
   int id_;
   ElementResponse::Ptr element_response_;

@@ -1,26 +1,25 @@
-#include "element.h"
+#include "elementhamaker.h"
 #include "common/mathutils.h"
-
-#include <complex>
+#include "common/constants.h"
 
 namespace everybeam {
-
-Antenna::Ptr Element::Clone() const {
-  auto element_clone =
-      Element::Ptr(new Element(coordinate_system_, element_response_, id_));
+Antenna::Ptr ElementHamaker::Clone() const {
+  auto element_clone = std::make_shared<ElementHamaker>(
+      ElementHamaker(coordinate_system_, element_response_, id_));
   element_clone->enabled_[0] = enabled_[0];
   element_clone->enabled_[1] = enabled_[1];
   return element_clone;
 }
 
-matrix22c_t Element::LocalResponse(real_t time, real_t freq,
-                                   const vector3r_t &direction, size_t id,
-                                   const Options &options) const {
+matrix22c_t ElementHamaker::LocalResponse(real_t time, real_t freq,
+                                          const vector3r_t &direction,
+                                          size_t id,
+                                          const Options &options) const {
   vector2r_t thetaphi = cart2thetaphi(direction);
+  thetaphi[1] -= 5.0 * common::pi_4;
 
   matrix22c_t result;
-  static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t),
-                "matrix22c_t has incorrect size");
+  static_assert(sizeof(std::complex<double>[2][2]) == sizeof(matrix22c_t));
   element_response_->Response(
       id, freq, thetaphi[0], thetaphi[1],
       reinterpret_cast<std::complex<double>(&)[2][2]>(result));
