@@ -42,7 +42,6 @@ class Station {
  public:
   typedef std::shared_ptr<Station> Ptr;
   typedef std::shared_ptr<const Station> ConstPtr;
-  //     typedef std::vector<AntennaField::ConstPtr>  FieldList;
 
   /*!
    *  \brief Construct a new Station instance.
@@ -52,8 +51,6 @@ class Station {
    */
   Station(const std::string &name, const vector3r_t &position,
           const ElementResponseModel model);
-
-  void SetResponseModel(const ElementResponseModel model);
 
   void SetResponse(std::shared_ptr<ElementResponse> element_response);
 
@@ -299,6 +296,11 @@ class Station {
   //! Returns a pointer to the ElementResponse class
   const ElementResponse::Ptr GetElementResponse() { return element_response_; }
 
+  //! Returns an enum of the chosen ElementResponse model
+  const ElementResponseModel GetElementResponseModel() const {
+    return element_response_model_;
+  }
+
   /**
    * @brief Compute the Jones matrix for the element response
    *
@@ -338,6 +340,8 @@ class Station {
   Antenna::Ptr GetAntenna() const { return antenna_; }
 
  private:
+  void SetResponseModel(const ElementResponseModel model);
+
   vector3r_t NCP(real_t time) const;
   vector3r_t NCPPol0(real_t time) const;
   //! Compute the parallactic rotation.
@@ -346,7 +350,8 @@ class Station {
   std::string name_;
   vector3r_t position_;
   vector3r_t phase_reference_;
-  ElementResponseModel element_response_model_ = ElementResponseModel::kUnknown;
+  ElementResponseModel
+      element_response_model_;  // = ElementResponseModel::kUnknown;
   ElementResponse::Ptr element_response_;
   Element::Ptr element_;
 

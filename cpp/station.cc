@@ -22,6 +22,7 @@
 
 #include "station.h"
 #include "common/mathutils.h"
+#include "beamformerlofarhba.h"
 
 #include "hamaker/hamakerelementresponse.h"
 #include "oskar/oskarelementresponse.h"
@@ -34,8 +35,9 @@ Station::Station(const std::string &name, const vector3r_t &position,
     : name_(name),
       position_(position),
       phase_reference_(position),
+      element_response_model_(model),
       element_response_(nullptr) {
-  SetResponseModel(model);
+  SetResponseModel(element_response_model_);
   vector3r_t ncp = {{0.0, 0.0, 1.0}};
   ncp_.reset(new coords::ITRFDirection(ncp));
   vector3r_t ncppol0 = {{1.0, 0.0, 0.0}};
@@ -85,12 +87,24 @@ void Station::SetAntenna(Antenna::Ptr antenna) {
 
   // The antenna can be either an Element or a BeamFormer
   // If it is a BeamFormer we recursively extract the first antenna
-  // until we have an Element.
+  // until we have a BeamFormerLofarHBA or an Element.
+  //
   // The extraction returns copies so antenna_ remains unchanged.
   // The element that is found is used in ComputeElementResponse to
   // compute the element response.
+
   while (auto beamformer = std::dynamic_pointer_cast<BeamFormer>(antenna)) {
     antenna = beamformer->ExtractAntenna(0);
+  }
+
+  // If we can cast to BeamFormerLofarHBA, then we extract the Element - please
+  // note that the Element is upcasted from an ElementHamaker into an Element in
+  // BeamFormerLofarHBA::Clone()!- and Transform the Element with the
+  // coordinate_system of the HBA BeamFormer
+  if (auto beamformer_hba =
+          std::dynamic_pointer_cast<BeamFormerLofarHBA>(antenna)) {
+    antenna = beamformer_hba->GetElement();
+    antenna->Transform(beamformer_hba->coordinate_system_);
   }
   element_ = std::dynamic_pointer_cast<Element>(antenna);
 }

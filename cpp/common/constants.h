@@ -31,7 +31,10 @@
 namespace everybeam {
 namespace common {
 /** Speed of light (m/s) */
-const real_t c = 2.99792458e+08;
+constexpr real_t c = 2.99792458e+08;
+
+/** 0.25*pi */
+constexpr real_t pi_4 = 0.7853981633974483096156608;
 }  // namespace common
 }  // namespace everybeam
 
