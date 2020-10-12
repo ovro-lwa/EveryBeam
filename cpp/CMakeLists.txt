@@ -14,7 +14,9 @@ add_library(everybeam SHARED
   elementresponse.cc
   beamformer.cc
   beamformeridenticalantennas.cc
+  beamformerlofar.cc
   beamformerlofarhba.cc
+  beamformerlofarlba.cc
   element.cc
   elementhamaker.cc
   load.cc
@@ -58,7 +60,6 @@ install (
 install (FILES
   antenna.h
   beamformer.h
-  beamformerlofarhba.h
   beamformeridenticalantennas.h
   element.h
   elementhamaker.h
@@ -66,7 +67,6 @@ install (FILES
   lofarreadutils.h
   msv3readutils.h
   station.h
-  # Related to new API:
   load.h
   options.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}")

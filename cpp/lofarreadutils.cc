@@ -24,6 +24,7 @@
 #include "lofarreadutils.h"
 #include "beamformeridenticalantennas.h"
 #include "beamformerlofarhba.h"
+#include "beamformerlofarlba.h"
 #include "common/mathutils.h"
 #include "common/casautils.h"
 
@@ -224,9 +225,8 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
       beam_former = std::make_shared<BeamFormerLofarHBA>(
           BeamFormerLofarHBA(coordinate_system));
     } else {
-      // TODO: will become a dedicated BeamFormerLofarLBA in the near future
-      beam_former = std::make_shared<BeamFormerIdenticalAntennas>(
-          BeamFormerIdenticalAntennas(coordinate_system));
+      beam_former = std::make_shared<BeamFormerLofarLBA>(
+          BeamFormerLofarLBA(coordinate_system));
     }
   } else {
     // Tiles / element should be kept unique, so work with generic BeamFormer
@@ -248,16 +248,24 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
     if (name == "LBA") {
       antenna = std::make_shared<Element>(
           Element(antenna_coordinate_system, element_response, id));
-      antenna->enabled_[0] = !aips_flag(0, i);
-      antenna->enabled_[1] = !aips_flag(1, i);
-
       if (element_response_model == kHamaker) {
-        // NOTE: no cast needed as yet, but it already hints towards
-        // future implementation
-        std::shared_ptr<BeamFormerIdenticalAntennas> beam_former_lba =
-            std::static_pointer_cast<BeamFormerIdenticalAntennas>(beam_former);
-        beam_former_lba->AddAntenna(antenna);
+        // Cast to LOFAR LBA
+        std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
+            std::static_pointer_cast<BeamFormerLofarLBA>(beam_former);
+        // Store only one Element
+        if (i == 0) {
+          std::shared_ptr<Element> element =
+              std::dynamic_pointer_cast<Element>(antenna);
+          beam_former_lba->SetElement(element);
+        }
+        // Store Element position and Element enabled in x/y?
+        beam_former_lba->AddElementPosition(antenna_position);
+        beam_former_lba->AddElementEnabled(
+            std::array<bool, 2>{!aips_flag(0, i), !aips_flag(0, i)});
       } else {
+        antenna->enabled_[0] = !aips_flag(0, i);
+        antenna->enabled_[1] = !aips_flag(1, i);
+
         std::shared_ptr<BeamFormer> beam_former_lba =
             std::static_pointer_cast<BeamFormer>(beam_former);
         beam_former_lba->AddAntenna(antenna);
@@ -268,7 +276,7 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
         std::shared_ptr<BeamFormerLofarHBA> beam_former_hba =
             std::static_pointer_cast<BeamFormerLofarHBA>(beam_former);
 
-        // Tile positions are uniques
+        // Tile positions are unique
         beam_former_hba->AddTilePosition(antenna_position);
 
         // Store only one tile
