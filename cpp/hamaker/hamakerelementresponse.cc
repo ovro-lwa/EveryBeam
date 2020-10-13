@@ -45,11 +45,11 @@ void HamakerElementResponse::Response(
     return;
   }
 
-  const double freq_center = m_coeffs->GetFreqCenter();
-  const double freq_range = m_coeffs->GetFreqRange();
-  const unsigned int nHarmonics = m_coeffs->Get_nHarmonics();
-  const unsigned int nPowerTheta = m_coeffs->Get_nPowerTheta();
-  const unsigned int nPowerFreq = m_coeffs->Get_nPowerFreq();
+  const double freq_center = coeffs_->GetFreqCenter();
+  const double freq_range = coeffs_->GetFreqRange();
+  const unsigned int nHarmonics = coeffs_->Get_nHarmonics();
+  const unsigned int nPowerTheta = coeffs_->Get_nPowerTheta();
+  const unsigned int nPowerFreq = coeffs_->Get_nPowerFreq();
   ;
 
   // The model is parameterized in terms of a normalized frequency in the
@@ -73,22 +73,21 @@ void HamakerElementResponse::Response(
     // start indexing the block of coefficients at the last element
 
     // Evaluate the highest order term.
-    P = m_coeffs->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1);
+    P = coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1);
 
     for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-      auto Pk =
-          m_coeffs->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2);
+      auto Pk = coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2);
       P.first = P.first * freq + Pk.first;
       P.second = P.second * freq + Pk.second;
     }
 
     // Evaluate the remaining terms.
     for (unsigned int j = 0; j < nPowerTheta - 1; ++j) {
-      Pj = m_coeffs->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1);
+      Pj = coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1);
 
       for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-        auto Pk = m_coeffs->GetCoefficient(k, nPowerTheta - j - 2,
-                                           nPowerFreq - i - 2);
+        auto Pk =
+            coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - i - 2);
         Pj.first = Pj.first * freq + Pk.first;
         Pj.second = Pj.second * freq + Pk.second;
       }
@@ -116,11 +115,11 @@ void HamakerElementResponse::Response(
 
 HamakerElementResponseHBA::HamakerElementResponseHBA() {
   std::string path = GetPath("HamakerHBACoeff.h5");
-  m_coeffs.reset(new HamakerCoefficients(path));
+  coeffs_.reset(new HamakerCoefficients(path));
 }
 
 HamakerElementResponseLBA::HamakerElementResponseLBA() {
   std::string path = GetPath("HamakerLBACoeff.h5");
-  m_coeffs.reset(new HamakerCoefficients(path));
+  coeffs_.reset(new HamakerCoefficients(path));
 }
 }  // namespace everybeam

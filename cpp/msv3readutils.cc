@@ -52,6 +52,24 @@
 #include <casacore/ms/MeasurementSets/MSSpectralWindow.h>
 #include <casacore/ms/MeasurementSets/MSSpWindowColumns.h>
 
+using casacore::Bool;
+using casacore::Double;
+using casacore::Int;
+using casacore::Matrix;
+using casacore::MDirection;
+using casacore::MeasurementSet;
+using casacore::MPosition;
+using casacore::MVPosition;
+using casacore::Quantity;
+using casacore::ROArrayColumn;
+using casacore::ROArrayMeasColumn;
+using casacore::ROArrayQuantColumn;
+using casacore::ROMSAntennaColumns;
+using casacore::ROScalarColumn;
+using casacore::ROScalarMeasColumn;
+using casacore::String;
+using casacore::Table;
+
 namespace everybeam {
 
 constexpr Antenna::CoordinateSystem::Axes antenna_orientation = {
@@ -67,8 +85,6 @@ constexpr Antenna::CoordinateSystem::Axes antenna_orientation = {
     },
     {0.0, 0.0, 1.0},
 };
-
-using namespace casacore;
 
 vector3r_t TransformToFieldCoordinates(
     const vector3r_t &position, const Antenna::CoordinateSystem::Axes &axes);
@@ -100,8 +116,8 @@ BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
     Antenna::Ptr antenna;
     Antenna::CoordinateSystem antenna_coordinate_system{antenna_position,
                                                         antenna_orientation};
-    antenna = Element::Ptr(
-        new Element(antenna_coordinate_system, element_response, id));
+    antenna = std::make_shared<Element>(antenna_coordinate_system,
+                                        element_response, id);
 
     antenna->enabled_[0] = !aips_flag(i, 0);
     antenna->enabled_[1] = !aips_flag(i, 1);
@@ -125,7 +141,8 @@ Station::Ptr ReadMSv3Station(const MeasurementSet &ms, unsigned int id,
   const vector3r_t position = {{mvPosition(0), mvPosition(1), mvPosition(2)}};
 
   // Create station.
-  Station::Ptr station(new Station(name, position, model));
+  std::shared_ptr<Station> station =
+      std::make_shared<Station>(name, position, model);
 
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 

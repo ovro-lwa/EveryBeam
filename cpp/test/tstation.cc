@@ -11,8 +11,8 @@ BOOST_AUTO_TEST_CASE(station) {
   auto model = everybeam::ElementResponseModel::kHamaker;
 
   // Create station.
-  everybeam::Station::Ptr station(
-      new everybeam::Station(name, position, model));
+  std::shared_ptr<everybeam::Station> station =
+      std::make_shared<everybeam::Station>(name, position, model);
 
   auto element_response = station->GetElementResponse();
 

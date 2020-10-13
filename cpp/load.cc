@@ -43,12 +43,7 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
               new telescope::LOFAR(ms, options));
       return telescope;
     }
-    case kATCATelescope: {
-      std::unique_ptr<telescope::Telescope> telescope =
-          std::unique_ptr<telescope::Telescope>(
-              new telescope::Dish(ms, options));
-      return telescope;
-    }
+    case kATCATelescope:
     case kVLATelescope: {
       std::unique_ptr<telescope::Telescope> telescope =
           std::unique_ptr<telescope::Telescope>(

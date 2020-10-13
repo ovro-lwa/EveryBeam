@@ -8,8 +8,8 @@
 namespace everybeam {
 
 Antenna::Ptr BeamFormer::Clone() const {
-  auto beamformer_clone = BeamFormer::Ptr(
-      new BeamFormer(coordinate_system_, phase_reference_position_));
+  auto beamformer_clone = std::make_shared<BeamFormer>(
+      coordinate_system_, phase_reference_position_);
 
   // antennas_ is a vector of pointers to Antennas, so
   // this creates a shallow copy, in the sense that

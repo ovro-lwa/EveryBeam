@@ -21,7 +21,7 @@ class HamakerElementResponse : public ElementResponse {
  protected:
   std::string GetPath(const char *) const;
 
-  std::unique_ptr<HamakerCoefficients> m_coeffs;
+  std::unique_ptr<HamakerCoefficients> coeffs_;
 };
 
 class HamakerElementResponseHBA : public HamakerElementResponse {
