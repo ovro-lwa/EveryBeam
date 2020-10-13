@@ -16,7 +16,7 @@ clang-format:
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   before_script:
     - apt-get -y install python3-pip
-    - pip3 install clang-format==9.0.0
+    - python3 -m pip install clang-format==9.0.0
   script: 
     - ./scripts/run-clang-format.sh
 
@@ -28,7 +28,7 @@ test-and-coverage:
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   before_script:
     - apt-get -y install python3-pip
-    - pip3 install gcovr
+    - python3 -m pip install gcovr
   script:
     # Download casacore wsrt measures
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
@@ -77,8 +77,9 @@ build-compare-oskar:
     - build-everybeam
   before_script:
     - apt-get -y install python3-pip
+    - python3 -m pip install pip setuptools --upgrade
     # Install python requirements for the OSKAR "integration" test
-    - pip3 install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
+    - python3 -m pip install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     # Check-out at specific version, before HDF5 got broken
