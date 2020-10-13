@@ -56,6 +56,24 @@
 #include <casacore/ms/MeasurementSets/MSSpectralWindow.h>
 #include <casacore/ms/MeasurementSets/MSSpWindowColumns.h>
 
+using casacore::Bool;
+using casacore::Double;
+using casacore::Int;
+using casacore::Matrix;
+using casacore::MDirection;
+using casacore::MeasurementSet;
+using casacore::MPosition;
+using casacore::MVPosition;
+using casacore::Quantity;
+using casacore::ROArrayColumn;
+using casacore::ROArrayMeasColumn;
+using casacore::ROArrayQuantColumn;
+using casacore::ROMSAntennaColumns;
+using casacore::ROScalarColumn;
+using casacore::ROScalarMeasColumn;
+using casacore::String;
+using casacore::Table;
+
 namespace everybeam {
 
 constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
@@ -77,8 +95,6 @@ constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
 //     {0.0, 1.0, 0.0,},
 //     {0.0, 0.0, 1.0},
 // };
-
-using namespace casacore;
 
 typedef std::array<vector3r_t, 16> TileConfig;
 
@@ -153,7 +169,7 @@ std::shared_ptr<BeamFormer> MakeTile(unsigned int id,
                                      const TileConfig &tile_config,
                                      ElementResponse::Ptr element_response) {
   std::shared_ptr<BeamFormer> tile =
-      std::make_shared<BeamFormer>(BeamFormerIdenticalAntennas(position));
+      std::make_shared<BeamFormerIdenticalAntennas>(position);
 
   for (unsigned int id = 0; id < tile_config.size(); id++) {
     vector3r_t antenna_position = tile_config[id];
@@ -162,8 +178,8 @@ std::shared_ptr<BeamFormer> MakeTile(unsigned int id,
     antenna_coordinate_system.origin = antenna_position;
     antenna_coordinate_system.axes = lofar_antenna_orientation;
 
-    Antenna::Ptr antenna = Element::Ptr(
-        new Element(antenna_coordinate_system, element_response, id));
+    std::shared_ptr<Antenna> antenna = std::make_shared<Element>(
+        antenna_coordinate_system, element_response, id);
     tile->AddAntenna(antenna);
   }
 
@@ -183,7 +199,7 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
     antenna_coordinate_system.axes = lofar_antenna_orientation;
 
     std::shared_ptr<ElementHamaker> antenna = std::make_shared<ElementHamaker>(
-        ElementHamaker(antenna_coordinate_system, element_response, id));
+        antenna_coordinate_system, element_response, id);
 
     // Only element 1 needs to be stored as an element
     if (id == 0) {
@@ -222,15 +238,13 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
   if (element_response_model == ElementResponseModel::kHamaker) {
     if (name != "LBA") {
       // Then HBA, HBA0 or HBA1
-      beam_former = std::make_shared<BeamFormerLofarHBA>(
-          BeamFormerLofarHBA(coordinate_system));
+      beam_former = std::make_shared<BeamFormerLofarHBA>(coordinate_system);
     } else {
-      beam_former = std::make_shared<BeamFormerLofarLBA>(
-          BeamFormerLofarLBA(coordinate_system));
+      beam_former = std::make_shared<BeamFormerLofarLBA>(coordinate_system);
     }
   } else {
     // Tiles / element should be kept unique, so work with generic BeamFormer
-    beam_former = std::make_shared<BeamFormer>(BeamFormer(coordinate_system));
+    beam_former = std::make_shared<BeamFormer>(coordinate_system);
   }
 
   TransformToFieldCoordinates(tile_config, coordinate_system.axes);
@@ -246,8 +260,8 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
         antenna_position, lofar_antenna_orientation};
 
     if (name == "LBA") {
-      antenna = std::make_shared<Element>(
-          Element(antenna_coordinate_system, element_response, id));
+      antenna = std::make_shared<Element>(antenna_coordinate_system,
+                                          element_response, id);
       if (element_response_model == kHamaker) {
         // Cast to LOFAR LBA
         std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
@@ -361,8 +375,7 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
   const vector3r_t position = {{mvPosition(0), mvPosition(1), mvPosition(2)}};
 
   // Create station.
-  Station::Ptr station =
-      std::make_shared<Station>(Station(name, position, model));
+  Station::Ptr station = std::make_shared<Station>(name, position, model);
 
   // Read phase reference position (if available).
   station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
@@ -379,8 +392,8 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
     // The Station will consist of a BeamFormer that combines the fields
     // coordinate system is ITRF
     // phase reference is station position
-    auto beam_former = std::make_shared<BeamFormer>(BeamFormer(
-        Antenna::IdentityCoordinateSystem, station->GetPhaseReference()));
+    auto beam_former = std::make_shared<BeamFormer>(
+        Antenna::IdentityCoordinateSystem, station->GetPhaseReference());
 
     for (size_t i = 0; i < tab_field.nrow(); ++i) {
       beam_former->AddAntenna(

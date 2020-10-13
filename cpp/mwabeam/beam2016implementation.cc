@@ -20,9 +20,12 @@
 
 #include "beam2016implementation.h"
 
-using namespace std;
-using namespace H5;
-using namespace everybeam::mwabeam;
+using everybeam::mwabeam::Beam2016Implementation;
+using everybeam::mwabeam::JonesMatrix;
+using std::complex;
+using std::size_t;
+using std::string;
+using std::vector;
 
 // constants :
 static const double deg2rad = M_PI / 180.00;
@@ -636,8 +639,8 @@ const std::vector<std::vector<double>>& Beam2016Implementation::GetDataSet(
 void Beam2016Implementation::ReadDataSet(const std::string& dataset_name,
                                          vector<vector<double>>& out_vector,
                                          H5::H5File& h5File) {
-  DataSet modes = h5File.openDataSet(dataset_name.c_str());
-  DataSpace modes_dataspace = modes.getSpace();
+  H5::DataSet modes = h5File.openDataSet(dataset_name.c_str());
+  H5::DataSpace modes_dataspace = modes.getSpace();
   int rank = modes_dataspace.getSimpleExtentNdims();
   hsize_t dims_out[2];
   modes_dataspace.getSimpleExtentDims(dims_out, NULL);
@@ -648,8 +651,9 @@ void Beam2016Implementation::ReadDataSet(const std::string& dataset_name,
   for (size_t i = 0; i < dims_out[0]; i++)
     modes_data[i] = &data[i * dims_out[1]];
 
-  DataSpace memspace(rank, dims_out);
-  modes.read(data.data(), PredType::NATIVE_FLOAT, memspace, modes_dataspace);
+  H5::DataSpace memspace(rank, dims_out);
+  modes.read(data.data(), H5::PredType::NATIVE_FLOAT, memspace,
+             modes_dataspace);
 
   for (size_t i = 0; i != dims_out[0]; i++) {
     const float* startElement = &data[i * dims_out[1]];
@@ -663,7 +667,7 @@ void Beam2016Implementation::ReadDataSet(const std::string& dataset_name,
 // Read data from H5 file, file name is specified in the object constructor
 void Beam2016Implementation::Read() {
   std::string h5_path = _searchPath;
-  _h5File.reset(new H5File(h5_path.c_str(), H5F_ACC_RDONLY));
+  _h5File.reset(new H5::H5File(h5_path.c_str(), H5F_ACC_RDONLY));
 
   // hid_t group_id = m_pH5File->getId();
   hid_t file_id = _h5File->getId();

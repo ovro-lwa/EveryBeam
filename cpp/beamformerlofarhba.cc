@@ -5,7 +5,7 @@ namespace everybeam {
 
 Antenna::Ptr BeamFormerLofarHBA::Clone() const {
   auto beamformer_clone = std::make_shared<BeamFormerLofarHBA>(
-      BeamFormerLofarHBA(coordinate_system_, phase_reference_position_));
+      coordinate_system_, phase_reference_position_);
 
   // NOTE: this is an incomplete clone, only creating a deep-copy of the
   // element. In fact, it also hides an upcast from an ElementHamaker into

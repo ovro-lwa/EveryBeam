@@ -4,8 +4,8 @@
 
 namespace everybeam {
 Antenna::Ptr ElementHamaker::Clone() const {
-  auto element_clone = std::make_shared<ElementHamaker>(
-      ElementHamaker(coordinate_system_, element_response_, id_));
+  auto element_clone = std::make_shared<ElementHamaker>(coordinate_system_,
+                                                        element_response_, id_);
   element_clone->enabled_[0] = enabled_[0];
   element_clone->enabled_[1] = enabled_[1];
   return element_clone;

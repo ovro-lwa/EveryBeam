@@ -31,6 +31,7 @@
 #include "lobes/lobeselementresponse.h"
 
 using namespace everybeam;
+using everybeam::coords::ITRFDirection;
 
 Station::Station(const std::string &name, const vector3r_t &position,
                  const ElementResponseModel model)
