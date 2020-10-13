@@ -4,6 +4,13 @@
 
 namespace everybeam {
 
+constexpr Antenna::CoordinateSystem::Axes
+    Antenna::CoordinateSystem::identity_axes;
+
+constexpr vector3r_t Antenna::CoordinateSystem::zero_origin;
+
+constexpr Antenna::CoordinateSystem Antenna::IdentityCoordinateSystem;
+
 vector3r_t Antenna::TransformToLocalDirection(
     const vector3r_t &direction) const {
   vector3r_t local_direction{
