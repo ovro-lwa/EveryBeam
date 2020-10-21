@@ -98,6 +98,20 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
   std::vector<std::complex<double>> geometric_response =
       ComputeGeometricResponse(freq, direction);
 
+  // Copy options into local_options. Needed to propagate
+  // the potential change in the rotate boolean downstream
+  Options local_options = options;
+  // If field_response_ not nullptr, set/precompute quantities
+  // related to the field
+  if (nullptr != field_response_.get()) {
+    // Lock the mutex, to avoid that the LOBESElementResponse basefunctions_
+    // are overwritten before response is computed
+    mtx_.lock();
+    vector2r_t thetaphi = cart2thetaphi(direction);
+    field_response_->SetFieldQuantities(thetaphi[0], thetaphi[1]);
+    local_options.rotate = false;
+  }
+
   matrix22c_t result = {0};
   for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
@@ -108,7 +122,7 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
         geometric_response[antenna_idx];
 
     matrix22c_t antenna_response =
-        antenna->Response(time, freq, direction, options);
+        antenna->Response(time, freq, direction, local_options);
     result[0][0] += antenna_weight.first * antenna_geometric_reponse *
                     antenna_response[0][0];
     result[0][1] += antenna_weight.first * antenna_geometric_reponse *
@@ -117,6 +131,23 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
                     antenna_response[1][0];
     result[1][1] += antenna_weight.second * antenna_geometric_reponse *
                     antenna_response[1][1];
+  }
+
+  // If the Jones matrix needs to be rotated from theta, phi directions
+  // to north, east directions, but this has not been done yet, do it here
+  if (options.rotate && !local_options.rotate) {
+    vector3r_t up = {0.0, 0.0, 1.0};
+    vector3r_t e_phi = normalize(cross(up, direction));
+    vector3r_t e_theta = cross(e_phi, direction);
+    matrix22r_t rotation;
+    rotation[0] = {dot(e_theta, options.north), dot(e_theta, options.east)};
+    rotation[1] = {dot(e_phi, options.north), dot(e_phi, options.east)};
+    result = result * rotation;
+  }
+
+  // Unlock mutex in case it was locked
+  if (nullptr != field_response_.get()) {
+    mtx_.unlock();
   }
   return result;
 }

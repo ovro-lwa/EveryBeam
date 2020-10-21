@@ -23,8 +23,6 @@
 #include "station.h"
 #include "common/mathutils.h"
 #include "beamformerlofar.h"
-// #include "beamformerlofarhba.h"
-// #include "beamformerlofarlba.h"
 
 #include "hamaker/hamakerelementresponse.h"
 #include "oskar/oskarelementresponse.h"
@@ -40,11 +38,19 @@ Station::Station(const std::string &name, const vector3r_t &position,
       phase_reference_(position),
       element_response_model_(model),
       element_response_(nullptr) {
-  SetResponseModel(element_response_model_);
   vector3r_t ncp = {{0.0, 0.0, 1.0}};
   ncp_.reset(new coords::ITRFDirection(ncp));
   vector3r_t ncppol0 = {{1.0, 0.0, 0.0}};
   ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
+
+  // LOBES is currently only supported for CS302LBA. Check this.
+  if (model == ElementResponseModel::kLOBES && name != "CS302LBA") {
+    std::cout << "Switching to Hamaker, LOBES is not yet "
+                 "supported for station "
+              << name << std::endl;
+    element_response_model_ = ElementResponseModel::kHamaker;
+  }
+  SetResponseModel(element_response_model_);
 }
 
 void Station::SetResponseModel(const ElementResponseModel model) {

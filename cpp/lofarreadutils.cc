@@ -242,8 +242,15 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
     } else {
       beam_former = std::make_shared<BeamFormerLofarLBA>(coordinate_system);
     }
+  } else if (element_response_model == ElementResponseModel::kLOBES) {
+    // BeamFormer is assigned a FieldResponse, for which common field quantities
+    // can be precomputed
+    beam_former = std::make_shared<BeamFormer>(
+        coordinate_system,
+        std::dynamic_pointer_cast<FieldResponse>(*element_response.get()));
   } else {
-    // Tiles / element should be kept unique, so work with generic BeamFormer
+    // All Tiles / elements should be kept unique, so work with generic
+    // BeamFormer
     beam_former = std::make_shared<BeamFormer>(coordinate_system);
   }
 

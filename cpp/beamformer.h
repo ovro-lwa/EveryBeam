@@ -6,6 +6,9 @@
 
 #include "element.h"
 #include "common/types.h"
+#include "fieldresponse.h"
+
+#include <mutex>
 
 namespace everybeam {
 class BeamFormer : public Antenna {
@@ -16,7 +19,8 @@ class BeamFormer : public Antenna {
    * @brief Construct a new BeamFormer object
    *
    */
-  BeamFormer() : Antenna() {
+  BeamFormer(std::shared_ptr<FieldResponse> field_response = nullptr)
+      : Antenna(), field_response_(field_response) {
     local_phase_reference_position_ =
         TransformToLocalPosition(phase_reference_position_);
   }
@@ -26,8 +30,9 @@ class BeamFormer : public Antenna {
    *
    * @param coordinate_system
    */
-  BeamFormer(const CoordinateSystem &coordinate_system)
-      : Antenna(coordinate_system) {
+  BeamFormer(const CoordinateSystem &coordinate_system,
+             std::shared_ptr<FieldResponse> field_response = nullptr)
+      : Antenna(coordinate_system), field_response_(field_response) {
     local_phase_reference_position_ =
         TransformToLocalPosition(phase_reference_position_);
   }
@@ -40,14 +45,17 @@ class BeamFormer : public Antenna {
    * @param phase_reference_position
    */
   BeamFormer(CoordinateSystem coordinate_system,
-             vector3r_t phase_reference_position)
-      : Antenna(coordinate_system, phase_reference_position) {
+             vector3r_t phase_reference_position,
+             std::shared_ptr<FieldResponse> field_response = nullptr)
+      : Antenna(coordinate_system, phase_reference_position),
+        field_response_(field_response) {
     local_phase_reference_position_ =
         TransformToLocalPosition(phase_reference_position_);
   }
 
-  BeamFormer(vector3r_t phase_reference_position)
-      : Antenna(phase_reference_position) {
+  BeamFormer(vector3r_t phase_reference_position,
+             std::shared_ptr<FieldResponse> field_response = nullptr)
+      : Antenna(phase_reference_position), field_response_(field_response) {
     local_phase_reference_position_ =
         TransformToLocalPosition(phase_reference_position_);
   }
@@ -111,6 +119,12 @@ class BeamFormer : public Antenna {
 
   // List of antennas in BeamFormer
   std::vector<Antenna::Ptr> antennas_;
+
+  // (Optional) shared pointer to field response model (e.g. LOBES)
+  std::shared_ptr<FieldResponse> field_response_;
+
+ private:
+  mutable std::mutex mtx_;
 };
 }  // namespace everybeam
 #endif
