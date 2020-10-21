@@ -6,6 +6,7 @@
 #include "../elementresponse.h"
 #include "../station.h"
 #include "../common/types.h"
+#include "../../external/npy.hpp"
 
 #include "config.h"
 #include <complex>
@@ -25,8 +26,29 @@ using everybeam::telescope::Telescope;
 
 BOOST_AUTO_TEST_SUITE(tlofar_lba)
 
-BOOST_AUTO_TEST_CASE(load_lofar) {
+// Properties extracted from MS
+double time = 4.92183348e+09;
+double frequency = 57812500.;
+double ra(-1.44194878), dec(0.85078091);
+
+// Properties of grid
+std::size_t width(4), height(4);
+double dl(0.5 * M_PI / 180.), dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
+
+CoordinateSystem coord_system = {.width = width,
+                                 .height = height,
+                                 .ra = ra,
+                                 .dec = dec,
+                                 .dl = dl,
+                                 .dm = dm,
+                                 .phase_centre_dl = shift_l,
+                                 .phase_centre_dm = shift_m};
+
+BOOST_AUTO_TEST_CASE(test_hamaker) {
   Options options;
+  // Only checks if we are defaulting to LOBES. Effectively,
+  // all the computations will be done as if the Hamaker model was chosen
+  // except for station 20 (CS302LBA)
   options.element_response_model = ElementResponseModel::kHamaker;
 
   casacore::MeasurementSet ms(LOFAR_LBA_MOCK_MS);
@@ -41,22 +63,6 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
 
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
   BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001LBA");
-
-  // Properties extracted from MS
-  double time = 4.92183348e+09;
-  double frequency = 57812500.;
-  std::size_t width(4), height(4);
-  double ra(-1.44194878), dec(0.85078091), dl(0.5 * M_PI / 180.),
-      dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
-
-  CoordinateSystem coord_system = {.width = width,
-                                   .height = height,
-                                   .ra = ra,
-                                   .dec = dec,
-                                   .dl = dl,
-                                   .dm = dm,
-                                   .phase_centre_dl = shift_l,
-                                   .phase_centre_dm = shift_m};
 
   // Reference solution obtained with commit sha
   // 70a286e7dace4616417b0e973a624477f15c9ce3
@@ -107,6 +113,51 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
     BOOST_CHECK(std::abs(antenna_buffer_single[offset_13 + i] -
                          everybeam_ref_p13[i]) < 1e-6);
   }
+}
+
+BOOST_AUTO_TEST_CASE(test_lobes) {
+  Options options;
+  // Effectively, all the computations will be done as if the Hamaker model was
+  // chosen except for station 20 (CS302LBA)
+  options.element_response_model = ElementResponseModel::kLOBES;
+
+  casacore::MeasurementSet ms(LOFAR_LBA_MOCK_MS);
+
+  // Load LOFAR Telescope
+  std::unique_ptr<Telescope> telescope = Load(ms, options);
+
+  // Extract Station 20, should be station CS302LBA
+  const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
+  BOOST_CHECK_EQUAL(lofartelescope.GetStation(20)->GetName(), "CS302LBA");
+
+  // Gridded response
+  std::unique_ptr<GriddedResponse> grid_response =
+      telescope->GetGriddedResponse(coord_system);
+
+  // Define buffer and get gridded responses
+  std::vector<std::complex<float>> antenna_buffer_single(
+      grid_response->GetStationBufferSize(1));
+
+  // Get the gridded response for station 20 (of course!)
+  grid_response->CalculateStation(antenna_buffer_single.data(), time, frequency,
+                                  20, 0);
+
+  // Compare with everybeam at pixel (1, 3). This solution only is a "reference"
+  // certainly not a "ground-truth"
+  std::vector<std::complex<float>> everybeam_ref_p13 = {
+      {-0.6094082, 0.2714097},
+      {-0.9981958, 1.081614},
+      {-0.5575241, -0.3563573},
+      {-0.6945726, 0.1506443}};
+  std::size_t offset_13 = (3 + 1 * width) * 4;
+
+  for (std::size_t i = 0; i < 4; ++i) {
+    BOOST_CHECK(std::abs(antenna_buffer_single[offset_13 + i] -
+                         everybeam_ref_p13[i]) < 1e-6);
+  }
+  // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
+  // npy::SaveArrayAsNumpy("lobes_station_response.npy", false, 4, leshape,
+  //                       antenna_buffer_single);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

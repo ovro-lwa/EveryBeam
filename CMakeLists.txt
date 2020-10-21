@@ -117,6 +117,12 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
 #------------------------------------------------------------------------------
+# pybind11 
+# NOTE: temporary fix to build pybindings for lobes
+add_subdirectory(python/lobes)
+
+
+#------------------------------------------------------------------------------
 # Documentation
 find_package(Doxygen)
 

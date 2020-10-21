@@ -1,24 +1,103 @@
-#ifndef LOBES_ELEMENTRESPONSE_H
-#define LOBES_ELEMENTRESPONSE_H
+#ifndef EVERYBEAM_LOBES_ELEMENTRESPONSE_H
+#define EVERYBEAM_LOBES_ELEMENTRESPONSE_H
 
-#include "../elementresponse.h"
+#include <Eigen/Core>
+#include <unsupported/Eigen/CXX11/Tensor>
 
+#include "../fieldresponse.h"
+
+#include <vector>
 #include <memory>
+#include <iostream>
 
 namespace everybeam {
 
 //! Implementation of the Lobes response model
-class LOBESElementResponse : public ElementResponse {
+class LOBESElementResponse : public FieldResponse {
  public:
+  /**
+   * @brief Construct a new LOBESElementResponse object
+   *
+   * @param name (LOFAR) station name, i.e. CS302LBA
+   */
   LOBESElementResponse(std::string name);
 
+  /**
+   * @brief Stub override of the Response method, an element id
+   * is needed to compute the element response.
+   *
+   * @param freq
+   * @param theta
+   * @param phi
+   * @param response
+   */
   virtual void Response(
       double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override;
+      std::complex<double> (&response)[2][2]) const final override {
+    throw std::invalid_argument(
+        "LOBESElementResponse::response needs an element_id");
+  };
+
+  /**
+   * @brief Virtual implementation of Response method
+   *
+   * @param element_id ID of element
+   * @param freq Frequency of the plane wave (Hz).
+   * @param theta Angle wrt. z-axis (rad) (NOTE: parameter is just a stub to
+   * match override)
+   * @param phi Angle in the xy-plane wrt. x-axis  (rad) (NOTE: parameter is
+   * just a stub to match override)
+   * @param result Pointer to 2x2 array of Jones matrix
+   */
+  virtual void Response(int element_id, double freq, double theta, double phi,
+                        std::complex<double> (&response)[2][2]) const;
 
   static std::shared_ptr<LOBESElementResponse> GetInstance(std::string name);
-};
 
+  /**
+   * @brief Set field quantities (i.e. the basefunctions) for the LOBES element
+   * response given the direction of interest, specified in (theta, phi) angles.
+   * NOTE: this method overrides the "cached" basefunction_ member every time
+   * when called.
+   *
+   * @param theta Angle wrt. z-axis (rad)
+   * @param phi Angle in the xy-plane wrt. x-axis  (rad)
+   */
+  virtual void SetFieldQuantities(double theta, double phi) final override {
+    basefunctions_ = ComputeBaseFunctions(theta, phi);
+  };
+
+ private:
+  // Typdef of BaseFunctions as Eigen::Array type
+  typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
+  BaseFunctions basefunctions_;
+
+  // Compose the path to a LOBES coefficient file
+  std::string GetPath(const char *) const;
+
+  // Find the closest frequency
+  size_t FindFrequencyIdx(double f) const {
+    auto is_closer = [f](int x, int y) { return abs(x - f) < abs(y - f); };
+    auto result =
+        std::min_element(frequencies_.begin(), frequencies_.end(), is_closer);
+    return std::distance(frequencies_.begin(), result);
+  }
+
+  // Compute the base functions given theta and phi angles
+  BaseFunctions ComputeBaseFunctions(double theta, double phi) const;
+
+  // Store h5 coefficients in coefficients_
+  Eigen::Tensor<std::complex<double>, 4> coefficients_;
+  std::vector<unsigned int> coefficients_shape_;
+
+  // Store h5 frequencies in frequencies_
+  std::vector<double> frequencies_;
+
+  struct nms_t {
+    int n, m, s;
+  };
+  std::vector<nms_t> nms_;
+};
 }  // namespace everybeam
 
 #endif
