@@ -64,6 +64,7 @@ install (FILES
   element.h
   elementhamaker.h
   elementresponse.h
+  fieldresponse.h
   lofarreadutils.h
   msv3readutils.h
   station.h

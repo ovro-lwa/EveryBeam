@@ -45,8 +45,8 @@ std::pair<std::complex<double>, std::complex<double>> F4far_new(int s, int m,
   std::complex<double> q3;
 
   // From cpp >= cpp14, complex literals can be used
-  std::complex<double> i_neg = {0.0, -1.0};
-  std::complex<double> i_pos = {0.0, 1.0};
+  constexpr std::complex<double> i_neg = {0.0, -1.0};
+  constexpr std::complex<double> i_pos = {0.0, 1.0};
 
   auto cos_theta = cos(theta);
   auto sin_theta = sin(theta);

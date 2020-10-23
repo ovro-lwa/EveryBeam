@@ -91,6 +91,8 @@ BeamFormer::ComputeWeights(const vector3r_t &pointing, double freq) const {
 matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
                                       const vector3r_t &direction,
                                       const Options &options) const {
+  std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+
   // Weights based on pointing direction of beam
   std::vector<std::pair<std::complex<double>, std::complex<double>>> weights =
       ComputeWeights(options.station0, options.freq0);
@@ -104,9 +106,9 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
   // If field_response_ not nullptr, set/precompute quantities
   // related to the field
   if (nullptr != field_response_.get()) {
-    // Lock the mutex, to avoid that the LOBESElementResponse basefunctions_
-    // are overwritten before response is computed
-    mtx_.lock();
+    // Lock the associated mutex, thus avoiding that the LOBESElementResponse
+    // basefunctions_ are overwritten before response is computed
+    lock.lock();
     vector2r_t thetaphi = cart2thetaphi(direction);
     field_response_->SetFieldQuantities(thetaphi[0], thetaphi[1]);
     local_options.rotate = false;
@@ -145,10 +147,6 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
     result = result * rotation;
   }
 
-  // Unlock mutex in case it was locked
-  if (nullptr != field_response_.get()) {
-    mtx_.unlock();
-  }
   return result;
 }
 
