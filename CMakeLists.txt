@@ -64,6 +64,12 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
 endif()
 
+# wget needs to be installed in order to download coefficient files on the fly
+include(FindWget)
+if(NOT WGET_FOUND)
+  message(FATAL_ERROR "wget not found. Install wget on your local system")
+endif()
+
 if (POLICY CMP0074)
 cmake_policy(SET CMP0074 NEW)
 endif()

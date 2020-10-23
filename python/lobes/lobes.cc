@@ -11,7 +11,6 @@
 #include <tuple>
 
 namespace py = pybind11;
-using namespace std::complex_literals;
 
 // python style enumerate function
 // To make it possible to write:
@@ -96,30 +95,34 @@ std::pair<Eigen::VectorXcd, Eigen::VectorXcd> F4far_new(
   Eigen::ArrayXcd q2;
   Eigen::ArrayXcd q3;
 
+  // From cpp >= cpp14, complex literals can be used instead
+  constexpr std::complex<double> i_neg = {0.0, -1.0};
+  constexpr std::complex<double> i_pos = {0.0, 1.0};
+
   Eigen::ArrayXd cos_theta = Eigen::cos(theta);
   Eigen::ArrayXd sin_theta = Eigen::sin(theta);
   Eigen::ArrayXd P_cos_theta = P(std::abs(m), n, cos_theta);
   Eigen::ArrayXd Pacc_cos_theta = Pacc(std::abs(m), n, cos_theta);
-  Eigen::ArrayXcd exp_i_m_phi = Eigen::exp(1.0i * double(m) * phi);
+  Eigen::ArrayXcd exp_i_m_phi = Eigen::exp(i_pos * double(m) * phi);
 
   if (s == 1) {
-    q2 = C * std::pow(-1.0i, -n - 1) / beta * 1.0i * double(m) /
+    q2 = C * std::pow(i_neg, -n - 1) / beta * i_pos * double(m) /
          (sin_theta)*std::sqrt((2. * n + 1) / 2.0 *
                                std::tgamma(n - std::abs(m) + 1) /
                                std::tgamma(n + std::abs(m) + 1)) *
          P_cos_theta * exp_i_m_phi;
 
-    q3 = C * std::pow(-1.0i, -n - 1) / beta *
+    q3 = C * std::pow(i_neg, -n - 1) / beta *
          std::sqrt((2. * n + 1) / 2.0 * std::tgamma(n - abs(m) + 1) /
                    std::tgamma(n + abs(m) + 1)) *
          Pacc_cos_theta * sin_theta * exp_i_m_phi;
   } else if (s == 2) {
-    q2 = -C * std::pow(-1.0i, -n) / beta *
+    q2 = -C * std::pow(i_neg, -n) / beta *
          std::sqrt((2. * n + 1) / 2.0 * std::tgamma(n - abs(m) + 1) /
                    std::tgamma(n + abs(m) + 1)) *
          Pacc_cos_theta * sin_theta * exp_i_m_phi;
 
-    q3 = C * std::pow(-1.0i, -n) / beta * 1.0i * double(m) / sin_theta *
+    q3 = C * std::pow(i_neg, -n) / beta * i_pos * double(m) / sin_theta *
          std::sqrt((2. * n + 1) / 2.0 * std::tgamma(n - abs(m) + 1) /
                    std::tgamma(n + abs(m) + 1)) *
          P_cos_theta * exp_i_m_phi;
