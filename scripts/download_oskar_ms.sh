@@ -19,16 +19,14 @@ cd test_data/
 OSKAR_MOCK_ARCHIVE=OSKAR_MOCK.tar.bz2
 OSKAR_MOCK_MS=OSKAR_MOCK.ms
 
-if [ ! -f "$OSKAR_MOCK_ARCHIVE" ]; then
-    wget -q https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2 -O $OSKAR_MOCK_ARCHIVE
-fi
+if [ ! -f ${OSKAR_MOCK_MS}/table.f0 ] ; then
 
-if [ -d $OSKAR_MOCK_MS ]
-then
-    echo "Directory already exists"
-else
-    mkdir $OSKAR_MOCK_MS
+    if [ ! -f "$OSKAR_MOCK_ARCHIVE" ]; then
+	wget -q https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2 -O $OSKAR_MOCK_ARCHIVE
+    fi
+    
+    mkdir -p $OSKAR_MOCK_MS
+    
+    tar -xf $OSKAR_MOCK_ARCHIVE  -C $OSKAR_MOCK_MS --strip-components=1
+    rm $OSKAR_MOCK_ARCHIVE
 fi
-
-tar -xf $OSKAR_MOCK_ARCHIVE  -C $OSKAR_MOCK_MS --strip-components=1
-rm $OSKAR_MOCK_ARCHIVE
