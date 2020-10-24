@@ -16,11 +16,14 @@ mkdir -p test_data
 cd test_data/
 
 MWA_COEFF_ARCHIVE=MWA_COEFF.tar.bz2
-MWA_COEFF_H5=MWA_COEFF.H5
+MWA_COEFF_H5=mwa_full_embedded_element_pattern.h5
 
-if [ ! -f "$MWA_COEFF_ARCHIVE" ]; then
-    wget -q www.astron.nl/citt/EveryBeam/mwa_full_embedded_element_pattern.tar.bz2 -O $MWA_COEFF_ARCHIVE
+if [ ! -f ${MWA_COEFF_H5} ] ; then
+
+    if [ ! -f "$MWA_COEFF_ARCHIVE" ]; then
+	wget -q www.astron.nl/citt/EveryBeam/mwa_full_embedded_element_pattern.tar.bz2 -O $MWA_COEFF_ARCHIVE
+    fi
+
+    tar -xf $MWA_COEFF_ARCHIVE
+    rm $MWA_COEFF_ARCHIVE
 fi
-
-tar -xf $MWA_COEFF_ARCHIVE
-rm $MWA_COEFF_ARCHIVE

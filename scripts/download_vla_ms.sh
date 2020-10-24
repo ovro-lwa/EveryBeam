@@ -18,16 +18,14 @@ cd test_data/
 VLA_MOCK_ARCHIVE=VLA_ARCHIVE.tar.bz2
 VLA_MOCK_MS=VLA_MOCK.ms
 
-if [ ! -f "$VLA_MOCK_ARCHIVE" ]; then
-    wget -q https://www.astron.nl/citt/EveryBeam/small-vla-set.tar.bz2 -O $VLA_MOCK_ARCHIVE
-fi
+if [ ! -f ${VLA_MOCK_MS}/table.f1 ] ; then
 
-if [ -d $VLA_MOCK_MS ]
-then
-    echo "Directory already exists"
-else
-    mkdir $VLA_MOCK_MS
-fi
+    if [ ! -f "$VLA_MOCK_ARCHIVE" ]; then
+	wget -q https://www.astron.nl/citt/EveryBeam/small-vla-set.tar.bz2 -O $VLA_MOCK_ARCHIVE
+    fi
 
-tar -xf $VLA_MOCK_ARCHIVE  -C $VLA_MOCK_MS --strip-components=1
-rm $VLA_MOCK_ARCHIVE
+    mkdir -p $VLA_MOCK_MS
+
+    tar -xf $VLA_MOCK_ARCHIVE  -C $VLA_MOCK_MS --strip-components=1
+    rm $VLA_MOCK_ARCHIVE
+fi

@@ -18,16 +18,14 @@ cd test_data/
 MWA_MOCK_ARCHIVE=MWA_ARCHIVE.tar.bz2
 MWA_MOCK_MS=MWA_MOCK.ms
 
-if [ ! -f "$MWA_MOCK_ARCHIVE" ]; then
-    wget -q www.astron.nl/citt/EveryBeam/MWA-single-timeslot.tar.bz2 -O $MWA_MOCK_ARCHIVE
-fi
+if [ ! -f ${MWA_MOCK_MS}/table.f1 ]; then
 
-if [ -d $MWA_MOCK_MS ]
-then
-    echo "Directory already exists"
-else
-    mkdir $MWA_MOCK_MS
-fi
+    if [ ! -f "$MWA_MOCK_ARCHIVE" ]; then
+	wget -q www.astron.nl/citt/EveryBeam/MWA-single-timeslot.tar.bz2 -O $MWA_MOCK_ARCHIVE
+    fi
 
-tar -xf $MWA_MOCK_ARCHIVE  -C $MWA_MOCK_MS --strip-components=1
-rm $MWA_MOCK_ARCHIVE
+    mkdir -p $MWA_MOCK_MS
+
+    tar -xf $MWA_MOCK_ARCHIVE  -C $MWA_MOCK_MS --strip-components=1
+    rm $MWA_MOCK_ARCHIVE
+fi
