@@ -10,6 +10,7 @@ add_custom_target(download_lobes_coefficients COMMAND ${CMAKE_SOURCE_DIR}/script
 #------------------------------------------------------------------------------
 add_library(lobes SHARED lobeselementresponse.cc)
 add_dependencies(lobes download_lobes_coefficients)
+target_include_directories(lobes PUBLIC ${HDF5_INCLUDE_DIRS})
 target_link_libraries(lobes PUBLIC ${HDF5_LIBRARIES})
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 set_target_properties(lobes PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-lobes")

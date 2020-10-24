@@ -6,5 +6,5 @@ pybind11_add_module(pylobes
                     )
 
 
-target_include_directories(pylobes PUBLIC ${HDF5_LIBRARIES})
+target_include_directories(pylobes PUBLIC ${HDF5_INCLUDE_DIRS})
 target_link_libraries(pylobes PUBLIC ${HDF5_LIBRARIES})
