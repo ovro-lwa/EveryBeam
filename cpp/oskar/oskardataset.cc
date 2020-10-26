@@ -18,8 +18,8 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
     assert(rank == dataset_rank_);
 
     // Get dimensions
-    hsize_t dims[rank];
-    dataspace.getSimpleExtentDims(dims, NULL);
+    std::vector<hsize_t> dims(rank);
+    dataspace.getSimpleExtentDims(dims.data(), NULL);
     auto nr_elements = dims[0];
     auto nr_coeffs = dims[1];
     assert(dims[2] == 4);  // tetm*pol

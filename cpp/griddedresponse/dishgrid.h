@@ -71,8 +71,8 @@ class DishGrid final : public GriddedResponse {
    * @param frequency Frequency (Hz)
    * @param field_id Field id
    */
-  void MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
-                              double frequency, size_t field_id);
+  void MakeIntegratedDishSnapshot(std::vector<aocommon::HMC4x4>& matrices,
+                                  double frequency, size_t field_id);
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

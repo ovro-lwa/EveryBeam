@@ -59,7 +59,7 @@ void DishGrid::CalculateIntegratedResponse(double* buffer, double,
   // Init (Hermitian) Mueller matrix for every pixel in the coarse grid
   size_t npixels = width_ * height_;
   std::vector<HMC4x4> matrices(npixels, HMC4x4::Zero());
-  MakeIntegratedSnapshot(matrices, frequency, field_id);
+  MakeIntegratedDishSnapshot(matrices, frequency, field_id);
 
   DoFFTResampling(buffer, width_, height_, width_original, height_original,
                   matrices);
@@ -71,8 +71,9 @@ void DishGrid::CalculateIntegratedResponse(double* buffer, double,
   dm_ = dm_original;
 };
 
-void DishGrid::MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
-                                      double frequency, size_t field_id) {
+void DishGrid::MakeIntegratedDishSnapshot(
+    std::vector<aocommon::HMC4x4>& matrices, double frequency,
+    size_t field_id) {
   size_t nstations = telescope_->GetNrStations();
   UVector<std::complex<float>> buffer_undersampled(
       GetStationBufferSize(nstations));

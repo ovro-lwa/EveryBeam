@@ -67,7 +67,7 @@ Eigen::ArrayXd P(int m, int n, py::EigenDRef<Eigen::ArrayXd> x) {
 }
 
 Eigen::ArrayXd Pacc(int m, int n, py::EigenDRef<Eigen::ArrayXd> x) {
-  auto N = x.rows();
+  // auto N = x.rows();
 
   return (-(n + m) * (n - m + 1.0) * Eigen::sqrt(1.0 - x * x) * P(m - 1, n, x) -
           m * x * P(m, n, x)) /

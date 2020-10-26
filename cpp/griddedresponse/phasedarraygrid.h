@@ -74,6 +74,9 @@ class PhasedArrayGrid : public GriddedResponse {
   std::vector<std::thread> threads_;
 
   struct Job {
+    Job() {}
+    Job(size_t y_, size_t antenna_idx_, size_t buffer_offset_)
+        : y(y_), antenna_idx(antenna_idx_), buffer_offset(buffer_offset_) {}
     size_t y, antenna_idx, buffer_offset;
   };
   aocommon::Lane<Job>* lane_;

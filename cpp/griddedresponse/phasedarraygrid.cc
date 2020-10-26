@@ -53,7 +53,7 @@ void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
   }
 
   for (size_t y = 0; y != height_; ++y) {
-    lane.write(Job{.y = y, .antenna_idx = station_idx, .buffer_offset = 0});
+    lane.emplace(Job(y, station_idx, 0));
   }
 
   lane.write_end();
@@ -95,8 +95,7 @@ void PhasedArrayGrid::CalculateAllStations(std::complex<float>* buffer,
   for (size_t y = 0; y != height_; ++y) {
     for (size_t antenna_idx = 0;
          antenna_idx != phasedarraytelescope.GetNrStations(); ++antenna_idx) {
-      lane.write(Job{
-          .y = y, .antenna_idx = antenna_idx, .buffer_offset = antenna_idx});
+      lane.write(Job(y, antenna_idx, antenna_idx));
     }
   }
 

@@ -30,6 +30,8 @@ std::ostream& operator<<(std::ostream& os, ElementResponseModel model);
  */
 class ElementResponse {
  public:
+  virtual ~ElementResponse() {}
+
   typedef common::MutablePtr<ElementResponse>
       Ptr;  //!< Pointer to ElementResponse object
 

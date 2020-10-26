@@ -62,7 +62,7 @@ diag22c_t BeamFormerLofar::FieldArrayFactor(
 matrix22c_t BeamFormerLofar::LocalResponse(real_t time, real_t freq,
                                            const vector3r_t &direction,
                                            const Options &options) const {
-  matrix22c_t result = {0};
+  matrix22c_t result = {{{0}}};
 
   // Compute the combined array factor
   diag22c_t array_factor = LocalArrayFactor(time, freq, direction, options);
