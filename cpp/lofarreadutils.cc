@@ -29,6 +29,7 @@
 #include "common/casautils.h"
 
 #include <memory>
+#include <cmath>
 
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MPosition.h>
@@ -78,13 +79,13 @@ namespace everybeam {
 
 constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
     {
-        -std::sqrt(.5),
-        -std::sqrt(.5),
+        -M_SQRT1_2,
+        -M_SQRT1_2,
         0.0,
     },
     {
-        std::sqrt(.5),
-        -std::sqrt(.5),
+        M_SQRT1_2,
+        -M_SQRT1_2,
         0.0,
     },
     {0.0, 0.0, 1.0},

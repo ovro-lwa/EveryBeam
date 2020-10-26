@@ -49,8 +49,8 @@ class LOBESElementResponse : public FieldResponse {
    * just a stub to match override)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual void Response(int element_id, double freq, double theta, double phi,
-                        std::complex<double> (&response)[2][2]) const;
+  void Response(int element_id, double freq, double theta, double phi,
+                std::complex<double> (&response)[2][2]) const override;
 
   static std::shared_ptr<LOBESElementResponse> GetInstance(std::string name);
 

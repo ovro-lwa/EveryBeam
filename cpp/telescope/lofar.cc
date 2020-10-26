@@ -91,10 +91,11 @@ LOFAR::LOFAR(casacore::MeasurementSet &ms, const Options &options)
       preapplied_beam_dir);
 
   // Populate struct
-  ms_properties_ = {.subband_freq = band.CentreFrequency(),
-                    .delay_dir = delay_dir_col(0),
-                    .tile_beam_dir = *(tile_beam_dir_col(0).data()),
-                    .preapplied_beam_dir = preapplied_beam_dir};
+  ms_properties_ = MSProperties();
+  ms_properties_.subband_freq = band.CentreFrequency();
+  ms_properties_.delay_dir = delay_dir_col(0);
+  ms_properties_.tile_beam_dir = *(tile_beam_dir_col(0).data());
+  ms_properties_.preapplied_beam_dir = preapplied_beam_dir;
 }
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(

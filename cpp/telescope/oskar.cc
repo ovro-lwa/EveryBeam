@@ -23,7 +23,8 @@ OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
       casacore::MSField::columnName(casacore::MSFieldEnums::DELAY_DIR));
 
   // Populate struct
-  ms_properties_ = {.delay_dir = delay_dir_col(0)};
+  ms_properties_ = MSProperties();
+  ms_properties_.delay_dir = delay_dir_col(0);
 }
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(

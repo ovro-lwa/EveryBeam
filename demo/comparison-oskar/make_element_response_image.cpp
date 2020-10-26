@@ -20,16 +20,14 @@ int main(int argc, char** argv){
     }
 
     std::vector<std::complex<double>> result(N*N*2*2);
-    typedef std::complex<double>result_arr_t[N][N][2][2];
-    result_arr_t &result_arr = * (result_arr_t*) result.data();
-
     for(int i=0; i<N; ++i) {
         double x = (2.0*i)/(N-1) - 1.0;
         for(int j=0; j<N; ++j) {
             double y = (2.0*j)/(N-1) - 1.0;
-            double theta = asin(sqrt(x*x + y*y));
-            double phi = atan2(y,x);
-            element_response.Response(0, freq, theta, phi, result_arr[i][j]);
+            double theta = std::asin(sqrt(x*x + y*y));
+            double phi = std::atan2(y,x);
+            typedef std::complex<double> Mat[2][2]; 
+            element_response.Response(0, freq, theta, phi, *reinterpret_cast<Mat*>(&result[4 * (i*N + j)]));
         }
     }
 

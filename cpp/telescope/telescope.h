@@ -50,6 +50,8 @@ namespace telescope {
  */
 class Telescope {
  public:
+  virtual ~Telescope(){};
+
   /**
    * @brief Return the gridded response object
    *

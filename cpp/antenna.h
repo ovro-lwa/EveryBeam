@@ -96,6 +96,8 @@ class Antenna {
          // system
         Antenna(coordinate_system, coordinate_system.origin) {}
 
+  virtual ~Antenna(){};
+
   /**
    * @brief Construct a new %Antenna object, given a coordinate system and a
    * phase reference position.
@@ -160,13 +162,13 @@ class Antenna {
                                const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
-    Options local_options = {
-        .freq0 = options.freq0,
-        .station0 = TransformToLocalDirection(options.station0),
-        .tile0 = TransformToLocalDirection(options.tile0),
-        .rotate = options.rotate,
-        .east = TransformToLocalDirection(options.east),
-        .north = TransformToLocalDirection(options.north)};
+    Options local_options;
+    local_options.freq0 = options.freq0;
+    local_options.station0 = TransformToLocalDirection(options.station0);
+    local_options.tile0 = TransformToLocalDirection(options.tile0);
+    local_options.rotate = options.rotate;
+    local_options.east = TransformToLocalDirection(options.east);
+    local_options.north = TransformToLocalDirection(options.north);
     matrix22c_t response =
         LocalResponse(time, freq, local_direction, local_options);
     return response;
@@ -185,10 +187,10 @@ class Antenna {
                         const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
-    Options local_options = {
-        .freq0 = options.freq0,
-        .station0 = TransformToLocalDirection(options.station0),
-        .tile0 = TransformToLocalDirection(options.tile0)};
+    Options local_options;
+    local_options.freq0 = options.freq0;
+    local_options.station0 = TransformToLocalDirection(options.station0);
+    local_options.tile0 = TransformToLocalDirection(options.tile0);
     return LocalArrayFactor(time, freq, local_direction, local_options);
   }
 

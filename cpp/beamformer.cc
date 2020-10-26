@@ -114,7 +114,7 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
     local_options.rotate = false;
   }
 
-  matrix22c_t result = {0};
+  matrix22c_t result = {{{0}}};
   for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
     Antenna::Ptr antenna = antennas_[antenna_idx];

@@ -161,8 +161,11 @@ matrix22c_t Station::Response(real_t time, real_t freq,
                               const vector3r_t &station0,
                               const vector3r_t &tile0,
                               const bool rotate) const {
-  Antenna::Options options = {
-      .freq0 = freq0, .station0 = station0, .tile0 = tile0, .rotate = rotate};
+  Antenna::Options options;
+  options.freq0 = freq0;
+  options.station0 = station0;
+  options.tile0 = tile0;
+  options.rotate = rotate;
 
   if (rotate) {
     vector3r_t ncp_ = NCP(time);
@@ -181,8 +184,10 @@ diag22c_t Station::ArrayFactor(real_t time, real_t freq,
                                const vector3r_t &direction, real_t freq0,
                                const vector3r_t &station0,
                                const vector3r_t &tile0) const {
-  Antenna::Options options = {
-      .freq0 = freq0, .station0 = station0, .tile0 = tile0};
+  Antenna::Options options;
+  options.freq0 = freq0;
+  options.station0 = station0;
+  options.tile0 = tile0;
   return antenna_->ArrayFactor(time, freq, direction, options);
 }
 

@@ -52,6 +52,8 @@ namespace griddedresponse {
  */
 class GriddedResponse {
  public:
+  virtual ~GriddedResponse() {}
+
   /**
    * @brief Compute the Beam response for a single station
    *
@@ -79,6 +81,9 @@ class GriddedResponse {
 
   /**
    * @brief Calculate integrated beam for a single time step.
+   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
+   * may override MakeIntegratedSnapshot() to implement a more efficient
+   * version.
    *
    * @param buffer Buffer for storing the result, should have size width *
    * height * 16
@@ -95,6 +100,9 @@ class GriddedResponse {
 
   /**
    * @brief Calculate integrated beam over multiple time steps.
+   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
+   * may override MakeIntegratedSnapshot() to implement a more efficient
+   * version.
    *
    * @param buffer Buffer for storing the result, should have size width *
    * height * 16
@@ -148,6 +156,12 @@ class GriddedResponse {
   double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
 
  private:
+  /**
+   * @brief Calculate a baseline-integrated snapshot.
+   * By default, this function will request the response for all antennas and
+   * perform a weighted average. (Partly) homogenous arrays may implement a
+   * faster implementation by overriding this method.
+   */
   virtual void MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
                                       double time, double frequency,
                                       size_t field_id,
