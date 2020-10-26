@@ -56,8 +56,19 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   std::vector<std::complex<float>> antenna_buffer(
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
 
-  grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
-                                      0);
+  try {
+    grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
+                                        0);
+  } catch (std::exception& e) {
+    throw std::runtime_error(
+        std::string(e.what()) +
+        "\nPath used for MWA coefficients file: " + MWA_COEFF_PATH);
+  } catch (...) {
+    throw std::runtime_error(
+        std::string("Unknown exception type was thrown, probably by HDF5 "
+                    "lib.\nPath used for MWA coefficients file: ") +
+        MWA_COEFF_PATH);
+  }
 
   // Check whether pixels are reproduced correctly at certain pixels on 16x16
   // image MWABeam output at pixel (0, 8):
