@@ -1,4 +1,3 @@
-#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 #include <cmath>
 
 #include <Eigen/Core>
@@ -9,6 +8,9 @@
 #include <complex>
 #include <H5Cpp.h>
 #include <tuple>
+#include <string>
+
+#include <boost/math/special_functions/legendre.hpp>
 
 namespace py = pybind11;
 
@@ -19,7 +21,7 @@ template <typename T, typename TIter = decltype(std::begin(std::declval<T>())),
           typename = decltype(std::end(std::declval<T>()))>
 constexpr auto enumerate(T &&iterable) {
   struct iterator {
-    size_t i;
+    std::size_t i;
     TIter iter;
     bool operator!=(const iterator &other) const { return iter != other.iter; }
     void operator++() {
@@ -41,9 +43,9 @@ double P21(double x) { return 3.0 * x * std::sqrt(1 - x * x); }
 double P22(double x) { return 3 * (1 - x * x); }
 
 int plustwo(int a) {
-  std::cout << std::assoc_legendre(2, 0, 0.5) << '=' << P20(0.5) << '\n'
-            << std::assoc_legendre(2, 1, 0.5) << '=' << P21(0.5) << '\n'
-            << std::assoc_legendre(2, 2, 0.5) << '=' << P22(0.5) << '\n';
+  std::cout << boost::math::legendre_p(2, 0, 0.5) << '=' << P20(0.5) << '\n'
+            << boost::math::legendre_p(2, 1, 0.5) << '=' << P21(0.5) << '\n'
+            << boost::math::legendre_p(2, 2, 0.5) << '=' << P22(0.5) << '\n';
 
   return a + 2;
 }
@@ -55,7 +57,7 @@ Eigen::ArrayXd P(int m, int n, py::EigenDRef<Eigen::ArrayXd> x) {
 
   Eigen::ArrayXd result(N);  // = Eigen::VectorXd::Zero(10, 1);
   for (int i = 0; i < N; i++) {
-    result[i] = std::assoc_legendre(n, std::abs(m), x[i]);
+    result[i] = boost::math::legendre_p(n, std::abs(m), x[i]);
   }
 
   if (m < 0) {
@@ -136,7 +138,8 @@ PYBIND11_MODULE(pylobes, m) {
 
   m.def("plustwo", &plustwo, "A function which adds two to a number");
 
-  m.def("assoc_legendre", &std::assoc_legendre<double>,
+  m.def("assoc_legendre",
+        static_cast<double (*)(int, double)>(&boost::math::legendre_p),
         "Associated legendre function");
 
   m.def("scale", [](py::EigenDRef<Eigen::MatrixXd> m, double c) { m *= c; });

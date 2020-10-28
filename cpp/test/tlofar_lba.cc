@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include "../load.h"
 #include "../options.h"
@@ -152,8 +153,8 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
   std::size_t offset_13 = (3 + 1 * width) * 4;
 
   for (std::size_t i = 0; i < 4; ++i) {
-    BOOST_CHECK(std::abs(antenna_buffer_single[offset_13 + i] -
-                         everybeam_ref_p13[i]) < 1e-6);
+    BOOST_CHECK_CLOSE(antenna_buffer_single[offset_13 + i],
+                      everybeam_ref_p13[i], 1e-4);
   }
   // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
   // npy::SaveArrayAsNumpy("lobes_station_response.npy", false, 4, leshape,

@@ -1,4 +1,3 @@
-#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 #include <cmath>
 
 #include "config.h"
@@ -10,14 +9,15 @@
 #include <H5Cpp.h>
 #include <iostream>
 
+#include <boost/math/special_functions/legendre.hpp>
+
 // Anonymous namespace for evaluating the base functions
 namespace {
 double P(int m, int n, double x) {
-  double result = std::assoc_legendre(n, std::abs(m), x);
-
+  double result = boost::math::legendre_p(n, std::abs(m), x);
   if (m < 0) {
-    result *=
-        std::pow(-1, -m) * std::tgamma(n + m + 1) / std::tgamma(n - m + 1);
+    int phase = ((-m) % 2 == 0) ? 1 : -1;
+    result *= phase * std::tgamma(n + m + 1) / std::tgamma(n - m + 1);
   }
 
   return result;
