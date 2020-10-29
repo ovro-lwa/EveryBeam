@@ -107,15 +107,18 @@ class BeamFormer : public Antenna {
                                      const Options &options) const override;
 
   // Compute the geometric response for all the antennas in the BeamFormer based
-  // on the probing frequency and a specified direction (either pointing dir or
-  // dir of interest).
+  // on the difference vector between the pointing direction and the direction
+  // of interest. This difference vector should be computed as: direction =
+  // pointing_freq * pointing_dir - interest_freq * interest_dir
   std::vector<std::complex<double>> ComputeGeometricResponse(
-      const double freq, const vector3r_t &direction) const;
+      const vector3r_t &direction) const;
 
-  // Compute the weights based on the pointing direction of the beam and the
-  // beam reference frequence.
+  // Compute the weights based on the difference vector between the pointing
+  // direction and the direction of interest. Analogous to
+  // ComputeGeometricResponse, this difference vector should be computed as:
+  // direction = pointing_freq * pointing_dir - interest_freq * interest_dir
   std::vector<std::pair<std::complex<double>, std::complex<double>>>
-  ComputeWeights(const vector3r_t &direction, double freq) const;
+  ComputeWeightedResponses(const vector3r_t &direction) const;
 
   // List of antennas in BeamFormer
   std::vector<Antenna::Ptr> antennas_;
