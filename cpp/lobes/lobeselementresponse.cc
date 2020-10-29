@@ -241,7 +241,7 @@ std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(
         entry, {name, std::make_shared<LOBESElementResponse>(name)});
   }
   return entry->second;
-};
+}
 
 std::string LOBESElementResponse::GetPath(const char* filename) const {
   std::stringstream ss;

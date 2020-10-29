@@ -64,13 +64,8 @@ class LOFAR final : public PhasedArray {
   Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                            const std::size_t id,
                            const ElementResponseModel model) const override;
-  struct MSProperties {
-    double subband_freq;
-    casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
-  };
 
   std::vector<Station::Ptr> stations_;
-  MSProperties ms_properties_;
 };
 }  // namespace telescope
 }  // namespace everybeam

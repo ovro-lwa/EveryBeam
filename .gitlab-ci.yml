@@ -29,17 +29,24 @@ test-and-coverage:
     - apt-get update
     - apt-get -y install python3-pip
     - python3 -m pip install gcovr
+    - python3 -m pip install pytest
+    - python3 -m pip install pytest-lazy-fixture
   script:
+    - WORKDIR=$PWD
     # Download casacore wsrt measures
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
     # Build in Debug mode
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_WITH_PYTHON=ON -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
     - make install -j8
     - ctest -j4 -T test
     # Capture coverage
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
+    # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH 
+    - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
+    - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/site-packages
+    - cd && python3 -c "import everybeam"
   artifacts:
     reports:
       # NOTE: artifacts only work with relative paths...

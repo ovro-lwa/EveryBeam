@@ -10,4 +10,4 @@ RUN apt-get update && \
 # install dependencies
         libboost-all-dev libhdf5-dev libfftw3-dev \
         libblas-dev liblapack-dev libgsl-dev libxml2-dev \
-        libpng-dev libgtkmm-3.0-dev
+        libpng-dev libgtkmm-3.0-dev libpython3-dev 

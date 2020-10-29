@@ -64,6 +64,35 @@ class PhasedArray : public Telescope {
     return stations_[station_idx];
   }
 
+  // Convenience getters (used in pybindings only)
+
+  //! Get the delay direction
+  casacore::MDirection GetDelayDirection() const {
+    return ms_properties_.delay_dir;
+  }
+
+  //! Get the tile beam direction
+  virtual casacore::MDirection GetTileBeamDirection() const {
+    return ms_properties_.tile_beam_dir;
+  };
+
+  //! Get the preapplied beam direction
+  virtual casacore::MDirection GetPreappliedBeamDirection() const {
+    return ms_properties_.preapplied_beam_dir;
+  };
+
+  //! Get the subband frequency
+  double GetSubbandFrequency() const { return ms_properties_.subband_freq; };
+
+  //! Get the number of channels
+  size_t GetNrChannels() const { return ms_properties_.channel_count; };
+
+  //! Get the channel frequency given a (zero-based) index
+  double GetChannelFrequency(size_t idx) const {
+    assert(idx < ms_properties_.channel_count);
+    return ms_properties_.channel_freqs[idx];
+  };
+
  protected:
   std::vector<Station::Ptr> stations_;
 
@@ -86,6 +115,15 @@ class PhasedArray : public Telescope {
   virtual Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                                    const std::size_t id,
                                    const ElementResponseModel model) const = 0;
+
+  struct MSProperties {
+    double subband_freq;
+    casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
+    size_t channel_count;
+    std::vector<double> channel_freqs;
+  };
+
+  MSProperties ms_properties_;
 };
 }  // namespace telescope
 }  // namespace everybeam

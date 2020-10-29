@@ -16,7 +16,7 @@ size_t HamakerCoefficients::GetIndex(const unsigned int n, const unsigned int t,
 // Constructor for reading coeff from file
 HamakerCoefficients::HamakerCoefficients(std::string& filename) {
   ReadCoefficients(filename);
-};
+}
 
 // Constructor for writing coeff to file
 HamakerCoefficients::HamakerCoefficients(const double freq_center,

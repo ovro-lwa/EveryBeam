@@ -47,7 +47,7 @@ inline void oskar_mul_sub_complex(FP& out_s, FP A, FP B) {
 template <typename FP>
 inline void make_zero2(FP& X) {
   X.x = X.y = 0;
-};
+}
 
 template <typename FP, typename FP2>
 inline void oskar_sph_wave(FP pds, FP dpms, FP sin_p, FP cos_p, int M, FP2 a_tm,

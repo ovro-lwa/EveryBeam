@@ -50,7 +50,7 @@ class OSKARGrid final : public PhasedArrayGrid {
     delay_dir_ = oskartelescope.ms_properties_.delay_dir;
     tile_beam_dir_ = oskartelescope.ms_properties_.delay_dir;
     // NOTE: for OSKAR, it always holds that:
-    // use_channel_frequency_ --> true (i.e. never use the subband_frequency_)
+    // use_channel_frequency_ = true (i.e. never use the subband_frequency_)
   };
 };
 }  // namespace griddedresponse

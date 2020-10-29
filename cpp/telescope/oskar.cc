@@ -18,13 +18,27 @@ OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   ReadAllStations(ms, options_.element_response_model);
 
+  aocommon::BandData band(ms.spectralWindow());
   casacore::ScalarMeasColumn<casacore::MDirection> delay_dir_col(
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::DELAY_DIR));
 
+  size_t channel_count = band.ChannelCount();
+  std::vector<double> channel_freqs(channel_count);
+  for (size_t idx = 0; idx < channel_count; ++idx) {
+    channel_freqs[idx] = band.ChannelFrequency(idx);
+  }
+
   // Populate struct
   ms_properties_ = MSProperties();
+  ms_properties_.subband_freq = band.CentreFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
+  // tile_beam_dir and preapplied_beam_dir
+  // have dummy values for OSKAR
+  ms_properties_.tile_beam_dir = delay_dir_col(0);
+  ms_properties_.preapplied_beam_dir = delay_dir_col(0);
+  ms_properties_.channel_count = channel_count;
+  ms_properties_.channel_freqs = channel_freqs;
 }
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(

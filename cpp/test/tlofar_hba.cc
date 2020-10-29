@@ -54,14 +54,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   double ra(2.15374123), dec(0.8415521), dl(0.5 * M_PI / 180.),
       dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
 
-  CoordinateSystem coord_system = {.width = width,
-                                   .height = height,
-                                   .ra = ra,
-                                   .dec = dec,
-                                   .dl = dl,
-                                   .dm = dm,
-                                   .phase_centre_dl = shift_l,
-                                   .phase_centre_dm = shift_m};
+  CoordinateSystem coord_system = {width, height, ra,      dec,
+                                   dl,    dm,     shift_l, shift_m};
+
   // Compute and check the Station::ComputeElementResponse for
   // a "randomly selected"  station (station 11)
   // NOTE: this is a regression test in the sense that we only check whether
@@ -72,7 +67,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   // target_element_response is the element response corresponding to this
   // direction
   vector3r_t direction = {0.397408, 0.527527, 0.750855};
-  matrix22c_t target_element_response = {0};
+  matrix22c_t target_element_response = {{{0}}};
   target_element_response[0][0] = {-0.164112, -0.000467162};
   target_element_response[0][1] = {-0.843709, -0.00123631};
   target_element_response[1][0] = {-0.892528, -0.00126278};
@@ -88,6 +83,29 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
     for (size_t j = 0; j != 2; ++j) {
       BOOST_CHECK(std::abs(element_response[i][j] -
                            target_element_response[i][j]) < 1e-6);
+    }
+  }
+
+  // Compute station response for station 63 (see also python/test)
+  const Station& station63 =
+      static_cast<const Station&>(*(lofartelescope.GetStation(63).get()));
+
+  vector3r_t direction_s63 = {0.424588, 0.4629957, 0.7780411};
+  vector3r_t station0_dir = {0.4083262, 0.5273447, 0.7451022};
+  vector3r_t tile0_dir = {0.4083268, 0.5273442, 0.7451022};
+  matrix22c_t station63_response = station63.Response(
+      time, frequency, direction_s63, frequency, station0_dir, tile0_dir);
+
+  matrix22c_t target_station_response = {{{0}}};
+  target_station_response[0][0] = {0.032594235, -0.00023045994};
+  target_station_response[0][1] = {0.12204097, -0.00091857865};
+  target_station_response[1][0] = {0.13063535, -0.0010039175};
+  target_station_response[1][1] = {-0.029348446, 0.00023882818};
+
+  for (size_t i = 0; i < 2; ++i) {
+    for (size_t j = 0; j < 2; ++j) {
+      BOOST_CHECK(std::abs(station63_response[i][j] -
+                           target_station_response[i][j]) < 1e-6);
     }
   }
 
@@ -212,15 +230,11 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   // +          double w = 1.;
   //
   std::size_t width_pb = 40, height_pb = 40;
-  CoordinateSystem coord_system_pb = {.width = width_pb,
-                                      .height = height_pb,
-                                      .ra = ra,
-                                      .dec = dec,
-                                      // 900asec
-                                      .dl = (0.25 * M_PI / 180.),
-                                      .dm = (0.25 * M_PI / 180.),
-                                      .phase_centre_dl = shift_l,
-                                      .phase_centre_dm = shift_m};
+  // (0.25 * M_PI / 180.) equals 900asec
+  CoordinateSystem coord_system_pb = {
+      width_pb, height_pb, ra, dec, (0.25 * M_PI / 180.), (0.25 * M_PI / 180.),
+      shift_l,  shift_m};
+
   std::unique_ptr<GriddedResponse> grid_response_pb =
       telescope->GetGriddedResponse(coord_system_pb);
 
