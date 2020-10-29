@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.0.0)
 # Set project name and version number
 project(EveryBeam VERSION 5.0.0)
 
+option (BUILD_WITH_PYTHON "Build python bindings" OFF)
+
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 
 # Set the path to CMake modules
@@ -36,7 +38,6 @@ endif()
 # Include aocommon/eigen3/pybind11 headers
 include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
 include_directories("${CMAKE_SOURCE_DIR}/external/eigen/")
-find_package(Python COMPONENTS Development REQUIRED)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/pybind11")
 include_directories(${pybind11_INCLUDE_DIR})
 
@@ -125,10 +126,9 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
 #------------------------------------------------------------------------------
-# pybind11 
-# NOTE: temporary fix to build pybindings for lobes
-add_subdirectory(python/lobes)
-
+if(BUILD_WITH_PYTHON)
+  add_subdirectory(python)
+endif()
 
 #------------------------------------------------------------------------------
 # Documentation

@@ -17,10 +17,9 @@ PhasedArrayGrid::PhasedArrayGrid(
   // Set private members
   use_differential_beam_ = telescope_->GetOptions().use_differential_beam;
   size_t ncpus = aocommon::ThreadPool::NCPUs();
-  // TODO: toskar fails on DAS5
   nthreads_ = std::min(ncpus, telescope_->GetNrStations());
   threads_.resize(nthreads_);
-};
+}
 
 void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
                                        double frequency, size_t station_idx,

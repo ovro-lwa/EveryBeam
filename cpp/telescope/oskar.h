@@ -60,16 +60,26 @@ class OSKAR final : public PhasedArray {
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
+  //! Get the tile beam direction, equal to delay direction for OSKAR!
+  virtual casacore::MDirection GetTileBeamDirection() const final override {
+    std::cout << "OSKAR has no tile. tile_beam_dir is equal to the delay_dir."
+              << std::endl;
+    return ms_properties_.tile_beam_dir;
+  };
+
+  //! Get the preapplied beam direction, equal to delay direction for OSKAR!
+  virtual casacore::MDirection GetPreappliedBeamDirection()
+      const final override {
+    std::cout << "OSKAR has no preapplied beam direction (yet). "
+                 "preapplied_beam_dir is equal to the delay_dir."
+              << std::endl;
+    return ms_properties_.preapplied_beam_dir;
+  };
+
  private:
   Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
                            const std::size_t id,
                            const ElementResponseModel model) const override;
-
-  struct MSProperties {
-    casacore::MDirection delay_dir;
-  };
-
-  MSProperties ms_properties_;
 };
 }  // namespace telescope
 }  // namespace everybeam

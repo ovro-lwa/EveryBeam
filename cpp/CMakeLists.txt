@@ -1,3 +1,5 @@
+project(everybeam_cpp)
+
 #------------------------------------------------------------------------------
 add_subdirectory(common)
 add_subdirectory(coords)

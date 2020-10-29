@@ -14,10 +14,9 @@ using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;
 
 namespace {
-bool GetPreappliedBeamDirection(casacore::MeasurementSet &ms,
-                                const std::string &data_column_name,
-                                bool use_differential_beam,
-                                casacore::MDirection &preapplied_beam_dir) {
+bool CalculatePreappliedBeamDirection(
+    casacore::MeasurementSet &ms, const std::string &data_column_name,
+    bool use_differential_beam, casacore::MDirection &preapplied_beam_dir) {
   casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
@@ -86,16 +85,23 @@ LOFAR::LOFAR(casacore::MeasurementSet &ms, const Options &options)
       ms.field(), "LOFAR_TILE_BEAM_DIR");
 
   casacore::MDirection preapplied_beam_dir;
-  options_.use_differential_beam = GetPreappliedBeamDirection(
+  options_.use_differential_beam = CalculatePreappliedBeamDirection(
       ms, options_.data_column_name, options_.use_differential_beam,
       preapplied_beam_dir);
 
+  size_t channel_count = band.ChannelCount();
+  std::vector<double> channel_freqs(channel_count);
+  for (size_t idx = 0; idx < channel_count; ++idx) {
+    channel_freqs[idx] = band.ChannelFrequency(idx);
+  }
   // Populate struct
   ms_properties_ = MSProperties();
   ms_properties_.subband_freq = band.CentreFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
   ms_properties_.tile_beam_dir = *(tile_beam_dir_col(0).data());
   ms_properties_.preapplied_beam_dir = preapplied_beam_dir;
+  ms_properties_.channel_count = channel_count;
+  ms_properties_.channel_freqs = channel_freqs;
 }
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(

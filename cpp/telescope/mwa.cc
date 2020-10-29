@@ -29,4 +29,4 @@ std::unique_ptr<GriddedResponse> MWA::GetGriddedResponse(
     const coords::CoordinateSystem &coordinate_system) {
   std::unique_ptr<GriddedResponse> grid(new MWAGrid(this, coordinate_system));
   return grid;
-};
+}

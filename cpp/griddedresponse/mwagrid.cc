@@ -59,7 +59,7 @@ void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
       }
     }
   }
-};
+}
 
 void MWAGrid::CalculateAllStations(std::complex<float>* buffer, double time,
                                    double frequency, size_t) {
@@ -69,7 +69,7 @@ void MWAGrid::CalculateAllStations(std::complex<float>* buffer, double time,
     std::copy_n(buffer, width_ * height_ * 4,
                 buffer + i * width_ * height_ * 4);
   }
-};
+}
 
 void MWAGrid::MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
                                      double time, double frequency,
