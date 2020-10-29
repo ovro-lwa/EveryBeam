@@ -4,6 +4,7 @@
 #include "common/mathutils.h"
 
 #include <cmath>
+#include <cassert>
 
 namespace everybeam {
 std::vector<std::complex<double>> BeamFormerLofar::ComputeGeometricResponse(
@@ -29,8 +30,7 @@ diag22c_t BeamFormerLofar::FieldArrayFactor(
     real_t time, real_t freq, const vector3r_t &direction,
     const Options &options, const std::vector<vector3r_t> &antenna_positions,
     const std::vector<std::array<bool, 2>> &antenna_enabled) const {
-  // Assert that size of input vectors is equal
-  //   assert(antenna_positions.size() == antenna_enabled.size());
+  assert(antenna_positions.size() == antenna_enabled.size());
 
   // Weighted subtraction of the directions, with weights given by corresponding
   // freqs. Purpose is to correctly handle the case in which options.freq0 !=
