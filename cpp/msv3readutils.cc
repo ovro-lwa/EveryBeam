@@ -117,7 +117,7 @@ BeamFormer::Ptr ReadMSv3AntennaField(const Table &table, unsigned int id,
     Antenna::CoordinateSystem antenna_coordinate_system{antenna_position,
                                                         antenna_orientation};
     antenna = std::make_shared<Element>(antenna_coordinate_system,
-                                        element_response, id);
+                                        element_response, i);
 
     antenna->enabled_[0] = !aips_flag(i, 0);
     antenna->enabled_[1] = !aips_flag(i, 1);
