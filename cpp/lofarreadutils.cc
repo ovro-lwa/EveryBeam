@@ -165,8 +165,7 @@ vector3r_t TransformToFieldCoordinates(
 //     return system;
 // }
 
-std::shared_ptr<BeamFormer> MakeTile(unsigned int id,
-                                     const vector3r_t &position,
+std::shared_ptr<BeamFormer> MakeTile(const vector3r_t &position,
                                      const TileConfig &tile_config,
                                      ElementResponse::Ptr element_response) {
   std::shared_ptr<BeamFormer> tile =
@@ -269,7 +268,7 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
 
     if (name == "LBA") {
       antenna = std::make_shared<Element>(antenna_coordinate_system,
-                                          element_response, id);
+                                          element_response, i);
       if (element_response_model == kHamaker) {
         // Cast to LOFAR LBA
         std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
@@ -312,7 +311,7 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
       } else {
         std::shared_ptr<BeamFormerIdenticalAntennas> beam_former_hba =
             std::static_pointer_cast<BeamFormerIdenticalAntennas>(beam_former);
-        antenna = MakeTile(id, antenna_position, tile_config, element_response);
+        antenna = MakeTile(antenna_position, tile_config, element_response);
         antenna->enabled_[0] = !aips_flag(0, i);
         antenna->enabled_[1] = !aips_flag(1, i);
         beam_former_hba->AddAntenna(antenna);

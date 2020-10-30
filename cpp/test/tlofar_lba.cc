@@ -164,10 +164,10 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
   // Compare with everybeam at pixel (1, 3). This solution only is a "reference"
   // certainly not a "ground-truth"
   std::vector<std::complex<float>> everybeam_ref_p13 = {
-      {-0.6094082, 0.2714097},
-      {-0.9981958, 1.081614},
-      {-0.5575241, -0.3563573},
-      {-0.6945726, 0.1506443}};
+      {0.022321859, 0.032528818},
+      {-0.0022747002, 0.096434057},
+      {0.037618704, 0.015968619},
+      {-0.041608963, 0.021379814}};
   std::size_t offset_13 = (3 + 1 * width) * 4;
 
   for (std::size_t i = 0; i < 4; ++i) {
