@@ -70,5 +70,11 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
               << " is not implemented.";
       throw std::runtime_error(message.str());
   }
-};
+}
+
+std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,
+                                           const Options &options) {
+  casacore::MeasurementSet ms(ms_name);
+  return Load(ms, options);
+}
 }  // namespace everybeam

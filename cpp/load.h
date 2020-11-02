@@ -59,11 +59,21 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms);
  * from MeasurementSet meta-data.
  *
  * @param ms MeasurementSet
- * @param model Element response model
  * @param options Options
  * @return telescope::Telescope::Ptr
  */
 std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
+                                           const Options &options);
+
+/**
+ * @brief Load telescope given a path to a measurment set. Telescope is
+ * determined from MeasurementSet meta-data.
+ *
+ * @param ms MeasurementSet
+ * @param options Options
+ * @return telescope::Telescope::Ptr
+ */
+std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,
                                            const Options &options);
 }  // namespace everybeam
 

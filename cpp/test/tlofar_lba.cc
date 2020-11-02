@@ -46,10 +46,8 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   // except for station 20 (CS302LBA)
   options.element_response_model = ElementResponseModel::kHamaker;
 
-  casacore::MeasurementSet ms(LOFAR_LBA_MOCK_MS);
-
   // Load LOFAR Telescope
-  std::unique_ptr<Telescope> telescope = Load(ms, options);
+  std::unique_ptr<Telescope> telescope = Load(LOFAR_LBA_MOCK_MS, options);
 
   // Assert if we indeed have a LOFAR pointer
   BOOST_CHECK(nullptr != dynamic_cast<LOFAR*>(telescope.get()));
