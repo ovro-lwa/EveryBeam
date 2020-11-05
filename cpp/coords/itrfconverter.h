@@ -24,9 +24,6 @@ namespace coords {
  */
 class ITRFConverter {
  public:
-  typedef std::unique_ptr<ITRFDirection> Ptr;
-  typedef std::unique_ptr<const ITRFDirection> ConstPtr;
-
   ITRFConverter(real_t time);
 
   void SetTime(real_t time);

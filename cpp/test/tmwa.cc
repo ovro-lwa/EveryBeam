@@ -4,6 +4,7 @@
 #include "../options.h"
 #include "../griddedresponse/mwagrid.h"
 #include "../../external/npy.hpp"
+#include "../telescope/mwa.h"
 
 #include "config.h"
 #include <complex>

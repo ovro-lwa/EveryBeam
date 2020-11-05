@@ -5,6 +5,7 @@
 #include "../griddedresponse/oskargrid.h"
 #include "../elementresponse.h"
 #include "../../external/npy.hpp"
+#include "../telescope/oskar.h"
 
 #include "config.h"
 #include <complex>

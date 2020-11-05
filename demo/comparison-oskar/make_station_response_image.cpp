@@ -11,6 +11,7 @@
 #include "config.h"
 #include "coords/coordutils.h"
 #include "coords/itrfconverter.h"
+#include "telescope/oskar.h"
 
 using namespace everybeam;
 
@@ -102,4 +103,3 @@ int main(int argc, char** argv){
     const long unsigned leshape [] = {(long unsigned int) N, (long unsigned int) N, 2, 2};
     npy::SaveArrayAsNumpy("station-response.npy", false, 4, leshape, result);
 }
-

@@ -7,6 +7,7 @@
 #include "../../external/npy.hpp"
 #include "../station.h"
 #include "../common/types.h"
+#include "../telescope/lofar.h"
 
 #include "config.h"
 #include <complex>

@@ -14,7 +14,7 @@ using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::OSKARGrid;
 using everybeam::telescope::OSKAR;
 
-OSKAR::OSKAR(MeasurementSet &ms, const Options &options)
+OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   ReadAllStations(ms, options_.element_response_model);
 

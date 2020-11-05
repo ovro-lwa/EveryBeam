@@ -4,6 +4,7 @@
 #include "../options.h"
 #include "../griddedresponse/dishgrid.h"
 #include "../elementresponse.h"
+#include "../telescope/dish.h"
 #include "../../external/npy.hpp"
 
 #include "config.h"

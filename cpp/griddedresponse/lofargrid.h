@@ -25,10 +25,7 @@
 #define EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_
 
 #include "phasedarraygrid.h"
-#include <iostream>
-#include <aocommon/matrix2x2.h>
-#include <complex>
-#include <limits>
+#include "../telescope/lofar.h"
 
 namespace everybeam {
 namespace griddedresponse {
