@@ -21,6 +21,12 @@ class FieldResponse : public ElementResponse {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    */
   virtual void SetFieldQuantities(double theta, double phi) = 0;
+
+  /**
+   * @brief Clear the cached field quantities
+   *
+   */
+  virtual void ClearFieldQuantities() = 0;
 };
 }  // namespace everybeam
 #endif

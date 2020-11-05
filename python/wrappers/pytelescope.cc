@@ -139,6 +139,12 @@ void init_telescope(py::module &m) {
         -------
         int
        )pbdoc")
+      .def("station_name",
+           [](PhasedArray &self, size_t idx) {
+             const Station &station =
+                 static_cast<const Station &>(*(self.GetStation(idx).get()));
+             return station.GetName();
+           })
       .def("channel_frequency", &PhasedArray::GetChannelFrequency,
            R"pbdoc(
         Retrieve channel frequency for a given (zero-based) channel index.
@@ -460,7 +466,7 @@ void init_telescope(py::module &m) {
             Evaluation response at time.
             Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
-            Get response for station index
+            station index
         freq: float
             Frequency of the plane wave (Hz)
         direction: np.1darray
@@ -477,6 +483,54 @@ void init_telescope(py::module &m) {
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"),
+          py::arg("rotate") = true)
+      .def(
+          "element_response",
+          [](PhasedArray &self, double time, size_t station_idx,
+             size_t element_idx, double freq,
+             const py::array_t<double> pydirection, bool is_local,
+             bool rotate) -> py::array_t<std::complex<double>> {
+            if (station_idx >= self.GetNrStations()) {
+              throw std::runtime_error(
+                  "Requested station index exceeds number of stations.");
+            }
+            // TODO: need such a check for element index too
+            vector3r_t direction = np2vector3r_t(pydirection);
+            const Station &station = static_cast<const Station &>(
+                *(self.GetStation(station_idx).get()));
+            matrix22c_t response = station.ComputeElementResponse(
+                time, freq, direction, element_idx, is_local, rotate);
+            return py::array_t<std::complex<double>>{cast_matrix(response)};
+          },
+          R"pbdoc(
+        Get element response given a station and an element in prescribed direction.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time. 
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+        station_idx: int
+            station index
+        element_idx: int
+            element index
+        freq: float
+            Frequency of the plane wave (Hz)
+        direction: np.1darray
+            Direction of arrival either in ITRF (m) or local East-North-Up (m)
+        is_local: bool, optional
+            Is the specified direction in local East-North-Up? If not, global coordinate 
+            system is assumed. [True/False] Defaults to False. 
+        rotate: bool, optional
+            Apply paralactic angle rotation? [True/False] Defaults to True
+
+        Returns
+        -------
+        np.ndarray
+            Response (Jones) matrix
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("element_idx"),
+          py::arg("freq"), py::arg("direction"), py::arg("is_local") = false,
           py::arg("rotate") = true);
 
   py::class_<LOFAR, PhasedArray>(m, "LOFAR").def(py::init(&create_lofar));

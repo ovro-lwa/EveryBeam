@@ -198,6 +198,9 @@ class Antenna {
   vector3r_t phase_reference_position_;
   bool enabled_[2];
 
+ protected:
+  vector3r_t TransformToLocalDirection(const vector3r_t &direction) const;
+
  private:
   virtual matrix22c_t LocalResponse(real_t time, real_t freq,
                                     const vector3r_t &direction,
@@ -208,8 +211,6 @@ class Antenna {
                                      const Options &options) const {
     return {1.0, 1.0};
   }
-
-  vector3r_t TransformToLocalDirection(const vector3r_t &direction) const;
 };
 
 }  // namespace everybeam
