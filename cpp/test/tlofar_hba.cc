@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(11).get()));
   matrix22c_t element_response =
-      station.ComputeElementResponse(time, frequency, direction, true);
+      station.ComputeElementResponse(time, frequency, direction, false);
 
   // Check whether element_response and target_element_response are "equal"
   for (size_t i = 0; i != 2; ++i) {

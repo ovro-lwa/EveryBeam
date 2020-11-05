@@ -67,10 +67,19 @@ class LOBESElementResponse : public FieldResponse {
     basefunctions_ = ComputeBaseFunctions(theta, phi);
   };
 
+  /**
+   * @brief Clear the cached basefunctions
+   *
+   */
+  virtual void ClearFieldQuantities() final override {
+    // Destructively resize the basefunctions_ to 0 rows
+    basefunctions_.resize(0, 2);
+  };
+
  private:
   // Typdef of BaseFunctions as Eigen::Array type
   typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
-  BaseFunctions basefunctions_;
+  mutable BaseFunctions basefunctions_;
 
   // Compose the path to a LOBES coefficient file
   std::string GetPath(const char *) const;
@@ -87,7 +96,7 @@ class LOBESElementResponse : public FieldResponse {
   BaseFunctions ComputeBaseFunctions(double theta, double phi) const;
 
   // Store h5 coefficients in coefficients_
-  Eigen::Tensor<std::complex<double>, 4> coefficients_;
+  Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor> coefficients_;
   std::vector<unsigned int> coefficients_shape_;
 
   // Store h5 frequencies in frequencies_

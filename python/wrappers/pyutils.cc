@@ -1,15 +1,79 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <pybind11/stl.h>
 
 #include "elementresponse.h"
 #include "options.h"
+#include "common/mathutils.h"
 #include "coords/coordutils.h"
 
 namespace py = pybind11;
+using everybeam::cart2thetaphi;
 using everybeam::ElementResponseModel;
 using everybeam::Options;
+using everybeam::thetaphi2cart;
+using everybeam::vector2r_t;
+using everybeam::vector3r_t;
 using everybeam::coords::CoordinateSystem;
 
+namespace {
+// Convert pyarray of size 3 to vector3r_t
+vector3r_t np2vector3r_t(const py::array_t<double> pyarray) {
+  auto r = pyarray.unchecked<1>();
+  if (r.size() != 3) {
+    throw std::runtime_error("Pyarry is of incorrect size, must be 3.");
+  }
+  return vector3r_t{r[0], r[1], r[2]};
+}
+}  // namespace
+
 void init_utils(py::module &m) {
+  m.def(
+      "cart2thetaphi",
+      [](py::array_t<double> pydirection) {
+        vector3r_t direction = np2vector3r_t(pydirection);
+        vector2r_t thetaphi = cart2thetaphi(direction);
+        return thetaphi;
+      },
+      R"pbdoc(
+        Convert direction vector (ITRF or local East-North-Up)
+        to theta, phi.
+        
+        Parameters
+        ---------- 
+        direction: np.1darray
+            Direction vector
+        
+        Returns
+        -------
+        list:
+            [theta, phi]   
+       )pbdoc",
+      py::arg("direction"));
+  m.def(
+      "thetaphi2cart",
+      [](double theta, double phi) -> py::array_t<float> {
+        vector2r_t thetaphi = {theta, phi};
+        vector3r_t direction = everybeam::thetaphi2cart(thetaphi);
+        return py::array_t<float>(py::cast(direction));
+      },
+      R"pbdoc(
+        Convert theta, phi angles to direction vector 
+        
+        Parameters
+        ---------- 
+        theta: float
+            theta angle [rad]
+        phi: float
+            phi angle [rad]
+        
+        Returns
+        -------
+        np.1darray:
+            
+       )pbdoc",
+      py::arg("theta"), py::arg("phi"));
+
   // Bindings for CoordinateSystem struct
   py::class_<CoordinateSystem>(m, "CoordinateSystem",
                                R"pbdoc(

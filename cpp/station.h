@@ -306,27 +306,35 @@ class Station {
    *
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency of the plane wave (Hz).
-   * @param direction Direction of arrival (ITRF, m).
+   * @param direction Direction of arrival. If is_local is true: (ENU, m) else
+   * direction vector in global coord system is assumed.
+   * @param is_local Use local east-north-up system (true) or global coordinate
+   * system (false, default).
    * @param id Element id
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return matrix22c_t Jones matrix of element response
    */
   matrix22c_t ComputeElementResponse(real_t time, real_t freq,
                                      const vector3r_t &direction, size_t id,
-                                     const bool rotate) const;
+                                     bool is_local = false,
+                                     bool rotate = true) const;
 
   /**
    * @brief Compute the Jones matrix for the element response
    *
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param freq Frequency of the plane wave (Hz).
-   * @param direction Direction of arrival (ITRF, m).
+   * @param direction Direction of arrival. If is_local is true: (ENU, m) else
+   * direction vector in global coord system is assumed.
+   * @param is_local Use local east-north-up system (true) or global coordinate
+   * system (false, default).
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return matrix22c_t Jones matrix of element response
    */
   matrix22c_t ComputeElementResponse(real_t time, real_t freq,
                                      const vector3r_t &direction,
-                                     const bool rotate = true) const;
+                                     bool is_local = false,
+                                     bool rotate = true) const;
 
   //! Specialized implementation of response function.
   matrix22c_t Response(real_t time, real_t freq,

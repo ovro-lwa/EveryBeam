@@ -142,41 +142,6 @@ LOBESElementResponse::LOBESElementResponse(std::string name) {
 
   nms_.resize(dims_nms[0]);
   dataset.read(nms_.data(), H5::PredType::NATIVE_INT);
-
-  // Normalise coefficients_ with response for an eps from zenith
-  // rather than 0. This is required since F4far_new is singular for theta=0
-  BaseFunctions basefunctions_zenith = ComputeBaseFunctions(1e-6, 0.);
-  Eigen::Index nr_rows = basefunctions_zenith.rows();
-  Eigen::Index nr_freqs = frequencies_.size();
-
-  for (Eigen::Index freq_idx = 0; freq_idx < nr_freqs; ++freq_idx) {
-    std::complex<double> xx = {0}, xy = {0}, yx = {0}, yy = {0};
-    for (Eigen::Index element_id = 0; element_id < coefficients_shape_[2];
-         ++element_id) {
-      for (Eigen::Index i = 0; i < nr_rows; ++i) {
-        std::complex<double> q2 = basefunctions_zenith(i, 0);
-        std::complex<double> q3 = basefunctions_zenith(i, 1);
-        xx += q2 * coefficients_(0, freq_idx, element_id, i);
-        xy += q3 * coefficients_(0, freq_idx, element_id, i);
-        yx += q2 * coefficients_(1, freq_idx, element_id, i);
-        yy += q3 * coefficients_(1, freq_idx, element_id, i);
-      }
-    }
-    // Compute normalisation factor: sqrt(2) / sqrt(1/nr_elements * sum of
-    // response matrix elements ^ 2) double norm_factor =
-    double norm_factor =
-        std::sqrt(2.) /
-        std::sqrt(1. / double(coefficients_shape_[2]) *
-                  (std::pow(std::abs(xx), 2) + std::pow(std::abs(xy), 2) +
-                   std::pow(std::abs(yx), 2) + std::pow(std::abs(yy), 2)));
-    for (Eigen::Index element_id = 0; element_id < coefficients_shape_[2];
-         ++element_id) {
-      for (Eigen::Index i = 0; i < nr_rows; ++i) {
-        coefficients_(0, freq_idx, element_id, i) *= norm_factor;
-        coefficients_(1, freq_idx, element_id, i) *= norm_factor;
-      }
-    }
-  }
 }
 
 LOBESElementResponse::BaseFunctions LOBESElementResponse::ComputeBaseFunctions(
@@ -205,6 +170,25 @@ LOBESElementResponse::BaseFunctions LOBESElementResponse::ComputeBaseFunctions(
 void LOBESElementResponse::Response(
     int element_id, double freq, double theta, double phi,
     std::complex<double> (&response)[2][2]) const {
+  // Initialize the response to zero.
+  response[0][0] = 0.0;
+  response[0][1] = 0.0;
+  response[1][0] = 0.0;
+  response[1][1] = 0.0;
+
+  // Clip directions below the horizon.
+  if (theta >= M_PI_2) {
+    return;
+  }
+
+  // Fill basefunctions if not yet set. Set clear_basefunctions to false
+  // to disable the caching of the basefunctions
+  bool clear_basefunctions = false;
+  if (basefunctions_.rows() == 0) {
+    clear_basefunctions = true;
+    basefunctions_ = ComputeBaseFunctions(theta, phi);
+  }
+
   int freq_idx = FindFrequencyIdx(freq);
   std::complex<double> xx = {0}, xy = {0}, yx = {0}, yy = {0};
 
@@ -228,6 +212,11 @@ void LOBESElementResponse::Response(
   response[0][1] = xy;
   response[1][0] = yx;
   response[1][1] = yy;
+
+  if (clear_basefunctions) {
+    // Do a destructive resize
+    basefunctions_.resize(0, 2);
+  }
 }
 
 std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(

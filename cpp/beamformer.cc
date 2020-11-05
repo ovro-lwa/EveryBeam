@@ -145,6 +145,10 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
     result = result * rotation;
   }
 
+  // Wipe out basefunctions cache
+  if (nullptr != field_response_.get()) {
+    field_response_->ClearFieldQuantities();
+  }
   return result;
 }
 

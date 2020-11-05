@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(19).get()));
   matrix22c_t element_response =
-      station.ComputeElementResponse(time, frequency, direction, true);
+      station.ComputeElementResponse(time, frequency, direction, false);
 
   for (size_t i = 0; i != 2; ++i) {
     for (size_t j = 0; j != 2; ++j) {
@@ -163,15 +163,16 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
   // Compare with everybeam at pixel (1, 3). This solution only is a "reference"
   // certainly not a "ground-truth"
   std::vector<std::complex<float>> everybeam_ref_p13 = {
-      {0.022321859, 0.032528818},
-      {-0.0022747002, 0.096434057},
-      {0.037618704, 0.015968619},
-      {-0.041608963, 0.021379814}};
-  std::size_t offset_13 = (3 + 1 * width) * 4;
+      {-2.1952772, -2.7803752},
+      {-1.4990979, -1.9227437},
+      {0.0086051673, 0.034685627},
+      {1.5801408, 2.0045171}};
 
+  std::size_t offset_13 = (3 + 1 * width) * 4;
   for (std::size_t i = 0; i < 4; ++i) {
+    // relative tolerance is 2e-1%, so 2e-3
     BOOST_CHECK_CLOSE(antenna_buffer_single[offset_13 + i],
-                      everybeam_ref_p13[i], 1e-4);
+                      everybeam_ref_p13[i], 2e-1);
   }
   // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
   // npy::SaveArrayAsNumpy("lobes_station_response.npy", false, 4, leshape,

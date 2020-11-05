@@ -121,8 +121,8 @@ void Station::SetAntenna(Antenna::Ptr antenna) {
 // ========================================================
 matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
                                             const vector3r_t &direction,
-                                            size_t id,
-                                            const bool rotate) const {
+                                            size_t id, bool is_local,
+                                            bool rotate) const {
   Antenna::Options options;
   options.rotate = rotate;
 
@@ -134,12 +134,13 @@ matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
     options.north = north;
   }
 
-  return element_->LocalResponse(time, freq, direction, id, options);
+  return is_local ? element_->LocalResponse(time, freq, direction, id, options)
+                  : element_->ResponseID(time, freq, direction, id, options);
 }
 
 matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
                                             const vector3r_t &direction,
-                                            const bool rotate) const {
+                                            bool is_local, bool rotate) const {
   Antenna::Options options;
   options.rotate = rotate;
 
@@ -151,9 +152,9 @@ matrix22c_t Station::ComputeElementResponse(real_t time, real_t freq,
     options.north = north;
   }
 
-  matrix22c_t response;
-  response = element_->Response(time, freq, direction, options);
-  return response;
+  return is_local ? element_->LocalResponse(time, freq, direction,
+                                            element_->GetElementID(), options)
+                  : element_->Response(time, freq, direction, options);
 }
 
 matrix22c_t Station::Response(real_t time, real_t freq,
