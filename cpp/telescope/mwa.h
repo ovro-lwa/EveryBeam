@@ -49,7 +49,7 @@ class MWA final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  MWA(casacore::MeasurementSet &ms, const Options &options);
+  MWA(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;

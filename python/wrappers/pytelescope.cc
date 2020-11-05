@@ -10,6 +10,8 @@
 #include "coords/coordutils.h"
 #include "coords/itrfconverter.h"
 #include "coords/itrfdirection.h"
+#include "telescope/lofar.h"
+#include "telescope/phasedarray.h"
 
 namespace py = pybind11;
 
@@ -108,7 +110,7 @@ void init_telescope(py::module &m) {
         Is time relevant for this telescope?
 
         Returns
-        -------                     
+        -------
         bool
        )pbdoc")
       .def_property_readonly("nr_stations", &Telescope::GetNrStations,
@@ -116,7 +118,7 @@ void init_telescope(py::module &m) {
         Retrieve the number of stations.
 
         Returns
-        -------                     
+        -------
         int
        )pbdoc")
       .def_property_readonly("options", &Telescope::GetOptions,
@@ -124,7 +126,7 @@ void init_telescope(py::module &m) {
         Retrieve the specified options.
 
         Returns
-        -------                     
+        -------
         pyeverybeam.Options
        )pbdoc");
 
@@ -134,7 +136,7 @@ void init_telescope(py::module &m) {
         Retrieve the number of channels.
 
         Returns
-        -------                     
+        -------
         int
        )pbdoc")
       .def("channel_frequency", &PhasedArray::GetChannelFrequency,
@@ -147,7 +149,7 @@ void init_telescope(py::module &m) {
             Channel index
 
         Returns
-        -------                     
+        -------
         float
        )pbdoc",
            py::arg("channel_index"))
@@ -193,11 +195,11 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         rotate: bool, optional
             Apply paralactic angle rotation? [True/False] Defaults to True
-       
+
         Returns
         -------
         np.ndarray
@@ -246,13 +248,13 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             Get response for station index
         rotate: bool, optional
             Apply paralactic angle rotation? [True/False] Defaults to True
-       
+
         Returns
         -------
         np.ndarray
@@ -301,15 +303,15 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             Get response for station index
         channel_idx: int
             Index of channel.
         rotate: bool, optional
             Apply paralactic angle rotation? [True/False] Defaults to True
-       
+
         Returns
         -------
         np.ndarray
@@ -354,15 +356,15 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             Get response for station index
         freq: float
             Frequency of the plane wave (Hz)
         rotate: bool, optional
             Apply paralactic angle rotation? [True/False] Defaults to True
-       
+
         Returns
         -------
         np.ndarray
@@ -401,8 +403,8 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             Get response for station index
         freq: float
@@ -455,8 +457,8 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             Get response for station index
         freq: float

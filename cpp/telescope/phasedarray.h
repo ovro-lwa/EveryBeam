@@ -47,7 +47,7 @@ class PhasedArray : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  PhasedArray(casacore::MeasurementSet &ms, const Options &options)
+  PhasedArray(const casacore::MeasurementSet &ms, const Options &options)
       : Telescope(ms, options) {
     stations_.resize(nstations_);
   };

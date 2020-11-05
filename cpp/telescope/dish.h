@@ -46,7 +46,7 @@ class Dish : public Telescope {
   friend class griddedresponse::DishGrid;
 
  public:
-  Dish(casacore::MeasurementSet &ms, const Options &options);
+  Dish(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;

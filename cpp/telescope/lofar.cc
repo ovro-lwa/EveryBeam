@@ -15,7 +15,7 @@ using everybeam::telescope::LOFAR;
 
 namespace {
 bool CalculatePreappliedBeamDirection(
-    casacore::MeasurementSet &ms, const std::string &data_column_name,
+    const casacore::MeasurementSet &ms, const std::string &data_column_name,
     bool use_differential_beam, casacore::MDirection &preapplied_beam_dir) {
   casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
       ms.field(),
@@ -56,7 +56,7 @@ bool CalculatePreappliedBeamDirection(
 }
 }  // namespace
 
-LOFAR::LOFAR(casacore::MeasurementSet &ms, const Options &options)
+LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   ReadAllStations(ms, options_.element_response_model);
 

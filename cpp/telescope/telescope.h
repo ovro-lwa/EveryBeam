@@ -72,7 +72,7 @@ class Telescope {
    * @param ms MeasurementSet
    * @param options telescope options
    */
-  Telescope(casacore::MeasurementSet &ms, const Options &options)
+  Telescope(const casacore::MeasurementSet &ms, const Options &options)
       : nstations_(ms.antenna().nrow()), options_(options){};
 
   void SetIsTimeRelevant(bool is_time_relevant) {

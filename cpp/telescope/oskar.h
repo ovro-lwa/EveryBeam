@@ -55,7 +55,7 @@ class OSKAR final : public PhasedArray {
    * @param model Element Response model
    * @param options telescope options
    */
-  OSKAR(casacore::MeasurementSet &ms, const Options &options);
+  OSKAR(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;

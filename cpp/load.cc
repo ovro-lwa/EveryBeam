@@ -1,5 +1,10 @@
 #include "load.h"
 
+#include "telescope/lofar.h"
+#include "telescope/dish.h"
+#include "telescope/mwa.h"
+#include "telescope/oskar.h"
+
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
@@ -32,35 +37,26 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
     return kUnknownTelescope;
 }
 
-std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
+std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
                                            const Options &options) {
-  TelescopeType telescope_name = GetTelescopeType(ms);
+  std::unique_ptr<telescope::Telescope> telescope;
+  const TelescopeType telescope_name = GetTelescopeType(ms);
   switch (telescope_name) {
-    case kAARTFAAC:
-    case kLofarTelescope: {
-      std::unique_ptr<telescope::Telescope> telescope =
-          std::unique_ptr<telescope::Telescope>(
-              new telescope::LOFAR(ms, options));
-      return telescope;
-    }
-    case kATCATelescope:
-    case kVLATelescope: {
-      std::unique_ptr<telescope::Telescope> telescope =
-          std::unique_ptr<telescope::Telescope>(
-              new telescope::Dish(ms, options));
-      return telescope;
-    }
+    case kAARTFAAC:  // fall through
+    case kLofarTelescope:
+      telescope.reset(new telescope::LOFAR(ms, options));
+      break;
+    case kATCATelescope:  // fall through
+    case kVLATelescope:
+      telescope.reset(new telescope::Dish(ms, options));
+      break;
     case kMWATelescope: {
-      std::unique_ptr<telescope::Telescope> telescope =
-          std::unique_ptr<telescope::Telescope>(
-              new telescope::MWA(ms, options));
-      return telescope;
+      telescope.reset(new telescope::MWA(ms, options));
+      break;
     }
     case kOSKARTelescope: {
-      std::unique_ptr<telescope::Telescope> telescope =
-          std::unique_ptr<telescope::Telescope>(
-              new telescope::OSKAR(ms, options));
-      return telescope;
+      telescope.reset(new telescope::OSKAR(ms, options));
+      break;
     }
     default:
       casacore::ScalarColumn<casacore::String> telescope_name_col(
@@ -70,6 +66,7 @@ std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
               << " is not implemented.";
       throw std::runtime_error(message.str());
   }
+  return telescope;
 }
 
 std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,

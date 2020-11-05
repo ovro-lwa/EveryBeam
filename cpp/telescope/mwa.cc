@@ -8,7 +8,7 @@ using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::MWAGrid;
 using everybeam::telescope::MWA;
 
-MWA::MWA(casacore::MeasurementSet &ms, const Options &options)
+MWA::MWA(const casacore::MeasurementSet &ms, const Options &options)
     : Telescope(ms, options) {
   if (GetNrStations() == 0) throw std::runtime_error("No antennae in set");
 

@@ -25,6 +25,7 @@
 #define EVERYBEAM_GRIDDEDRESPONSE_OSKARGRID_H_
 
 #include "phasedarraygrid.h"
+#include "../telescope/oskar.h"
 
 namespace everybeam {
 namespace griddedresponse {

@@ -25,10 +25,6 @@
 #define EVERYBEAM_LOAD_H_
 
 #include "./telescope/telescope.h"
-#include "./telescope/lofar.h"
-#include "./telescope/dish.h"
-#include "./telescope/mwa.h"
-#include "./telescope/oskar.h"
 #include "options.h"
 
 namespace everybeam {
@@ -62,7 +58,7 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms);
  * @param options Options
  * @return telescope::Telescope::Ptr
  */
-std::unique_ptr<telescope::Telescope> Load(casacore::MeasurementSet &ms,
+std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
                                            const Options &options);
 
 /**
