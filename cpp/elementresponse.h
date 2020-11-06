@@ -14,7 +14,10 @@ class MutablePtr;
 }
 
 enum ElementResponseModel {
-  kUnknown,
+  /// The default will select the default element response model
+  /// based on the telescope: e.g. LOFAR will use kHamaker,
+  /// OSKAR will select kOSKARSphericalWave.
+  kDefault,
   kHamaker,
   kLOBES,
   kOSKARDipole,

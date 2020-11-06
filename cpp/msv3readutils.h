@@ -37,7 +37,7 @@
 
 namespace everybeam {
 const ElementResponseModel defaultElementResponseModel =
-    ElementResponseModel::kUnknown;
+    ElementResponseModel::kDefault;
 
 /**
  * @brief Read single station from MeasurementSet

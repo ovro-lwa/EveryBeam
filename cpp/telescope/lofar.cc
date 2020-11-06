@@ -58,6 +58,8 @@ bool CalculatePreappliedBeamDirection(
 
 LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
+  if (options_.element_response_model == kDefault)
+    options_.element_response_model = kHamaker;
   ReadAllStations(ms, options_.element_response_model);
 
   // Populate MeasurementSet properties struct
