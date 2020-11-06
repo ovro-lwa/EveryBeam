@@ -16,6 +16,8 @@ using everybeam::telescope::OSKAR;
 
 OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
+  if (options_.element_response_model == kDefault)
+    options_.element_response_model = kOSKARSphericalWave;
   ReadAllStations(ms, options_.element_response_model);
 
   aocommon::BandData band(ms.spectralWindow());

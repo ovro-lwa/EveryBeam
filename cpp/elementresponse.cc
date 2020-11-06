@@ -3,8 +3,8 @@
 namespace everybeam {
 std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   switch (model) {
-    case kUnknown:
-      os << "Unknown";
+    case kDefault:
+      os << "Default";
       break;
     case kHamaker:
       os << "Hamaker";
