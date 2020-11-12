@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include "../load.h"
 #include "../options.h"
@@ -8,35 +9,94 @@
 #include "../station.h"
 #include "../common/types.h"
 #include "../telescope/lofar.h"
+#include "../aterms/atermconfig.h"
+#include "../aterms/parsetprovider.h"
 
 #include "config.h"
 #include <complex>
 #include <cmath>
 #include <iostream>
 
+using everybeam::ATermSettings;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::matrix22c_t;
 using everybeam::Options;
 using everybeam::Station;
 using everybeam::vector3r_t;
+using everybeam::aterms::ATermConfig;
+using everybeam::aterms::ParsetProvider;
 using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::Telescope;
 
-BOOST_AUTO_TEST_SUITE(tlofar_hba)
+namespace {
+// A very simple override of the ParsetProvider. Just falls back on the
+// default or on hard-coded values
+struct ParsetATerms : public ParsetProvider {
+  virtual std::string GetString(const std::string& key) const final override {
+    // Not relevant for EveryBeamATerm
+    return "";
+  }
 
-BOOST_AUTO_TEST_CASE(load_lofar) {
+  std::string GetStringOr(const std::string& key,
+                          const std::string& or_value) const final override {
+    // Default response model
+    return or_value;
+  }
+
+  std::vector<std::string> GetStringList(
+      const std::string& key) const final override {
+    return std::vector<std::string>{"beam"};
+  }
+
+  double GetDoubleOr(const std::string& key,
+                     double or_value) const final override {
+    // Update interval set to 1200 (s)
+    return 1200.0;
+  }
+  bool GetBool(const std::string& key) const final override {
+    // No use
+    return false;
+  }
+  bool GetBoolOr(const std::string& key, bool or_value) const final override {
+    return or_value;
+  }
+};
+}  // namespace
+
+struct HBAFixture {
+  HBAFixture() : time(4929192878.008341), frequency(138476562.5) {
+    options.element_response_model = ElementResponseModel::kHamaker;
+    ms = casacore::MeasurementSet{LOFAR_HBA_MOCK_MS};
+    telescope = Load(ms, options);
+    coord_system.width = 4;
+    coord_system.height = 4;
+    coord_system.ra = 2.15374123;
+    coord_system.dec = 0.8415521;
+    coord_system.dl = 0.5 * M_PI / 180.;
+    coord_system.dm = 0.5 * M_PI / 180.;
+    coord_system.phase_centre_dl = 0.;
+    coord_system.phase_centre_dm = 0.;
+    grid_response = telescope->GetGriddedResponse(coord_system);
+  }
+  ~HBAFixture(){};
   Options options;
+  std::unique_ptr<Telescope> telescope;
+  std::unique_ptr<GriddedResponse> grid_response;
+  CoordinateSystem coord_system;
+
+  casacore::MeasurementSet ms;
+  double time;
+  double frequency;
+};
+
+BOOST_FIXTURE_TEST_SUITE(tlofar_hba, HBAFixture)
+
+BOOST_AUTO_TEST_CASE(load_lofar_hba) {
   options.element_response_model = ElementResponseModel::kHamaker;
-
-  casacore::MeasurementSet ms(LOFAR_HBA_MOCK_MS);
-
-  // Load LOFAR Telescope
-  std::unique_ptr<Telescope> telescope = Load(ms, options);
-
   // Assert if we indeed have a LOFAR pointer
   BOOST_CHECK(nullptr != dynamic_cast<LOFAR*>(telescope.get()));
 
@@ -47,17 +107,10 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   // Assert if GetStation(stationd_id) behaves properly
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
   BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001HBA0");
+}
 
-  // Properties extracted from MS
-  double time = 4929192878.008341;
-  double frequency = 138476562.5;
-  std::size_t width(4), height(4);
-  double ra(2.15374123), dec(0.8415521), dl(0.5 * M_PI / 180.),
-      dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
-
-  CoordinateSystem coord_system = {width, height, ra,      dec,
-                                   dl,    dm,     shift_l, shift_m};
-
+BOOST_AUTO_TEST_CASE(element_response) {
+  const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
   // Compute and check the Station::ComputeElementResponse for
   // a "randomly selected"  station (station 11)
   // NOTE: this is a regression test in the sense that we only check whether
@@ -109,9 +162,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                            target_station_response[i][j]) < 1e-6);
     }
   }
+}
 
-  std::unique_ptr<GriddedResponse> grid_response =
-      telescope->GetGriddedResponse(coord_system);
+BOOST_AUTO_TEST_CASE(gridded_response) {
   BOOST_CHECK(nullptr != dynamic_cast<LOFARGrid*>(grid_response.get()));
 
   // Define buffer and get gridded responses
@@ -119,9 +172,9 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
       grid_response->GetStationBufferSize(1));
   grid_response->CalculateStation(antenna_buffer_single.data(), time, frequency,
                                   23, 0);
-  BOOST_CHECK_EQUAL(antenna_buffer_single.size(),
-                    std::size_t(width * height * 2 * 2));
-
+  BOOST_CHECK_EQUAL(
+      antenna_buffer_single.size(),
+      std::size_t(coord_system.width * coord_system.height * 2 * 2));
   // LOFARBeam output at pixel (2,2):
   std::vector<std::complex<float>> lofar_p22 = {{-0.175908, -0.000478397},
                                                 {-0.845988, -0.00121503},
@@ -129,10 +182,10 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                                 {0.108123, -5.36076e-05}};
 
   // Compare with everybeam
-  std::size_t offset_22 = (2 + 2 * width) * 4;
+  std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
   for (std::size_t i = 0; i < 4; ++i) {
-    BOOST_CHECK(std::abs(antenna_buffer_single[offset_22 + i] - lofar_p22[i]) <
-                1e-4);
+    // Tolerance is a percentage, so 1e-2 --> 1e-4
+    BOOST_CHECK_CLOSE(antenna_buffer_single[offset_22 + i], lofar_p22[i], 1e-2);
   }
 
   // LOFARBeam output at pixel (1,3):
@@ -142,10 +195,10 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
                                                 {0.0936919, 0.000110673}};
 
   // Compare with everybeam
-  std::size_t offset_13 = (1 + 3 * width) * 4;
+  std::size_t offset_13 = (1 + 3 * coord_system.width) * 4;
   for (std::size_t i = 0; i < 4; ++i) {
-    BOOST_CHECK(std::abs(antenna_buffer_single[offset_13 + i] - lofar_p13[i]) <
-                1e-4);
+    // Tolerance is a percentage, so 1e-2 --> 1e-4
+    BOOST_CHECK_CLOSE(antenna_buffer_single[offset_13 + i], lofar_p13[i], 1e-2);
   }
 
   // All stations
@@ -153,16 +206,56 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
   grid_response->CalculateAllStations(antenna_buffer_all.data(), time,
                                       frequency, 0);
-  BOOST_CHECK_EQUAL(
-      antenna_buffer_all.size(),
-      std::size_t(telescope->GetNrStations() * width * height * 2 * 2));
+  BOOST_CHECK_EQUAL(antenna_buffer_all.size(),
+                    std::size_t(telescope->GetNrStations() *
+                                coord_system.width * coord_system.height * 4));
 
+  // Check consistency of values for station 23
+  std::size_t offset_s23 = 23 * coord_system.width * coord_system.height * 4;
+  for (std::size_t i = 0; i != antenna_buffer_single.size(); ++i) {
+    BOOST_CHECK(std::abs(antenna_buffer_all[offset_s23 + i] -
+                         antenna_buffer_single[i]) < 1e-6);
+  }
+
+  // Check result via aterm calculation
+  // Fake the original time for the aterm calculation, accounting for half the
+  // update interval
+  double time1 = time - 600;
+  ATermSettings aterm_settings;
+  std::vector<std::complex<float>> aterm_buffer(antenna_buffer_all.size());
+  ParsetATerms parset_aterms;
+  ATermConfig aterms(telescope->GetNrStations(), coord_system, aterm_settings);
+  aterms.Read(ms, parset_aterms);
+  aterms.Calculate(aterm_buffer.data(), time1, frequency, 0, nullptr);
+
+  // Check against antenna_buffer_all
+  for (std::size_t i = 0; i != aterm_buffer.size(); ++i) {
+    BOOST_CHECK_CLOSE(aterm_buffer[i], antenna_buffer_all[i], 1e-6);
+  }
+
+  // Save buffer for later reference
+  std::vector<std::complex<float>> aterm_ref = aterm_buffer;
+
+  // Result should not change for time increase <1200s
+  aterms.Calculate(aterm_buffer.data(), time1 + 1199, frequency, 0, nullptr);
+  for (std::size_t i = 0; i != aterm_buffer.size(); ++i) {
+    BOOST_CHECK_CLOSE(aterm_buffer[i], aterm_ref[i], 1e-6);
+  }
+
+  // Result should change for time increase >=1200s
+  aterms.Calculate(aterm_buffer.data(), time1 + 1201, frequency, 0, nullptr);
+  for (std::size_t i = 0; i != aterm_buffer.size(); ++i) {
+    BOOST_CHECK(std::abs(aterm_buffer[i] - aterm_ref[i]) > 1e-4);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(differential_beam) {
   // Test with differential beam, single
-  Options options_diff_beam;
+  Options options_diff_beam = options;
   options_diff_beam.element_response_model = ElementResponseModel::kHamaker;
   options_diff_beam.use_differential_beam = true;
 
-  // Load LOFAR Telescope
+  // Load (a new) LOFAR Telescope
   std::unique_ptr<Telescope> telescope_diff_beam = Load(ms, options_diff_beam);
 
   std::unique_ptr<GriddedResponse> grid_response_diff_beam =
@@ -173,16 +266,17 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   grid_response_diff_beam->CalculateStation(antenna_buffer_diff_beam.data(),
                                             time, frequency, 15, 0);
 
+  std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
   double norm_jones_mat = 0.;
   for (std::size_t i = 0; i < 4; ++i) {
     norm_jones_mat += std::norm(antenna_buffer_diff_beam[offset_22 + i]);
   }
   BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
+}
 
-  // Primary beam tests
-  //
+BOOST_AUTO_TEST_CASE(integrated_beam) {
   // Just check whether CalculateIntegratedResponse does run and reproduces
-  // results One time interval
+  // results for One time interval
   std::vector<double> antenna_buffer_integrated(
       grid_response->GetIntegratedBufferSize());
   std::vector<double> baseline_weights(
@@ -232,9 +326,14 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   //
   std::size_t width_pb = 40, height_pb = 40;
   // (0.25 * M_PI / 180.) equals 900asec
-  CoordinateSystem coord_system_pb = {
-      width_pb, height_pb, ra, dec, (0.25 * M_PI / 180.), (0.25 * M_PI / 180.),
-      shift_l,  shift_m};
+  CoordinateSystem coord_system_pb = {width_pb,
+                                      height_pb,
+                                      coord_system.ra,
+                                      coord_system.dec,
+                                      (0.25 * M_PI / 180.),
+                                      (0.25 * M_PI / 180.),
+                                      coord_system.phase_centre_dl,
+                                      coord_system.phase_centre_dm};
 
   std::unique_ptr<GriddedResponse> grid_response_pb =
       telescope->GetGriddedResponse(coord_system_pb);
@@ -257,5 +356,4 @@ BOOST_AUTO_TEST_CASE(load_lofar) {
   BOOST_CHECK(std::abs(antenna_buffer_pb[offset_52020] - 0.00018088287) < 1e-6);
   BOOST_CHECK(std::abs(antenna_buffer_pb[offset_51825] - 0.00013052078) < 1e-6);
 }
-
 BOOST_AUTO_TEST_SUITE_END()

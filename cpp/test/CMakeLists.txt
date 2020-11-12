@@ -18,6 +18,7 @@ set(TEST_FILENAMES
   tmwa.cc
   tstation.cc
   tvla.cc
+  tcache.cc
 )
 
 # Add boost dynamic link flag for all test files.

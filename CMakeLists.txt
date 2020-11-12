@@ -61,6 +61,10 @@ include_directories(${Boost_INCLUDE_DIR})
 # Find and include FFTW3 float libraries
 find_package(FFTW3 COMPONENTS single REQUIRED)
 
+# Find CFITSIO, needed for everybeam::aterms only
+find_package(CFITSIO REQUIRED)
+include_directories(${CFITSIO_INCLUDE_DIR})
+
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
