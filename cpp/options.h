@@ -25,6 +25,7 @@
 #define EVERYBEAM_OPTIONS_H_
 
 #include <string>
+#include <vector>
 #include "elementresponse.h"
 
 namespace everybeam {
@@ -46,6 +47,25 @@ struct Options {
 
   // MWA specific (Lofar probably will follow)
   bool frequency_interpolation = false;
+};
+
+struct ATermSettings {
+  // Path to coefficients file
+  std::string coeff_path = ".";
+  // Save aterm fits files?
+  bool save_aterms = false;
+  // Prefix for the aterm fits files
+  std::string save_aterms_prefix = "wsclean";
+  // Default for the data column name
+  std::string data_column_name = "DATA";
+
+  std::vector<std::string> filenames = std::vector<std::string>();
+  size_t max_support = 32;
+
+  // Time interval (s) before a new aterm will be computed
+  double aterm_update_interval = 300.;
+  size_t padded_image_width = 0, padded_image_height = 0,
+         trimmed_image_width = 0, trimmed_image_height = 0;
 };
 }  // namespace everybeam
 #endif  // EVERYBEAM_OPTIONS_H_

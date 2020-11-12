@@ -1,6 +1,7 @@
 project(everybeam_cpp)
 
 #------------------------------------------------------------------------------
+add_subdirectory(aterms)
 add_subdirectory(common)
 add_subdirectory(coords)
 add_subdirectory(griddedresponse)
@@ -22,6 +23,17 @@ add_library(everybeam SHARED
   element.cc
   elementhamaker.cc
   load.cc
+  # aterms
+  aterms/atermconfig.cc
+  aterms/atermbase.cc
+  aterms/atermresampler.cc
+  aterms/everybeamaterm.cc
+  aterms/fitsatermbase.cc
+  aterms/fitsaterm.cc
+  aterms/dldmaterm.cc
+  aterms/pafbeamterm.cc
+  aterms/cache.cc
+  # common
   common/fftresampler.cc
   coords/itrfconverter.cc
   coords/itrfdirection.cc
@@ -52,7 +64,7 @@ target_include_directories(everybeam PUBLIC
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
-target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES} ${FFTW3F_LIBRARY})
+target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES} ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})
 
 install (
   TARGETS everybeam
