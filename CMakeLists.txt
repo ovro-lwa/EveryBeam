@@ -3,8 +3,18 @@
 cmake_minimum_required(VERSION 3.0.0)
 
 #------------------------------------------------------------------------------
-# Set project name and version number
-project(EveryBeam VERSION 5.0.0)
+# Set version name and project number
+set(EVERYBEAM_VERSION 0.1.0)
+if(EVERYBEAM_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)")
+  set(EVERYBEAM_VERSION_MAJOR "${CMAKE_MATCH_1}")
+  set(EVERYBEAM_VERSION_MINOR "${CMAKE_MATCH_2}")
+  set(EVERYBEAM_VERSION_PATCH "${CMAKE_MATCH_3}")
+  message(${EVERYBEAM_VERSION_PATCH})
+else()
+  message(FATAL_ERROR "Failed to parse EVERYBEAM_VERSION='${EVERYBEAM_VERSION}'")
+endif()
+
+project(EveryBeam VERSION ${EVERYBEAM_VERSION})
 
 option (BUILD_WITH_PYTHON "Build python bindings" OFF)
 
@@ -126,8 +136,15 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
 endif()
 
 #------------------------------------------------------------------------------
-# Generate config.h file
+# Generate config.h and version.h headers
 configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/CMake/version.h.in ${CMAKE_BINARY_DIR}/version.h)
+
+install(FILES
+  ${CMAKE_BINARY_DIR}/config.h  
+  ${CMAKE_BINARY_DIR}/version.h
+  DESTINATION "include/${CMAKE_PROJECT_NAME}"
+  )
 
 #------------------------------------------------------------------------------
 if(BUILD_WITH_PYTHON)
