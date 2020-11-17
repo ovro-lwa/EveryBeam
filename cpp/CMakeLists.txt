@@ -93,3 +93,11 @@ install(
   DESTINATION "lib/${projectname}"
 )
 
+# Configure and install the ConfigVersion.cmake
+configure_file(${CMAKE_SOURCE_DIR}/CMake/EveryBeamConfigVersion.cmake.in
+  "${CMAKE_BINARY_DIR}/EveryBeamConfigVersion.cmake" @ONLY)
+install(
+  FILES
+  "${CMAKE_BINARY_DIR}/EveryBeamConfigVersion.cmake"
+  DESTINATION "lib/${projectname}"
+)
