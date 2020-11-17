@@ -86,18 +86,23 @@ install (FILES
   options.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}")
 
+# TODO: not sure whether this is needed at all
 install(
   EXPORT EveryBeamTargets
-  FILE EveryBeamConfig.cmake
+  FILE EveryBeamTargets.cmake
   NAMESPACE EveryBeam::
   DESTINATION "lib/${projectname}"
 )
 
-# Configure and install the ConfigVersion.cmake
-configure_file(${CMAKE_SOURCE_DIR}/CMake/EveryBeamConfigVersion.cmake.in
-  "${CMAKE_BINARY_DIR}/EveryBeamConfigVersion.cmake" @ONLY)
+# Set-up cmake configuration files
+configure_file("${CMAKE_SOURCE_DIR}/CMake/EveryBeamConfig.cmake.in"
+    "${CMAKE_BINARY_DIR}/CMakeFiles/EveryBeamConfig.cmake" @ONLY)
+configure_file("${CMAKE_SOURCE_DIR}/CMake/EveryBeamConfigVersion.cmake.in"
+  "${CMAKE_BINARY_DIR}/CMakeFiles/EveryBeamConfigVersion.cmake" @ONLY)
+
 install(
   FILES
-  "${CMAKE_BINARY_DIR}/EveryBeamConfigVersion.cmake"
+  "${CMAKE_BINARY_DIR}/CMakeFiles/EveryBeamConfig.cmake"
+  "${CMAKE_BINARY_DIR}/CMakeFiles/EveryBeamConfigVersion.cmake"
   DESTINATION "lib/${projectname}"
 )
