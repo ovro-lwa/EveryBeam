@@ -1,9 +1,10 @@
-/**
- * C++ implementation of Full Embeded Element beam model for MWA based on
- * beam_full_EE.py script and Sokolowski et al (2016) paper Implemented by
- * Marcin Sokolowski (May 2017) - marcin.sokolowski@curtin.edu.au 20 May 2017 :
- * Somewhat optimized by André Offringa.
- */
+// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// C++ implementation of Full Embeded Element beam model for MWA based on
+// beam_full_EE.py script and Sokolowski et al (2016) paper Implemented by
+// Marcin Sokolowski (May 2017) - marcin.sokolowski@curtin.edu.au 20 May 2017 :
+// Somewhat optimized by André Offringa.
 
 #include <algorithm>
 #include <cmath>

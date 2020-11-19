@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Original Matlab code by Michel Arts
 # Ported to python by Sebastiaan van der Tol
 # Interface change: theta, phi are now in radians
@@ -64,5 +67,3 @@ def F42(m,n,theta,phi,beta):
     q3 = C * (-1j)**(-n) / beta * 1j * m/np.sin(theta) * np.sqrt((2.*n+1) / 2.0 * np.math.factorial(n-abs(m)) / np.math.factorial(n+abs(m))) * P(abs(m),n,np.cos(theta)) * np.exp(1j*m*phi)
 
     return (q1, q2, q3)
-
-

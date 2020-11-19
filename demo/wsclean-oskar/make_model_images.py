@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from astropy.io import fits
 
 with fits.open("template-image.fits") as img:
@@ -24,4 +27,3 @@ with fits.open("template-image.fits") as img:
     img[0].data[:] = 0.0
     img[0].data[0,0,N-offset,N-offset] = 1.0
     img.writeto('wsclean-V-model.fits', overwrite = True)
-

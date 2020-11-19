@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import os
 import numpy as np
 from read_oskar_beams import read_oskar_beams
@@ -20,4 +23,3 @@ A = read_oskar_beams()
 B = np.load('station-response.npy')
 
 check_tolerance(tolerance, A, B)
-

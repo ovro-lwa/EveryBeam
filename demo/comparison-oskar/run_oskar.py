@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 Generates all-sky zenith-centred beam patterns for SKALA-4 and EDA-2 antennas.
 """

@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from everybeam import load_telescope, LOFAR, Options, thetaphi2cart
 import matplotlib.pyplot as plt
 import numpy as np

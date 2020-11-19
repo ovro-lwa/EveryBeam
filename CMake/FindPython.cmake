@@ -1,4 +1,4 @@
-# - Try to find the Python interpreter, Python header files and libraries. 
+# - Try to find the Python interpreter, Python header files and libraries.
 # This macro effectively wraps the FindPythonInterp and FindPythonLibs macros
 # provided by CMake.
 #
@@ -10,25 +10,8 @@
 #  PYTHON_BUILD_DIR    - build directory for Python extensions (cached)
 #  PYTHON_INSTALL_DIR  - installation directory for Python extensions (cached)
 
-# Copyright (C) 2009
-# ASTRON (Netherlands Institute for Radio Astronomy)
-# P.O.Box 2, 7990 AA Dwingeloo, The Netherlands
-#
-# This file is part of the LOFAR software suite.
-# The LOFAR software suite is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# The LOFAR software suite is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with the LOFAR software suite. If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: FindPython.cmake 22948 2012-11-23 08:54:47Z loose $
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Set options string to pass to the find_package() commands below.
 set(_options ${Python_FIND_VERSION})
@@ -59,4 +42,3 @@ set(PYTHON_FOUND FALSE)
 if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
   set(PYTHON_FOUND TRUE)
 endif(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
-

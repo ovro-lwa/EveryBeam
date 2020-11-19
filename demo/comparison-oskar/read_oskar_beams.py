@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from matplotlib import pyplot as plt
 from astropy.io import fits
 import numpy as np
@@ -5,7 +8,7 @@ import numpy as np
 
 def read_oskar_beams():
     """
-    Read oskar beam and store into 
+    Read oskar beam and store into
 
     Returns
     -------

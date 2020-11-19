@@ -1,3 +1,6 @@
+// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
@@ -26,7 +29,7 @@ int main(int argc, char** argv){
             double y = (2.0*j)/(N-1) - 1.0;
             double theta = std::asin(sqrt(x*x + y*y));
             double phi = std::atan2(y,x);
-            typedef std::complex<double> Mat[2][2]; 
+            typedef std::complex<double> Mat[2][2];
             element_response.Response(0, freq, theta, phi, *reinterpret_cast<Mat*>(&result[4 * (i*N + j)]));
         }
     }

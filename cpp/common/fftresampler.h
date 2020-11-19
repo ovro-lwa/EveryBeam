@@ -1,3 +1,6 @@
+// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef EVERYBEAM_COMMON_FFT_RESAMPLE_H_
 #define EVERYBEAM_COMMON_FFT_RESAMPLE_H_
 

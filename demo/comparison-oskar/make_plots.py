@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import numpy as np
 from matplotlib import pyplot as plt
 from read_oskar_beams import read_oskar_beams

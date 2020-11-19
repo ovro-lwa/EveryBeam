@@ -1,5 +1,7 @@
 #!/bin/sh
-#
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Author: Jakob Maljaars
 # Email: jakob.maljaars_@_stcorp.nl
 
@@ -24,9 +26,9 @@ if [ ! -f ${OSKAR_MOCK_MS}/table.f0 ] ; then
     if [ ! -f "$OSKAR_MOCK_ARCHIVE" ]; then
 	wget -q https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2 -O $OSKAR_MOCK_ARCHIVE
     fi
-    
+
     mkdir -p $OSKAR_MOCK_MS
-    
+
     tar -xf $OSKAR_MOCK_ARCHIVE  -C $OSKAR_MOCK_MS --strip-components=1
     rm $OSKAR_MOCK_ARCHIVE
 fi

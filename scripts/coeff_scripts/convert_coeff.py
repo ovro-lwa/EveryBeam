@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Script to convert an ASCII beam model coefficient file to a .cc file for
 # inclusion in the library. Whenever the beam model coefficients file are
@@ -61,8 +63,8 @@ def main(args):
 
     Examples:
 
-    ./convert_coeff.py element_beam_LBA.coeff defaultcoefflba.cc default_lba 
-    ./convert_coeff.py element_beam_HBA.coeff defaultcoeffhba.cc default_hba 
+    ./convert_coeff.py element_beam_LBA.coeff defaultcoefflba.cc default_lba
+    ./convert_coeff.py element_beam_HBA.coeff defaultcoeffhba.cc default_hba
     """
     print "converting %s -> %s (variable name: %s)" % (args[0], args[1], args[2])
 

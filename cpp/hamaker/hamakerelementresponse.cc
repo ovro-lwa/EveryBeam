@@ -1,3 +1,6 @@
+// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // hamakerelementresponse.cc:
 // Functions to compute the (idealized) response of a LOFAR
 // LBA or HBA dual dipole antenna.

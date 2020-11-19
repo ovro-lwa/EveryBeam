@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 import lobes
 from scipy.io import loadmat
@@ -40,5 +42,3 @@ Nfreq = 4
 Nant = 96
 
 rr = r.reshape((Nphi, Ntheta, 2, Nfreq, Nant)).transpose((4,2,1,0,3))
-
-

@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import matplotlib
 matplotlib.use('tkagg')
 from matplotlib import pyplot as plt
@@ -69,5 +72,3 @@ plt.xlabel('phi(deg)')
 plt.ylabel('E (V)')
 
 plt.show()
-
-
