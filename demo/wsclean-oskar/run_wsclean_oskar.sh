@@ -1,4 +1,7 @@
 #!/bin/sh
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 set -e
 
 SRC_DIR="$( cd "$( dirname "${0}" )" >/dev/null 2>&1 && pwd )"
@@ -26,5 +29,3 @@ wsclean ${intervaloptions} -name oskar-1-1 -no-dirty -scale 2amin -size 300 300 
 wsclean ${intervaloptions} -predict -pol IQUV ${atermoptions} -use-idg ${MS}
 wsclean ${intervaloptions} -name oskar-1-1 -data-column MODEL_DATA -pol IQUV -no-dirty -scale 2amin -size 300 300 ${atermoptions} -use-idg ${MS}
 wsclean ${intervaloptions} -name oskar-1-0 -data-column MODEL_DATA -pol IQUV -no-dirty -scale 2amin -size 300 300 -use-idg ${MS}
-
-

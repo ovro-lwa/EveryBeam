@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 project(everybeam_pybind11)
 
 find_package(PythonLibs 3 REQUIRED)

@@ -1,5 +1,7 @@
 #!/bin/sh
-#
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Author: Jakob Maljaars
 # Email: jakob.maljaars_@_stcorp.nl
 
@@ -25,7 +27,7 @@ if [ ! -f ${LOFAR_LBA_MOCK_MS}/table.f0 ] ; then
     fi
 
     mkdir -p $LOFAR_LBA_MOCK_MS
-    
+
     tar -xf $LOFAR_MOCK_ARCHIVE  -C $LOFAR_LBA_MOCK_MS --strip-components=1
     rm $LOFAR_MOCK_ARCHIVE
 fi

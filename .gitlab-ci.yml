@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 stages:
   - prepare
   - build
@@ -18,7 +21,7 @@ clang-format:
   before_script:
     - apt-get -y install python3-pip
     - python3 -m pip install clang-format==9.0.0
-  script: 
+  script:
     - ./scripts/run-clang-format.sh
 
 # Build a debug version of EveryBeam from the base image
@@ -45,7 +48,7 @@ test-and-coverage:
     # Capture coverage
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
-    # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH 
+    # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
     - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/site-packages
     - cd && python3 -c "import everybeam"
@@ -65,7 +68,7 @@ build-doc:
   stage: build
   except:
     - schedules
-  needs: ["build-base"]  
+  needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   script:
     - EVERYBEAM_PATH=$PWD
@@ -91,7 +94,7 @@ build-compare-oskar:
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     # Check-out at specific version, before HDF5 got broken
-    - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee 
+    - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee
     - cd /opt/oskar/build
   script:
     # OSKAR cpp install
@@ -100,7 +103,7 @@ build-compare-oskar:
     - make install
     # Python install
     - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
-    - cd ./../OSKAR/python && python3 setup.py install 
+    - cd ./../OSKAR/python && python3 setup.py install
     - export PATH=/opt/oskar/bin:$PATH
     # Run OSKAR comparison, set some env variables for this session
     - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12

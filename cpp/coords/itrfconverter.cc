@@ -1,3 +1,6 @@
+// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Dir2ITRF.cc: Convertor that maps time to an ITRF direction.
 
 #include "itrfdirection.h"

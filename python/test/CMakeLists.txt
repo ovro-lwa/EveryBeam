@@ -1,3 +1,6 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # List of tests
 set(UNIT_TESTS
   tPyLoad

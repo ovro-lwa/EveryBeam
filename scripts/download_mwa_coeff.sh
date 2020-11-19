@@ -1,5 +1,7 @@
 #!/bin/sh
-#
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Author: Jakob Maljaars
 # Email: jakob.maljaars_@_stcorp.nl
 

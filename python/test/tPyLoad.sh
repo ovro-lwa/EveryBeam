@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -18,4 +20,4 @@ else
     $SCRIPTS_DIR/download_lofar_lba.sh
 fi
 
-pytest -s --exitfirst ${DIR}/test_load.py 
+pytest -s --exitfirst ${DIR}/test_load.py
