@@ -21,6 +21,7 @@
 #include <iostream>
 
 using everybeam::ATermSettings;
+using everybeam::diag22c_t;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::matrix22c_t;
@@ -249,6 +250,54 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   aterms.Calculate(aterm_buffer.data(), time1 + 1201, frequency, 0, nullptr);
   for (std::size_t i = 0; i != aterm_buffer.size(); ++i) {
     BOOST_CHECK(std::abs(aterm_buffer[i] - aterm_ref[i]) > 1e-4);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(gridded_response_array_factor) {
+  // This tests whether "element beam" x "array factor" == "full beam"
+  const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
+  const Station& station =
+      static_cast<const Station&>(*(lofartelescope.GetStation(23).get()));
+
+  // tile0 equals station0
+  vector3r_t station0 = {0.408326, 0.527345, 0.745102};
+  vector3r_t direction_p13 = {0.397408, 0.527527, 0.750855};
+  matrix22c_t full_beam_p13 = station.Response(time, frequency, direction_p13,
+                                               frequency, station0, station0);
+  matrix22c_t element_beam_p13 =
+      station.ComputeElementResponse(time, frequency, direction_p13);
+  diag22c_t array_factor_p13 = station.ArrayFactor(
+      time, frequency, direction_p13, frequency, station0, station0);
+  matrix22c_t full_beam_product_p13;
+  full_beam_product_p13[0][0] = array_factor_p13[0] * element_beam_p13[0][0];
+  full_beam_product_p13[0][1] = array_factor_p13[0] * element_beam_p13[0][1];
+  full_beam_product_p13[1][0] = array_factor_p13[1] * element_beam_p13[1][0];
+  full_beam_product_p13[1][1] = array_factor_p13[1] * element_beam_p13[1][1];
+  for (std::size_t i = 0; i < 2; ++i) {
+    for (std::size_t j = 0; j < 2; ++j) {
+      // Tolerance is a percentage, so 1e-2 --> 1e-4
+      BOOST_CHECK_CLOSE(full_beam_product_p13[i][j], full_beam_p13[i][j], 1e-2);
+    }
+  }
+
+  vector3r_t direction_p22 = {0.408326, 0.527345, 0.745102};
+  matrix22c_t full_beam_p22 = station.Response(time, frequency, direction_p22,
+                                               frequency, station0, station0);
+  matrix22c_t element_beam_p22 =
+      station.ComputeElementResponse(time, frequency, direction_p22);
+  diag22c_t array_factor_p22 = station.ArrayFactor(
+      time, frequency, direction_p22, frequency, station0, station0);
+  matrix22c_t full_beam_product_p22;
+  full_beam_product_p22[0][0] = array_factor_p22[0] * element_beam_p22[0][0];
+  full_beam_product_p22[0][1] = array_factor_p22[0] * element_beam_p22[0][1];
+  full_beam_product_p22[1][0] = array_factor_p22[1] * element_beam_p22[1][0];
+  full_beam_product_p22[1][1] = array_factor_p22[1] * element_beam_p22[1][1];
+
+  for (std::size_t i = 0; i < 2; ++i) {
+    for (std::size_t j = 0; j < 2; ++j) {
+      // Tolerance is a percentage, so 1e-2 --> 1e-4
+      BOOST_CHECK_CLOSE(full_beam_product_p22[i][j], full_beam_p22[i][j], 1e-2);
+    }
   }
 }
 

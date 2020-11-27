@@ -176,8 +176,11 @@ diag22c_t BeamFormer::LocalArrayFactor(real_t time, real_t freq,
     std::pair<std::complex<double>, std::complex<double>> antenna_weight =
         weights[antenna_idx];
 
-    result[0] += antenna_weight.first;
-    result[1] += antenna_weight.second;
+    diag22c_t antenna_array_factor =
+        antenna->ArrayFactor(time, freq, direction, options);
+
+    result[0] += antenna_weight.first * antenna_array_factor[0];
+    result[1] += antenna_weight.second * antenna_array_factor[1];
   }
   return result;
 }
