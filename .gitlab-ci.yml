@@ -12,10 +12,10 @@ build-base:
   stage: prepare
   script:
     - docker build --tag everybeam_base:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-base .
+  rules:
+    - when: always
 
 clang-format:
-  except:
-    - schedules
   stage: build
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
@@ -24,10 +24,14 @@ clang-format:
     - python3 -m pip install clang-format==9.0.0
   script:
     - ./scripts/run-clang-format.sh
+  rules:
+    # Do not add for schedules
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - when: on_success
 
 # Build a debug version of EveryBeam from the base image
 test-and-coverage:
-  # stage is always triggered
   stage: build
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
@@ -53,6 +57,8 @@ test-and-coverage:
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
     - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
     - cd && python3 -c "import everybeam"
+  rules:
+    - when: on_success
   artifacts:
     reports:
       # NOTE: artifacts only work with relative paths...
@@ -64,11 +70,11 @@ build-everybeam:
   needs: ["build-base"]
   script:
     - docker build --build-arg BASE_TAG=${CI_COMMIT_SHORT_SHA} --tag everybeam:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-everybeam .
+  rules:
+    - when: on_success
 
 build-doc:
   stage: build
-  except:
-    - schedules
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
   script:
@@ -79,11 +85,13 @@ build-doc:
   artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
     paths:
     - build/doc/html
+  rules:
+    # Only add job for commits to master or on merge_request_event
+    # NOTE: creates duplicate pipelines in case of open MR,
+    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-# Deploy package should be ran when
-#   when: manual
-#   only:
-#     - master
 build-package:
   stage: package
   needs: ["build-everybeam"]
@@ -97,13 +105,19 @@ build-package:
   artifacts:
     paths:
     - everybeam_package/
+  rules:
+    # The package is built only during a merge_request_event, a merge to master,
+    # or when the pipeline is triggered by a tag event.
+    # A - yet to be created - deploy-package job should only be run during merges
+    # to master (to create a :latest version) and during a tag event (to create a :stable)
+    # version
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_TAG'
 
 build-compare-oskar:
   stage: oskar-comparison
   image: everybeam:${CI_COMMIT_SHORT_SHA}
-  only:
-    - schedules
-    - master
   needs: ["build-everybeam"]
   before_script:
     - apt-get -y install python3-pip
@@ -131,11 +145,16 @@ build-compare-oskar:
     # Run OSKAR stationresponse comparison
     - export NPIXELS=32 TOLERANCE=1e-5
     - make VERBOSE=1 comparison-oskar-station-response
+  rules:
+    # Only add job for schedules, on merge_request_event, and on master
+    # NOTE: creates duplicate pipelines in case of open MR,
+    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 deploy-doc:
   stage: deploy
-  except:
-    - schedules
   needs: ["build-doc"]
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
@@ -146,20 +165,39 @@ deploy-doc:
     - ssh-keyscan -H dop288 > ~/.ssh/known_hosts
   script:
     - scp -r build/doc/html/* citt@dop288:EveryBeam
-  only:
-    refs:
-      - master
+  rules:
+    # Only add job when ran on master and not a scheduled job, i.e. when merging
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - when: never
 
 deploy-image:
   variables:
     GIT_STRATEGY: none
-  except:
-    - schedules
-  only:
-    - master
   needs: ["build-everybeam"]
   stage: deploy
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker tag everybeam:${CI_COMMIT_SHORT_SHA} $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:latest
+  rules:
+    # Only add job when ran on master and not a scheduled job, i.e. when merging
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - when: never
+
+check-stack:
+  variables:
+    # Pass commit hash to downstream pipeline
+    EVERYBEAM_TRIGGER_HASH: $CI_COMMIT_SHA
+  stage: deploy
+  needs: []
+  trigger:
+    project: RD/schaap-stack
+    branch: master
+    # This will mirror the status of the downstream pipeline
+    strategy: depend
+  rules:
+    # Only add job during merge request event
+    # NOTE: creates duplicate pipelines in case of open MR,
+    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
