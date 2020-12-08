@@ -8,5 +8,5 @@ ENV EVERYBEAMDIR /opt/everybeam
 ADD . ${EVERYBEAMDIR}/EveryBeam
 
 RUN mkdir -p ${EVERYBEAMDIR}/build && cd ${EVERYBEAMDIR}/build \
-    && cmake -DBUILD_WITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=.. ../EveryBeam \
+    && cmake -DBUILD_WITH_PYTHON=ON -DBUILD_APT_PACKAGES=ON -DCMAKE_INSTALL_PREFIX=.. ../EveryBeam \
     && make -j8 && make install -j8
