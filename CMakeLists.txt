@@ -20,6 +20,7 @@ endif()
 project(EveryBeam VERSION ${EVERYBEAM_VERSION})
 
 option (BUILD_WITH_PYTHON "Build python bindings" OFF)
+option (BUILD_APT_PACKAGES "Build apt package" OFF)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 
@@ -167,3 +168,11 @@ add_custom_target(doc
 elseif(DOXYGEN_FOUND)
 
 endif(DOXYGEN_FOUND)
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Allow packaging with "make package"
+if(BUILD_APT_PACKAGES)
+  add_subdirectory(package)
+endif()
+#------------------------------------------------------------------------------

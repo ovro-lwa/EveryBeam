@@ -4,6 +4,7 @@
 stages:
   - prepare
   - build
+  - package
   - oskar-comparison
   - deploy
 
@@ -50,7 +51,7 @@ test-and-coverage:
     - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
     # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
-    - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/site-packages
+    - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
     - cd && python3 -c "import everybeam"
   artifacts:
     reports:
@@ -78,6 +79,24 @@ build-doc:
   artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
     paths:
     - build/doc/html
+
+# Deploy package should be ran when
+#   when: manual
+#   only:
+#     - master
+build-package:
+  stage: package
+  needs: ["build-everybeam"]
+  image: everybeam:${CI_COMMIT_SHORT_SHA}
+  script:
+    - mkdir everybeam_package
+    - export SRC=$(pwd)
+    - cd /opt/everybeam/build
+    - make package
+    - mv $(ls -p | grep *\.deb) $SRC/everybeam_package
+  artifacts:
+    paths:
+    - everybeam_package/
 
 build-compare-oskar:
   stage: oskar-comparison

@@ -30,7 +30,13 @@ add_subdirectory(lobes)
 
 # If the PYTHON_LIBRARY_DIR is not specified, install in lib dir
 if(NOT DEFINED ${PYTHON_LIBRARY_DIR}) 
-   set(PYTHON_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
+    execute_process (COMMAND ${PYTHON_EXECUTABLE} -c "import site; print(site.getsitepackages()[0])" OUTPUT_VARIABLE PYTHON_DIST_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if(PYTHON_DIST_PATH MATCHES "\\/(python${PYTHON_VERSION_MAJOR}\\.${PYTHON_VERSION_MINOR}\\/.*)")
+        set(PYTHON_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_MATCH_1})
+    else()
+        message(FATAL_ERROR "Failed to parse PYTHON_DIST_PATH='${PYTHON_DIST_PATH}'")
+    endif()
 endif()
 
 # Install pyeverybeam in site-packages directory
