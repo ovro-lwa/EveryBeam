@@ -57,11 +57,6 @@ class OSKAR final : public PhasedArray {
               << std::endl;
     return ms_properties_.preapplied_beam_dir;
   };
-
- private:
-  Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
-                           const std::size_t id,
-                           const ElementResponseModel model) const override;
 };
 }  // namespace telescope
 }  // namespace everybeam

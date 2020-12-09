@@ -7,12 +7,11 @@
 
 #include "beam-helper.h"
 
-void calculateStationBeams(std::vector<everybeam::Station::Ptr>& stations,
-                           std::vector<vector3r_t>& itrfDirections,
-                           vector3r_t stationDirection,
-                           vector3r_t tileDirection, unsigned int subgrid_size,
-                           std::vector<std::complex<float>>& buffer,
-                           double time, double frequency) {
+void calculateStationBeams(
+    std::vector<std::shared_ptr<everybeam::Station>>& stations,
+    std::vector<vector3r_t>& itrfDirections, vector3r_t stationDirection,
+    vector3r_t tileDirection, unsigned int subgrid_size,
+    std::vector<std::complex<float>>& buffer, double time, double frequency) {
   typedef std::complex<float> Data[stations.size()][subgrid_size][subgrid_size]
                                   [4];
   Data* data_ptr = (Data*)buffer.data();
@@ -74,9 +73,9 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   double currentTime = timeColumn(nr_timesteps / 2);
 
   // Read stations
-  std::vector<everybeam::Station::Ptr> stations;
+  std::vector<std::shared_ptr<everybeam::Station>> stations;
   stations.resize(nr_stations);
-  ReadStations(ms, stations.begin(), elementResponseModel);
+  ReadAllStations(ms, stations.begin(), elementResponseModel);
 
   // Imaging parameters
   float image_size = 0.5;    // in radians

@@ -20,8 +20,6 @@ namespace everybeam {
  */
 class Element : public Antenna {
  public:
-  typedef std::shared_ptr<Element> Ptr;
-
   /**
    * @brief Construct a new Element object
    *

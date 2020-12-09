@@ -5,7 +5,7 @@
 #include "../griddedresponse/lofargrid.h"
 #include "../common/mathutils.h"
 #include "../common/casautils.h"
-#include "../lofarreadutils.h"
+#include "../msreadutils.h"
 
 #include <aocommon/banddata.h>
 #include <cassert>
@@ -115,10 +115,3 @@ std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(
   std::unique_ptr<GriddedResponse> grid(new LOFARGrid(this, coordinate_system));
   return grid;
 };
-
-Station::Ptr LOFAR::ReadStation(const casacore::MeasurementSet &ms,
-                                std::size_t id,
-                                const ElementResponseModel model) const {
-  Station::Ptr station = ReadLofarStation(ms, id, model);
-  return station;
-}

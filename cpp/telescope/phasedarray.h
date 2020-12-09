@@ -9,6 +9,7 @@
 
 #include "../station.h"
 #include "../elementresponse.h"
+#include "../msreadutils.h"
 #include "telescope.h"
 
 #include <casacore/measures/Measures/MPosition.h>
@@ -38,9 +39,9 @@ class PhasedArray : public Telescope {
    * @brief Get station by index
    *
    * @param station_id Station index to retrieve
-   * @return Station::Ptr
+   * @return std::shared_ptr<Station>
    */
-  Station::Ptr GetStation(std::size_t station_idx) const {
+  std::shared_ptr<Station> GetStation(std::size_t station_idx) const {
     // Assert only in DEBUG mode
     assert(station_idx < nstations_);
     return stations_[station_idx];
@@ -76,7 +77,7 @@ class PhasedArray : public Telescope {
   };
 
  protected:
-  std::vector<Station::Ptr> stations_;
+  std::vector<std::shared_ptr<Station>> stations_;
 
   /**
    * @brief Read stations into vector
@@ -94,9 +95,12 @@ class PhasedArray : public Telescope {
     }
   };
 
-  virtual Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
-                                   const std::size_t id,
-                                   const ElementResponseModel model) const = 0;
+  std::shared_ptr<Station> ReadStation(const casacore::MeasurementSet &ms,
+                                       std::size_t id,
+                                       const ElementResponseModel model) const {
+    std::shared_ptr<Station> station = ReadSingleStation(ms, id, model);
+    return station;
+  }
 
   struct MSProperties {
     double subband_freq;

@@ -8,12 +8,14 @@
 #include "../options.h"
 #include "../griddedresponse/lofargrid.h"
 #include "../elementresponse.h"
+#include "../coords/coordutils.h"
 #include "../../external/npy.hpp"
 #include "../station.h"
 #include "../common/types.h"
 #include "../telescope/lofar.h"
 #include "../aterms/atermconfig.h"
 #include "../aterms/parsetprovider.h"
+#include "../msreadutils.h"
 
 #include "config.h"
 #include <complex>
@@ -26,11 +28,13 @@ using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::matrix22c_t;
 using everybeam::Options;
+using everybeam::ReadTileBeamDirection;
 using everybeam::Station;
 using everybeam::vector3r_t;
 using everybeam::aterms::ATermConfig;
 using everybeam::aterms::ParsetProvider;
 using everybeam::coords::CoordinateSystem;
+using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;
@@ -111,6 +115,18 @@ BOOST_AUTO_TEST_CASE(load_lofar_hba) {
   // Assert if GetStation(stationd_id) behaves properly
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
   BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001HBA0");
+}
+
+BOOST_AUTO_TEST_CASE(tile_beam_direction) {
+  auto lofar_telescope = dynamic_cast<LOFAR*>(telescope.get());
+  // Check consistency of the different methods for computing
+  // the tile beam direction
+  vector3r_t tile_beam_dir_0, tile_beam_dir_1;
+  SetITRFVector(lofar_telescope->GetTileBeamDirection(), tile_beam_dir_0);
+  SetITRFVector(ReadTileBeamDirection(ms), tile_beam_dir_1);
+  for (size_t i = 0; i < 3; ++i) {
+    BOOST_CHECK_CLOSE(tile_beam_dir_0[i], tile_beam_dir_1[i], 1e-4);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(element_response) {

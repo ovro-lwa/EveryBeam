@@ -62,7 +62,7 @@ class BeamFormerLofar : public Antenna {
    *
    * @param element
    */
-  void SetElement(Element::Ptr element) { element_ = element; }
+  void SetElement(std::shared_ptr<Element> element) { element_ = element; }
 
   /**
    * @brief Add element position to the element_positions_ array

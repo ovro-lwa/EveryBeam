@@ -1,15 +1,12 @@
-// msv3readutils.h: Utility functions to read the meta data relevant for
-// simulating the beam from OSKAR simulations stored in MS format.
-//
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef EVERYBEAM_MSV3READUTILS_H_
-#define EVERYBEAM_MSV3READUTILS_H_
+#ifndef EVERYBEAM_MSREADUTILS_H_
+#define EVERYBEAM_MSREADUTILS_H_
 
 // \file
 // Utility functions to read the meta data relevant for simulating the beam from
-// OSKAR simulations stored in MS format.
+// LOFAR / OSKAR observations stored in MS format.
 
 #include "station.h"
 #include "elementresponse.h"
@@ -19,24 +16,21 @@
 #include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
-const ElementResponseModel defaultElementResponseModel =
-    ElementResponseModel::kDefault;
-
 /**
- * @brief Read single station from MeasurementSet
+ * @brief Read single station from MeasurementSet by index
  *
  * @param ms Measurement set
  * @param id Station id
  * @param model Element response model
- * @return Station::Ptr
+ * @return shared
  */
-Station::Ptr ReadMSv3Station(
+std::shared_ptr<Station> ReadSingleStation(
     const casacore::MeasurementSet &ms, unsigned int id,
-    const ElementResponseModel model = defaultElementResponseModel);
+    ElementResponseModel model = ElementResponseModel::kDefault);
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
- * Loops over ReadMSv3Station for all the antennas in MeasurementSet
+ * Loops over ReadLofarStation for all the antennas in MeasurementSet
  *
  * @tparam T Template type
  * @param ms Measurement set
@@ -44,14 +38,17 @@ Station::Ptr ReadMSv3Station(
  * @param model Element Response buffer
  */
 template <typename T>
-void ReadMSv3Stations(
+inline void ReadAllStations(
     const casacore::MeasurementSet &ms, T out_it,
-    const ElementResponseModel model = defaultElementResponseModel) {
+    const ElementResponseModel model = ElementResponseModel::kDefault) {
   casacore::ROMSAntennaColumns antenna(ms.antenna());
   for (unsigned int i = 0; i < antenna.nrow(); ++i) {
-    *out_it++ = ReadMSv3Station(ms, i, model);
+    *out_it++ = ReadSingleStation(ms, i, model);
   }
 }
 
+// Read the tile beam direction from a LOFAR MS. If it is not defined,
+// this function returns the delay center.
+casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms);
 }  // namespace everybeam
-#endif  // EVERYBEAM_MSV3READUTILS_H_
+#endif  // EVERYBEAM_MSREADUTILS_H_
