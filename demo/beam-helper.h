@@ -3,7 +3,7 @@
 
 #include "../cpp/elementresponse.h"
 #include "../cpp/station.h"
-#include "../cpp/lofarreadutils.h"
+#include "../cpp/msreadutils.h"
 #include "../cpp/coords/coordutils.h"
 
 #include <casacore/measures/Measures/MPosition.h>

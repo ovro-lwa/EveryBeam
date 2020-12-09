@@ -5,7 +5,8 @@
 #include "../griddedresponse/oskargrid.h"
 #include "../common/mathutils.h"
 #include "../common/casautils.h"
-#include "../msv3readutils.h"
+// #include "../msv3readutils.h"
+#include "../msreadutils.h"
 
 #include <aocommon/banddata.h>
 #include <cassert>
@@ -51,10 +52,4 @@ std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
   // Get and return GriddedResponse ptr
   std::unique_ptr<GriddedResponse> grid(new OSKARGrid(this, coordinate_system));
   return grid;
-}
-
-Station::Ptr OSKAR::ReadStation(const MeasurementSet &ms, std::size_t id,
-                                const ElementResponseModel model) const {
-  Station::Ptr station = ReadMSv3Station(ms, id, model);
-  return station;
 }

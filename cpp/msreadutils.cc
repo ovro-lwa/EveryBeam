@@ -1,18 +1,17 @@
-// lofarreadutils.cc: Utility functions to read the meta data relevant for
-// simulating the beam from LOFAR observations stored in MS format.
+// msreadutils.cc: Utility functions to read the meta data relevant for
+// simulating the beam from phased array (LOFAR/OSKAR) observations stored in MS
+// format.
 //
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "lofarreadutils.h"
+#include "msreadutils.h"
+#include "load.h"
 #include "beamformeridenticalantennas.h"
 #include "beamformerlofarhba.h"
 #include "beamformerlofarlba.h"
 #include "common/mathutils.h"
 #include "common/casautils.h"
-
-#include <memory>
-#include <cmath>
 
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/measures/Measures/MPosition.h>
@@ -59,6 +58,22 @@ using casacore::String;
 using casacore::Table;
 
 namespace everybeam {
+namespace {
+using TileConfig = std::array<vector3r_t, 16>;
+
+constexpr Antenna::CoordinateSystem::Axes oskar_antenna_orientation = {
+    {
+        1.0,
+        0.0,
+        0.0,
+    },
+    {
+        0.0,
+        1.0,
+        0.0,
+    },
+    {0.0, 0.0, 1.0},
+};
 
 constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
     {
@@ -73,19 +88,6 @@ constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
     },
     {0.0, 0.0, 1.0},
 };
-
-// constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
-//     {1.0, 0.0, 0.0,},
-//     {0.0, 1.0, 0.0,},
-//     {0.0, 0.0, 1.0},
-// };
-
-typedef std::array<vector3r_t, 16> TileConfig;
-
-// TODO: utility is not used at all
-bool HasSubTable(const Table &table, const string &name) {
-  return table.keywordSet().isDefined(name);
-}
 
 TileConfig ReadTileConfig(const Table &table, unsigned int row) {
   ROArrayQuantColumn<Double> c_tile_offset(table, "TILE_ELEMENT_OFFSET", "m");
@@ -121,32 +123,6 @@ vector3r_t TransformToFieldCoordinates(
                           dot(position, axes.r)};
   return result;
 }
-
-// AntennaField::CoordinateSystem readCoordinateSystemAartfaac(
-//     const Table &table, unsigned int id)
-// {
-//     ROArrayQuantColumn<Double> c_position(table, "POSITION", "m");
-//
-//     // Read antenna field center (ITRF).
-//     Vector<Quantity> aips_position = c_position(id);
-//     assert(aips_position.size() == 3);
-//
-//     vector3r_t position = {{aips_position(0).getValue(),
-//         aips_position(1).getValue(), aips_position(2).getValue()}};
-//
-//     TableRecord keywordset = table.keywordSet();
-//     Matrix<double> aips_axes;
-//     keywordset.get("AARTFAAC_COORDINATE_AXES", aips_axes);
-//     assert(aips_axes.shape().isEqual(IPosition(2, 3, 3)));
-//
-//     vector3r_t p = {{aips_axes(0, 0), aips_axes(1, 0), aips_axes(2, 0)}};
-//     vector3r_t q = {{aips_axes(0, 1), aips_axes(1, 1), aips_axes(2, 1)}};
-//     vector3r_t r = {{aips_axes(0, 2), aips_axes(1, 2), aips_axes(2, 2)}};
-//
-//     AntennaField::CoordinateSystem system = {position, {p, q, r}};
-//
-//     return system;
-// }
 
 std::shared_ptr<BeamFormer> MakeTile(const vector3r_t &position,
                                      const TileConfig &tile_config,
@@ -193,9 +169,9 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
   }
 }
 
-Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
-                              ElementResponse::Ptr element_response,
-                              ElementResponseModel element_response_model) {
+std::shared_ptr<Antenna> ReadAntennaFieldLofar(
+    const Table &table, unsigned int id, ElementResponse::Ptr element_response,
+    ElementResponseModel element_response_model) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, id);
 
@@ -245,7 +221,7 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
                                    aips_offset(2, i).getValue()};
     antenna_position =
         TransformToFieldCoordinates(antenna_position, coordinate_system.axes);
-    Antenna::Ptr antenna;
+    std::shared_ptr<Antenna> antenna;
     Antenna::CoordinateSystem antenna_coordinate_system{
         antenna_position, lofar_antenna_orientation};
 
@@ -304,10 +280,11 @@ Antenna::Ptr ReadAntennaField(const Table &table, unsigned int id,
   return beam_former;
 }
 
-BeamFormer::Ptr ReadAntennaFieldAartfaac(const Table &table,
-                                         const string &ant_type,
-                                         unsigned int id) {
-  BeamFormer::Ptr field;
+// TODO: seems like a draft...
+std::shared_ptr<BeamFormer> ReadAntennaFieldAartfaac(const Table &table,
+                                                     const string &ant_type,
+                                                     unsigned int id) {
+  std::shared_ptr<BeamFormer> field;
   //     AntennaField::CoordinateSystem system =
   //     readCoordinateSystemAartfaac(table, id);
   //
@@ -333,8 +310,88 @@ BeamFormer::Ptr ReadAntennaFieldAartfaac(const Table &table,
   //     antenna.enabled[1] = true;
   //
   //     field->addAntenna(antenna);
-
   return field;
+}
+
+std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
+    const Table &table, unsigned int id,
+    ElementResponse::Ptr element_response) {
+  Antenna::CoordinateSystem coordinate_system =
+      common::ReadCoordinateSystem(table, id);
+  std::shared_ptr<BeamFormer> beam_former =
+      std::make_shared<BeamFormerIdenticalAntennas>(coordinate_system);
+
+  ROArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
+  ROArrayColumn<Bool> c_flag(table, "ELEMENT_FLAG");
+
+  // Read element offsets and flags.
+  Matrix<Quantity> aips_offset = c_offset(id);
+
+  assert(aips_offset.shape().isEqual(IPosition(2, aips_offset.nrow(), 3)));
+
+  Matrix<Bool> aips_flag = c_flag(id);
+  assert(aips_flag.shape().isEqual(IPosition(2, aips_offset.nrow(), 2)));
+
+  for (size_t i = 0; i < aips_offset.nrow(); ++i) {
+    vector3r_t antenna_position = {aips_offset(i, 0).getValue(),
+                                   aips_offset(i, 1).getValue(),
+                                   aips_offset(i, 2).getValue()};
+    antenna_position =
+        TransformToFieldCoordinates(antenna_position, coordinate_system.axes);
+    std::shared_ptr<Antenna> antenna;
+    Antenna::CoordinateSystem antenna_coordinate_system{
+        antenna_position, oskar_antenna_orientation};
+    antenna = std::make_shared<Element>(antenna_coordinate_system,
+                                        element_response, i);
+
+    antenna->enabled_[0] = !aips_flag(i, 0);
+    antenna->enabled_[1] = !aips_flag(i, 1);
+    beam_former->AddAntenna(antenna);
+  }
+  return beam_former;
+}
+
+std::shared_ptr<BeamFormer> LofarStationBeamFormer(
+    const MeasurementSet &ms, unsigned int id, const ElementResponseModel model,
+    const std::string &name, const vector3r_t &position,
+    const vector3r_t &phase_reference, ElementResponse::Ptr element_response) {
+  // Read antenna field information.
+  ROScalarColumn<String> telescope_name_col(
+      common::GetSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
+  string telescope_name = telescope_name_col(0);
+
+  std::shared_ptr<BeamFormer> beam_former;
+
+  if (telescope_name == "LOFAR") {
+    Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
+    tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
+
+    // The Station will consist of a BeamFormer that combines the fields
+    // coordinate system is ITRF
+    // phase reference is station position
+    beam_former = std::make_shared<BeamFormer>(
+        Antenna::IdentityCoordinateSystem, phase_reference);
+
+    for (size_t i = 0; i < tab_field.nrow(); ++i) {
+      beam_former->AddAntenna(
+          ReadAntennaFieldLofar(tab_field, i, element_response, model));
+    }
+
+    // TODO
+    // If There is only one field, the top level beamformer is not needed
+    // and the station antenna can be set to the beamformer of the field
+    // station->SetAntenna(beam_former);
+  } else if (telescope_name == "AARTFAAC") {
+    ROScalarColumn<String> ant_type_col(common::GetSubTable(ms, "OBSERVATION"),
+                                        "AARTFAAC_ANTENNA_TYPE");
+    string ant_type = ant_type_col(0);
+
+    Table tab_field = common::GetSubTable(ms, "ANTENNA");
+
+    beam_former = ReadAntennaFieldAartfaac(tab_field, ant_type, id);
+  }
+
+  return beam_former;
 }
 
 vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
@@ -350,8 +407,33 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
   return phase_reference;
 }
 
-Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
-                              const ElementResponseModel model) {
+std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
+    const MeasurementSet &ms, unsigned int id, const ElementResponseModel model,
+    const std::string &name, const vector3r_t &position,
+    ElementResponse::Ptr element_response) {
+  Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
+
+  // The Station will consist of a BeamFormer that combines the fields
+  // coordinate system is ITRF
+  auto beam_former =
+      ReadAntennaFieldMSv3(tab_phased_array, id, element_response);
+  return beam_former;
+}
+}  // namespace
+
+std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
+                                           unsigned int id,
+                                           ElementResponseModel model) {
+  TelescopeType telescope_type = GetTelescopeType(ms);
+  if (telescope_type != TelescopeType::kLofarTelescope &&
+      telescope_type != TelescopeType::kAARTFAAC &&
+      telescope_type != TelescopeType::kOSKARTelescope) {
+    throw std::runtime_error(
+        "MSReadUtils found an unknown telescope type in MS, return value of "
+        "GetTelescopeType(ms) should be one of "
+        "kLofarTelescope, kAARTFAAC, or kOSKARTelescope.");
+  }
+
   ROMSAntennaColumns antenna(ms.antenna());
   assert(antenna.nrow() > id && !antenna.flagRow()(id));
 
@@ -364,70 +446,64 @@ Station::Ptr ReadLofarStation(const MeasurementSet &ms, unsigned int id,
   MVPosition mvPosition = mPosition.getValue();
   const vector3r_t position = {{mvPosition(0), mvPosition(1), mvPosition(2)}};
 
-  // Create station.
-  Station::Ptr station = std::make_shared<Station>(name, position, model);
+  if (model == ElementResponseModel::kDefault) {
+    model = telescope_type == TelescopeType::kOSKARTelescope
+                ? ElementResponseModel::kOSKARSphericalWave
+                : ElementResponseModel::kHamaker;
+  }
 
-  // Read phase reference position (if available).
-  station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
+  // Create station
+  std::shared_ptr<Station> station =
+      std::make_shared<Station>(name, position, model);
 
-  // Read antenna field information.
-  ROScalarColumn<String> telescope_name_col(
-      common::GetSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
-  string telescope_name = telescope_name_col(0);
-
-  if (telescope_name == "LOFAR") {
-    Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
-    tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
-
-    // The Station will consist of a BeamFormer that combines the fields
-    // coordinate system is ITRF
-    // phase reference is station position
-    auto beam_former = std::make_shared<BeamFormer>(
-        Antenna::IdentityCoordinateSystem, station->GetPhaseReference());
-
-    for (size_t i = 0; i < tab_field.nrow(); ++i) {
-      beam_former->AddAntenna(
-          ReadAntennaField(tab_field, i, station->GetElementResponse(),
-                           station->GetElementResponseModel()));
-    }
-
-    // TODO
-    // If There is only one field, the top level beamformer is not needed
-    // and the station antenna can be set the the beamformer of the field
+  // Set the top level beamformer (that might contain nested beam formers)
+  if (telescope_type == TelescopeType::kOSKARTelescope) {
+    // OSKAR telescope
+    auto beam_former =
+        MSv3StationBeamFormer(ms, id, station->GetElementResponseModel(), name,
+                              position, station->GetElementResponse());
     station->SetAntenna(beam_former);
-  } else if (telescope_name == "AARTFAAC") {
-    ROScalarColumn<String> ant_type_col(common::GetSubTable(ms, "OBSERVATION"),
-                                        "AARTFAAC_ANTENNA_TYPE");
-    string ant_type = ant_type_col(0);
-
-    Table tab_field = common::GetSubTable(ms, "ANTENNA");
-    station->SetAntenna(ReadAntennaFieldAartfaac(tab_field, ant_type, id));
+  } else {
+    // LOFAR Telescope or AARTFAAC
+    station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
+    auto beam_former = LofarStationBeamFormer(
+        ms, id, station->GetElementResponseModel(), name, position,
+        station->GetPhaseReference(), station->GetElementResponse());
+    station->SetAntenna(beam_former);
   }
 
   return station;
 }
 
 MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms) {
-  MDirection tileBeamDir;
+  TelescopeType telescope_type = GetTelescopeType(ms);
+  if (telescope_type != TelescopeType::kLofarTelescope &&
+      telescope_type != TelescopeType::kAARTFAAC) {
+    throw std::runtime_error(
+        "Tile beam direction requested. This does not work with MS other than "
+        "LOFAR or AARTFAAC.");
+  }
 
-  Table fieldTable = common::GetSubTable(ms, "FIELD");
+  MDirection tile_beam_dir;
 
-  if (fieldTable.nrow() != 1) {
+  Table field_table = common::GetSubTable(ms, "FIELD");
+
+  if (field_table.nrow() != 1) {
     throw std::runtime_error(
         "MS has multiple fields, this does not work with the LOFAR beam "
         "library.");
   }
 
-  if (common::HasColumn(fieldTable, "LOFAR_TILE_BEAM_DIR")) {
-    ROArrayMeasColumn<MDirection> tileBeamCol(fieldTable,
-                                              "LOFAR_TILE_BEAM_DIR");
-    tileBeamDir = *(tileBeamCol(0).data());
+  if (common::HasColumn(field_table, "LOFAR_TILE_BEAM_DIR")) {
+    ROArrayMeasColumn<MDirection> tile_beam_col(field_table,
+                                                "LOFAR_TILE_BEAM_DIR");
+    tile_beam_dir = *(tile_beam_col(0).data());
   } else {
-    ROArrayMeasColumn<MDirection> tileBeamCol(fieldTable, "DELAY_DIR");
-    tileBeamDir = *(tileBeamCol(0).data());
+    ROArrayMeasColumn<MDirection> tile_beam_col(field_table, "DELAY_DIR");
+    tile_beam_dir = *(tile_beam_col(0).data());
   }
 
-  return tileBeamDir;
+  return tile_beam_dir;
 }
 
 }  // namespace everybeam

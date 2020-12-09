@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "./../cpp/station.h"
-#include "./../cpp/lofarreadutils.h"
+#include "./../cpp/msreadutils.h"
 #include "./../cpp/common/mathutils.h"
 
 #include "config.h"
@@ -52,9 +52,9 @@ int main() {
   matrix22c_t response;
   vector3r_t direction = {0.0, 0.0, 1.0};
 
-  //     Station::Ptr station = ReadLofarStation(ms, 0,
+  //     std::shared_ptr<Station> station = ReadLofarStation(ms, 0,
   //     ElementResponseModel::kOSKARDipole);
-  Station::Ptr station = ReadLofarStation(ms, 0);
+  std::shared_ptr<Station> station = ReadSingleStation(ms, 0);
 
   auto freq_beamformer = freq;
   auto station_pointing = direction;

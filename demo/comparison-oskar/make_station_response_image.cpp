@@ -53,11 +53,11 @@ int main(int argc, char** argv){
     auto telescope = Load(ms, options);
     auto &oskar_telescope = *dynamic_cast<telescope::OSKAR*>(telescope.get());
 
-    Station::Ptr station = oskar_telescope.GetStation(0);
+    std::shared_ptr<Station> station = oskar_telescope.GetStation(0);
     auto element_response = std::make_shared<everybeam::OSKARElementResponseSphericalWave>("oskar.h5");
     station->SetResponse(element_response);
 
-    Antenna::Ptr antenna = station->GetAntenna();
+    std::shared_ptr<Antenna> antenna = station->GetAntenna();
 
     auto p = antenna->coordinate_system_.axes.p;
     auto q = antenna->coordinate_system_.axes.q;

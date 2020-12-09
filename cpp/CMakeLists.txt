@@ -40,8 +40,7 @@ add_library(everybeam SHARED
   common/fftresampler.cc
   coords/itrfconverter.cc
   coords/itrfdirection.cc
-  lofarreadutils.cc
-  msv3readutils.cc
+  msreadutils.cc
   station.cc
   telescope/lofar.cc
   telescope/dish.cc
@@ -82,8 +81,7 @@ install (FILES
   elementhamaker.h
   elementresponse.h
   fieldresponse.h
-  lofarreadutils.h
-  msv3readutils.h
+  msreadutils.h
   station.h
   load.h
   options.h

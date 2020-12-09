@@ -42,12 +42,7 @@ class LOFAR final : public PhasedArray {
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) override;
 
- private:
-  Station::Ptr ReadStation(const casacore::MeasurementSet &ms,
-                           const std::size_t id,
-                           const ElementResponseModel model) const override;
-
-  std::vector<Station::Ptr> stations_;
+  std::vector<std::shared_ptr<Station>> stations_;
 };
 }  // namespace telescope
 }  // namespace everybeam

@@ -22,7 +22,6 @@ namespace everybeam {
 
 class Station {
  public:
-  typedef std::shared_ptr<Station> Ptr;
   typedef std::shared_ptr<const Station> ConstPtr;
 
   /*!
@@ -343,9 +342,9 @@ class Station {
   ElementResponseModel
       element_response_model_;  // = ElementResponseModel::kUnknown;
   ElementResponse::Ptr element_response_;
-  Element::Ptr element_;
+  std::shared_ptr<Element> element_;
 
-  Antenna::Ptr antenna_;
+  std::shared_ptr<Antenna> antenna_;
 
   coords::ITRFDirection::Ptr ncp_;
   /** Reference direction for NCP observations.

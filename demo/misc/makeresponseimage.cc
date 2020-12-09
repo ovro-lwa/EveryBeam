@@ -7,7 +7,7 @@
 #include <lofar_config.h>
 
 #include <EveryBeam/Package__Version.h>
-#include <EveryBeam/lofarreadutils.h>
+#include <EveryBeam/msreadutils.h>
 #include <Common/InputParSet.h>
 #include <Common/lofar_sstream.h>
 #include <Common/LofarLogger.h>
@@ -263,8 +263,8 @@ int main(int argc, char *argv[]) {
   unsigned int idObservation = 0, idField = 0, idDataDescription = 0;
 
   // Read station meta-data.
-  vector<Station::Ptr> stations;
-  ReadStations(ms, std::back_inserter(stations));
+  vector<std::shared_ptr<Station>> stations;
+  ReadAllStations(ms, std::back_inserter(stations));
 
   // Remove illegal station indices.
   stationIDs.erase(filter(stationIDs.begin(), stationIDs.end(), 0,
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
     for (vector<int>::const_iterator it = stationIDs.begin(),
                                      end = stationIDs.end();
          it != end; ++it) {
-      Station::ConstPtr station = stations[*it];
+      std::shared_ptr<const Station> station = stations[*it];
       cout << *it << ":" << station->GetName() << " " << flush;
 
       for (size_t y = 0; y < size; ++y) {
@@ -407,7 +407,7 @@ DirectionCoordinate makeCoordinates(const MDirection &reference,
                                     unsigned int size, double delta) {
   MDirection referenceJ2000 =
       MDirection::Convert(reference, MDirection::J2000)();
-  Quantum<Vector<Double> > referenceAngles = referenceJ2000.getAngle();
+  Quantum<Vector<Double>> referenceAngles = referenceJ2000.getAngle();
   double ra = referenceAngles.getBaseValue()(0);
   double dec = referenceAngles.getBaseValue()(1);
 

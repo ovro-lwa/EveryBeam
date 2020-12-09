@@ -7,7 +7,7 @@
 
 #include "beam-helper.h"
 
-void calculateElementBeams(everybeam::Station::Ptr& station,
+void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
                            std::vector<vector2r_t>& thetaPhiDirections,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double frequency,
@@ -43,7 +43,7 @@ void calculateElementBeams(everybeam::Station::Ptr& station,
   }
 }
 
-void calculateElementBeams(everybeam::Station::Ptr& station,
+void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
                            std::vector<vector3r_t>& itrfDirections,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double time, double frequency,
@@ -97,7 +97,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read station
   size_t field_id = 0;
   size_t station_id = 0;
-  auto station = ReadLofarStation(ms, station_id, elementResponseModel);
+  auto station = ReadSingleStation(ms, station_id, elementResponseModel);
   auto field_name = GetFieldName(ms, field_id);
   auto station_name = GetStationName(ms, station_id);
   auto nr_antennas = GetNrAntennas(ms, field_id);
