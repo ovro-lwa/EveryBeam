@@ -144,6 +144,10 @@ void init_telescope(py::module &m) {
        )pbdoc")
       .def("station_name",
            [](PhasedArray &self, size_t idx) {
+             if (idx >= self.GetNrStations()) {
+               throw std::runtime_error(
+                   "Requested station index exceeds number of stations.");
+             }
              const Station &station =
                  static_cast<const Station &>(*(self.GetStation(idx).get()));
              return station.GetName();
