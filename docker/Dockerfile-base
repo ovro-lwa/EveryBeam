@@ -3,14 +3,18 @@
 
 # base
 FROM ubuntu:18.04
-RUN apt-get update && apt-get upgrade -y && \
+RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get upgrade -y && \
 # install astronomy packages
     apt-get -y install casacore-dev python-casacore \
-        aoflagger-dev libcfitsio-dev wcslib-dev
+        aoflagger-dev libcfitsio-dev wcslib-dev python3-pip
 # install misc packages
 RUN apt-get update && \
     apt-get -y install wget git make cmake g++ doxygen graphviz \
 # install dependencies
         libboost-all-dev libhdf5-dev libfftw3-dev \
         libblas-dev liblapack-dev libgsl-dev libxml2-dev \
-        libpng-dev libgtkmm-3.0-dev libpython3-dev
+        libpng-dev libgtkmm-3.0-dev libpython3-dev && \
+# Install python dependencies
+    pip3 install clang-format==9.0.0 gcovr pytest pytest-lazy-fixture \
+    # Install python requirements for the OSKAR "integration" test
+        numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
