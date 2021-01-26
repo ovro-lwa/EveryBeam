@@ -8,6 +8,7 @@
 #include "everybeamaterm.h"
 #include "fitsaterm.h"
 #include "pafbeamterm.h"
+#include "h5parmaterm.h"
 
 #include "../load.h"
 #include "../options.h"
@@ -17,6 +18,8 @@
 #include <aocommon/matrix2x2.h>
 #include <aocommon/radeccoord.h>
 
+#include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
+
 #include <algorithm>
 
 using everybeam::ATermSettings;
@@ -25,6 +28,7 @@ using everybeam::aterms::ATermConfig;
 using everybeam::aterms::DLDMATerm;
 using everybeam::aterms::EveryBeamATerm;
 using everybeam::aterms::FitsATerm;
+using everybeam::aterms::H5ParmATerm;
 using everybeam::aterms::PAFBeamTerm;
 using everybeam::aterms::ParsetProvider;
 using everybeam::coords::CoordinateSystem;
@@ -174,6 +178,31 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       f->SetReferenceFrequency(
           reader.GetDoubleOr(aterm_name + ".reference_frequency", 0.0));
       aterms_.emplace_back(std::move(f));
+    } else if (aterm_type == "h5parm") {
+      std::vector<std::string> h5parm_files =
+          reader.GetStringList(aterm_name + ".files");
+
+      // Extract antenna names from MS
+      std::vector<std::string> station_names(n_antennas_);
+      casacore::ROMSAntennaColumns stations(ms.antenna());
+      if (stations.nrow() != n_antennas_) {
+        throw std::runtime_error(
+            "Number of stations read from measurement set (" +
+            std::to_string(stations.nrow()) +
+            ") should match the number of stations set in the constructor "
+            "command line (" +
+            std::to_string(n_antennas_) + ")");
+      }
+
+      for (size_t i = 0; i < n_antennas_; ++i) {
+        station_names[i] = stations.name()(i);
+      }
+
+      std::unique_ptr<H5ParmATerm> f(
+          new H5ParmATerm(station_names, coordinate_system_));
+      f->Open(h5parm_files);
+      f->SetUpdateInterval(reader.GetDoubleOr(aterm_name + ".update_interval",
+                                              settings_.aterm_update_interval));
     } else {
       throw std::runtime_error("The specified aterm type " + aterm_type +
                                " is not recognized");

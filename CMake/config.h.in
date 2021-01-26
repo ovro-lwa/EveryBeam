@@ -12,5 +12,6 @@
 #define VLA_MOCK_MS "@VLA_MOCK_MS@"
 #define MWA_MOCK_MS "@MWA_MOCK_MS@"
 #define MWA_COEFF_PATH "@MWA_COEFF_PATH@"
+#define MOCK_H5PARM_PATH "@MOCK_H5PARM_PATH@"
 
 #endif

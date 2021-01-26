@@ -35,6 +35,7 @@ add_library(everybeam SHARED
   aterms/fitsaterm.cc
   aterms/dldmaterm.cc
   aterms/pafbeamterm.cc
+  aterms/h5parmaterm.cc
   aterms/cache.cc
   # common
   common/fftresampler.cc
@@ -67,6 +68,7 @@ target_include_directories(everybeam PUBLIC
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
 target_link_libraries(everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES} ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})
+target_link_libraries(everybeam PRIVATE schaapcommon)
 
 install (
   TARGETS everybeam

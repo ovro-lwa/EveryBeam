@@ -12,7 +12,6 @@ if(EVERYBEAM_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)")
   set(EVERYBEAM_VERSION_MAJOR "${CMAKE_MATCH_1}")
   set(EVERYBEAM_VERSION_MINOR "${CMAKE_MATCH_2}")
   set(EVERYBEAM_VERSION_PATCH "${CMAKE_MATCH_3}")
-  message(${EVERYBEAM_VERSION_PATCH})
 else()
   message(FATAL_ERROR "Failed to parse EVERYBEAM_VERSION='${EVERYBEAM_VERSION}'")
 endif()
@@ -54,6 +53,10 @@ include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
 include_directories("${CMAKE_SOURCE_DIR}/external/eigen/")
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/pybind11")
 include_directories(${pybind11_INCLUDE_DIR})
+
+# Include schaapcommon
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/schaapcommon")
+include_directories("${CMAKE_SOURCE_DIR}/external/schaapcommon/include")
 
 # Find and include HDF5
 find_package(HDF5 COMPONENTS C CXX REQUIRED)
@@ -145,7 +148,7 @@ configure_file(${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_BINARY_DIR}/config.
 configure_file(${CMAKE_SOURCE_DIR}/CMake/version.h.in ${CMAKE_BINARY_DIR}/version.h)
 
 install(FILES
-  ${CMAKE_BINARY_DIR}/config.h  
+  ${CMAKE_BINARY_DIR}/config.h
   ${CMAKE_BINARY_DIR}/version.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}"
   )
