@@ -11,6 +11,7 @@ set(OSKAR_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/OSKAR_MOCK.ms CACHE PATH "")
 set(VLA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/VLA_MOCK.ms CACHE PATH "")
 set(MWA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/MWA_MOCK.ms CACHE PATH "")
 set(MWA_COEFF_PATH ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_pattern.h5 CACHE PATH "")
+set(MOCK_H5PARM_PATH ${CMAKE_SOURCE_DIR}/test_data/MOCK_H5PARM.h5 CACHE PATH "")
 
 #------------------------------------------------------------------------------
 set(TEST_FILENAMES
@@ -22,6 +23,7 @@ set(TEST_FILENAMES
   tstation.cc
   tvla.cc
   tcache.cc
+  th5parmaterm.cc
 )
 
 # Add boost dynamic link flag for all test files.
@@ -60,12 +62,20 @@ set_tests_properties(
   download_lofar_hba_ms download_lofar_lba_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff
   PROPERTIES FIXTURES_SETUP mocks
 )
+add_test(
+  NAME download_mock_h5parm
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
+)
+set_tests_properties(
+  download_lofar_hba_ms download_lofar_lba_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff download_mock_h5parm
+  PROPERTIES FIXTURES_SETUP mocks
+)
 
 add_executable(
   unittests EXCLUDE_FROM_ALL
   ${TEST_FILENAMES}
 )
-target_link_libraries(unittests everybeam ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+target_link_libraries(unittests everybeam ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} schaapcommon)
 # Required to get the config.h header
 target_include_directories(unittests PRIVATE "${CMAKE_BINARY_DIR}")
 

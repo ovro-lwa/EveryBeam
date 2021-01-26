@@ -8,11 +8,12 @@ parsetprovider.h
 cache.h
 atermbase.h
 atermbeam.h
-atermresampler.h  
+atermresampler.h
 #
 fitsatermbase.h
 fitsaterm.h
 everybeamaterm.h
 dldmaterm.h
 pafbeamterm.h
+h5parmaterm.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}/aterms")
