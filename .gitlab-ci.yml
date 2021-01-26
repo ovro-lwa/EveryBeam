@@ -3,7 +3,8 @@
 
 workflow:
   rules:
-    - if: '$CI_MERGE_REQUEST_TITLE =~ /(?i)(^WIP.*)/ || $CI_MERGE_REQUEST_TITLE =~ /(?i)(^DRAFT.*)/'
+    # don't create a pipeline if its a commit pipeline, on a branch and that branch has open merge requests (bc we will get a MR build instead)
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - when: always
 
@@ -25,9 +26,6 @@ clang-format:
   stage: build
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
-  before_script:
-    - apt-get -y install python3-pip
-    - python3 -m pip install clang-format==9.0.0
   script:
     - ./scripts/run-clang-format.sh
   rules:
@@ -41,12 +39,6 @@ test-and-coverage:
   stage: build
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
-  before_script:
-    - apt-get update
-    - apt-get -y install python3-pip
-    - python3 -m pip install gcovr
-    - python3 -m pip install pytest
-    - python3 -m pip install pytest-lazy-fixture
   script:
     - WORKDIR=$PWD
     # Download casacore wsrt measures
@@ -57,8 +49,9 @@ test-and-coverage:
     - make install -j8
     - ctest -j4 -T test
     # Capture coverage
-    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*'
-    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --xml > coverage.xml
+    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json -o run-unit.json
+    - gcovr --add-tracefile run-unit.json --xml > coverage.xml
+    - gcovr --add-tracefile run-unit.json
     # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
     - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
@@ -126,10 +119,6 @@ build-compare-oskar:
   image: everybeam:${CI_COMMIT_SHORT_SHA}
   needs: ["build-everybeam"]
   before_script:
-    - apt-get -y install python3-pip
-    - python3 -m pip install pip setuptools --upgrade
-    # Install python requirements for the OSKAR "integration" test
-    - python3 -m pip install numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     # Check-out at specific version, before HDF5 got broken
