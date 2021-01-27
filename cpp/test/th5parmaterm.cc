@@ -21,9 +21,9 @@ using schaapcommon::h5parm::H5Parm;
 std::string h5parm_mock = MOCK_H5PARM_PATH;
 
 BOOST_AUTO_TEST_SUITE(th5parmaterm)
-// Lazy and non-optimal evaluation of polynomials, for reference only
-float LazyPolynomialEvaluation(float x, float y, size_t order,
-                               const std::vector<float> coeffs) {
+// Explicit, but inefficient evaluation of polynomials, for reference only
+float ExplicitPolynomialEvaluation(float x, float y, size_t order,
+                                   const std::vector<float>& coeffs) {
   float sol = 0;
   size_t idx = 0;
   for (size_t n = 0; n < order + 1; ++n) {
@@ -36,23 +36,18 @@ float LazyPolynomialEvaluation(float x, float y, size_t order,
 }
 
 // Convenience method to convert pixel coordinates to lm coordinates
-std::array<std::vector<double>, 2> ConvertXYToLM(
+std::vector<std::pair<float, float>> ConvertXYToLM(
     CoordinateSystem coord_system) {
-  std::array<std::vector<double>, 2> result;
-  std::vector<double> l_coords;
-  std::vector<double> m_coords;
+  std::vector<std::pair<float, float>> result;
   for (size_t y = 0; y < coord_system.height; ++y) {
     for (size_t x = 0; x < coord_system.width; ++x) {
       double l, m;
       aocommon::ImageCoordinates::XYToLM(x, y, coord_system.dl, coord_system.dm,
                                          coord_system.width,
                                          coord_system.height, l, m);
-      l_coords.push_back(l);
-      m_coords.push_back(m);
+      result.push_back(std::make_pair(l, m));
     }
   }
-  result[0] = l_coords;
-  result[1] = m_coords;
   return result;
 }
 
@@ -90,7 +85,7 @@ BOOST_AUTO_TEST_CASE(test_lagrange_0) {
 
   float x = 20, y = 6;
   float result = poly.Evaluate(x, y, coeffs);
-  float ref = LazyPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
+  float ref = ExplicitPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
   BOOST_CHECK_EQUAL(result, ref);
 }
 
@@ -105,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_lagrange_1) {
 
   float x = 20, y = 6;
   float result = poly.Evaluate(x, y, coeffs);
-  float ref = LazyPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
+  float ref = ExplicitPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
   BOOST_CHECK_EQUAL(result, ref);
 }
 
@@ -121,7 +116,7 @@ BOOST_AUTO_TEST_CASE(test_lagrange_2) {
 
   float x = 20, y = 6;
   float result = poly.Evaluate(x, y, coeffs);
-  float ref = LazyPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
+  float ref = ExplicitPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
   BOOST_CHECK_EQUAL(result, ref);
 }
 
@@ -137,7 +132,7 @@ BOOST_AUTO_TEST_CASE(test_lagrange_3) {
 
   float x = 20, y = 6;
   float result = poly.Evaluate(x, y, coeffs);
-  float ref = LazyPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
+  float ref = ExplicitPolynomialEvaluation(x, y, poly.GetOrder(), coeffs);
   BOOST_CHECK_EQUAL(result, ref);
 }
 
@@ -163,7 +158,8 @@ BOOST_AUTO_TEST_CASE(read_h5parmfile) {
   H5Parm h5parm_tmp = H5Parm(h5parm_files[0]);
   LagrangePolynomial ampl_polynomial(6);
   LagrangePolynomial phase_polynomial(3);
-  std::array<std::vector<double>, 2> image_coords = ConvertXYToLM(coord_system);
+  std::vector<std::pair<float, float>> image_coords =
+      ConvertXYToLM(coord_system);
 
   for (float time = 0; time <= 10; ++time) {
     // Compute solution with H5ParmATerm
@@ -181,8 +177,8 @@ BOOST_AUTO_TEST_CASE(read_h5parmfile) {
       std::vector<float> ampl_coeffs = ComputeTestCoeffs(2, i, tindex_ampl);
       std::vector<float> phase_coeffs = ComputeTestCoeffs(1, i, tindex_phase);
       for (size_t j = 0; j < width * height; ++j) {
-        double l = image_coords[0][j];
-        double m = image_coords[1][j];
+        const float l = image_coords[j].first;
+        const float m = image_coords[j].second;
 
         float ampl_ref = ampl_polynomial.Evaluate(l, m, ampl_coeffs);
         float phase_ref = phase_polynomial.Evaluate(l, m, phase_coeffs);

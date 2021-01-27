@@ -19,6 +19,9 @@
 #include <aocommon/radeccoord.h>
 
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
+#include <casacore/tables/Tables/TableKeyword.h>
+#include <casacore/tables/Tables/TableRecord.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 
 #include <algorithm>
 
@@ -184,7 +187,10 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
 
       // Extract antenna names from MS
       std::vector<std::string> station_names(n_antennas_);
-      casacore::ROMSAntennaColumns stations(ms.antenna());
+      casacore::ScalarColumn<casacore::String> stations(
+          ms.antenna(),
+          ms.antenna().columnName(casacore::MSAntennaEnums::NAME));
+
       if (stations.nrow() != n_antennas_) {
         throw std::runtime_error(
             "Number of stations read from measurement set (" +
@@ -195,7 +201,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       }
 
       for (size_t i = 0; i < n_antennas_; ++i) {
-        station_names[i] = stations.name()(i);
+        station_names[i] = stations(i);
       }
 
       std::unique_ptr<H5ParmATerm> f(
@@ -203,6 +209,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       f->Open(h5parm_files);
       f->SetUpdateInterval(reader.GetDoubleOr(aterm_name + ".update_interval",
                                               settings_.aterm_update_interval));
+      aterms_.emplace_back(std::move(f));
     } else {
       throw std::runtime_error("The specified aterm type " + aterm_type +
                                " is not recognized");
