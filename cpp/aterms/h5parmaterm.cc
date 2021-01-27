@@ -83,16 +83,20 @@ bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
   if (!outdated) return false;
   last_aterm_update_ = time;
 
-  hsize_t tindex_ampl = amplitude_soltab_[0].GetTimeIndex(time);
-  hsize_t tindex_phase = phase_soltab_[0].GetTimeIndex(time);
-  bool recalculate_amplitude = (tindex_ampl != last_ampl_index_);
-  bool recalculate_phase = (tindex_phase != last_phase_index_);
+  hsize_t time_index_amplitude = amplitude_soltab_[0].GetTimeIndex(time);
+  hsize_t time_index_phase = phase_soltab_[0].GetTimeIndex(time);
+  bool recalculate_amplitude = (time_index_amplitude != last_ampl_index_);
+  bool recalculate_phase = (time_index_phase != last_phase_index_);
+
+  // Initialize placeholders for the y coefficient expansions only once for
+  // efficiency reasons
+  std::vector<float> scratch_amplitude_coeffs(ampl_polynomial_->GetOrder() + 1);
+  std::vector<float> scratch_phase_coeffs(phase_polynomial_->GetOrder() + 1);
 
   // Outer loop may be over the y coordinates when implementing multi-threading
-  // for (const auto& name : station_names_ms_) {
   for (size_t i = 0; i < station_names_ms_.size(); ++i) {
-    std::string name = station_names_ms_[i];
-    size_t station_offset =
+    const std::string& name = station_names_ms_[i];
+    const size_t station_offset =
         i * coordinate_system_.height * coordinate_system_.width;
     for (size_t y = 0; y < coordinate_system_.height; ++y) {
       for (size_t x = 0; x < coordinate_system_.width; ++x) {
@@ -104,10 +108,11 @@ bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
         l += coordinate_system_.phase_centre_dl;
         m += coordinate_system_.phase_centre_dm;
 
-        size_t offset = station_offset + y * coordinate_system_.width + x;
-        std::complex<float> output =
-            ExpandComplexExp(name, tindex_ampl, tindex_phase, frequency, l, m,
-                             recalculate_amplitude, recalculate_phase, offset);
+        const size_t offset = station_offset + y * coordinate_system_.width + x;
+        const std::complex<float> output =
+            ExpandComplexExp(name, time_index_amplitude, time_index_phase, l, m,
+                             recalculate_amplitude, recalculate_phase, offset,
+                             scratch_amplitude_coeffs, scratch_phase_coeffs);
 
         // Store output on "diagonal" of Jones matrix
         buffer[0] = output;
@@ -119,48 +124,48 @@ bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
     }
   }
   // Update amplitude and phase index to latest
-  last_ampl_index_ = tindex_ampl;
-  last_phase_index_ = tindex_phase;
+  last_ampl_index_ = time_index_amplitude;
+  last_phase_index_ = time_index_phase;
   return true;
 }
 
 void H5ParmATerm::ReadCoeffs(SolTab& soltab, const std::string& station_name,
-                             std::vector<float>& coeffs, hsize_t tindex,
-                             double) {
-  size_t ntime = 1;
+                             std::vector<float>& coeffs, hsize_t time_index) {
+  size_t n_times = 1;
   size_t timestep = 1;
 
   // Not yet relevant
-  size_t freq_start = 0, nfreq = 1, freqstep = 1;
+  size_t freq_start = 0, n_freq = 1, freq_step = 1;
   size_t pol = 0;
 
   for (size_t idx = 0; idx < coeffs.size(); ++idx) {
-    coeffs[idx] = soltab.GetValues(station_name, tindex, ntime, timestep,
-                                   freq_start, nfreq, freqstep, pol, idx)[0];
+    coeffs[idx] = soltab.GetValues(station_name, time_index, n_times, timestep,
+                                   freq_start, n_freq, freq_step, pol, idx)[0];
   }
 }
 
 std::complex<float> H5ParmATerm::ExpandComplexExp(
     const std::string& station_name, hsize_t ampl_tindex, hsize_t phase_tindex,
-    double freq, double l, double m, bool recalculate_ampl,
-    bool recalculate_phase, size_t offset) {
-  // Expand amplitude coeffs
+    double l, double m, bool recalculate_ampl, bool recalculate_phase,
+    size_t offset, std::vector<float>& scratch_amplitude_coeffs,
+    std::vector<float>& scratch_phase_coeffs) {
   if (recalculate_ampl) {
     std::vector<float> ampl_coeffs(ampl_polynomial_->GetNrCoeffs());
-    ReadCoeffs(amplitude_soltab_[0], station_name, ampl_coeffs, ampl_tindex,
-               freq);
-    amplitude_cache_[offset] = ampl_polynomial_->Evaluate(l, m, ampl_coeffs);
+    ReadCoeffs(amplitude_soltab_[0], station_name, ampl_coeffs, ampl_tindex);
+    amplitude_cache_[offset] =
+        ampl_polynomial_->Evaluate(l, m, ampl_coeffs, scratch_amplitude_coeffs);
   }
 
-  // Expand phase coeffs
   if (recalculate_phase) {
     std::vector<float> phase_coeffs(phase_polynomial_->GetNrCoeffs());
-    ReadCoeffs(phase_soltab_[0], station_name, phase_coeffs, phase_tindex,
-               freq);
-    phase_cache_[offset] = phase_polynomial_->Evaluate(l, m, phase_coeffs);
+    ReadCoeffs(phase_soltab_[0], station_name, phase_coeffs, phase_tindex);
+    phase_cache_[offset] =
+        phase_polynomial_->Evaluate(l, m, phase_coeffs, scratch_phase_coeffs);
   }
-  return std::complex<float>{amplitude_cache_[offset] *
-                             exp(std::complex<float>(0, phase_cache_[offset]))};
+  // Compute complex exponential as Ampl * e^(i*Phase)
+  return std::complex<float>{
+      amplitude_cache_[offset] *
+      std::exp(std::complex<float>(0, phase_cache_[offset]))};
 }
 }  // namespace aterms
 }  // namespace everybeam

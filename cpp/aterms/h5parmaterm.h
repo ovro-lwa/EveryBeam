@@ -43,31 +43,56 @@ class LagrangePolynomial {
    *
    * @param x x-coordinate
    * @param y y-coordinate
-   * @param coeffs Coefficients of polynomial. Ordering as in Pascal's triangle
-   * is assumed
+   * @param coeffs Coefficients of polynomial. Ordering according to Pascal's
+   * triangle is assumed
    * @return float
    */
-  float Evaluate(double x, double y, const std::vector<float>& coeffs) {
-    assert(coeffs.size() == nr_coeffs_);
+  float Evaluate(float x, float y, const std::vector<float>& coeffs) {
     std::vector<float> y_coeffs(order_ + 1);
+    return Evaluate(x, y, coeffs, y_coeffs);
+  }
+
+  /**
+   * @brief Evaluate binomial on x,y coordinate, taking a scratch vector
+   * y_coeffs as input to avoid repeated initializations.
+   *
+   * @param x x-coordinate
+   * @param y y-coordinate
+   * @param coeffs Coefficients of polynomial. Ordering according to Pascal's
+   * triangle is assumed
+   * @param y_coeffs Vector that should have size order_ + 1. Will be
+   * overwritten by every call to the Evaluate method
+   * @return float
+   */
+  float Evaluate(float x, float y, const std::vector<float>& coeffs,
+                 std::vector<float>& y_coeffs) {
+    assert(coeffs.size() == nr_coeffs_);
     for (int i = static_cast<int>(order_); i >= 0; --i) {
-      std::vector<size_t> coeff_indices = GetRDiagonalIndices(i);
-      std::vector<float> coeffs_tmp;
-      for (auto idx : coeff_indices) {
-        coeffs_tmp.push_back(coeffs[idx]);
+      const std::vector<size_t> coeff_indices = GetRDiagonalIndices(i);
+      std::vector<float> coeffs_tmp(coeff_indices.size());
+      for (size_t i = 0; i < coeff_indices.size(); ++i) {
+        // Fill in reversed order
+        coeffs_tmp[coeff_indices.size() - 1 - i] = coeffs[coeff_indices[i]];
       }
-      // Flip ordering of coefficients
-      std::reverse(coeffs_tmp.begin(), coeffs_tmp.end());
-      y_coeffs[i] = HornersMethod(y, coeffs_tmp);
+      // Fill in reversed order
+      y_coeffs[order_ - i] = HornersMethod(y, coeffs_tmp);
     }
     // Flip ordering
-    std::reverse(y_coeffs.begin(), y_coeffs.end());
+    // std::reverse(y_coeffs.begin(), y_coeffs.end());
     float result = HornersMethod(x, y_coeffs);
     return result;
   }
 
   // Get indices of right diagonal in Pascal's triangle,
-  // given the number of the diagonal
+  // given the number of the diagonal. Consider for example the Pascal triangle
+  // for a second order polynomial, with the elements ordered:
+  //
+  //     0
+  //   1   2
+  // 3   4   5
+  //
+  // For diagonal 2 we want to retrieve [3], and for diagonal 0 we want to
+  // obtain [0, 2, 5]
   std::vector<size_t> GetRDiagonalIndices(size_t diag_nr) {
     if (diag_nr > order_) {
       throw std::runtime_error(
@@ -91,20 +116,9 @@ class LagrangePolynomial {
    * @return size_t Polynomial order
    */
   static size_t ComputeOrder(size_t nr_coeffs) {
-    size_t degree = 0;
-    size_t term_counter = 1;
-    while (term_counter < nr_coeffs) {
-      degree++;
-      term_counter += (degree + 1);
-    }
-
-    // Computed number of coeffs and input value should match exactly
-    if (term_counter != nr_coeffs) {
-      throw std::runtime_error(
-          "Computed number of coefficients and input number of coefficients do "
-          "not match exactly. Probably the input value is inconsistent.");
-    }
-    return degree;
+    // Solution to the quadratic expression (order + 1)(order + 2) / 2 =
+    // nr_coeffs, for the positive square root of the discriminant
+    return (-3 + std::sqrt(1 + 8 * nr_coeffs)) / 2;
   }
 
   /**
@@ -114,11 +128,7 @@ class LagrangePolynomial {
    * @return size_t number of terms
    */
   static size_t ComputeNrCoeffs(size_t order) {
-    size_t nr_coeffs = 0;
-    for (size_t i = 0; i <= order; ++i) {
-      nr_coeffs += (i + 1);
-    }
-    return nr_coeffs;
+    return (order + 1) * (order + 2) / 2;
   }
 
   size_t GetOrder() const { return order_; }
@@ -133,7 +143,7 @@ class LagrangePolynomial {
    * c_n x^n
    * @return float Result
    */
-  static float HornersMethod(double coord, const std::vector<float>& coeffs) {
+  static float HornersMethod(float coord, const std::vector<float>& coeffs) {
     float result = 0;
     for (size_t i = 0; i < coeffs.size(); ++i) {
       result = coeffs[i] + result * coord;
@@ -152,12 +162,10 @@ class LagrangePolynomial {
  * has at least the following axes ("ant", "time", "dir"). The polynomial
  * coefficients are stored along the "dir" axis
  */
-class H5ParmATerm : public ATermBase {
+class H5ParmATerm final : public ATermBase {
  public:
   H5ParmATerm(const std::vector<std::string>& station_names_ms,
               const coords::CoordinateSystem& coordinate_system);
-
-  ~H5ParmATerm(){};
 
   /**
    * @brief Read h5parm files given a vector of paths
@@ -193,19 +201,20 @@ class H5ParmATerm : public ATermBase {
   double AverageUpdateTime() const override final { return update_interval_; }
 
  private:
-  // Expand complex exponential from amplitude and phase
-  std::complex<float> ExpandComplexExp(const std::string& station_name,
-                                       hsize_t ampl_tindex,
-                                       hsize_t phase_tindex, double freq,
-                                       double l, double m,
-                                       bool recalculate_ampl,
-                                       bool recalculate_phase, size_t offset);
+  // Expand complex exponential from amplitude and phase as
+  // amplitude * e^(i*phase)
+  std::complex<float> ExpandComplexExp(
+      const std::string& station_name, hsize_t ampl_tindex,
+      hsize_t phase_tindex, double l, double m, bool recalculate_ampl,
+      bool recalculate_phase, size_t offset,
+      std::vector<float>& scratch_amplitude_coeffs,
+      std::vector<float>& scratch_phase_coeffs);
 
   // Read coefficients from solution tab, for given
   // time index(frequency not relevant, as yet)
   static void ReadCoeffs(schaapcommon::h5parm::SolTab& soltab,
                          const std::string& station_name,
-                         std::vector<float>& coeffs, hsize_t tindex, double);
+                         std::vector<float>& coeffs, hsize_t time_index);
 
   std::vector<schaapcommon::h5parm::SolTab> amplitude_soltab_;
   std::vector<schaapcommon::h5parm::SolTab> phase_soltab_;
