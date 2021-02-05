@@ -13,7 +13,7 @@ namespace everybeam {
 namespace griddedresponse {
 class PhasedArrayGrid : public GriddedResponse {
  public:
-  PhasedArrayGrid(telescope::Telescope* telescope_ptr,
+  PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
                   const coords::CoordinateSystem& coordinate_system);
 
   /**
@@ -28,7 +28,7 @@ class PhasedArrayGrid : public GriddedResponse {
    */
   void CalculateStation(std::complex<float>* buffer, double time,
                         double frequency, size_t station_idx,
-                        size_t field_id) override;
+                        size_t field_id) final override;
 
   /**
    * @brief Compute the Beam response for all stations in a Telescope
@@ -39,7 +39,7 @@ class PhasedArrayGrid : public GriddedResponse {
    * @param freq Frequency (Hz)
    */
   void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency, size_t field_id) override;
+                            double frequency, size_t field_id) final override;
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;

@@ -3,9 +3,9 @@
 
 #include "oskar.h"
 #include "../griddedresponse/oskargrid.h"
+#include "../pointresponse/oskarpoint.h"
 #include "../common/mathutils.h"
 #include "../common/casautils.h"
-// #include "../msv3readutils.h"
 #include "../msreadutils.h"
 
 #include <aocommon/banddata.h>
@@ -16,6 +16,8 @@ using casacore::MeasurementSet;
 using everybeam::Station;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::OSKARGrid;
+using everybeam::pointresponse::OSKARPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::OSKAR;
 
 OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
@@ -48,8 +50,14 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) {
+    const coords::CoordinateSystem &coordinate_system) const {
   // Get and return GriddedResponse ptr
   std::unique_ptr<GriddedResponse> grid(new OSKARGrid(this, coordinate_system));
   return grid;
+}
+
+std::unique_ptr<PointResponse> OSKAR::GetPointResponse(double time) const {
+  // Get and return PointResponse ptr
+  std::unique_ptr<PointResponse> point_response(new OSKARPoint(this, time));
+  return point_response;
 }

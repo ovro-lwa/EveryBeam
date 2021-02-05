@@ -12,7 +12,6 @@
 
 #include "../load.h"
 #include "../options.h"
-#include "../elementresponse.h"
 #include "parsetprovider.h"
 
 #include <aocommon/matrix2x2.h>
@@ -292,29 +291,10 @@ everybeam::Options ATermConfig::ConvertToEBOptions(
     options.coeff_path = settings.coeff_path;
     options.frequency_interpolation = frequency_interpolation;
   }
-  // LOFAR & SKA(/OSKAR) related
-  std::string element_response_upper = element_response_model;
-  std::transform(element_response_upper.begin(), element_response_upper.end(),
-                 element_response_upper.begin(), ::toupper);
 
-  everybeam::ElementResponseModel element_response_enum;
-  if (element_response_upper == "" || element_response_upper == "DEFAULT")
-    element_response_enum = everybeam::ElementResponseModel::kDefault;
-  else if (element_response_upper == "HAMAKER")
-    element_response_enum = everybeam::ElementResponseModel::kHamaker;
-  else if (element_response_upper == "LOBES")
-    element_response_enum = everybeam::ElementResponseModel::kLOBES;
-  else if (element_response_upper == "OSKARDIPOLE")
-    element_response_enum = everybeam::ElementResponseModel::kOSKARDipole;
-  else if (element_response_upper == "OSKARSPHERICALWAVE")
-    element_response_enum =
-        everybeam::ElementResponseModel::kOSKARSphericalWave;
-  else {
-    std::stringstream message;
-    message << "The specified element response model " << element_response_model
-            << " is not implemented.";
-    throw std::runtime_error(message.str());
-  }
+  everybeam::ElementResponseModel element_response_enum =
+      GetElementResponseEnum(element_response_model);
+
   options.data_column_name = settings.data_column_name;
   options.use_differential_beam = use_differential_beam;
   options.use_channel_frequency = use_channel_frequency;

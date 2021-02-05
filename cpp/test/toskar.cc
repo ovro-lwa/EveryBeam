@@ -6,6 +6,7 @@
 #include "../load.h"
 #include "../options.h"
 #include "../griddedresponse/oskargrid.h"
+#include "../pointresponse/oskarpoint.h"
 #include "../elementresponse.h"
 #include "../../external/npy.hpp"
 #include "../telescope/oskar.h"
@@ -26,6 +27,8 @@ using everybeam::Station;
 using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::OSKARGrid;
+using everybeam::pointresponse::OSKARPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::OSKAR;
 using everybeam::telescope::Telescope;
 
@@ -68,9 +71,15 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
                                    .dm = dm,
                                    .phase_centre_dl = shift_l,
                                    .phase_centre_dm = shift_m};
+  // Get GriddedResponse pointer
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr != dynamic_cast<OSKARGrid*>(grid_response.get()));
+
+  // Get PointResponse pointer
+  std::unique_ptr<PointResponse> point_response =
+      telescope->GetPointResponse(time);
+  BOOST_CHECK(nullptr != dynamic_cast<OSKARPoint*>(point_response.get()));
 
   // Define buffer and get gridded response (all stations)
   std::vector<std::complex<float>> antenna_buffer(
@@ -102,8 +111,15 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
                                                 {6.07546e-05, 0.0013592},
                                                 {-0.000379462, 0.00158725},
                                                 {0.000982019, -0.00856565}};
+  // Compute results via PointResponse (station 0)
+  std::complex<float> point_buffer_single_station[4];
+  point_response->CalculateStation(point_buffer_single_station, coord_system.ra,
+                                   coord_system.dec, frequency, 0, 0);
+
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer[offset_p88 + i] - oskar_p88[i]) < 1e-6);
+    BOOST_CHECK(std::abs(point_buffer_single_station[i] -
+                         antenna_buffer[offset_p88 + i]) < 1e-6);
   }
 
   // Pixel (5, 13), values to be reproduced are

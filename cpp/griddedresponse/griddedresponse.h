@@ -103,12 +103,10 @@ class GriddedResponse {
       const std::vector<double>& baseline_weights);
 
   std::size_t GetStationBufferSize(std::size_t nstations) const {
-    return std::size_t(nstations * width_ * height_ * 4);
+    return nstations * width_ * height_ * 4u;
   }
 
-  std::size_t GetIntegratedBufferSize() const {
-    return std::size_t(width_ * height_ * 16);
-  }
+  std::size_t GetIntegratedBufferSize() const { return width_ * height_ * 16u; }
 
  protected:
   /**
@@ -117,7 +115,7 @@ class GriddedResponse {
    * @param telescope_ptr Pointer to telescope::Telescope object
    * @param coordinate_system CoordinateSystem struct
    */
-  GriddedResponse(const telescope::Telescope* const telescope_ptr,
+  GriddedResponse(const telescope::Telescope* telescope_ptr,
                   const coords::CoordinateSystem& coordinate_system)
       : telescope_(telescope_ptr),
         width_(coordinate_system.width),
@@ -133,7 +131,7 @@ class GriddedResponse {
                               int width_out, int height_out,
                               const std::vector<aocommon::HMC4x4>& matrices);
 
-  const telescope::Telescope* const telescope_;
+  const telescope::Telescope* telescope_;
   size_t width_, height_;
   double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
 

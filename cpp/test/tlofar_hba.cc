@@ -7,6 +7,7 @@
 #include "../load.h"
 #include "../options.h"
 #include "../griddedresponse/lofargrid.h"
+#include "../pointresponse/lofarpoint.h"
 #include "../elementresponse.h"
 #include "../coords/coordutils.h"
 #include "../../external/npy.hpp"
@@ -37,6 +38,8 @@ using everybeam::coords::CoordinateSystem;
 using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
+using everybeam::pointresponse::LOFARPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::Telescope;
 
@@ -89,11 +92,13 @@ struct HBAFixture {
     coord_system.phase_centre_dl = 0.;
     coord_system.phase_centre_dm = 0.;
     grid_response = telescope->GetGriddedResponse(coord_system);
+    point_response = telescope->GetPointResponse(time);
   }
   ~HBAFixture(){};
   Options options;
   std::unique_ptr<Telescope> telescope;
   std::unique_ptr<GriddedResponse> grid_response;
+  std::unique_ptr<PointResponse> point_response;
   CoordinateSystem coord_system;
 
   casacore::MeasurementSet ms;
@@ -186,6 +191,7 @@ BOOST_AUTO_TEST_CASE(element_response) {
 
 BOOST_AUTO_TEST_CASE(gridded_response) {
   BOOST_CHECK(nullptr != dynamic_cast<LOFARGrid*>(grid_response.get()));
+  BOOST_CHECK(nullptr != dynamic_cast<LOFARPoint*>(point_response.get()));
 
   // Define buffer and get gridded responses
   std::vector<std::complex<float>> antenna_buffer_single(
@@ -201,11 +207,31 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
                                                 {-0.89047, -0.00125383},
                                                 {0.108123, -5.36076e-05}};
 
+  // Compute response for center pixel via PointResponse
+  // One station
+  std::complex<float> point_buffer_single_station[4];
+  point_response->CalculateStation(point_buffer_single_station, coord_system.ra,
+                                   coord_system.dec, frequency, 23, 0);
+
+  // All stations
+  std::complex<float>
+      point_buffer_all_stations[point_response->GetAllStationsBufferSize()];
+  point_response->CalculateAllStations(point_buffer_all_stations,
+                                       coord_system.ra, coord_system.dec,
+                                       frequency, 0);
+
   // Compare with everybeam
   std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
+  // Offset for station 23
+  std::size_t offset_point = 4 * 23;
   for (std::size_t i = 0; i < 4; ++i) {
     // Tolerance is a percentage, so 1e-2 --> 1e-4
     BOOST_CHECK_CLOSE(antenna_buffer_single[offset_22 + i], lofar_p22[i], 1e-2);
+    // Following must match exactly, hence, use tighter tolerance
+    BOOST_CHECK_CLOSE(point_buffer_single_station[i],
+                      antenna_buffer_single[offset_22 + i], 1e-6);
+    BOOST_CHECK_CLOSE(point_buffer_all_stations[offset_point + i],
+                      antenna_buffer_single[offset_22 + i], 1e-6);
   }
 
   // LOFARBeam output at pixel (1,3):

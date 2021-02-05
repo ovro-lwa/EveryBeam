@@ -24,7 +24,7 @@ class OSKARGrid final : public PhasedArrayGrid {
    * @param telescope_ptr Pointer to telescope::OSKAR object
    * @param coordinate_system CoordinateSystem struct
    */
-  OSKARGrid(telescope::Telescope* telescope_ptr,
+  OSKARGrid(const telescope::Telescope* telescope_ptr,
             const coords::CoordinateSystem& coordinate_system)
       : PhasedArrayGrid(telescope_ptr, coordinate_system) {
     const telescope::OSKAR& oskartelescope =

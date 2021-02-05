@@ -33,6 +33,11 @@ class VoltagePattern {
               double pointing_ra, double pointing_dec, double phase_centre_dl,
               double phase_centre_dm, double frequency_hz) const;
 
+  // Specialization for single point
+  void Render(std::complex<float>* aterm, double phase_centre_ra,
+              double phase_centre_dec, double pointing_ra, double pointing_dec,
+              double frequency_hz) const;
+
  private:
   // Only works when frequencies_.size() > 1
   aocommon::UVector<double> InterpolateValues(double freq) const;

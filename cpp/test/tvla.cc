@@ -6,6 +6,7 @@
 #include "../load.h"
 #include "../options.h"
 #include "../griddedresponse/dishgrid.h"
+#include "../pointresponse/dishpoint.h"
 #include "../elementresponse.h"
 #include "../telescope/dish.h"
 #include "../../external/npy.hpp"
@@ -19,6 +20,8 @@ using everybeam::Options;
 using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::DishGrid;
 using everybeam::griddedresponse::GriddedResponse;
+using everybeam::pointresponse::DishPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::Dish;
 using everybeam::telescope::Telescope;
 
@@ -83,9 +86,10 @@ BOOST_AUTO_TEST_CASE(load_vla) {
       {0.8672509, 0.}, {0, 0}, {0, 0}, {0.8672509, 0.}};
 
   // Convert pixel to buffer offsets
-  std::size_t offset_00 = (0 + 0 * width) * 4;
-  std::size_t offset_23 = (2 + 3 * width) * 4;
-  std::size_t offset_1012 = (10 + 12 * width) * 4;
+  const std::size_t offset_00 = (0 + 0 * width) * 4;
+  const std::size_t offset_23 = (2 + 3 * width) * 4;
+  const std::size_t offset_1012 = (10 + 12 * width) * 4;
+  const std::size_t offset_88 = (8 + 8 * width) * 4;
 
   // Check if results are reproduced
   BOOST_CHECK_EQUAL_COLLECTIONS(antenna_buffer.begin() + offset_00,
@@ -97,6 +101,27 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   BOOST_CHECK_EQUAL_COLLECTIONS(antenna_buffer.begin() + offset_1012,
                                 antenna_buffer.begin() + offset_1012 + 4,
                                 vla_p1012.begin(), vla_p1012.end());
+
+  // Compare center pixel with PointResponse result
+  std::unique_ptr<PointResponse> point_response =
+      telescope->GetPointResponse(time);
+  BOOST_CHECK(nullptr != dynamic_cast<DishPoint*>(point_response.get()));
+
+  // Use ComputeAllStations (should be a repetitive call to CalculateStation)
+  std::complex<float> point_response_buffer[4 * telescope->GetNrStations()];
+  point_response->CalculateAllStations(point_response_buffer, coord_system.ra,
+                                       coord_system.dec, frequency, 0);
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,
+                                point_response_buffer + 4,
+                                antenna_buffer.begin() + offset_88,
+                                antenna_buffer.begin() + offset_88 + 4);
+  // Check if point response equal for all stations
+  for (size_t i = 0; i < telescope->GetNrStations(); ++i) {
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        point_response_buffer + i * 4, point_response_buffer + 4 * (i + 1),
+        point_response_buffer, point_response_buffer + 4);
+  }
 
   // Print to np array, note: this spits out the transposed grid
   const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};

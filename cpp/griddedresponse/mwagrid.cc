@@ -22,6 +22,7 @@ void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
                                double frequency, size_t station_idx, size_t) {
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
+
   casacore::MEpoch time_epoch(casacore::Quantity(time, "s"));
   casacore::MeasFrame frame(mwatelescope.ms_properties_.array_position,
                             time_epoch);
@@ -34,7 +35,7 @@ void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
       j2000_to_azelgeoref(j2000_ref, azelgeo_ref);
   casacore::MPosition wgs = casacore::MPosition::Convert(
       mwatelescope.ms_properties_.array_position, casacore::MPosition::WGS84)();
-  double arrLatitude = wgs.getValue().getLat();
+  double arr_latitude = wgs.getValue().getLat();
 
   if (!tile_beam_) {
     tile_beam_.reset(
@@ -53,7 +54,7 @@ void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
 
       std::complex<double> gain[4];
       tile_beam_->ArrayResponse(ra, dec, j2000_ref, j2000_to_hadecref,
-                                j2000_to_azelgeoref, arrLatitude, frequency,
+                                j2000_to_azelgeoref, arr_latitude, frequency,
                                 gain);
 
       for (size_t i = 0; i != 4; ++i) {

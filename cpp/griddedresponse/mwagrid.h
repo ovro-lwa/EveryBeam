@@ -1,4 +1,4 @@
-// mwagrid.h: Class for computing the circular symmetric (gridded) response.
+// mwagrid.h: Class for computing the (gridded) response for the MWA telescope
 //
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -15,7 +15,7 @@ namespace everybeam {
 namespace griddedresponse {
 class MWAGrid final : public GriddedResponse {
  public:
-  MWAGrid(telescope::Telescope* telescope_ptr,
+  MWAGrid(const telescope::Telescope* telescope_ptr,
           const coords::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 

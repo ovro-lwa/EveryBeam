@@ -18,20 +18,29 @@ class DishGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
+namespace pointresponse {
+class PointResponse;
+class DishPoint;
+}  // namespace pointresponse
+
 namespace telescope {
 
 /**
  * This class calculates the a-terms for dishes with a circularly symmetric
  * response.
  */
-class Dish : public Telescope {
+class Dish final : public Telescope {
   friend class griddedresponse::DishGrid;
+  friend class pointresponse::DishPoint;
 
  public:
   Dish(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) override;
+      const coords::CoordinateSystem &coordinate_system) const override;
+
+  std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
+      double time) const override;
 
  private:
   struct MSProperties {

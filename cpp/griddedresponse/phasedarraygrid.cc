@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "phasedarraygrid.h"
-#include "./../telescope/phasedarray.h"
+#include "../telescope/phasedarray.h"
 
 #include <aocommon/imagecoordinates.h>
 #include <aocommon/threadpool.h>
@@ -12,7 +12,7 @@
 using everybeam::griddedresponse::PhasedArrayGrid;
 
 PhasedArrayGrid::PhasedArrayGrid(
-    telescope::Telescope* telescope_ptr,
+    const telescope::Telescope* telescope_ptr,
     const coords::CoordinateSystem& coordinate_system)
     : GriddedResponse(telescope_ptr, coordinate_system),
       use_channel_frequency_(true),
