@@ -6,8 +6,9 @@
 #ifndef EVERYBEAM_LOAD_H_
 #define EVERYBEAM_LOAD_H_
 
-#include "./telescope/telescope.h"
+#include "telescope/telescope.h"
 #include "options.h"
+#include "elementresponse.h"
 
 namespace everybeam {
 /**
@@ -53,6 +54,14 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
  */
 std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,
                                            const Options &options);
+
+/**
+ * @brief Convert a string to an ElementResponseModel enum
+ *
+ */
+everybeam::ElementResponseModel GetElementResponseEnum(
+    const std::string &element_response);
+
 }  // namespace everybeam
 
 #endif  // EVERYBEAM_LOAD_H_

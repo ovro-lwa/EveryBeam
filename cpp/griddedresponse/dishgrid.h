@@ -18,7 +18,7 @@ namespace griddedresponse {
  */
 class DishGrid final : public GriddedResponse {
  public:
-  DishGrid(telescope::Telescope* telescope_ptr,
+  DishGrid(const telescope::Telescope* telescope_ptr,
            const coords::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 

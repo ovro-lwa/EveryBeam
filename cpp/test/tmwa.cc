@@ -6,6 +6,7 @@
 #include "../load.h"
 #include "../options.h"
 #include "../griddedresponse/mwagrid.h"
+#include "../pointresponse/mwapoint.h"
 #include "../../external/npy.hpp"
 #include "../telescope/mwa.h"
 
@@ -18,6 +19,8 @@ using everybeam::Options;
 using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::MWAGrid;
+using everybeam::pointresponse::MWAPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::MWA;
 using everybeam::telescope::Telescope;
 
@@ -92,9 +95,10 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
                                                 {0.02796424, -0.00624412}};
 
   // Convert pixel to buffer offsets
-  std::size_t offset_08 = (0 + 8 * width) * 4;
-  std::size_t offset_1013 = (10 + 13 * width) * 4;
-  std::size_t offset_1515 = (15 + 15 * width) * 4;
+  const std::size_t offset_08 = (0 + 8 * width) * 4;
+  const std::size_t offset_88 = (8 + 8 * width) * 4;
+  const std::size_t offset_1013 = (10 + 13 * width) * 4;
+  const std::size_t offset_1515 = (15 + 15 * width) * 4;
 
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer[offset_08 + i] - mwa_p08[i]) < 1e-6);
@@ -102,6 +106,28 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
                 1e-6);
     BOOST_CHECK(std::abs(antenna_buffer[offset_1515 + i] - mwa_p1515[i]) <
                 1e-6);
+  }
+
+  // Check response at center pixel
+  std::unique_ptr<PointResponse> point_response =
+      telescope->GetPointResponse(time);
+  BOOST_CHECK(nullptr != dynamic_cast<MWAPoint*>(point_response.get()));
+
+  // Use ComputeAllStations (should be a repetitive call to CalculateStation)
+  std::complex<float>
+      point_response_buffer[point_response->GetAllStationsBufferSize()];
+  point_response->CalculateAllStations(point_response_buffer, coord_system.ra,
+                                       coord_system.dec, frequency, 0);
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,
+                                point_response_buffer + 4,
+                                antenna_buffer.begin() + offset_88,
+                                antenna_buffer.begin() + offset_88 + 4);
+  // Check if point response equal for all stations
+  for (size_t i = 0; i < telescope->GetNrStations(); ++i) {
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        point_response_buffer + i * 4, point_response_buffer + 4 * (i + 1),
+        point_response_buffer, point_response_buffer + 4);
   }
 
   // Print to np array

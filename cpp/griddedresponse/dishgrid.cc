@@ -33,7 +33,7 @@ void DishGrid::CalculateStation(std::complex<float>* buffer, double,
   vp.EvaluatePolynomial(coefs_vec, false);
   vp.Render(buffer, width_, height_, dl_, dm_, ra_, dec_, pdir_ra, pdir_dec,
             phase_centre_dl_, phase_centre_dm_, frequency);
-};
+}
 
 void DishGrid::CalculateAllStations(std::complex<float>* buffer, double,
                                     double frequency, size_t field_id) {
@@ -72,7 +72,7 @@ void DishGrid::CalculateIntegratedResponse(double* buffer, double,
   height_ = height_original;
   dl_ = dl_original;
   dm_ = dm_original;
-};
+}
 
 void DishGrid::MakeIntegratedDishSnapshot(
     std::vector<aocommon::HMC4x4>& matrices, double frequency,
@@ -97,4 +97,4 @@ void DishGrid::MakeIntegratedDishSnapshot(
           HMC4x4::KroneckerProduct(A.HermTranspose().Transpose(), A);
     }
   }
-};
+}

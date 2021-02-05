@@ -12,7 +12,7 @@ Datafile::Datafile(const std::string& filename) {
 
   // Disable HDF5 error prints
   H5::Exception::dontPrint();
-};
+}
 
 std::shared_ptr<Dataset> Datafile::Get(const unsigned int freq) {
   std::lock_guard<std::mutex> lock(mutex_);

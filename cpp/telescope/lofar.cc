@@ -3,6 +3,7 @@
 
 #include "lofar.h"
 #include "../griddedresponse/lofargrid.h"
+#include "../pointresponse/lofarpoint.h"
 #include "../common/mathutils.h"
 #include "../common/casautils.h"
 #include "../msreadutils.h"
@@ -14,6 +15,8 @@
 using everybeam::Station;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
+using everybeam::pointresponse::LOFARPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 
 namespace {
@@ -110,8 +113,13 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) {
+    const coords::CoordinateSystem &coordinate_system) const {
   // Get and return GriddedResponse ptr
   std::unique_ptr<GriddedResponse> grid(new LOFARGrid(this, coordinate_system));
   return grid;
-};
+}
+
+std::unique_ptr<PointResponse> LOFAR::GetPointResponse(double time) const {
+  std::unique_ptr<PointResponse> point_response(new LOFARPoint(this, time));
+  return point_response;
+}

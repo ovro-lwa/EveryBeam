@@ -22,16 +22,16 @@ const vector3r_t ITRFDirection::lofar_position_ = {
 
 ITRFDirection::ITRFDirection(const vector3r_t &position,
                              const vector2r_t &direction) {
-  casacore::MVPosition mvPosition(position[0], position[1], position[2]);
-  casacore::MPosition mPosition(mvPosition, casacore::MPosition::ITRF);
-  frame_ = casacore::MeasFrame(casacore::MEpoch(), mPosition);
+  casacore::MVPosition mv_position(position[0], position[1], position[2]);
+  casacore::MPosition m_position(mv_position, casacore::MPosition::ITRF);
+  frame_ = casacore::MeasFrame(casacore::MEpoch(), m_position);
 
   // Order of angles seems to be longitude (along the equator), lattitude
   // (towards the pole).
-  casacore::MVDirection mvDirection(direction[0], direction[1]);
-  casacore::MDirection mDirection(mvDirection, casacore::MDirection::J2000);
+  casacore::MVDirection mv_direction(direction[0], direction[1]);
+  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
   converter_ = casacore::MDirection::Convert(
-      mDirection,
+      m_direction,
       casacore::MDirection::Ref(casacore::MDirection::ITRF, frame_));
 }
 
@@ -42,14 +42,14 @@ ITRFDirection::ITRFDirection(const vector2r_t &direction)
 
 ITRFDirection::ITRFDirection(const vector3r_t &position,
                              const vector3r_t &direction) {
-  casacore::MVPosition mvPosition(position[0], position[1], position[2]);
-  casacore::MPosition mPosition(mvPosition, casacore::MPosition::ITRF);
-  frame_ = casacore::MeasFrame(casacore::MEpoch(), mPosition);
+  casacore::MVPosition mv_position(position[0], position[1], position[2]);
+  casacore::MPosition m_position(mv_position, casacore::MPosition::ITRF);
+  frame_ = casacore::MeasFrame(casacore::MEpoch(), m_position);
 
-  casacore::MVDirection mvDirection(direction[0], direction[1], direction[2]);
-  casacore::MDirection mDirection(mvDirection, casacore::MDirection::J2000);
+  casacore::MVDirection mv_direction(direction[0], direction[1], direction[2]);
+  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
   converter_ = casacore::MDirection::Convert(
-      mDirection,
+      m_direction,
       casacore::MDirection::Ref(casacore::MDirection::ITRF, frame_));
 }
 
@@ -67,10 +67,10 @@ vector3r_t ITRFDirection::at(real_t time) const {
   // argument is UTC in (fractional) days (MJD).
   frame_.resetEpoch(casacore::Quantity(time, "s"));
 
-  const casacore::MDirection &mITRF = converter_();
-  const casacore::MVDirection &mvITRF = mITRF.getValue();
+  const casacore::MDirection &m_ITRF = converter_();
+  const casacore::MVDirection &mv_ITRF = m_ITRF.getValue();
 
-  vector3r_t itrf = {{mvITRF(0), mvITRF(1), mvITRF(2)}};
+  vector3r_t itrf = {{mv_ITRF(0), mv_ITRF(1), mv_ITRF(2)}};
   return itrf;
 }
 }  // namespace coords

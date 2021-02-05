@@ -7,6 +7,7 @@ project(everybeam_cpp)
 add_subdirectory(aterms)
 add_subdirectory(common)
 add_subdirectory(coords)
+add_subdirectory(pointresponse)
 add_subdirectory(griddedresponse)
 add_subdirectory(hamaker)
 add_subdirectory(lobes)
@@ -50,6 +51,9 @@ add_library(everybeam SHARED
   griddedresponse/griddedresponse.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
+  pointresponse/phasedarraypoint.cc
+  pointresponse/dishpoint.cc
+  pointresponse/mwapoint.cc
   circularsymmetric/voltagepattern.cc
   circularsymmetric/vlabeam.cc
   # Phased array telescopes (SKA, LOFAR)

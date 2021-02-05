@@ -23,11 +23,17 @@ class LOFARGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
+namespace pointresponse {
+class PointResponse;
+class LOFARPoint;
+}  // namespace pointresponse
+
 namespace telescope {
 
 //! LOFAR telescope class
 class LOFAR final : public PhasedArray {
   friend class griddedresponse::LOFARGrid;
+  friend class pointresponse::LOFARPoint;
 
  public:
   /**
@@ -40,7 +46,10 @@ class LOFAR final : public PhasedArray {
   LOFAR(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) override;
+      const coords::CoordinateSystem &coordinate_system) const override;
+
+  std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
+      double time) const override;
 
   std::vector<std::shared_ptr<Station>> stations_;
 };

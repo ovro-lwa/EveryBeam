@@ -3,11 +3,14 @@
 
 #include "dish.h"
 #include "../griddedresponse/dishgrid.h"
+#include "../pointresponse/dishpoint.h"
 
 #include <casacore/measures/TableMeasures/ArrayMeasColumn.h>
 
 using everybeam::griddedresponse::DishGrid;
 using everybeam::griddedresponse::GriddedResponse;
+using everybeam::pointresponse::DishPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::Dish;
 
 Dish::Dish(const casacore::MeasurementSet &ms, const Options &options)
@@ -26,7 +29,12 @@ Dish::Dish(const casacore::MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) {
+    const coords::CoordinateSystem &coordinate_system) const {
   std::unique_ptr<GriddedResponse> grid(new DishGrid(this, coordinate_system));
   return grid;
+}
+
+std::unique_ptr<PointResponse> Dish::GetPointResponse(double time) const {
+  std::unique_ptr<PointResponse> point_response(new DishPoint(this, time));
+  return point_response;
 }

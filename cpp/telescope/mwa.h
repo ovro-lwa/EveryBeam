@@ -18,10 +18,16 @@ class MWAGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
+namespace pointresponse {
+class MWAPoint;
+class PointResponse;
+}  // namespace pointresponse
+
 namespace telescope {
 
 class MWA final : public Telescope {
   friend class griddedresponse::MWAGrid;
+  friend class pointresponse::MWAPoint;
 
  public:
   /**
@@ -34,7 +40,10 @@ class MWA final : public Telescope {
   MWA(const casacore::MeasurementSet &ms, const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) override;
+      const coords::CoordinateSystem &coordinate_system) const override;
+
+  std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
+      double time) const override;
 
  private:
   struct MSProperties {
