@@ -183,8 +183,8 @@ deploy-package:
     - export FILES=$(ls -dp $PWD/* | grep .deb | tr "\n" " ")
     - echo UPLOADING files $FILES
     # The following example command must be executed first or else the update will fail because there is no repository
-    # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} -p ${CI_PROJECT_NAME} schaap
-    - ../external/schaap-packaging/update_repo.py --cleanup -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} -p ${CI_PROJECT_NAME} schaap ${FILES}
+    # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap
+    - ../external/schaap-packaging/update_repo.py --cleanup -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap ${FILES}
   rules:
     # Only run on master because GPG_KEY and GPG_PASS are protected and therefore only available on protected branches.
     - if: '$CI_COMMIT_BRANCH != "master"'
