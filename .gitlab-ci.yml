@@ -94,18 +94,15 @@ build-package:
     - export SRC=$(pwd)
     - cd /opt/everybeam/build
     - make package
-    - mv $(ls -p | grep *\.deb) $SRC/everybeam_package
+    - mv $(ls -1 *.deb) $SRC/everybeam_package/
   artifacts:
     paths:
     - everybeam_package/
   rules:
     # The package is built only during a merge_request_event, a merge to master,
     # or when the pipeline is triggered by a tag event.
-    # A - yet to be created - deploy-package job should only be run during merges
-    # to master (to create a :latest version) and during a tag event (to create a :stable)
-    # version
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
     - if: '$CI_COMMIT_TAG'
     - if: '$UPLOAD_PACKAGE'
 
@@ -180,7 +177,7 @@ deploy-package:
     - pip3 install aptly-api-client
     - chmod -R 700 external/schaap-packaging
     - cd everybeam_package
-    - export FILES=$(ls -dp $PWD/* | grep .deb | tr "\n" " ")
+    - export FILES=$(ls -1 $PWD/*.deb)
     - echo UPLOADING files $FILES
     # The following example command must be executed first or else the update will fail because there is no repository
     # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap
