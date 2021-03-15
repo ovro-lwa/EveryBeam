@@ -7,6 +7,7 @@
 #include <Eigen/Core>
 #include <unsupported/Eigen/CXX11/Tensor>
 
+#include "../options.h"
 #include "../fieldresponse.h"
 
 #include <vector>
@@ -22,8 +23,12 @@ class LOBESElementResponse : public FieldResponse {
    * @brief Construct a new LOBESElementResponse object
    *
    * @param name (LOFAR) station name, i.e. CS302LBA
+   * @param options if options.coeff_path is non-empty it is used to find
+   * coefficient files
    */
-  LOBESElementResponse(std::string name);
+  LOBESElementResponse(const std::string &name, const Options &options);
+
+  ElementResponseModel GetModel() const final override { return kLOBES; }
 
   /**
    * @brief Stub override of the Response method, an element id
@@ -55,7 +60,14 @@ class LOBESElementResponse : public FieldResponse {
   void Response(int element_id, double freq, double theta, double phi,
                 std::complex<double> (&response)[2][2]) const override;
 
-  static std::shared_ptr<LOBESElementResponse> GetInstance(std::string name);
+  /**
+   * @brief Create LOBESElementResponse
+   *
+   * @param name Station name, e.g. CS302LBA
+   * @return std::shared_ptr<LOBESElementResponse>
+   */
+  static std::shared_ptr<LOBESElementResponse> GetInstance(
+      const std::string &name, const Options &options);
 
   /**
    * @brief Set field quantities (i.e. the basefunctions) for the LOBES element
@@ -83,9 +95,6 @@ class LOBESElementResponse : public FieldResponse {
   // Typdef of BaseFunctions as Eigen::Array type
   typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
   mutable BaseFunctions basefunctions_;
-
-  // Compose the path to a LOBES coefficient file
-  std::string GetPath(const char *) const;
 
   // Find the closest frequency
   size_t FindFrequencyIdx(double f) const {

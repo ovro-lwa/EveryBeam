@@ -11,10 +11,10 @@ include_directories(${CMAKE_BINARY_DIR})
 add_custom_target(download_lobes_coefficients COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lobes_coeffs.sh)
 
 #------------------------------------------------------------------------------
-add_library(lobes SHARED lobeselementresponse.cc)
+add_library(lobes SHARED lobeselementresponse.cc ${CMAKE_SOURCE_DIR}/cpp/common/sphericalharmonics.cc)
 add_dependencies(lobes download_lobes_coefficients)
 target_include_directories(lobes PUBLIC ${HDF5_INCLUDE_DIRS})
-target_link_libraries(lobes PUBLIC ${HDF5_LIBRARIES})
+target_link_libraries(lobes PUBLIC ${HDF5_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 set_target_properties(lobes PROPERTIES LIBRARY_OUTPUT_NAME "${projectname}-lobes")
 

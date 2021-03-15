@@ -22,28 +22,31 @@ namespace everybeam {
  * @param ms Measurement set
  * @param id Station id
  * @param model Element response model
- * @return shared
+ * @param options [optional] can contain for example the coefficient path, used
+ to specify
+ * locations of LOBES or other coefficient file(s)
+ * @return Shared pointer to \param Station object
+
  */
-std::shared_ptr<Station> ReadSingleStation(
-    const casacore::MeasurementSet &ms, unsigned int id,
-    ElementResponseModel model = ElementResponseModel::kDefault);
+std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
+                                           unsigned int id,
+                                           const Options &options = Options());
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
- * Loops over ReadLofarStation for all the antennas in MeasurementSet
+ * Loops over ReadSingleStation for all the antennas in MeasurementSet
  *
  * @tparam T Template type
  * @param ms Measurement set
- * @param out_it Out buffer
- * @param model Element Response buffer
+ * @param out_it Out buffer, storing shared pointers to Station objects
+ * @param model ElementResponseModel to use
  */
 template <typename T>
-inline void ReadAllStations(
-    const casacore::MeasurementSet &ms, T out_it,
-    const ElementResponseModel model = ElementResponseModel::kDefault) {
+inline void ReadAllStations(const casacore::MeasurementSet &ms, T out_it,
+                            const Options &options = Options()) {
   casacore::ROMSAntennaColumns antenna(ms.antenna());
   for (unsigned int i = 0; i < antenna.nrow(); ++i) {
-    *out_it++ = ReadSingleStation(ms, i, model);
+    *out_it++ = ReadSingleStation(ms, i, options);
   }
 }
 

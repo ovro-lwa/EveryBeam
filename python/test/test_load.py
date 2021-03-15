@@ -52,10 +52,9 @@ def hba_setup():
     }
 
 
-# @pytest.mark.parametrize(
-#     "ref", [pytest.lazy_fixture("lba_setup"), pytest.lazy_fixture("hba_setup")]
-# )
-@pytest.mark.parametrize("ref", [pytest.lazy_fixture("hba_setup")])
+@pytest.mark.parametrize(
+    "ref", [pytest.lazy_fixture("lba_setup"), pytest.lazy_fixture("hba_setup")]
+)
 def test_load_telescope(ref):
     ms_path = os.path.join(DATADIR, ref["filename"])
     telescope = load_telescope(ms_path)

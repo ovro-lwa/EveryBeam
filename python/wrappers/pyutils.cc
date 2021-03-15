@@ -41,16 +41,16 @@ void init_utils(py::module &m) {
       R"pbdoc(
         Convert direction vector (ITRF or local East-North-Up)
         to theta, phi.
-        
+
         Parameters
-        ---------- 
+        ----------
         direction: np.1darray
             Direction vector
-        
+
         Returns
         -------
         list:
-            [theta, phi]   
+            [theta, phi]
        )pbdoc",
       py::arg("direction"));
   m.def(
@@ -61,19 +61,19 @@ void init_utils(py::module &m) {
         return py::array_t<float>(py::cast(direction));
       },
       R"pbdoc(
-        Convert theta, phi angles to direction vector 
-        
+        Convert theta, phi angles to direction vector
+
         Parameters
-        ---------- 
+        ----------
         theta: float
             theta angle [rad]
         phi: float
             phi angle [rad]
-        
+
         Returns
         -------
         np.1darray:
-            
+
        )pbdoc",
       py::arg("theta"), py::arg("phi"));
 
@@ -81,14 +81,14 @@ void init_utils(py::module &m) {
   py::class_<CoordinateSystem>(m, "CoordinateSystem",
                                R"pbdoc(
         Class for specifying the dimensions of the grid.
-        Will be useful for the gridded response. 
+        Will be useful for the gridded response.
        )pbdoc")
       .def(py::init<>(),
            R"pbdoc(
         Initialize CoordinateSystem
-        
+
         Parameters
-        ---------- 
+        ----------
        )pbdoc")
       .def_readwrite("width", &CoordinateSystem::width,
                      R"pbdoc(
@@ -150,9 +150,12 @@ void init_utils(py::module &m) {
         Class for specifying some beam forming options.
        )pbdoc")
       .def(py::init<>())
+      .def_readwrite("coeff_path", &Options::coeff_path, R"pbdoc(
+        Full path to coefficients file (MWA) or path to directory where
+        coefficient files can be found (LOFAR LOBEs model)
+       )pbdoc")
       // [TODO] MWA specific
-      // .def_readwrite("coeff_path", &Options::coeff_path, "Coefficient path to
-      // (MWA) coefficient file") .def_readwrite("frequency_interpolation",
+      // .def_readwrite("frequency_interpolation",
       // &Options::frequency_interpolation, "Use frequency interpolation (MWA
       // specific)")
       .def_readwrite("use_differential_beam", &Options::use_differential_beam,

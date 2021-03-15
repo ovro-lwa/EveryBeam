@@ -7,8 +7,6 @@
 #ifndef EVERYBEAM_TELESCOPE_OSKAR_H_
 #define EVERYBEAM_TELESCOPE_OSKAR_H_
 
-#include "../station.h"
-#include "../elementresponse.h"
 #include "phasedarray.h"
 
 #include <casacore/measures/Measures/MPosition.h>
@@ -40,7 +38,6 @@ class OSKAR final : public PhasedArray {
    * @brief Construct a new OSKAR object
    *
    * @param ms MeasurementSet
-   * @param model Element Response model
    * @param options telescope options
    */
   OSKAR(const casacore::MeasurementSet &ms, const Options &options);

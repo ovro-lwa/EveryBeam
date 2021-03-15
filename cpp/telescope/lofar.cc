@@ -66,7 +66,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   if (options_.element_response_model == kDefault)
     options_.element_response_model = kHamaker;
-  ReadAllStations(ms, options_.element_response_model);
+  ReadAllStations(ms, stations_.begin(), options_);
 
   // Populate MeasurementSet properties struct
   aocommon::BandData band(ms.spectralWindow());

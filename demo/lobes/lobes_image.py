@@ -5,17 +5,22 @@ from everybeam import load_telescope, LOFAR, Options, thetaphi2cart
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import logging
 
 # MS
 try:
     datadir = os.environ["DATA_DIR"]
 except:
     ValueError("DATA_DIR variable not found in environment variables")
+
+
+# LOFAR_LBA_MOCK.ms can be retrieved from https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
 filename = "LOFAR_LBA_MOCK.ms"
 ms_path = os.path.join(datadir, filename)
 
 # Response settings
-mode = "element"
+# mode = "element"
+mode = "station"
 time = 4.92183348e09
 frequency = 57812500.0
 station_id = 20
@@ -23,14 +28,18 @@ element_id = 0
 
 # Same station0 direction as in python/test
 station0 = np.array([0.655743, -0.0670973, 0.751996])
-is_local = True  # use local coords
+is_local = True  # use local coords.
 rotate = True
 response_model = "lobes"
 
 # Load telescope
 telescope = load_telescope(ms_path, element_response_model=response_model)
-station_name = telescope.station_name(20)
-assert station_name == "CS302LBA"
+station_name = telescope.station_name(station_id)
+
+if station_name not in ["CS302LBA", "SE607LBA"] and response_model == "lobes":
+    logging.warning(
+        f"LOBEs response requested, but not available for station {station_name}. EveryBeam defaults back to Hamaker"
+    )
 
 # Make coordinates for mesh
 x_v = np.linspace(-1.0, 1.0, 128)

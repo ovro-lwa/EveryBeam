@@ -24,7 +24,7 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   if (options_.element_response_model == kDefault)
     options_.element_response_model = kOSKARSphericalWave;
-  ReadAllStations(ms, options_.element_response_model);
+  ReadAllStations(ms, stations_.begin(), options_);
 
   aocommon::BandData band(ms.spectralWindow());
   casacore::ScalarMeasColumn<casacore::MDirection> delay_dir_col(

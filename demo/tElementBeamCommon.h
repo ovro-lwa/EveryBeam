@@ -97,7 +97,9 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read station
   size_t field_id = 0;
   size_t station_id = 0;
-  auto station = ReadSingleStation(ms, station_id, elementResponseModel);
+  Options options;
+  options.element_response_model = elementResponseModel;
+  auto station = ReadSingleStation(ms, station_id, options);
   auto field_name = GetFieldName(ms, field_id);
   auto station_name = GetStationName(ms, station_id);
   auto nr_antennas = GetNrAntennas(ms, field_id);

@@ -8,4 +8,5 @@ install (FILES
   mutable_ptr.h
   types.h
   fftresampler.h
+  sphericalharmonics.h
 DESTINATION "include/${CMAKE_PROJECT_NAME}/common")

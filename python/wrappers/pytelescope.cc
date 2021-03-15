@@ -515,8 +515,8 @@ void init_telescope(py::module &m) {
         Parameters
         ----------
         time: double
-            Evaluation response at time. 
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s) 
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         station_idx: int
             station index
         element_idx: int
@@ -526,8 +526,8 @@ void init_telescope(py::module &m) {
         direction: np.1darray
             Direction of arrival either in ITRF (m) or local East-North-Up (m)
         is_local: bool, optional
-            Is the specified direction in local East-North-Up? If not, global coordinate 
-            system is assumed. [True/False] Defaults to False. 
+            Is the specified direction in local East-North-Up? If not, global coordinate
+            system is assumed. [True/False] Defaults to False.
         rotate: bool, optional
             Apply paralactic angle rotation? [True/False] Defaults to True
 

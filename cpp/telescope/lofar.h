@@ -7,8 +7,6 @@
 #ifndef EVERYBEAM_TELESCOPE_LOFAR_H_
 #define EVERYBEAM_TELESCOPE_LOFAR_H_
 
-#include "../station.h"
-#include "../elementresponse.h"
 #include "phasedarray.h"
 
 #include <casacore/measures/Measures/MPosition.h>
@@ -50,8 +48,6 @@ class LOFAR final : public PhasedArray {
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
-
-  std::vector<std::shared_ptr<Station>> stations_;
 };
 }  // namespace telescope
 }  // namespace everybeam
