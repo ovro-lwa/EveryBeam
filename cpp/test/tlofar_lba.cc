@@ -45,9 +45,6 @@ CoordinateSystem coord_system = {width, height, ra,      dec,
 
 BOOST_AUTO_TEST_CASE(test_hamaker) {
   Options options;
-  // Only checks if we are defaulting to LOBES. Effectively,
-  // all the computations will be done as if the Hamaker model was chosen
-  // except for station 20 (CS302LBA)
   options.element_response_model = ElementResponseModel::kHamaker;
 
   // Load LOFAR Telescope
@@ -141,6 +138,7 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
   // Effectively, all the computations will be done as if the Hamaker model was
   // chosen except for station 20 (CS302LBA)
   options.element_response_model = ElementResponseModel::kLOBES;
+  options.coeff_path = LOBES_COEFF_PATH;
 
   casacore::MeasurementSet ms(LOFAR_LBA_MOCK_MS);
 

@@ -73,6 +73,8 @@ find_package(OpenMP REQUIRED)
 
 # Find and include Boost headers (boost::math required for MWA beam)
 find_package(Boost REQUIRED)
+# Filesystem component required to search for LOBES coefficient files
+find_package(Boost COMPONENTS filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 # Find and include FFTW3 float libraries

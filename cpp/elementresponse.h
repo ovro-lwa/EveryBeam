@@ -16,6 +16,8 @@ template <typename T>
 class MutablePtr;
 }
 
+class Options;
+
 enum ElementResponseModel {
   /// The default will select the default element response model
   /// based on the telescope: e.g. LOFAR will use kHamaker,
@@ -27,7 +29,10 @@ enum ElementResponseModel {
   kOSKARSphericalWave
 };
 
-std::ostream& operator<<(std::ostream& os, ElementResponseModel model);
+std::ostream &operator<<(std::ostream &os, ElementResponseModel model);
+
+ElementResponseModel ElementResponseModelFromString(
+    const std::string &element_response);
 
 /**
  * @brief Virtual class for the element response model. All the
@@ -40,6 +45,8 @@ class ElementResponse {
 
   typedef common::MutablePtr<ElementResponse>
       Ptr;  //!< Pointer to ElementResponse object
+
+  virtual ElementResponseModel GetModel() const = 0;
 
   /**
    * @brief Virtual implementation of Response method
@@ -65,6 +72,9 @@ class ElementResponse {
                         std::complex<double> (&result)[2][2]) const {
     Response(freq, theta, phi, result);
   }
+
+  static std::shared_ptr<ElementResponse> GetInstance(
+      ElementResponseModel model, const std::string &name, Options &options);
 };
 }  // namespace everybeam
 #endif

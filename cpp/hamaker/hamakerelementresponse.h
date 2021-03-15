@@ -14,6 +14,7 @@ namespace everybeam {
 //! Implementation of the Hamaker response model
 class HamakerElementResponse : public ElementResponse {
  public:
+  ElementResponseModel GetModel() const final override { return kHamaker; }
   virtual void Response(
       double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;

@@ -14,7 +14,7 @@
 #include "beamformer.h"
 #include "coords/itrfdirection.h"
 #include "common/types.h"
-
+#include "options.h"
 #include <memory>
 #include <vector>
 
@@ -31,7 +31,7 @@ class Station {
    *  \param position Position of the station (ITRF, m).
    */
   Station(const std::string &name, const vector3r_t &position,
-          const ElementResponseModel model);
+          const Options &options = Options());
 
   void SetResponse(std::shared_ptr<ElementResponse> element_response);
 
@@ -277,11 +277,6 @@ class Station {
   //! Returns a pointer to the ElementResponse class
   const ElementResponse::Ptr GetElementResponse() { return element_response_; }
 
-  //! Returns an enum of the chosen ElementResponse model
-  const ElementResponseModel GetElementResponseModel() const {
-    return element_response_model_;
-  }
-
   /**
    * @brief Compute the Jones matrix for the element response
    *
@@ -338,9 +333,8 @@ class Station {
 
   std::string name_;
   vector3r_t position_;
+  Options options_;
   vector3r_t phase_reference_;
-  ElementResponseModel
-      element_response_model_;  // = ElementResponseModel::kUnknown;
   ElementResponse::Ptr element_response_;
   std::shared_ptr<Element> element_;
 

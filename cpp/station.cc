@@ -7,55 +7,25 @@
 #include "common/mathutils.h"
 #include "beamformerlofar.h"
 
-#include "hamaker/hamakerelementresponse.h"
-#include "oskar/oskarelementresponse.h"
-#include "lobes/lobeselementresponse.h"
-
 using namespace everybeam;
 using everybeam::coords::ITRFDirection;
 
 Station::Station(const std::string &name, const vector3r_t &position,
-                 const ElementResponseModel model)
+                 const Options &options)
     : name_(name),
       position_(position),
+      options_(options),
       phase_reference_(position),
-      element_response_model_(model),
-      element_response_(nullptr) {
+      element_response_(ElementResponse::GetInstance(
+          options.element_response_model, name_, options_)) {
   vector3r_t ncp = {{0.0, 0.0, 1.0}};
   ncp_.reset(new coords::ITRFDirection(ncp));
   vector3r_t ncppol0 = {{1.0, 0.0, 0.0}};
   ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
-
-  // LOBES is currently only supported for CS302LBA. Check this.
-  if (model == ElementResponseModel::kLOBES && name != "CS302LBA") {
-    std::cout << "Switching to Hamaker, LOBES is not yet "
-                 "supported for station "
-              << name << std::endl;
-    element_response_model_ = ElementResponseModel::kHamaker;
-  }
-  SetResponseModel(element_response_model_);
 }
 
 void Station::SetResponseModel(const ElementResponseModel model) {
-  switch (model) {
-    case kHamaker:
-      element_response_.set(HamakerElementResponse::GetInstance(name_));
-      break;
-    case kOSKARDipole:
-      element_response_.set(OSKARElementResponseDipole::GetInstance());
-      break;
-    case kOSKARSphericalWave:
-      element_response_.set(OSKARElementResponseSphericalWave::GetInstance());
-      break;
-    case kLOBES:
-      element_response_.set(LOBESElementResponse::GetInstance(name_));
-      break;
-    default:
-      std::stringstream message;
-      message << "The requested element response model '" << model
-              << "' is not implemented.";
-      throw std::runtime_error(message.str());
-  }
+  element_response_.set(ElementResponse::GetInstance(model, name_, options_));
 }
 
 void Station::SetResponse(std::shared_ptr<ElementResponse> element_response) {

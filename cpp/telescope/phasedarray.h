@@ -7,10 +7,8 @@
 #ifndef EVERYBEAM_TELESCOPE_PHASEDARRAY_H_
 #define EVERYBEAM_TELESCOPE_PHASEDARRAY_H_
 
-#include "../station.h"
-#include "../elementresponse.h"
-#include "../msreadutils.h"
 #include "telescope.h"
+#include "../station.h"
 
 #include <casacore/measures/Measures/MPosition.h>
 #include <casacore/measures/Measures/MDirection.h>
@@ -27,7 +25,6 @@ class PhasedArray : public Telescope {
    * @brief Construct a new PhasedArray object
    *
    * @param ms MeasurementSet
-   * @param model Element Response model
    * @param options telescope options
    */
   PhasedArray(const casacore::MeasurementSet &ms, const Options &options)
@@ -78,29 +75,6 @@ class PhasedArray : public Telescope {
 
  protected:
   std::vector<std::shared_ptr<Station>> stations_;
-
-  /**
-   * @brief Read stations into vector
-   *
-   * @param out_it std::vector of stations
-   * @param ms measurement set
-   * @param model model
-   */
-  void ReadAllStations(const casacore::MeasurementSet &ms,
-                       const ElementResponseModel model) {
-    casacore::ROMSAntennaColumns antenna(ms.antenna());
-
-    for (std::size_t i = 0; i < antenna.nrow(); ++i) {
-      stations_[i] = ReadStation(ms, i, model);
-    }
-  };
-
-  std::shared_ptr<Station> ReadStation(const casacore::MeasurementSet &ms,
-                                       std::size_t id,
-                                       const ElementResponseModel model) const {
-    std::shared_ptr<Station> station = ReadSingleStation(ms, id, model);
-    return station;
-  }
 
   struct MSProperties {
     double subband_freq;

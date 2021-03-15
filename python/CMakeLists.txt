@@ -9,10 +9,11 @@ message(STATUS "Using python version ${PYTHON_VERSION_STRING}")
 
 # Create the binding library
 # pyeverybeam is a temporary alias for everybeam target
-pybind11_add_module(pyeverybeam 
+pybind11_add_module(pyeverybeam
                     wrappers/pyutils.cc
                     wrappers/pyload.cc
                     wrappers/pytelescope.cc
+                    wrappers/pylobes.cc
                     wrappers/wrapper.cc
                     )
 
@@ -25,11 +26,8 @@ set_target_properties(pyeverybeam PROPERTIES OUTPUT_NAME everybeam)
 
 add_subdirectory(test)
 
-# Add the subdirectory for LOBES (convenience) functions
-add_subdirectory(lobes)
-
 # If the PYTHON_LIBRARY_DIR is not specified, install in lib dir
-if(NOT DEFINED ${PYTHON_LIBRARY_DIR}) 
+if(NOT DEFINED ${PYTHON_LIBRARY_DIR})
     execute_process (COMMAND ${PYTHON_EXECUTABLE} -c "import site; print(site.getsitepackages()[0])" OUTPUT_VARIABLE PYTHON_DIST_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if(PYTHON_DIST_PATH MATCHES "\\/(python${PYTHON_VERSION_MAJOR}\\.${PYTHON_VERSION_MINOR}\\/.*)")

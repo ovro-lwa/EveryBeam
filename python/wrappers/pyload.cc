@@ -21,7 +21,8 @@ namespace py = pybind11;
 std::unique_ptr<Telescope> pyload_telescope(
     const std::string& name, const std::string& data_column = "DATA",
     bool differential_beam = false, bool channel_frequency = true,
-    const std::string& element_response_model = "hamaker") {
+    const std::string& element_response_model = "hamaker",
+    const std::string& coeff_path = "") {
   // Load measurement set
   MeasurementSet ms(name);
 
@@ -58,6 +59,7 @@ std::unique_ptr<Telescope> pyload_telescope(
   options.use_differential_beam = differential_beam;
   options.use_channel_frequency = channel_frequency;
   options.element_response_model = element_response_enum;
+  options.coeff_path = coeff_path;
 
   // Return the telescope
   std::unique_ptr<Telescope> telescope = Load(ms, options);
@@ -71,16 +73,16 @@ void init_load(py::module& m) {
         Parameters
         ----------
         name: str
-            Path to MS    
+            Path to MS
         data_column: str, optional
-            Data column that should 
+            Data column that should
         use_differential_beam: bool, optional
             Use differential beam? Defaults to False
         use_channel_frequency: bool, optional
             Use channel frequency? Defaults to True.
         element_response_model: str
             Specify the element response model, should be any of
-            ["hamaker", "lobes", "oskardipole", "oskarsphericalwave"]  
+            ["hamaker", "lobes", "oskardipole", "oskarsphericalwave"]
 
         Returns
         -------
@@ -89,5 +91,6 @@ void init_load(py::module& m) {
         py::arg("name"), py::arg("data_column") = "DATA",
         py::arg("use_differential_beam") = false,
         py::arg("use_channel_frequency") = true,
-        py::arg("element_response_model") = "hamaker");
+        py::arg("element_response_model") = "hamaker",
+        py::arg("coeff_path") = "");
 }

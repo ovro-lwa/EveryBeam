@@ -18,8 +18,11 @@ namespace everybeam {
  *
  */
 struct Options {
-  // Path to coefficients file
-  std::string coeff_path = ".";
+  // Path to (MWA/LOBES) coefficients file:
+  // - in case of MWA, this should be the path to the file (absolute/relative)
+  // - in case of LOBES, this should be the directory containing LOBES
+  // coefficient files
+  std::string coeff_path = "";
 
   // LOFAR specific
   bool use_differential_beam = false;

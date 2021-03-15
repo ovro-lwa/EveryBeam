@@ -8,6 +8,7 @@ namespace py = pybind11;
 void init_utils(py::module &);
 void init_load(py::module &);
 void init_telescope(py::module &);
+void init_lobes(py::module &);
 
 PYBIND11_MODULE(everybeam, m) {
   m.doc() = R"pbdoc(
@@ -16,4 +17,5 @@ PYBIND11_MODULE(everybeam, m) {
   init_load(m);
   init_utils(m);
   init_telescope(m);
+  init_lobes(m);
 }

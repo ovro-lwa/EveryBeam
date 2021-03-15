@@ -20,6 +20,8 @@ class OSKARElementResponseDipole : public ElementResponse {
     return common::Singleton<OSKARElementResponseDipole>::GetInstance();
   }
 
+  ElementResponseModel GetModel() const final override { return kOSKARDipole; }
+
   virtual void Response(
       double freq, double theta, double phi,
       std::complex<double> (&response)[2][2]) const final override;
@@ -46,6 +48,10 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
    * @param path Path to the coefficients file to load
    */
   OSKARElementResponseSphericalWave(const std::string &path);
+
+  ElementResponseModel GetModel() const final override {
+    return kOSKARSphericalWave;
+  }
 
   virtual void Response(
       double freq, double theta, double phi,

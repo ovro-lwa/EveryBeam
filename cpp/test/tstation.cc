@@ -11,11 +11,12 @@ BOOST_AUTO_TEST_CASE(station) {
   const everybeam::vector3r_t position = {{1.0, 2.0, 3.0}};
 
   std::string name = "station0_LBA";
-  auto model = everybeam::ElementResponseModel::kHamaker;
+  everybeam::Options options;
+  options.element_response_model = everybeam::ElementResponseModel::kHamaker;
 
   // Create station.
   std::shared_ptr<everybeam::Station> station =
-      std::make_shared<everybeam::Station>(name, position, model);
+      std::make_shared<everybeam::Station>(name, position, options);
 
   auto element_response = station->GetElementResponse();
 

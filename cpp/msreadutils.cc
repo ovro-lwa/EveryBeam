@@ -170,8 +170,8 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
 }
 
 std::shared_ptr<Antenna> ReadAntennaFieldLofar(
-    const Table &table, unsigned int id, ElementResponse::Ptr element_response,
-    ElementResponseModel element_response_model) {
+    const Table &table, unsigned int id,
+    ElementResponse::Ptr element_response) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, id);
 
@@ -194,14 +194,14 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
   std::shared_ptr<Antenna> beam_former;
   // Cast to the beam_former corresponding to the element response
   // model and LBA/HBA configuration
-  if (element_response_model == ElementResponseModel::kHamaker) {
+  if (element_response->GetModel() == ElementResponseModel::kHamaker) {
     if (name != "LBA") {
       // Then HBA, HBA0 or HBA1
       beam_former = std::make_shared<BeamFormerLofarHBA>(coordinate_system);
     } else {
       beam_former = std::make_shared<BeamFormerLofarLBA>(coordinate_system);
     }
-  } else if (element_response_model == ElementResponseModel::kLOBES) {
+  } else if (element_response->GetModel() == ElementResponseModel::kLOBES) {
     // BeamFormer is assigned a FieldResponse, for which common field quantities
     // can be precomputed
     beam_former = std::make_shared<BeamFormer>(
@@ -228,7 +228,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
     if (name == "LBA") {
       antenna = std::make_shared<Element>(antenna_coordinate_system,
                                           element_response, i);
-      if (element_response_model == kHamaker) {
+      if (element_response->GetModel() == kHamaker) {
         // Cast to LOFAR LBA
         std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
             std::static_pointer_cast<BeamFormerLofarLBA>(beam_former);
@@ -252,7 +252,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
       }
     } else {
       // name is HBA, HBA0 or HBA1
-      if (element_response_model == kHamaker) {
+      if (element_response->GetModel() == kHamaker) {
         std::shared_ptr<BeamFormerLofarHBA> beam_former_hba =
             std::static_pointer_cast<BeamFormerLofarHBA>(beam_former);
 
@@ -352,9 +352,9 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
 }
 
 std::shared_ptr<BeamFormer> LofarStationBeamFormer(
-    const MeasurementSet &ms, unsigned int id, const ElementResponseModel model,
-    const std::string &name, const vector3r_t &position,
-    const vector3r_t &phase_reference, ElementResponse::Ptr element_response) {
+    const MeasurementSet &ms, unsigned int id, const std::string &name,
+    const vector3r_t &position, const vector3r_t &phase_reference,
+    ElementResponse::Ptr element_response) {
   // Read antenna field information.
   ROScalarColumn<String> telescope_name_col(
       common::GetSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
@@ -374,7 +374,7 @@ std::shared_ptr<BeamFormer> LofarStationBeamFormer(
 
     for (size_t i = 0; i < tab_field.nrow(); ++i) {
       beam_former->AddAntenna(
-          ReadAntennaFieldLofar(tab_field, i, element_response, model));
+          ReadAntennaFieldLofar(tab_field, i, element_response));
     }
 
     // TODO
@@ -408,9 +408,8 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
 }
 
 std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
-    const MeasurementSet &ms, unsigned int id, const ElementResponseModel model,
-    const std::string &name, const vector3r_t &position,
-    ElementResponse::Ptr element_response) {
+    const MeasurementSet &ms, unsigned int id, const std::string &name,
+    const vector3r_t &position, ElementResponse::Ptr element_response) {
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
   // The Station will consist of a BeamFormer that combines the fields
@@ -423,7 +422,7 @@ std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
 
 std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
                                            unsigned int id,
-                                           ElementResponseModel model) {
+                                           const Options &options) {
   TelescopeType telescope_type = GetTelescopeType(ms);
   if (telescope_type != TelescopeType::kLofarTelescope &&
       telescope_type != TelescopeType::kAARTFAAC &&
@@ -446,29 +445,22 @@ std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
   MVPosition mvPosition = mPosition.getValue();
   const vector3r_t position = {{mvPosition(0), mvPosition(1), mvPosition(2)}};
 
-  if (model == ElementResponseModel::kDefault) {
-    model = telescope_type == TelescopeType::kOSKARTelescope
-                ? ElementResponseModel::kOSKARSphericalWave
-                : ElementResponseModel::kHamaker;
-  }
-
   // Create station
   std::shared_ptr<Station> station =
-      std::make_shared<Station>(name, position, model);
+      std::make_shared<Station>(name, position, options);
 
   // Set the top level beamformer (that might contain nested beam formers)
   if (telescope_type == TelescopeType::kOSKARTelescope) {
     // OSKAR telescope
-    auto beam_former =
-        MSv3StationBeamFormer(ms, id, station->GetElementResponseModel(), name,
-                              position, station->GetElementResponse());
+    auto beam_former = MSv3StationBeamFormer(ms, id, name, position,
+                                             station->GetElementResponse());
     station->SetAntenna(beam_former);
   } else {
     // LOFAR Telescope or AARTFAAC
     station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
-    auto beam_former = LofarStationBeamFormer(
-        ms, id, station->GetElementResponseModel(), name, position,
-        station->GetPhaseReference(), station->GetElementResponse());
+    auto beam_former = LofarStationBeamFormer(ms, id, name, position,
+                                              station->GetPhaseReference(),
+                                              station->GetElementResponse());
     station->SetAntenna(beam_former);
   }
 

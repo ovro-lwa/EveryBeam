@@ -39,6 +39,7 @@ add_library(everybeam SHARED
   aterms/h5parmaterm.cc
   aterms/cache.cc
   # common
+  common/sphericalharmonics.cc
   common/fftresampler.cc
   coords/itrfconverter.cc
   coords/itrfdirection.cc
@@ -68,6 +69,8 @@ add_library(everybeam SHARED
 target_include_directories(everybeam PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
+# Required to get config.h header
+target_include_directories(everybeam PRIVATE "${CMAKE_BINARY_DIR}")
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
