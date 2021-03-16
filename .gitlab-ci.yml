@@ -149,9 +149,9 @@ deploy-doc:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | base64 -d | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan -H dop288 > ~/.ssh/known_hosts
+    - ssh-keyscan -H dop810 > ~/.ssh/known_hosts
   script:
-    - scp -r build/doc/html/* citt@dop288:EveryBeam
+    - scp -r build/doc/html/* citt@dop810:EveryBeam
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
