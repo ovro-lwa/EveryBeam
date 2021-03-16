@@ -19,8 +19,6 @@ build-base:
   stage: prepare
   script:
     - docker build --tag everybeam_base:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-base .
-  rules:
-    - when: always
 
 clang-format:
   stage: build
@@ -56,8 +54,6 @@ test-and-coverage:
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
     - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
     - cd && python3 -c "import everybeam"
-  rules:
-    - when: on_success
   artifacts:
     reports:
       # NOTE: artifacts only work with relative paths...
@@ -69,8 +65,6 @@ build-everybeam:
   needs: ["build-base"]
   script:
     - docker build --build-arg BASE_TAG=${CI_COMMIT_SHORT_SHA} --tag everybeam:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-everybeam .
-  rules:
-    - when: on_success
 
 build-doc:
   stage: build
@@ -100,19 +94,17 @@ build-package:
     - export SRC=$(pwd)
     - cd /opt/everybeam/build
     - make package
-    - mv $(ls -p | grep *\.deb) $SRC/everybeam_package
+    - mv $(ls -1 *.deb) $SRC/everybeam_package/
   artifacts:
     paths:
     - everybeam_package/
   rules:
     # The package is built only during a merge_request_event, a merge to master,
     # or when the pipeline is triggered by a tag event.
-    # A - yet to be created - deploy-package job should only be run during merges
-    # to master (to create a :latest version) and during a tag event (to create a :stable)
-    # version
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
     - if: '$CI_COMMIT_TAG'
+    - if: '$UPLOAD_PACKAGE'
 
 build-compare-oskar:
   stage: oskar-comparison
@@ -163,7 +155,6 @@ deploy-doc:
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
-    - when: never
 
 deploy-image:
   variables:
@@ -177,7 +168,26 @@ deploy-image:
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
-    - when: never
+
+deploy-package:
+  stage: deploy
+  needs: ["build-package"]
+  image: everybeam:${CI_COMMIT_SHORT_SHA}
+  script:
+    - pip3 install aptly-api-client
+    - chmod -R 700 external/schaap-packaging
+    - cd everybeam_package
+    - export FILES=$(ls -1 $PWD/*.deb)
+    - echo UPLOADING files $FILES
+    # The following example command must be executed first or else the update will fail because there is no repository
+    # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap
+    - ../external/schaap-packaging/update_repo.py --cleanup -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap ${FILES}
+  rules:
+    # Only run on master because GPG_KEY and GPG_PASS are protected and therefore only available on protected branches.
+    - if: '$CI_COMMIT_BRANCH != "master"'
+      when: never
+    - if: '$UPLOAD_PACKAGE'
+
 
 check-stack:
   variables:
@@ -195,4 +205,3 @@ check-stack:
     # NOTE: creates duplicate pipelines in case of open MR,
     # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - when: never
