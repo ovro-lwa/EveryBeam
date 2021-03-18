@@ -3,7 +3,7 @@
 
 #------------------------------------------------------------------------------
 # Top level CMakeLists.txt file for EveryBeam
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.7)
 
 #------------------------------------------------------------------------------
 # Set version name and project number
@@ -18,8 +18,9 @@ endif()
 
 project(EveryBeam VERSION ${EVERYBEAM_VERSION})
 
-option (BUILD_WITH_PYTHON "Build python bindings" OFF)
-option (BUILD_APT_PACKAGES "Build apt package" OFF)
+option(BUILD_WITH_PYTHON "Build python bindings" OFF)
+option(BUILD_APT_PACKAGES "Build apt package" OFF)
+option(BUILD_TESTING "Build tests" OFF)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname )
 
@@ -72,7 +73,6 @@ include_directories(${CASACORE_INCLUDE_DIR})
 find_package(OpenMP REQUIRED)
 
 # Find and include Boost headers (boost::math required for MWA beam)
-find_package(Boost REQUIRED)
 # Filesystem component required to search for LOBES coefficient files
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
@@ -86,9 +86,6 @@ include_directories(${CFITSIO_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(CTest)
-endif()
 
 # wget needs to be installed in order to download coefficient files on the fly
 include(FindWget)
@@ -123,7 +120,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
-   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif("${isSystemDir}" STREQUAL "-1")
 
 #------------------------------------------------------------------------------
@@ -133,15 +130,13 @@ add_subdirectory(cpp)
 #------------------------------------------------------------------------------
 # Add tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  include(CTest)
+
+  add_subdirectory(cpp/test)
+
   # TODO: compiling the demos should probably be a different cmake project
   # in which we use find_package(EveryBeam)
   add_subdirectory(demo)
-
-  if(Boost_FOUND)
-    add_subdirectory(cpp/test)
-  else()
-    message("Boost NOT found. This is not an error but indicates that the tests won't be built.")
-  endif()
 endif()
 
 #------------------------------------------------------------------------------

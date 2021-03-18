@@ -1,8 +1,8 @@
 # Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Find boost
-find_package(Boost COMPONENTS unit_test_framework)
+# Ensure that the Boost unit test framework is available.
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 # Set cache values if not specified
 set(LOFAR_HBA_MOCK_MS ${CMAKE_SOURCE_DIR}/test_data/LOFAR_HBA_MOCK.ms CACHE PATH "")
@@ -35,59 +35,38 @@ set_source_files_properties(
   ${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK"
 )
 
-add_test(
-  NAME download_lofar_hba_ms
+add_custom_target(download_mocks
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
-)
-add_test(
-  NAME download_lofar_lba_ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
-)
-add_test(
-  NAME download_oskar_ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_oskar_ms.sh
-)
-add_test(
-  NAME download_vla_ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
-)
-add_test(
-  NAME download_mwa_ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
-)
-add_test(
-  NAME download_mwa_coeff
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
-)
-set_tests_properties(
-  download_lofar_hba_ms download_lofar_lba_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff
-  PROPERTIES FIXTURES_SETUP mocks
-)
-add_test(
-  NAME download_mock_h5parm
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
 )
-set_tests_properties(
-  download_lofar_hba_ms download_lofar_lba_ms download_oskar_ms download_vla_ms download_mwa_ms download_mwa_coeff download_mock_h5parm
-  PROPERTIES FIXTURES_SETUP mocks
+add_test(
+  NAME download_mocks
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target download_mocks
 )
+set_tests_properties(download_mocks PROPERTIES FIXTURES_SETUP mocks)
 
-add_executable(
-  unittests EXCLUDE_FROM_ALL
-  ${TEST_FILENAMES}
-)
+add_executable(unittests ${TEST_FILENAMES})
 target_link_libraries(unittests everybeam ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} schaapcommon)
 # Required to get the config.h header
 target_include_directories(unittests PRIVATE "${CMAKE_BINARY_DIR}")
 
-# Add tests for ctest
-add_test(buildunittests ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target unittests)
+# Add test for automatically (re)building unittests if needed.
+add_test(
+  NAME buildunittests
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target unittests
+)
 set_tests_properties(buildunittests PROPERTIES FIXTURES_SETUP unittests)
+
 add_test(
   NAME unittests
   COMMAND unittests -f JUNIT -k unittests.xml --catch_system_error=yes
 )
 set_tests_properties(
-  unittests PROPERTIES LABELS unit
-  FIXTURES_REQUIRED "unittests;mocks"
+  unittests
+  PROPERTIES LABELS unit FIXTURES_REQUIRED "unittests;mocks"
 )
