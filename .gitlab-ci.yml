@@ -43,7 +43,7 @@ test-and-coverage:
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
     # Build in Debug mode
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_WITH_PYTHON=ON -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
     - make install -j8
     - ctest -j4 -T test
     # Capture coverage
