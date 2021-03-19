@@ -15,24 +15,11 @@ void MWAPoint::CalculateStation(std::complex<float>* buffer, double ra,
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
 
-  // lock, since casacore::Direction not thread-safe
-  // The lock prevents different MWAPoints to calculate the
-  // the station response simultaneously
-  std::unique_lock<std::mutex> lock(mtx_);
-  casacore::MEpoch time_epoch(casacore::Quantity(time_, "s"));
-  casacore::MeasFrame frame(mwatelescope.ms_properties_.array_position,
-                            time_epoch);
-
-  const casacore::MDirection::Ref hadec_ref(casacore::MDirection::HADEC, frame);
-  const casacore::MDirection::Ref azelgeo_ref(casacore::MDirection::AZELGEO,
-                                              frame);
-  const casacore::MDirection::Ref j2000_ref(casacore::MDirection::J2000, frame);
-  casacore::MDirection::Convert j2000_to_hadecref(j2000_ref, hadec_ref),
-      j2000_to_azelgeoref(j2000_ref, azelgeo_ref);
-  casacore::MPosition wgs = casacore::MPosition::Convert(
-      mwatelescope.ms_properties_.array_position, casacore::MPosition::WGS84)();
-  double arr_latitude = wgs.getValue().getLat();
-  lock.unlock();
+  // Only compute J2000 vectors if time was updated
+  if (has_time_update_) {
+    SetJ200Vectors();
+    has_time_update_ = false;
+  }
 
   if (!tile_beam_) {
     tile_beam_.reset(
@@ -42,8 +29,8 @@ void MWAPoint::CalculateStation(std::complex<float>* buffer, double ra,
   }
 
   std::complex<double> gain[4];
-  tile_beam_->ArrayResponse(ra, dec, j2000_ref, j2000_to_hadecref,
-                            j2000_to_azelgeoref, arr_latitude, freq, gain);
+  tile_beam_->ArrayResponse(ra, dec, j2000_ref_, j2000_to_hadecref_,
+                            j2000_to_azelgeoref_, arr_latitude_, freq, gain);
 
   for (size_t i = 0; i != 4; ++i) {
     *buffer = gain[i];
@@ -58,6 +45,29 @@ void MWAPoint::CalculateAllStations(std::complex<float>* buffer, double ra,
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
     std::copy_n(buffer, 4, buffer + i * 4);
   }
+}
+
+void MWAPoint::SetJ200Vectors() {
+  const telescope::MWA& mwatelescope =
+      static_cast<const telescope::MWA&>(*telescope_);
+  // lock, since casacore::Direction not thread-safe
+  // The lock prevents different MWAPoints to calculate the
+  // the station response simultaneously
+  std::unique_lock<std::mutex> lock(mutex_);
+  casacore::MEpoch time_epoch(
+      casacore::Quantity(time_ + 0.5 * update_interval_, "s"));
+  casacore::MeasFrame frame(mwatelescope.ms_properties_.array_position,
+                            time_epoch);
+
+  const casacore::MDirection::Ref hadec_ref(casacore::MDirection::HADEC, frame);
+  const casacore::MDirection::Ref azelgeo_ref(casacore::MDirection::AZELGEO,
+                                              frame);
+  j2000_ref_ = casacore::MDirection::Ref(casacore::MDirection::J2000, frame);
+  j2000_to_hadecref_(j2000_ref_, hadec_ref);
+  j2000_to_azelgeoref_(j2000_ref_, azelgeo_ref);
+  casacore::MPosition wgs = casacore::MPosition::Convert(
+      mwatelescope.ms_properties_.array_position, casacore::MPosition::WGS84)();
+  arr_latitude_ = wgs.getValue().getLat();
 }
 }  // namespace pointresponse
 }  // namespace everybeam

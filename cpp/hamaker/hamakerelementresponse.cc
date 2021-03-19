@@ -66,6 +66,7 @@ void HamakerElementResponse::Response(
 
   std::pair<std::complex<double>, std::complex<double>> P;
   std::pair<std::complex<double>, std::complex<double>> Pj;
+  std::pair<std::complex<double>, std::complex<double>> Pk;
   for (unsigned int k = 0; k < nHarmonics; ++k) {
     // Compute the (diagonal) projection matrix P for the current harmonic.
     // This requires the evaluation of two polynomials in theta and freq (of
@@ -76,31 +77,27 @@ void HamakerElementResponse::Response(
     // start indexing the block of coefficients at the last element
 
     // Evaluate the highest order term.
-    P = coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1);
+    coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1, P);
 
     for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-      auto Pk = coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2);
+      coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2, Pk);
       P.first = P.first * freq + Pk.first;
       P.second = P.second * freq + Pk.second;
     }
 
     // Evaluate the remaining terms.
     for (unsigned int j = 0; j < nPowerTheta - 1; ++j) {
-      Pj = coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1);
-
+      coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1, Pj);
       for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-        auto Pk =
-            coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - i - 2);
+        coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - i - 2, Pk);
         Pj.first = Pj.first * freq + Pk.first;
         Pj.second = Pj.second * freq + Pk.second;
       }
-
       P.first = P.first * theta + Pj.first;
       P.second = P.second * theta + Pj.second;
     }
 
     // Compute the Jones matrix for the current harmonic, by rotating P over
-    // kappa * az, and add it to the result.
     const double angle = sign * kappa * phi;
     const double caz = std::cos(angle);
     const double saz = std::sin(angle);

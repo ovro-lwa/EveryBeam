@@ -20,6 +20,21 @@ class MWAPoint final : public PointResponse {
   MWAPoint(const telescope::Telescope* telescope_ptr, double time)
       : PointResponse(telescope_ptr, time){};
 
+  /**
+   * @brief Get beam response for a given station at a prescribed ra, dec
+   * position.
+   * NOTE: CalculateStation complies with the standard
+   * threading rules, but does not guarantee thread-safety itself for efficiency
+   * reasons. The caller is responsible to ensure this.
+   *
+   * @param buffer Buffer with a size of 4 complex floats to receive the beam
+   * response
+   * @param ra Right ascension (rad)
+   * @param dec Declination (rad)
+   * @param freq Frequency (Hz)
+   * @param station_idx Station index
+   * @param field_id
+   */
   void CalculateStation(std::complex<float>* buffer, double ra, double dec,
                         double freq, size_t station_idx,
                         size_t field_id) override;
@@ -28,9 +43,15 @@ class MWAPoint final : public PointResponse {
                             double freq, size_t field_id);
 
  private:
+  void SetJ200Vectors();
   std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;
 
-  mutable std::mutex mtx_;
+  casacore::MDirection::Ref j2000_ref_;
+  casacore::MDirection::Convert j2000_to_hadecref_;
+  casacore::MDirection::Convert j2000_to_azelgeoref_;
+
+  double arr_latitude_;
+  std::mutex mutex_;
 };
 }  // namespace pointresponse
 }  // namespace everybeam

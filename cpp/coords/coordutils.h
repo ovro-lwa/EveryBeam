@@ -23,10 +23,7 @@ struct CoordinateSystem {
  */
 inline void SetITRFVector(const casacore::MDirection& itrf_dir,
                           vector3r_t& itrf) {
-  const casacore::Vector<double>& itrf_val = itrf_dir.getValue().getValue();
-  itrf[0] = itrf_val[0];
-  itrf[1] = itrf_val[1];
-  itrf[2] = itrf_val[2];
+  std::copy_n(itrf_dir.getValue().getValue().data(), itrf.size(), itrf.begin());
 }
 }  // namespace coords
 }  // namespace everybeam

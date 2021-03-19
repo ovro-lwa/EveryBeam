@@ -22,9 +22,33 @@ class PhasedArrayPoint : public PointResponse {
  public:
   PhasedArrayPoint(const telescope::Telescope* telescope_ptr, double time);
 
+  /**
+   * @brief Get beam response for a given station at a prescribed ra, dec
+   * position.
+   * NOTE: the \param ra, \param dec input values are only used if values are
+   * different from the cached values. Direction values in cache along with the
+   * ITRF directions can be precomputed with UpdateITRFVectors for efficiency.
+   * NOTE: CalculateStation complies with the standard
+   * threading rules, but does not guarantee thread-safety itself for efficiency
+   * reasons. The caller is responsible to ensure this.
+   *
+   * @param buffer Buffer with a size of 4 complex floats to receive the beam
+   * response
+   * @param ra Right ascension (rad)
+   * @param dec Declination (rad)
+   * @param freq Frequency (Hz)
+   * @param station_idx Station index
+   * @param field_id
+   */
   void CalculateStation(std::complex<float>* buffer, double ra, double dec,
                         double freq, size_t station_idx,
                         size_t field_id) final override;
+
+  /**
+   * @brief Method for computing the ITRF-vectors, given ra, dec position in
+   * radians and using the cached \param time ((MJD(UTC), s))
+   */
+  void UpdateITRFVectors(double ra, double dec);
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
@@ -35,14 +59,8 @@ class PhasedArrayPoint : public PointResponse {
 
  private:
   aocommon::MC2x2F inverse_central_gain_;
-
-  /**
-   * @brief Method for computing the ITRF-vectors, given a ra, dec position in
-   * radians. NOTE: method not thread-safe due to casacore dependencies.
-   */
-  void SetITRFVectors(double ra, double dec);
-
-  std::mutex mtx_;
+  double ra_, dec_;
+  std::mutex mutex_;
 };
 
 }  // namespace pointresponse
