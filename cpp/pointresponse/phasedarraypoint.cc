@@ -9,6 +9,7 @@
 #include "./../coords/itrfdirection.h"
 #include "./../coords/itrfconverter.h"
 
+#include <limits>
 namespace everybeam {
 namespace pointresponse {
 
@@ -16,22 +17,24 @@ PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope* telescope_ptr,
                                    double time)
     : PointResponse(telescope_ptr, time),
       use_channel_frequency_(true),
-      subband_frequency_(0.0) {
+      subband_frequency_(0.0),
+      ra_(std::numeric_limits<double>::min()),
+      dec_(std::numeric_limits<double>::min()) {
   use_differential_beam_ = telescope_->GetOptions().use_differential_beam;
 }
 
 void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
                                         double dec, double freq,
                                         size_t station_idx, size_t field_id) {
+  // Only compute ITRF directions if values differ from cached values
+  if (has_time_update_ || std::abs(ra - ra_) > 1e-10 ||
+      std::abs(dec - dec_) > 1e-10) {
+    UpdateITRFVectors(ra, dec);
+    has_time_update_ = false;
+  }
+
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
-
-  // lock, since casacore::Direction not thread-safe
-  // The lock prevents different MWAPoints to calculate the
-  // the station response simultaneously
-  std::unique_lock<std::mutex> lock(mtx_);
-  SetITRFVectors(ra, dec);
-  lock.unlock();
 
   double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
@@ -67,8 +70,14 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
   }
 }
 
-void PhasedArrayPoint::SetITRFVectors(double ra, double dec) {
-  coords::ITRFConverter itrf_converter(time_);
+void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {
+  ra_ = ra;
+  dec_ = dec;
+  // lock, since casacore::Direction is not thread-safe
+  // The lock prevents different PhasedArrayPoints to calculate the
+  // the station response simultaneously
+  std::unique_lock<std::mutex> lock(mutex_);
+  coords::ITRFConverter itrf_converter(time_ + 0.5 * update_interval_);
   coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
   coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
 

@@ -112,12 +112,13 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   std::unique_ptr<PointResponse> point_response =
       telescope->GetPointResponse(time);
   BOOST_CHECK(nullptr != dynamic_cast<MWAPoint*>(point_response.get()));
-
+  BOOST_CHECK_EQUAL(point_response->HasTimeUpdate(), true);
   // Use ComputeAllStations (should be a repetitive call to CalculateStation)
   std::complex<float>
       point_response_buffer[point_response->GetAllStationsBufferSize()];
   point_response->CalculateAllStations(point_response_buffer, coord_system.ra,
                                        coord_system.dec, frequency, 0);
+  BOOST_CHECK_EQUAL(point_response->HasTimeUpdate(), false);
 
   BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,
                                 point_response_buffer + 4,

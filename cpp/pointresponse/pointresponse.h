@@ -26,13 +26,35 @@ class PointResponse {
    *
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    */
-  void UpdateTime(double time) { time_ = time; }
+  void UpdateTime(double time) {
+    // Second condition enables "backwards marching" in time
+    if (time - time_ > update_interval_ || time_ - time > 0.0) {
+      time_ = time;
+      has_time_update_ = true;
+    } else {
+      has_time_update_ = false;
+    }
+  }
+
+  /**
+   * @brief Set interval for updating the time. Can be used for caching
+   * ITRF direction vectors.
+   *
+   * @param update_interval Update interval (s)
+   */
+  void SetUpdateInterval(double update_interval) {
+    update_interval_ = update_interval;
+    has_time_update_ = true;
+  }
+
+  /**
+   * @brief Check whether cached time settings have changed
+   */
+  bool HasTimeUpdate() const { return has_time_update_; }
 
   /**
    * @brief Get beam response for a given station at a prescribed ra, dec
    * position.
-   * Method is made virtual, to admit more efficient overrides in the near
-   * future.
    *
    * @param buffer Buffer with a size of 4 complex floats to receive the beam
    * response
@@ -72,17 +94,20 @@ class PointResponse {
  protected:
   /**
    * @brief Construct a new Point Response object
-   * NOTE: constructor will become protected once this class forms the
-   * a virtual base class for all specializations
    *
    * @param telescope_ptr Const pointer to telescope object
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    */
   PointResponse(const telescope::Telescope* telescope_ptr, double time)
-      : telescope_(telescope_ptr), time_(time){};
+      : telescope_(telescope_ptr),
+        time_(time),
+        update_interval_(0),
+        has_time_update_(true){};
 
   const telescope::Telescope* telescope_;
   double time_;
+  double update_interval_;
+  bool has_time_update_;
 };
 }  // namespace pointresponse
 }  // namespace everybeam
