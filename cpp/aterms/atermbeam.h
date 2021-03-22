@@ -36,7 +36,7 @@ class ATermBeam : public ATermBase {
     last_field_id_ = 0;
   }
 
-  double AverageUpdateTime() const override { return update_interval_; }
+  double AverageUpdateTime() const final override { return update_interval_; }
 
  protected:
   virtual bool CalculateBeam(std::complex<float>* buffer, double time,

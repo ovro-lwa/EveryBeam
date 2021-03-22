@@ -1,4 +1,4 @@
-// constants.h: %Constants used in this library.
+// constants.h: Constants used in this library.
 //
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -7,7 +7,7 @@
 #define EVERYBEAM_CONSTANTS_H
 
 // \file
-// %Constants used in this library.
+// Constants used in this library.
 
 #include "types.h"
 

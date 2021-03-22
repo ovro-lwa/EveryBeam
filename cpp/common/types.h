@@ -6,9 +6,6 @@
 #ifndef EVERYBEAM_TYPES_H
 #define EVERYBEAM_TYPES_H
 
-// \file
-// Types used in this library.
-
 #include <array>
 #include <cstring>
 #include <ostream>

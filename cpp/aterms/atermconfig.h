@@ -48,7 +48,7 @@ class ATermConfig : public ATermBase {
                  size_t fieldId, const double* uvwInM) final override;
 
   /** Reimplemented from ATermBase */
-  double AverageUpdateTime() const override {
+  double AverageUpdateTime() const final override {
     double avgTime = aterms_.front()->AverageUpdateTime();
     for (size_t i = 1; i < aterms_.size(); ++i)
       avgTime = std::min(avgTime, aterms_[i]->AverageUpdateTime());

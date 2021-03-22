@@ -40,7 +40,7 @@ class ITRFDirection {
 
   mutable casacore::MeasFrame frame_;
   mutable casacore::MDirection::Convert converter_;
-  mutable std::mutex itsMutex;
+  mutable std::mutex mutex_;
 };
 }  // namespace coords
 }  // namespace everybeam
