@@ -31,7 +31,7 @@ class PAFBeamTerm final : public ATermBase {
     update_interval_ = update_interval;
   }
 
-  double AverageUpdateTime() const override { return update_interval_; }
+  double AverageUpdateTime() const final override { return update_interval_; }
 
   void Open(const std::string& filename_template,
             const std::vector<std::string>& antenna_map,

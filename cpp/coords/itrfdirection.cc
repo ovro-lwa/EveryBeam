@@ -61,7 +61,7 @@ ITRFDirection::ITRFDirection(const vector3r_t &direction)
 }
 
 vector3r_t ITRFDirection::at(real_t time) const {
-  std::lock_guard<std::mutex> lock(itsMutex);
+  std::lock_guard<std::mutex> lock(mutex_);
 
   // Cannot use MeasFrame::resetEpoch(Double), because that assumes the
   // argument is UTC in (fractional) days (MJD).
@@ -70,8 +70,7 @@ vector3r_t ITRFDirection::at(real_t time) const {
   const casacore::MDirection &m_ITRF = converter_();
   const casacore::MVDirection &mv_ITRF = m_ITRF.getValue();
 
-  vector3r_t itrf = {{mv_ITRF(0), mv_ITRF(1), mv_ITRF(2)}};
-  return itrf;
+  return vector3r_t{mv_ITRF(0), mv_ITRF(1), mv_ITRF(2)};
 }
 }  // namespace coords
 }  // namespace everybeam

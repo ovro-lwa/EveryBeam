@@ -25,7 +25,7 @@ class DLDMATerm final : public FitsATermBase {
     update_interval_ = updateInterval;
   }
 
-  double AverageUpdateTime() const override {
+  double AverageUpdateTime() const final override {
     return std::min(FitsATermBase::AverageUpdateTime(), update_interval_);
   }
 

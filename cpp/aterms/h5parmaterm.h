@@ -198,7 +198,7 @@ class H5ParmATerm final : public ATermBase {
   }
 
   // Get average update time, fixed value for h5parm aterm
-  double AverageUpdateTime() const override final { return update_interval_; }
+  double AverageUpdateTime() const final override { return update_interval_; }
 
  private:
   // Expand complex exponential from amplitude and phase as
