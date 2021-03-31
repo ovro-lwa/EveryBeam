@@ -16,11 +16,12 @@
 #include "telescope/lofar.h"
 #include "telescope/phasedarray.h"
 
+#include <aocommon/matrix2x2.h>
+
 namespace py = pybind11;
 
 using casacore::MeasurementSet;
 
-using everybeam::matrix22c_t;
 using everybeam::Options;
 using everybeam::Station;
 using everybeam::vector3r_t;
@@ -42,19 +43,19 @@ vector3r_t np2vector3r_t(const py::array_t<double> pyarray) {
   return vector3r_t{r[0], r[1], r[2]};
 }
 
-// Cast matrix22c_t to py::array
-py::array_t<std::complex<double>> cast_matrix(const matrix22c_t matrix) {
+// Cast aocommon::MC2x2 to py::array
+py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 matrix) {
   // Solution from: https://github.com/pybind/pybind11/issues/1299
   // Reinterpret cast is needed to "flatten" the nested std::array
-  auto mat_ptr = reinterpret_cast<const std::complex<double> *>(matrix.data());
-  auto a =
-      py::array_t<std::complex<double>>(std::vector<ptrdiff_t>{2, 2}, mat_ptr);
-  return a;
+  auto mat_ptr = reinterpret_cast<const std::complex<double> *>(matrix.Data());
+  return py::array_t<std::complex<double>>(std::vector<ptrdiff_t>{2, 2},
+                                           mat_ptr);
 }
 
-// Cast vector of matrix22c_t to numpy tensor
+// Cast vector of aocommon::MC2x2 to numpy tensor
 py::array_t<std::complex<double>> cast_tensor(
-    const std::vector<matrix22c_t> matrix, const std::vector<size_t> layout) {
+    const std::vector<aocommon::MC2x2> matrix,
+    const std::vector<size_t> layout) {
   size_t total_size = 1;
   for (size_t rank_size : layout) {
     total_size *= rank_size;
@@ -66,10 +67,8 @@ py::array_t<std::complex<double>> cast_tensor(
   // Reinterpret_cast needed to flatten the nested std::array
   auto mat_ptr = reinterpret_cast<const std::complex<double> *>(matrix.data());
   std::vector<ptrdiff_t> np_layout(layout.begin(), layout.end());
-  auto a = py::array_t<std::complex<double>>(np_layout, mat_ptr);
-  return a;
+  return py::array_t<std::complex<double>>(np_layout, mat_ptr);
 }
-
 }  // namespace
 
 /**
@@ -183,7 +182,7 @@ void init_telescope(py::module &m) {
 
             size_t nr_stations = self.GetNrStations(),
                    nr_channels = self.GetNrChannels();
-            std::vector<matrix22c_t> response(nr_stations * nr_channels);
+            std::vector<aocommon::MC2x2> response(nr_stations * nr_channels);
             for (size_t station_idx = 0; station_idx < nr_stations;
                  ++station_idx) {
               const Station &station = static_cast<const Station &>(
@@ -243,7 +242,7 @@ void init_telescope(py::module &m) {
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
 
             size_t nr_channels = self.GetNrChannels();
-            std::vector<matrix22c_t> response(nr_channels);
+            std::vector<aocommon::MC2x2> response(nr_channels);
             for (size_t idx = 0; idx < nr_channels; ++idx) {
               double freq = self.GetChannelFrequency(idx);
               double freq0 = self.GetOptions().use_channel_frequency
@@ -306,7 +305,7 @@ void init_telescope(py::module &m) {
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
 
-            matrix22c_t response = station.Response(
+            aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
@@ -359,7 +358,7 @@ void init_telescope(py::module &m) {
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
 
-            matrix22c_t response = station.Response(
+            aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
@@ -406,7 +405,7 @@ void init_telescope(py::module &m) {
 
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
-            matrix22c_t response = station.Response(
+            aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
@@ -460,7 +459,7 @@ void init_telescope(py::module &m) {
 
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
-            matrix22c_t response = station.Response(
+            aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
@@ -505,7 +504,7 @@ void init_telescope(py::module &m) {
             vector3r_t direction = np2vector3r_t(pydirection);
             const Station &station = static_cast<const Station &>(
                 *(self.GetStation(station_idx).get()));
-            matrix22c_t response = station.ComputeElementResponse(
+            aocommon::MC2x2 response = station.ComputeElementResponse(
                 time, freq, direction, element_idx, is_local, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },

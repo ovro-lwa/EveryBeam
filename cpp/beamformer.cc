@@ -62,16 +62,15 @@ std::vector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
   return result;
 }
 
-std::vector<std::pair<std::complex<double>, std::complex<double>>>
-BeamFormer::ComputeWeightedResponses(const vector3r_t &pointing) const {
+std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
+    const vector3r_t &pointing) const {
   // Get geometric response for pointing direction
   std::vector<std::complex<double>> geometric_response =
       ComputeGeometricResponse(pointing);
 
   // Initialize and fill result
   double weight_sum[2] = {0.0, 0.0};
-  std::vector<std::pair<std::complex<double>, std::complex<double>>> result(
-      geometric_response.size());
+  std::vector<aocommon::MC2x2Diag> result(geometric_response.size());
   for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
     // Get geometric response at index
     std::complex<double> phasor = geometric_response[idx];
@@ -84,16 +83,16 @@ BeamFormer::ComputeWeightedResponses(const vector3r_t &pointing) const {
 
   // Normalize the weight by the number of antennas
   for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
-    result[idx].first /= weight_sum[0];
-    result[idx].second /= weight_sum[1];
+    result[idx][0] /= weight_sum[0];
+    result[idx][1] /= weight_sum[1];
   }
 
   return result;
 }
 
-matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
-                                      const vector3r_t &direction,
-                                      const Options &options) const {
+aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
+                                          const vector3r_t &direction,
+                                          const Options &options) const {
   std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
 
   // Weighted subtraction of the pointing direction (0-direction), and the
@@ -103,7 +102,7 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
 
   // Weights based on (weighted) difference vector between
   // pointing direction and direction of interest of beam
-  std::vector<std::pair<std::complex<double>, std::complex<double>>> weights =
+  std::vector<aocommon::MC2x2Diag> weights =
       ComputeWeightedResponses(delta_direction);
 
   // Copy options into local_options. Needed to propagate
@@ -120,20 +119,13 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
     local_options.rotate = false;
   }
 
-  matrix22c_t result = {{{0}}};
+  aocommon::MC2x2 result(0.0, 0.0, 0.0, 0.0);
   for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
     Antenna::Ptr antenna = antennas_[antenna_idx];
-    std::pair<std::complex<double>, std::complex<double>> antenna_weight =
-        weights[antenna_idx];
-
-    matrix22c_t antenna_response =
+    aocommon::MC2x2 antenna_response =
         antenna->Response(time, freq, direction, local_options);
-
-    result[0][0] += antenna_weight.first * antenna_response[0][0];
-    result[0][1] += antenna_weight.first * antenna_response[0][1];
-    result[1][0] += antenna_weight.second * antenna_response[1][0];
-    result[1][1] += antenna_weight.second * antenna_response[1][1];
+    result += weights[antenna_idx] * antenna_response;
   }
 
   // If the Jones matrix needs to be rotated from theta, phi directions
@@ -142,10 +134,11 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
     vector3r_t up = {0.0, 0.0, 1.0};
     vector3r_t e_phi = normalize(cross(up, direction));
     vector3r_t e_theta = cross(e_phi, direction);
-    matrix22r_t rotation;
-    rotation[0] = {dot(e_theta, options.north), dot(e_theta, options.east)};
-    rotation[1] = {dot(e_phi, options.north), dot(e_phi, options.east)};
-    result = result * rotation;
+
+    double rotation[4] = {dot(e_theta, options.north),
+                          dot(e_theta, options.east), dot(e_phi, options.north),
+                          dot(e_phi, options.east)};
+    result *= rotation;
   }
 
   // Wipe out basefunctions cache
@@ -155,9 +148,9 @@ matrix22c_t BeamFormer::LocalResponse(real_t time, real_t freq,
   return result;
 }
 
-diag22c_t BeamFormer::LocalArrayFactor(real_t time, real_t freq,
-                                       const vector3r_t &direction,
-                                       const Options &options) const {
+aocommon::MC2x2Diag BeamFormer::LocalArrayFactor(real_t time, real_t freq,
+                                                 const vector3r_t &direction,
+                                                 const Options &options) const {
   // Weighted subtraction of the pointing direction (0-direction), and the
   // direction of interest (direction). Weights are given by corresponding
   // freqs.
@@ -166,21 +159,16 @@ diag22c_t BeamFormer::LocalArrayFactor(real_t time, real_t freq,
 
   // Weights based on (weighted) difference vector between
   // pointing direction and direction of interest of beam
-  std::vector<std::pair<std::complex<double>, std::complex<double>>> weights =
+  std::vector<aocommon::MC2x2Diag> weights =
       ComputeWeightedResponses(delta_direction);
 
-  diag22c_t result = {0};
+  aocommon::MC2x2Diag result(0., 0.);
   for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
        ++antenna_idx) {
     Antenna::Ptr antenna = antennas_[antenna_idx];
-    std::pair<std::complex<double>, std::complex<double>> antenna_weight =
-        weights[antenna_idx];
-
-    diag22c_t antenna_array_factor =
+    aocommon::MC2x2Diag antenna_array_factor =
         antenna->ArrayFactor(time, freq, direction, options);
-
-    result[0] += antenna_weight.first * antenna_array_factor[0];
-    result[1] += antenna_weight.second * antenna_array_factor[1];
+    result += weights[antenna_idx] * antenna_array_factor;
   }
   return result;
 }

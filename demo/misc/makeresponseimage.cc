@@ -331,14 +331,14 @@ int main(int argc, char *argv[]) {
 
       for (size_t y = 0; y < size; ++y) {
         for (size_t x = 0; x < size; ++x) {
-          matrix22c_t E = station->Response(
+          aocommon::MC2x2 E = station->Response(
               directionMap.time0, refFrequency, directionMap.directions(x, y),
               refFrequency, directionMap.station0, directionMap.tile0);
 
-          response(x, y, 0) = E[0][0];
-          response(x, y, 1) = E[0][1];
-          response(x, y, 2) = E[1][0];
-          response(x, y, 3) = E[1][1];
+          response(x, y, 0) = E[0];
+          response(x, y, 1) = E[1];
+          response(x, y, 2) = E[2];
+          response(x, y, 3) = E[3];
         }
       }
 

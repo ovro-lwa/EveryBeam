@@ -31,15 +31,6 @@ void GetITRFDirections(vector3r_t* itrfDirections, size_t subgrid_size,
 void StoreBeam(const std::string& filename, const std::complex<float>* buffer,
                size_t nStations, size_t width, size_t height);
 
-inline matrix22c_t operator*(const matrix22c_t& arg0, const matrix22c_t& arg1) {
-  matrix22c_t result;
-  result[0][0] = arg0[0][0] * arg1[0][0] + arg0[0][1] * arg1[1][0];
-  result[0][1] = arg0[0][0] * arg1[0][1] + arg0[0][1] * arg1[1][1];
-  result[1][0] = arg0[1][0] * arg1[0][0] + arg0[1][1] * arg1[1][0];
-  result[1][1] = arg0[1][0] * arg1[0][1] + arg0[1][1] * arg1[1][1];
-  return result;
-}
-
 void GetRaDecZenith(vector3r_t position, double time, double& ra, double& dec);
 
 std::string GetFieldName(casacore::MeasurementSet& ms,

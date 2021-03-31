@@ -39,34 +39,25 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
   double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
   if (use_differential_beam_) {
-    matrix22c_t gain_matrix = phasedarraytelescope.GetStation(station_idx)
-                                  ->Response(time_, freq, diff_beam_centre_,
-                                             sb_freq, station0_, tile0_);
-    inverse_central_gain_[0] = gain_matrix[0][0];
-    inverse_central_gain_[1] = gain_matrix[0][1];
-    inverse_central_gain_[2] = gain_matrix[1][0];
-    inverse_central_gain_[3] = gain_matrix[1][1];
+    inverse_central_gain_ =
+        aocommon::MC2x2F(phasedarraytelescope.GetStation(station_idx)
+                             ->Response(time_, freq, diff_beam_centre_, sb_freq,
+                                        station0_, tile0_)
+                             .Data());
     if (!inverse_central_gain_.Invert()) {
       inverse_central_gain_ = aocommon::MC2x2F::Zero();
     }
   }
 
-  matrix22c_t gain_matrix =
+  const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
       phasedarraytelescope.GetStation(station_idx)
-          ->Response(time_, freq, dir_itrf_, sb_freq, station0_, tile0_);
+          ->Response(time_, freq, dir_itrf_, sb_freq, station0_, tile0_)
+          .Data());
 
   if (use_differential_beam_) {
-    aocommon::MC2x2F station_gains;
-    station_gains[0] = gain_matrix[0][0];
-    station_gains[1] = gain_matrix[0][1];
-    station_gains[2] = gain_matrix[1][0];
-    station_gains[3] = gain_matrix[1][1];
-    aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain_, station_gains);
+    aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain_, gain_matrix);
   } else {
-    buffer[0] = gain_matrix[0][0];
-    buffer[1] = gain_matrix[0][1];
-    buffer[2] = gain_matrix[1][0];
-    buffer[3] = gain_matrix[1][1];
+    gain_matrix.AssignTo(buffer);
   }
 }
 

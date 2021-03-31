@@ -34,22 +34,21 @@ class ElementHamaker : public Element {
 
   Antenna::Ptr Clone() const override;
 
-  virtual matrix22c_t Response(real_t time, real_t freq,
-                               const vector3r_t &direction,
-                               const Options &options) override {
+  aocommon::MC2x2 Response(real_t time, real_t freq,
+                           const vector3r_t &direction,
+                           const Options &options) override {
     // The only transform that is needed is hard-coded in LocalResponse
-    matrix22c_t response = LocalResponse(time, freq, direction, options);
-    return response;
+    return LocalResponse(time, freq, direction, options);
   }
 
-  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
-                                    const vector3r_t &direction, size_t id,
-                                    const Options &options) const override;
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction, size_t id,
+                                const Options &options) const override;
 
  private:
-  virtual matrix22c_t LocalResponse(
-      real_t time, real_t freq, const vector3r_t &direction,
-      const Options &options) const final override {
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction,
+                                const Options &options) const final override {
     return LocalResponse(time, freq, direction, id_, options);
   };
 };

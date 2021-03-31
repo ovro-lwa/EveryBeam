@@ -18,6 +18,9 @@
 #include <memory>
 #include <vector>
 
+#include <aocommon/matrix2x2diag.h>
+#include <aocommon/matrix2x2.h>
+
 namespace everybeam {
 
 class Station {
@@ -122,9 +125,10 @@ class Station {
    *  point \e from the ground \e towards the direction from which the plane
    *  wave arrives.
    */
-  matrix22c_t Response(real_t time, real_t freq, const vector3r_t &direction,
-                       real_t freq0, const vector3r_t &station0,
-                       const vector3r_t &tile0, const bool rotate = true) const;
+  aocommon::MC2x2 Response(real_t time, real_t freq,
+                           const vector3r_t &direction, real_t freq0,
+                           const vector3r_t &station0, const vector3r_t &tile0,
+                           const bool rotate = true) const;
 
   /*!
    *  \brief Compute the array factor of the station for a plane wave of
@@ -155,9 +159,10 @@ class Station {
    *  point \e from the ground \e towards the direction from which the plane
    *  wave arrives.
    */
-  diag22c_t ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
-                        real_t freq0, const vector3r_t &station0,
-                        const vector3r_t &tile0) const;
+  aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
+                                  const vector3r_t &direction, real_t freq0,
+                                  const vector3r_t &station0,
+                                  const vector3r_t &tile0) const;
 
   /*!
    *  \name Convenience member functions
@@ -181,7 +186,7 @@ class Station {
    *  \param tile0 Tile beam former reference direction (ITRF, m).
    *  \param rotate Boolean deciding if paralactic rotation should be applied.
    *  \param buffer Output iterator with room for \p count instances of type
-   *  ::matrix22c_t.
+   *  ::aocommon::MC2x2.
    *
    *  \see response(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
@@ -206,7 +211,7 @@ class Station {
    *  \param tile0 Tile beam former reference direction (ITRF, m).
    *  \param rotate Boolean deciding if paralactic rotation should be applied.
    *  \param buffer Output iterator with room for \p count instances of type
-   *  ::diag22c_t.
+   *  ::aocommon::MC2x2.
    *
    *  \see ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
@@ -232,7 +237,7 @@ class Station {
    *  \param tile0 Tile beam former reference direction (ITRF, m).
    *  \param rotate Boolean deciding if paralactic rotation should be applied.
    *  \param buffer Output iterator with room for \p count instances of type
-   *  ::matrix22c_t.
+   *  ::aocommon::MC2x2.
    *
    *  \see response(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
@@ -257,7 +262,7 @@ class Station {
    *  \param tile0 Tile beam former reference direction (ITRF, m).
    *  \param rotate Boolean deciding if paralactic rotation should be applied.
    *  \param buffer Output iterator with room for \p count instances of type
-   *  ::diag22c_t.
+   *  ::aocommon::MC2x2.
    *
    *  \see ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
@@ -288,12 +293,12 @@ class Station {
    * system (false, default).
    * @param id Element id
    * @param rotate Boolean deciding if paralactic rotation should be applied.
-   * @return matrix22c_t Jones matrix of element response
+   * @return aocommon::MC2x2 Jones matrix of element response
    */
-  matrix22c_t ComputeElementResponse(real_t time, real_t freq,
-                                     const vector3r_t &direction, size_t id,
-                                     bool is_local = false,
-                                     bool rotate = true) const;
+  aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
+                                         const vector3r_t &direction, size_t id,
+                                         bool is_local = false,
+                                         bool rotate = true) const;
 
   /**
    * @brief Compute the Jones matrix for the element response
@@ -305,16 +310,16 @@ class Station {
    * @param is_local Use local east-north-up system (true) or global coordinate
    * system (false, default).
    * @param rotate Boolean deciding if paralactic rotation should be applied.
-   * @return matrix22c_t Jones matrix of element response
+   * @return aocommon::MC2x2 Jones matrix of element response
    */
-  matrix22c_t ComputeElementResponse(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     bool is_local = false,
-                                     bool rotate = true) const;
+  aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
+                                         const vector3r_t &direction,
+                                         bool is_local = false,
+                                         bool rotate = true) const;
 
   //! Specialized implementation of response function.
-  matrix22c_t Response(real_t time, real_t freq,
-                       const vector3r_t &direction) const {
+  aocommon::MC2x2 Response(real_t time, real_t freq,
+                           const vector3r_t &direction) const {
     return antenna_->Response(time, freq, direction);
   }
 
@@ -328,8 +333,6 @@ class Station {
 
   vector3r_t NCP(real_t time) const;
   vector3r_t NCPPol0(real_t time) const;
-  //! Compute the parallactic rotation.
-  matrix22r_t Rotation(real_t time, const vector3r_t &direction) const;
 
   std::string name_;
   vector3r_t position_;

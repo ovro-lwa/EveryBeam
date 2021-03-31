@@ -20,23 +20,18 @@ Antenna::Ptr BeamFormerLofarHBA::Clone() const {
   return beamformer_clone;
 }
 
-diag22c_t BeamFormerLofarHBA::LocalArrayFactor(real_t time, real_t freq,
-                                               const vector3r_t &direction,
-                                               const Options &options) const {
-  diag22c_t result = {0};
-
+aocommon::MC2x2Diag BeamFormerLofarHBA::LocalArrayFactor(
+    real_t time, real_t freq, const vector3r_t &direction,
+    const Options &options) const {
   // Compute the array factor of the field
-  diag22c_t array_factor_field = FieldArrayFactor(
+  aocommon::MC2x2Diag array_factor_field = FieldArrayFactor(
       time, freq, direction, options, tile_positions_, tile_enabled_);
 
   // Compute the array factor of a tile
   std::complex<double> array_factor_tile =
       TileArrayFactor(time, freq, direction, options);
 
-  result[0] = array_factor_tile * array_factor_field[0];
-  result[1] = array_factor_tile * array_factor_field[1];
-
-  return result;
+  return array_factor_field * array_factor_tile;
 }
 
 std::complex<double> BeamFormerLofarHBA::TileArrayFactor(

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <complex>
 #include <vector>
+#include <aocommon/matrix2x2.h>
 
 #include "beam-helper.h"
 
@@ -22,17 +23,12 @@ void calculateStationBeams(
       for (unsigned x = 0; x < subgrid_size; x++) {
         auto direction = itrfDirections[y * subgrid_size + x];
         auto freq_beamformer = frequency;
-        matrix22c_t gainMatrix =
+        aocommon::MC2x2 gainMatrix =
             stations[s]->Response(time, frequency, direction, freq_beamformer,
                                   stationDirection, tileDirection);
 
         std::complex<float>* antBufferPtr = (*data_ptr)[s][y][x];
-
-        matrix22c_t stationGain = gainMatrix;
-        antBufferPtr[0] = stationGain[0][0];
-        antBufferPtr[1] = stationGain[0][1];
-        antBufferPtr[2] = stationGain[1][0];
-        antBufferPtr[3] = stationGain[1][1];
+        gainMatrix.AssignTo(antBufferPtr);
       }
     }
   }

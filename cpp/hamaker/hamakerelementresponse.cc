@@ -12,6 +12,8 @@
 #include "hamakerelementresponse.h"
 #include "../common/singleton.h"
 
+#include <aocommon/matrix2x2.h>
+
 namespace everybeam {
 
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::GetInstance(
@@ -34,18 +36,13 @@ std::string HamakerElementResponse::GetPath(const char* filename) const {
   return ss.str();
 }
 
-void HamakerElementResponse::Response(
-    double freq, double theta, double phi,
-    std::complex<double> (&response)[2][2]) const {
-  // Initialize the response to zero.
-  response[0][0] = 0.0;
-  response[0][1] = 0.0;
-  response[1][0] = 0.0;
-  response[1][1] = 0.0;
+aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
+                                                 double phi) const {
+  aocommon::MC2x2 response = aocommon::MC2x2::Zero();
 
   // Clip directions below the horizon.
   if (theta >= M_PI_2) {
-    return;
+    return response;
   }
 
   const double freq_center = coeffs_->GetFreqCenter();
@@ -53,7 +50,6 @@ void HamakerElementResponse::Response(
   const unsigned int nHarmonics = coeffs_->Get_nHarmonics();
   const unsigned int nPowerTheta = coeffs_->Get_nPowerTheta();
   const unsigned int nPowerFreq = coeffs_->Get_nPowerFreq();
-  ;
 
   // The model is parameterized in terms of a normalized frequency in the
   // range [-1, 1]. The appropriate conversion is taken care of below.
@@ -102,15 +98,16 @@ void HamakerElementResponse::Response(
     const double caz = std::cos(angle);
     const double saz = std::sin(angle);
 
-    response[0][0] += caz * P.first;
-    response[0][1] += -saz * P.second;
-    response[1][0] += saz * P.first;
-    response[1][1] += caz * P.second;
+    response[0] += caz * P.first;
+    response[1] += -saz * P.second;
+    response[2] += saz * P.first;
+    response[3] += caz * P.second;
 
     // Update sign and kappa.
     sign = -sign;
     kappa += 2;
   }
+  return response;
 }
 
 HamakerElementResponseHBA::HamakerElementResponseHBA() {

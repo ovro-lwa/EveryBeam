@@ -8,6 +8,9 @@
 #include <memory>
 #include <iostream>
 
+#include <aocommon/matrix2x2.h>
+#include <aocommon/matrix2x2diag.h>
+
 #include "common/types.h"
 
 namespace everybeam {
@@ -158,11 +161,10 @@ class Antenna {
    * @param freq Frequency of the plane wave (Hz).
    * @param direction Direction of arrival (ITRF, m).
    * @param options
-   * @return matrix22c_t Jones matrix
    */
-  virtual matrix22c_t Response(real_t time, real_t freq,
-                               const vector3r_t &direction,
-                               const Options &options = {}) {
+  virtual aocommon::MC2x2 Response(real_t time, real_t freq,
+                                   const vector3r_t &direction,
+                                   const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
@@ -172,9 +174,7 @@ class Antenna {
     local_options.rotate = options.rotate;
     local_options.east = TransformToLocalDirection(options.east);
     local_options.north = TransformToLocalDirection(options.north);
-    matrix22c_t response =
-        LocalResponse(time, freq, local_direction, local_options);
-    return response;
+    return LocalResponse(time, freq, local_direction, local_options);
   }
 
   /**
@@ -184,10 +184,10 @@ class Antenna {
    * @param freq Frequency of the plane wave (Hz).
    * @param direction Direction of arrival (ITRF, m).
    * @param options
-   * @return diag22c_t
    */
-  diag22c_t ArrayFactor(real_t time, real_t freq, const vector3r_t &direction,
-                        const Options &options = {}) {
+  aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
+                                  const vector3r_t &direction,
+                                  const Options &options = {}) {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
@@ -205,14 +205,14 @@ class Antenna {
   vector3r_t TransformToLocalDirection(const vector3r_t &direction) const;
 
  private:
-  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
-                                    const vector3r_t &direction,
-                                    const Options &options) const = 0;
+  virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                        const vector3r_t &direction,
+                                        const Options &options) const = 0;
 
-  virtual diag22c_t LocalArrayFactor(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     const Options &options) const {
-    return {1.0, 1.0};
+  virtual aocommon::MC2x2Diag LocalArrayFactor(real_t time, real_t freq,
+                                               const vector3r_t &direction,
+                                               const Options &options) const {
+    return aocommon::MC2x2Diag::Unity();
   }
 };
 

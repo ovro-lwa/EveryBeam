@@ -6,6 +6,7 @@
 
 #include <complex>
 #include <ostream>
+#include <aocommon/matrix2x2.h>
 
 #include "common/mutable_ptr.h"
 
@@ -56,8 +57,8 @@ class ElementResponse {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual void Response(double freq, double theta, double phi,
-                        std::complex<double> (&result)[2][2]) const = 0;
+  virtual aocommon::MC2x2 Response(double freq, double theta,
+                                   double phi) const = 0;
 
   /**
    * @brief Virtual implementation of Response method
@@ -68,9 +69,9 @@ class ElementResponse {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual void Response(int element_id, double freq, double theta, double phi,
-                        std::complex<double> (&result)[2][2]) const {
-    Response(freq, theta, phi, result);
+  virtual aocommon::MC2x2 Response(int element_id, double freq, double theta,
+                                   double phi) const {
+    return Response(freq, theta, phi);
   }
 
   static std::shared_ptr<ElementResponse> GetInstance(

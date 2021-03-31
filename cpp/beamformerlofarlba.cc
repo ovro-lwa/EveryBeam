@@ -19,13 +19,11 @@ Antenna::Ptr BeamFormerLofarLBA::Clone() const {
   return beamformer_clone;
 }
 
-diag22c_t BeamFormerLofarLBA::LocalArrayFactor(real_t time, real_t freq,
-                                               const vector3r_t &direction,
-                                               const Options &options) const {
+aocommon::MC2x2Diag BeamFormerLofarLBA::LocalArrayFactor(
+    real_t time, real_t freq, const vector3r_t &direction,
+    const Options &options) const {
   // Compute the array factor of the field
-  diag22c_t array_factor_field = FieldArrayFactor(
-      time, freq, direction, options, element_positions_, element_enabled_);
-
-  return array_factor_field;
+  return FieldArrayFactor(time, freq, direction, options, element_positions_,
+                          element_enabled_);
 }
 }  // namespace everybeam
