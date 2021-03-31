@@ -15,9 +15,8 @@ namespace everybeam {
 class HamakerElementResponse : public ElementResponse {
  public:
   ElementResponseModel GetModel() const final override { return kHamaker; }
-  virtual void Response(
-      double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override;
+  aocommon::MC2x2 Response(double freq, double theta,
+                           double phi) const final override;
 
   static std::shared_ptr<HamakerElementResponse> GetInstance(
       const std::string &name);

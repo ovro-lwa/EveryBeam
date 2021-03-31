@@ -43,9 +43,9 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
  private:
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
-  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
-                                    const vector3r_t &direction,
-                                    const Options &options) const override;
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction,
+                                const Options &options) const override;
 };
 }  // namespace everybeam
 #endif

@@ -39,9 +39,8 @@ class LOBESElementResponse : public FieldResponse {
    * @param phi
    * @param response
    */
-  virtual void Response(
-      double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override {
+  aocommon::MC2x2 Response(double freq, double theta,
+                           double phi) const final override {
     throw std::invalid_argument(
         "LOBESElementResponse::response needs an element_id");
   };
@@ -57,8 +56,8 @@ class LOBESElementResponse : public FieldResponse {
    * just a stub to match override)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  void Response(int element_id, double freq, double theta, double phi,
-                std::complex<double> (&response)[2][2]) const override;
+  aocommon::MC2x2 Response(int element_id, double freq, double theta,
+                           double phi) const final override;
 
   /**
    * @brief Create LOBESElementResponse

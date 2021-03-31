@@ -99,15 +99,15 @@ class BeamFormer : public Antenna {
 
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
-  virtual matrix22c_t LocalResponse(real_t time, real_t freq,
-                                    const vector3r_t &direction,
-                                    const Options &options) const override;
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction,
+                                const Options &options) const override;
 
   // Compute the local ArrayFactor, with ArrayFactor a vectorial
   // "representation" of Jones matrix
-  virtual diag22c_t LocalArrayFactor(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     const Options &options) const override;
+  aocommon::MC2x2Diag LocalArrayFactor(real_t time, real_t freq,
+                                       const vector3r_t &direction,
+                                       const Options &options) const override;
 
   // Compute the geometric response for all the antennas in the BeamFormer based
   // on the difference vector between the pointing direction and the direction
@@ -120,8 +120,8 @@ class BeamFormer : public Antenna {
   // direction and the direction of interest. Analogous to
   // ComputeGeometricResponse, this difference vector should be computed as:
   // direction = pointing_freq * pointing_dir - interest_freq * interest_dir
-  std::vector<std::pair<std::complex<double>, std::complex<double>>>
-  ComputeWeightedResponses(const vector3r_t &direction) const;
+  std::vector<aocommon::MC2x2Diag> ComputeWeightedResponses(
+      const vector3r_t &direction) const;
 
   // List of antennas in BeamFormer
   std::vector<Antenna::Ptr> antennas_;

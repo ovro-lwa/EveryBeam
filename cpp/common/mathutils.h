@@ -23,8 +23,12 @@ inline vector3r_t operator*(real_t arg0, const vector3r_t arg1) {
   return vector3r_t{arg0 * arg1[0], arg0 * arg1[1], arg0 * arg1[2]};
 }
 
+inline vector3r_t operator/(const vector3r_t arg0, real_t arg1) {
+  return vector3r_t{arg0[0] / arg1, arg0[1] / arg1, arg0[2] / arg1};
+}
+
 inline vector3r_t normalize(const vector3r_t &arg0) {
-  return 1.0 / norm(arg0) * arg0;
+  return arg0 / norm(arg0);
 }
 
 inline vector2r_t cart2thetaphi(const vector3r_t &cart) {
@@ -50,15 +54,6 @@ inline vector3r_t sph2cart(const vector3r_t &sph) {
                     sph[2] * cos(sph[1]) * sin(sph[0]), sph[2] * sin(sph[1])};
 }
 
-inline matrix22c_t operator*(const matrix22c_t &arg0, const matrix22r_t &arg1) {
-  matrix22c_t result;
-  result[0][0] = arg0[0][0] * arg1[0][0] + arg0[0][1] * arg1[1][0];
-  result[0][1] = arg0[0][0] * arg1[0][1] + arg0[0][1] * arg1[1][1];
-  result[1][0] = arg0[1][0] * arg1[0][0] + arg0[1][1] * arg1[1][0];
-  result[1][1] = arg0[1][0] * arg1[0][1] + arg0[1][1] * arg1[1][1];
-  return result;
-}
-
 inline vector3r_t cross(const vector3r_t &arg0, const vector3r_t &arg1) {
   return vector3r_t{arg0[1] * arg1[2] - arg0[2] * arg1[1],
                     arg0[2] * arg1[0] - arg0[0] * arg1[2],
@@ -71,36 +66,6 @@ inline vector3r_t operator+(const vector3r_t &arg0, const vector3r_t &arg1) {
 
 inline vector3r_t operator-(const vector3r_t &arg0, const vector3r_t &arg1) {
   return vector3r_t{arg0[0] - arg1[0], arg0[1] - arg1[1], arg0[2] - arg1[2]};
-}
-
-inline matrix22c_t normalize(const raw_response_t &raw) {
-  matrix22c_t response = {{{{}}, {{}}}};
-
-  if (raw.weight[0] != 0.0) {
-    response[0][0] = raw.response[0][0] / raw.weight[0];
-    response[0][1] = raw.response[0][1] / raw.weight[0];
-  }
-
-  if (raw.weight[1] != 0.0) {
-    response[1][0] = raw.response[1][0] / raw.weight[1];
-    response[1][1] = raw.response[1][1] / raw.weight[1];
-  }
-
-  return response;
-}
-
-inline diag22c_t normalize(const raw_array_factor_t &raw) {
-  diag22c_t af = {{}};
-
-  if (raw.weight[0] != 0.0) {
-    af[0] = raw.factor[0] / raw.weight[0];
-  }
-
-  if (raw.weight[1] != 0.0) {
-    af[1] = raw.factor[1] / raw.weight[1];
-  }
-
-  return af;
 }
 }  // namespace everybeam
 #endif  // EVERYBEAM_MATHUTIL_H

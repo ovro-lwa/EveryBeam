@@ -23,19 +23,13 @@ BOOST_AUTO_TEST_CASE(station) {
   double freq = 50e6;
 
   constexpr int N = 100;
-  std::vector<std::complex<double>> result(N * N * 2 * 2);
-  typedef std::complex<double> result_arr_t[N][N][2][2];
-
-  result_arr_t &result_arr = *(result_arr_t *)result.data();
-
   for (int i = 0; i < N; ++i) {
     double x = (2.0 * i) / (N - 1) - 1.0;
     for (int j = 0; j < N; ++j) {
       double y = (2.0 * j) / (N - 1) - 1.0;
       double theta = asin(sqrt(x * x + y * y));
       double phi = atan2(y, x);
-      BOOST_REQUIRE_NO_THROW(
-          element_response->Response(0, freq, theta, phi, result_arr[i][j]));
+      BOOST_REQUIRE_NO_THROW(element_response->Response(0, freq, theta, phi));
     }
   }
 }

@@ -22,9 +22,8 @@ class OSKARElementResponseDipole : public ElementResponse {
 
   ElementResponseModel GetModel() const final override { return kOSKARDipole; }
 
-  virtual void Response(
-      double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override;
+  aocommon::MC2x2 Response(double freq, double theta,
+                           double phi) const final override;
 };
 
 //! Implementation of the OSKAR spherical wave response model
@@ -53,13 +52,11 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
     return kOSKARSphericalWave;
   }
 
-  virtual void Response(
-      double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override;
+  aocommon::MC2x2 Response(double freq, double theta,
+                           double phi) const final override;
 
-  virtual void Response(
-      int element_id, double freq, double theta, double phi,
-      std::complex<double> (&response)[2][2]) const final override;
+  aocommon::MC2x2 Response(int element_id, double freq, double theta,
+                           double phi) const final override;
 
  protected:
   std::string GetPath(const char *) const;

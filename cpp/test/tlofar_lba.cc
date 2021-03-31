@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
+#include "config.h"
 #include "../load.h"
 #include "../options.h"
 #include "../griddedresponse/lofargrid.h"
@@ -13,13 +14,13 @@
 #include "../../external/npy.hpp"
 #include "../telescope/lofar.h"
 
-#include "config.h"
 #include <complex>
 #include <cmath>
 
+#include <aocommon/matrix2x2.h>
+
 using everybeam::ElementResponseModel;
 using everybeam::Load;
-using everybeam::matrix22c_t;
 using everybeam::Options;
 using everybeam::Station;
 using everybeam::vector3r_t;
@@ -64,22 +65,18 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   // Compute element response for station 19
   // Direction corresponds to the ITRF direction of one of the pixels
   vector3r_t direction = {0.663096, -0.0590573, 0.746199};
-  matrix22c_t target_element_response = {{{0}}};
-  target_element_response[0][0] = {-0.802669, 0.00378276};
-  target_element_response[0][1] = {-0.577012, 0.000892636};
-  target_element_response[1][0] = {-0.586008, 0.00549141};
-  target_element_response[1][1] = {0.805793, -0.00504886};
+  aocommon::MC2x2 target_element_response(
+      {-0.802669, 0.00378276}, {-0.577012, 0.000892636},
+      {-0.586008, 0.00549141}, {0.805793, -0.00504886});
 
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(19).get()));
-  matrix22c_t element_response =
+  aocommon::MC2x2 element_response =
       station.ComputeElementResponse(time, frequency, direction, false);
 
-  for (size_t i = 0; i != 2; ++i) {
-    for (size_t j = 0; j != 2; ++j) {
-      BOOST_CHECK(std::abs(element_response[i][j] -
-                           target_element_response[i][j]) < 1e-6);
-    }
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK(std::abs(element_response[i] - target_element_response[i]) <
+                1e-6);
   }
 
   // Compute station response for station 31 (see also python/test)
@@ -90,20 +87,16 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   double freq4 = lofartelescope.GetChannelFrequency(3);
   vector3r_t direction_s31 = {0.667806, -0.0770635, 0.740335};
   vector3r_t station0_dir = {0.655743, -0.0670973, 0.751996};
-  matrix22c_t station31_response = station31.Response(
+  aocommon::MC2x2 station31_response = station31.Response(
       time, freq4, direction_s31, freq4, station0_dir, station0_dir);
 
-  matrix22c_t target_station_response = {{{0}}};
-  target_station_response[0][0] = {-0.71383788, 0.00612506};
-  target_station_response[0][1] = {-0.4903527, 0.00171652};
-  target_station_response[1][0] = {-0.502122, 0.00821683};
-  target_station_response[1][1] = {0.7184408, -0.00821723};
+  aocommon::MC2x2 target_station_response(
+      {-0.71383788, 0.00612506}, {-0.4903527, 0.00171652},
+      {-0.502122, 0.00821683}, {0.7184408, -0.00821723});
 
-  for (size_t i = 0; i < 2; ++i) {
-    for (size_t j = 0; j < 2; ++j) {
-      BOOST_CHECK(std::abs(station31_response[i][j] -
-                           target_station_response[i][j]) < 1e-6);
-    }
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK(std::abs(station31_response[i] - target_station_response[i]) <
+                1e-6);
   }
 
   // Gridded response

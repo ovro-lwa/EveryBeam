@@ -127,18 +127,11 @@ LOBESElementResponse::BaseFunctions LOBESElementResponse::ComputeBaseFunctions(
   return base_functions;
 }
 
-void LOBESElementResponse::Response(
-    int element_id, double freq, double theta, double phi,
-    std::complex<double> (&response)[2][2]) const {
-  // Initialize the response to zero.
-  response[0][0] = 0.0;
-  response[0][1] = 0.0;
-  response[1][0] = 0.0;
-  response[1][1] = 0.0;
-
+aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
+                                               double theta, double phi) const {
   // Clip directions below the horizon.
   if (theta >= M_PI_2) {
-    return;
+    return aocommon::MC2x2::Zero();
   }
 
   // Fill basefunctions if not yet set. Set clear_basefunctions to false
@@ -168,15 +161,11 @@ void LOBESElementResponse::Response(
     yy += q3 * coefficients_(1, freq_idx, element_id, i);
   }
 
-  response[0][0] = xx;
-  response[0][1] = xy;
-  response[1][0] = yx;
-  response[1][1] = yy;
-
   if (clear_basefunctions) {
     // Do a destructive resize
     basefunctions_.resize(0, 2);
   }
+  return aocommon::MC2x2(xx, xy, yx, yy);
 }
 
 std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <complex>
 #include <vector>
+#include <aocommon/matrix2x2.h>
 
 #include "beam-helper.h"
 
@@ -27,17 +28,15 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
         double phi = direction_thetaphi[1];
 
         // Compute gain
-        std::complex<double> gainMatrix[2][2] = {0.0};
+        // std::complex<double> gainMatrix[2][2] = {0.0};
+        aocommon::MC2x2 gainMatrix;
         if (std::isfinite(theta) && std::isfinite(phi)) {
-          elementResponse->Response(a, frequency, theta, phi, gainMatrix);
+          gainMatrix = elementResponse->Response(a, frequency, theta, phi);
         }
 
         // Store gain
         std::complex<float>* antBufferPtr = (*data_ptr)[a][y][x];
-        antBufferPtr[0] = gainMatrix[0][0];
-        antBufferPtr[1] = gainMatrix[0][1];
-        antBufferPtr[2] = gainMatrix[1][0];
-        antBufferPtr[3] = gainMatrix[1][1];
+        gainMatrix.AssignTo(antBufferPtr);
       }
     }
   }
@@ -59,7 +58,7 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
         auto direction = itrfDirections[y * subgrid_size + x];
 
         // Compute gain
-        matrix22c_t gainMatrix = {0.0};
+        aocommon::MC2x2 gainMatrix(0., 0., 0., 0.);
         if (std::isfinite(direction[0])) {
           gainMatrix = station->ComputeElementResponse(time, frequency,
                                                        direction, a, true);
@@ -67,10 +66,7 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
 
         // Store gain
         std::complex<float>* antBufferPtr = (*data_ptr)[a][y][x];
-        antBufferPtr[0] = gainMatrix[0][0];
-        antBufferPtr[1] = gainMatrix[0][1];
-        antBufferPtr[2] = gainMatrix[1][0];
-        antBufferPtr[3] = gainMatrix[1][1];
+        gainMatrix.AssignTo(antBufferPtr);
       }
     }
   }

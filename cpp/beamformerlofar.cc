@@ -29,7 +29,7 @@ std::vector<std::complex<double>> BeamFormerLofar::ComputeGeometricResponse(
   return result;
 }
 
-diag22c_t BeamFormerLofar::FieldArrayFactor(
+aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
     real_t time, real_t freq, const vector3r_t &direction,
     const Options &options, const std::vector<vector3r_t> &antenna_positions,
     const std::vector<std::array<bool, 2>> &antenna_enabled) const {
@@ -46,7 +46,7 @@ diag22c_t BeamFormerLofar::FieldArrayFactor(
       ComputeGeometricResponse(antenna_positions, delta_direction);
 
   double weight_sum[2] = {0.0, 0.0};
-  diag22c_t result;
+  aocommon::MC2x2Diag result(0., 0.);
 
   for (std::size_t idx = 0; idx < antenna_positions.size(); ++idx) {
     result[0] += geometric_response[idx] * (1.0 * antenna_enabled[idx][0]);
@@ -62,24 +62,17 @@ diag22c_t BeamFormerLofar::FieldArrayFactor(
   return result;
 }
 
-matrix22c_t BeamFormerLofar::LocalResponse(real_t time, real_t freq,
-                                           const vector3r_t &direction,
-                                           const Options &options) const {
-  matrix22c_t result = {{{0}}};
-
+aocommon::MC2x2 BeamFormerLofar::LocalResponse(real_t time, real_t freq,
+                                               const vector3r_t &direction,
+                                               const Options &options) const {
   // Compute the combined array factor
-  diag22c_t array_factor = LocalArrayFactor(time, freq, direction, options);
+  aocommon::MC2x2Diag array_factor =
+      LocalArrayFactor(time, freq, direction, options);
 
   // NOTE: there are maybe some redundant transformations in element-> response
-  matrix22c_t element_response =
+  aocommon::MC2x2 element_response =
       element_->Response(time, freq, direction, options);
-
-  result[0][0] = (array_factor[0] * element_response[0][0]);
-  result[0][1] = (array_factor[0] * element_response[0][1]);
-  result[1][0] = (array_factor[1] * element_response[1][0]);
-  result[1][1] = (array_factor[1] * element_response[1][1]);
-
-  return result;
+  return array_factor * element_response;
 }
 
 }  // namespace everybeam

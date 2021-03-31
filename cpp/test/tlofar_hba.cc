@@ -22,12 +22,12 @@
 #include <complex>
 #include <cmath>
 #include <iostream>
+#include <aocommon/matrix2x2.h>
+#include <aocommon/matrix2x2diag.h>
 
 using everybeam::ATermSettings;
-using everybeam::diag22c_t;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
-using everybeam::matrix22c_t;
 using everybeam::Options;
 using everybeam::ReadTileBeamDirection;
 using everybeam::Station;
@@ -146,23 +146,19 @@ BOOST_AUTO_TEST_CASE(element_response) {
   // target_element_response is the element response corresponding to this
   // direction
   vector3r_t direction = {0.397408, 0.527527, 0.750855};
-  matrix22c_t target_element_response = {{{0}}};
-  target_element_response[0][0] = {-0.164112, -0.000467162};
-  target_element_response[0][1] = {-0.843709, -0.00123631};
-  target_element_response[1][0] = {-0.892528, -0.00126278};
-  target_element_response[1][1] = {0.0968527, -6.7158e-05};
+  aocommon::MC2x2 target_element_response(
+      {-0.164112, -0.000467162}, {-0.843709, -0.00123631},
+      {-0.892528, -0.00126278}, {0.0968527, -6.7158e-05});
 
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(11).get()));
-  matrix22c_t element_response =
+  aocommon::MC2x2 element_response =
       station.ComputeElementResponse(time, frequency, direction, false);
 
   // Check whether element_response and target_element_response are "equal"
-  for (size_t i = 0; i != 2; ++i) {
-    for (size_t j = 0; j != 2; ++j) {
-      BOOST_CHECK(std::abs(element_response[i][j] -
-                           target_element_response[i][j]) < 1e-6);
-    }
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK(std::abs(element_response[i] - target_element_response[i]) <
+                1e-6);
   }
 
   // Compute station response for station 63 (see also python/test)
@@ -172,20 +168,16 @@ BOOST_AUTO_TEST_CASE(element_response) {
   vector3r_t direction_s63 = {0.424588, 0.4629957, 0.7780411};
   vector3r_t station0_dir = {0.4083262, 0.5273447, 0.7451022};
   vector3r_t tile0_dir = {0.4083268, 0.5273442, 0.7451022};
-  matrix22c_t station63_response = station63.Response(
+  aocommon::MC2x2 station63_response = station63.Response(
       time, frequency, direction_s63, frequency, station0_dir, tile0_dir);
 
-  matrix22c_t target_station_response = {{{0}}};
-  target_station_response[0][0] = {0.032594235, -0.00023045994};
-  target_station_response[0][1] = {0.12204097, -0.00091857865};
-  target_station_response[1][0] = {0.13063535, -0.0010039175};
-  target_station_response[1][1] = {-0.029348446, 0.00023882818};
+  aocommon::MC2x2 target_station_response(
+      {0.032594235, -0.00023045994}, {0.12204097, -0.00091857865},
+      {0.13063535, -0.0010039175}, {-0.029348446, 0.00023882818});
 
-  for (size_t i = 0; i < 2; ++i) {
-    for (size_t j = 0; j < 2; ++j) {
-      BOOST_CHECK(std::abs(station63_response[i][j] -
-                           target_station_response[i][j]) < 1e-6);
-    }
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK(std::abs(station63_response[i] - target_station_response[i]) <
+                1e-6);
   }
 }
 
@@ -346,42 +338,30 @@ BOOST_AUTO_TEST_CASE(gridded_response_array_factor) {
   // tile0 equals station0
   vector3r_t station0 = {0.408326, 0.527345, 0.745102};
   vector3r_t direction_p13 = {0.397408, 0.527527, 0.750855};
-  matrix22c_t full_beam_p13 = station.Response(time, frequency, direction_p13,
-                                               frequency, station0, station0);
-  matrix22c_t element_beam_p13 =
-      station.ComputeElementResponse(time, frequency, direction_p13);
-  diag22c_t array_factor_p13 = station.ArrayFactor(
+  aocommon::MC2x2 full_beam_p13 = station.Response(
       time, frequency, direction_p13, frequency, station0, station0);
-  matrix22c_t full_beam_product_p13;
-  full_beam_product_p13[0][0] = array_factor_p13[0] * element_beam_p13[0][0];
-  full_beam_product_p13[0][1] = array_factor_p13[0] * element_beam_p13[0][1];
-  full_beam_product_p13[1][0] = array_factor_p13[1] * element_beam_p13[1][0];
-  full_beam_product_p13[1][1] = array_factor_p13[1] * element_beam_p13[1][1];
-  for (std::size_t i = 0; i < 2; ++i) {
-    for (std::size_t j = 0; j < 2; ++j) {
-      // Tolerance is a percentage, so 1e-2 --> 1e-4
-      BOOST_CHECK_CLOSE(full_beam_product_p13[i][j], full_beam_p13[i][j], 1e-2);
-    }
+  aocommon::MC2x2 element_beam_p13 =
+      station.ComputeElementResponse(time, frequency, direction_p13);
+  aocommon::MC2x2Diag array_factor_p13 = station.ArrayFactor(
+      time, frequency, direction_p13, frequency, station0, station0);
+  aocommon::MC2x2 full_beam_product_p13 = array_factor_p13 * element_beam_p13;
+  for (std::size_t i = 0; i < 4; ++i) {
+    // Tolerance is a percentage, so 1e-2 --> 1e-4
+    BOOST_CHECK_CLOSE(full_beam_product_p13[i], full_beam_p13[i], 1e-2);
   }
 
   vector3r_t direction_p22 = {0.408326, 0.527345, 0.745102};
-  matrix22c_t full_beam_p22 = station.Response(time, frequency, direction_p22,
-                                               frequency, station0, station0);
-  matrix22c_t element_beam_p22 =
-      station.ComputeElementResponse(time, frequency, direction_p22);
-  diag22c_t array_factor_p22 = station.ArrayFactor(
+  aocommon::MC2x2 full_beam_p22 = station.Response(
       time, frequency, direction_p22, frequency, station0, station0);
-  matrix22c_t full_beam_product_p22;
-  full_beam_product_p22[0][0] = array_factor_p22[0] * element_beam_p22[0][0];
-  full_beam_product_p22[0][1] = array_factor_p22[0] * element_beam_p22[0][1];
-  full_beam_product_p22[1][0] = array_factor_p22[1] * element_beam_p22[1][0];
-  full_beam_product_p22[1][1] = array_factor_p22[1] * element_beam_p22[1][1];
+  aocommon::MC2x2 element_beam_p22 =
+      station.ComputeElementResponse(time, frequency, direction_p22);
+  aocommon::MC2x2Diag array_factor_p22 = station.ArrayFactor(
+      time, frequency, direction_p22, frequency, station0, station0);
+  aocommon::MC2x2 full_beam_product_p22 = array_factor_p22 * element_beam_p22;
 
-  for (std::size_t i = 0; i < 2; ++i) {
-    for (std::size_t j = 0; j < 2; ++j) {
-      // Tolerance is a percentage, so 1e-2 --> 1e-4
-      BOOST_CHECK_CLOSE(full_beam_product_p22[i][j], full_beam_p22[i][j], 1e-2);
-    }
+  for (std::size_t i = 0; i < 4; ++i) {
+    // Tolerance is a percentage, so 1e-2 --> 1e-4
+    BOOST_CHECK_CLOSE(full_beam_product_p22[i], full_beam_p22[i], 1e-2);
   }
 }
 

@@ -63,7 +63,7 @@ class BeamFormerLofarLBA : public BeamFormerLofar {
 
  private:
   // Local Array factor override
-  virtual diag22c_t LocalArrayFactor(
+  aocommon::MC2x2Diag LocalArrayFactor(
       real_t time, real_t freq, const vector3r_t &direction,
       const Options &options) const final override;
 

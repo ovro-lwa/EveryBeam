@@ -21,7 +21,6 @@ int main() {
   //     double time;
   //     double freq;
   //     vector3r_t direction = {0.0, 0.0, 1.0};
-  //     matrix22c_t response;
 
   //     auto antenna0 = Element::Ptr(new
   //     Element(station.GetElementResponse(),0)); auto antenna1 =
@@ -49,7 +48,7 @@ int main() {
   std::cout << firstTime << std::endl;
   double time = firstTime;
   double freq = 55e6;
-  matrix22c_t response;
+  aocommon::MC2x2 response;
   vector3r_t direction = {0.0, 0.0, 1.0};
 
   //     std::shared_ptr<Station> station = ReadLofarStation(ms, 0,
@@ -66,8 +65,7 @@ int main() {
     d = normalize(d);
     response = station->Response(time, freq, d, freq_beamformer,
                                  station_pointing, tile_pointing);
-    std::cout << response[0][0] << " " << response[0][1] << " "
-              << response[1][0] << " " << response[1][1] << " " << std::endl;
+    std::cout << response.ToString() << std::endl;
   }
 
   return 0;

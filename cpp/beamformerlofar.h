@@ -90,22 +90,22 @@ class BeamFormerLofar : public Antenna {
       const vector3r_t &direction) const;
 
   // Pure virtual implementation of array factor at station level
-  virtual diag22c_t LocalArrayFactor(real_t time, real_t freq,
-                                     const vector3r_t &direction,
-                                     const Options &options) const override = 0;
+  aocommon::MC2x2Diag LocalArrayFactor(
+      real_t time, real_t freq, const vector3r_t &direction,
+      const Options &options) const override = 0;
 
   // Array factor at Field level. antenna_positions_ and antenna_enabled_
   // either represent the tiles in case of LOFAR HBA or the elements in case
   // of LOFAR LBA
-  diag22c_t FieldArrayFactor(
+  aocommon::MC2x2Diag FieldArrayFactor(
       real_t time, real_t freq, const vector3r_t &direction,
       const Options &options, const std::vector<vector3r_t> &antenna_positions,
       const std::vector<std::array<bool, 2>> &antenna_enabled) const;
 
   // Override of the LocalResponse method
-  virtual matrix22c_t LocalResponse(
-      real_t time, real_t freq, const vector3r_t &direction,
-      const Options &options) const final override;
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction,
+                                const Options &options) const final override;
 
   // Each BeamFormerLofar stores one unique element, and a vector of unique
   // positions Usually, the Element will be of type ElementHamaker.
