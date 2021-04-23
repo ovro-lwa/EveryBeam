@@ -83,6 +83,24 @@ def test_load_telescope(ref):
     )
     np.testing.assert_allclose(response_0, ref["cpp_response"], rtol=1e-6)
 
+    # Array factor in pointing direction should be unity
+    array_factor_I = telescope.array_factor(
+        time, ref["station_id"], freq, ref["station0"], ref["station0"], ref["station0"]
+    )
+    np.testing.assert_allclose(array_factor_I, np.eye(2, dtype=np.complex64), rtol=1e-6)
+
+    # Check that the same response is obtained by multiplying the array factor with the
+    # element response
+    array_factor = telescope.array_factor(
+        time, ref["station_id"], freq, ref["direction"], ref["station0"], ref["tile0"]
+    )
+    element_response = telescope.element_response(
+        time, ref["station_id"], freq, ref["direction"]
+    )
+    np.testing.assert_allclose(
+        np.matmul(array_factor, element_response), response_0, rtol=1e-6
+    )
+
     # For equal station and tile direction, check that the same response is
     # obtained via two routes:
     # Response by explicitly specifying the direction
@@ -100,3 +118,16 @@ def test_load_telescope(ref):
         time, ref["station_id"], freq, ref["direction"], ref["station0"],
     )
     np.testing.assert_allclose(response_1, response_2)
+
+    # Check that we can reproduce this with array_factor * beam_response
+    # Check that the same response is obtained by multiplying the array factor with the
+    # element response
+    array_factor = telescope.array_factor(
+        time, ref["station_id"], freq, ref["direction"], ref["station0"]
+    )
+    element_response = telescope.element_response(
+        time, ref["station_id"], freq, ref["direction"]
+    )
+    np.testing.assert_allclose(
+        np.matmul(array_factor, element_response), response_1, rtol=1e-6
+    )
