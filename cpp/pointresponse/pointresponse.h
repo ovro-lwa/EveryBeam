@@ -56,34 +56,36 @@ class PointResponse {
    * @brief Get beam response for a given station at a prescribed ra, dec
    * position.
    *
-   * @param buffer Buffer with a size of 4 complex floats to receive the beam
-   * response
+   * @param response_matrix Buffer with a size of 4 complex floats to receive
+   * the beam response
    * @param ra Right ascension (rad)
    * @param dec Declination (rad)
    * @param freq Frequency (Hz)
-   * @param station_idx Station index
-   * @param field_id
+   * @param station_id Station index, corresponding to measurement set antenna
+   * index.
+   * @param field_id Field index as used in the measurement set
    */
-  virtual void CalculateStation(std::complex<float>* buffer, double ra,
-                                double dec, double freq, size_t station_idx,
+  virtual void CalculateStation(std::complex<float>* response_matrix, double ra,
+                                double dec, double freq, size_t station_id,
                                 size_t field_id) = 0;
 
   /**
    * @brief Same as PointResponseStation, but now iterate over all stations in
    * MS.
    *
-   * @param buffer Buffer with a size of 4 * nr_stations complex floats to
-   * receive the beam response
+   * @param response_matrices Buffer with a size of 4 * nr_stations complex
+   * floats to receive the beam response
    * @param ra Right ascension (rad)
    * @param dec Declination (rad)
    * @param freq Frequency (Hz)
-   * @param field_id
+   * @param field_id Field index as used in the measurement set
    */
-  virtual void CalculateAllStations(std::complex<float>* buffer, double ra,
-                                    double dec, double freq, size_t field_id) {
+  virtual void CalculateAllStations(std::complex<float>* response_matrices,
+                                    double ra, double dec, double freq,
+                                    size_t field_id) {
     for (size_t i = 0; i < telescope_->GetNrStations(); ++i) {
-      CalculateStation(buffer, ra, dec, freq, i, field_id);
-      buffer += 4;
+      CalculateStation(response_matrices, ra, dec, freq, i, field_id);
+      response_matrices += 4;
     }
   };
 
