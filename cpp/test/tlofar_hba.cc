@@ -157,8 +157,8 @@ BOOST_AUTO_TEST_CASE(element_response) {
 
   // Check whether element_response and target_element_response are "equal"
   for (size_t i = 0; i != 4; ++i) {
-    BOOST_CHECK(std::abs(element_response[i] - target_element_response[i]) <
-                1e-6);
+    BOOST_CHECK_LT(std::abs(element_response[i] - target_element_response[i]),
+                   1e-6);
   }
 
   // Compute station response for station 63 (see also python/test)
@@ -176,8 +176,8 @@ BOOST_AUTO_TEST_CASE(element_response) {
       {0.13063535, -0.0010039175}, {-0.029348446, 0.00023882818});
 
   for (size_t i = 0; i != 4; ++i) {
-    BOOST_CHECK(std::abs(station63_response[i] - target_station_response[i]) <
-                1e-6);
+    BOOST_CHECK_LT(std::abs(station63_response[i] - target_station_response[i]),
+                   1e-6);
   }
 }
 
@@ -251,8 +251,9 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // Check consistency of values for station 23
   std::size_t offset_s23 = 23 * coord_system.width * coord_system.height * 4;
   for (std::size_t i = 0; i != antenna_buffer_single.size(); ++i) {
-    BOOST_CHECK(std::abs(antenna_buffer_all[offset_s23 + i] -
-                         antenna_buffer_single[i]) < 1e-6);
+    BOOST_CHECK_LT(
+        std::abs(antenna_buffer_all[offset_s23 + i] - antenna_buffer_single[i]),
+        1e-6);
   }
 
   // Check result via aterm calculation
@@ -283,7 +284,7 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // Result should change for time increase >=1200s
   aterms.Calculate(aterm_buffer.data(), time1 + 1201, frequency, 0, nullptr);
   for (std::size_t i = 0; i != aterm_buffer.size(); ++i) {
-    BOOST_CHECK(std::abs(aterm_buffer[i] - aterm_ref[i]) > 1e-4);
+    BOOST_CHECK_GT(std::abs(aterm_buffer[i] - aterm_ref[i]), 1e-4);
   }
 }
 
@@ -387,7 +388,7 @@ BOOST_AUTO_TEST_CASE(differential_beam) {
   for (std::size_t i = 0; i < 4; ++i) {
     norm_jones_mat += std::norm(antenna_buffer_diff_beam[offset_22 + i]);
   }
-  BOOST_CHECK(std::abs(norm_jones_mat - 2.) < 1e-6);
+  BOOST_CHECK_LT(std::abs(norm_jones_mat - 2.), 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(integrated_beam) {
@@ -402,9 +403,9 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
                                              baseline_weights);
 
   // Just check whether some (rather arbitrary) numbers are reproduced
-  BOOST_CHECK(std::abs(antenna_buffer_integrated[10] - 0.0262708) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_integrated[20] - 0.127972) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_integrated.back() - 0.00847742) < 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[10] - 0.0309436), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[20] - 0.156267), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated.back() - 0.0118085), 1e-6);
 
   // Two time intervals, should give same output as single time interval
   std::fill(antenna_buffer_integrated.begin(), antenna_buffer_integrated.end(),
@@ -416,9 +417,9 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
                                              tarray, frequency, 0, 2,
                                              baseline_weights);
 
-  BOOST_CHECK(std::abs(antenna_buffer_integrated[10] - 0.0262708) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_integrated[20] - 0.127972) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_integrated.back() - 0.00847742) < 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[10] - 0.0309436), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[20] - 0.156267), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_integrated.back() - 0.0118085), 1e-6);
 
   // Primary beam response on 40 x 40 grid.
   // Validated results were obtained with the following wsclean command
@@ -467,9 +468,9 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
               offset_52020 = 5 * width_pb * height_pb + 20 * width_pb + 20,
               offset_51825 = 5 * width_pb * height_pb + 18 * width_pb + 25;
 
-  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_01616] - 0.020324793) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_02310] - 0.0059926948) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_52020] - 0.00018088287) < 1e-6);
-  BOOST_CHECK(std::abs(antenna_buffer_pb[offset_51825] - 0.00013052078) < 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_pb[offset_01616] - 0.0203205), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_pb[offset_02310] - 0.0111653), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_pb[offset_52020] - 0.000154699), 1e-6);
+  BOOST_CHECK_LT(std::abs(antenna_buffer_pb[offset_51825] - 0.000133702), 1e-6);
 }
 BOOST_AUTO_TEST_SUITE_END()

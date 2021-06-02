@@ -44,7 +44,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
     throw std::runtime_error(
         "No a-term correction given in parset (aterms key is an empty list)");
 
-  for (const std::string aterm_name : aterms) {
+  for (const std::string& aterm_name : aterms) {
     // Allows to "alias" the aterm type.
     std::string aterm_type =
         reader.GetStringOr(aterm_name + ".type", aterm_name);
