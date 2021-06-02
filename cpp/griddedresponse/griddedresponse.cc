@@ -156,6 +156,7 @@ void GriddedResponse::DoFFTResampling(
     const std::vector<aocommon::HMC4x4>& matrices) {
   // (FFT) resampling, run multi-threaded?
   FFTResampler resampler(width_in, height_in, width_out, height_out);
+  resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
   UVector<float> lowres_input(width_in * height_in);
   // Loop over the "double"  representation of the HMC4x4 Hermitian matrix
   for (size_t p = 0; p != 16; ++p) {
