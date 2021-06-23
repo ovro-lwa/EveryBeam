@@ -39,7 +39,7 @@ bool CalculatePreappliedBeamDirection(
       if (mode == "Element" || mode == "ArrayFactor")
         throw std::runtime_error(
             "This observation was corrected for the " + mode +
-            " beam. WSClean can only handle a full pre-applied beam (both "
+            " beam. EveryBeam can only handle a full pre-applied beam (both "
             "arrayfactor + element).");
       else if (mode == "Full") {
         was_beam_applied = true;
