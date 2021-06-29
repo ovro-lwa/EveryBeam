@@ -35,7 +35,7 @@ using everybeam::telescope::Telescope;
 
 namespace {
 // Convert pyarray of size 3 to vector3r_t
-vector3r_t np2vector3r_t(const py::array_t<double> pyarray) {
+vector3r_t np2vector3r_t(const py::array_t<double> &pyarray) {
   auto r = pyarray.unchecked<1>();
   if (r.size() != 3) {
     throw std::runtime_error("Pyarry is of incorrect size, must be 3.");
@@ -44,7 +44,7 @@ vector3r_t np2vector3r_t(const py::array_t<double> pyarray) {
 }
 
 // Cast aocommon::MC2x2 to py::array
-py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 matrix) {
+py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 &matrix) {
   // Solution from: https://github.com/pybind/pybind11/issues/1299
   // Reinterpret cast is needed to "flatten" the nested std::array
   auto mat_ptr = reinterpret_cast<const std::complex<double> *>(matrix.Data());
@@ -54,8 +54,8 @@ py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 matrix) {
 
 // Cast vector of aocommon::MC2x2 to numpy tensor
 py::array_t<std::complex<double>> cast_tensor(
-    const std::vector<aocommon::MC2x2> matrix,
-    const std::vector<size_t> layout) {
+    const std::vector<aocommon::MC2x2> &matrix,
+    const std::vector<size_t> &layout) {
   size_t total_size = 1;
   for (size_t rank_size : layout) {
     total_size *= rank_size;
@@ -78,6 +78,19 @@ void check_station_index(size_t idx, size_t idx_max,
     throw std::runtime_error(
         prefix + ": Requested station index exceeds number of stations.");
   }
+}
+
+// Convenience function for applying the differential beam response (lhs) to the
+// response (rhs)
+void apply_differential_beam(aocommon::MC2x2 &lhs, const aocommon::MC2x2 &rhs) {
+  // Computes lhs = lhs^{-1} * rhs by
+  // 1) computing the inverse of response (in preapplied beam direction), if it
+  // exists...
+  if (!lhs.Invert()) {
+    lhs = aocommon::MC2x2::Zero();
+  }
+  // 2) and multiplying the inverse with response (rhs)
+  lhs *= rhs;
 }
 
 }  // namespace
@@ -110,7 +123,6 @@ std::unique_ptr<LOFAR> create_lofar(const std::string &name,
         "LOFAR telescope requested, but specified path name does not contain a "
         "LOFAR MS.");
   }
-
   std::unique_ptr<LOFAR> telescope =
       std::unique_ptr<LOFAR>(new LOFAR(ms, options));
   return telescope;
@@ -205,8 +217,14 @@ void init_telescope(py::module &m) {
                 const double freq0 = self.GetOptions().use_channel_frequency
                                          ? freq
                                          : self.GetSubbandFrequency();
-                response[idx] = station.Response(time, freq, direction, freq0,
-                                                 station0, tile0, rotate);
+
+                if (self.GetOptions().use_differential_beam) {
+                  // Exploiting: R^{-1}R = I
+                  response[idx] = aocommon::MC2x2::Unity();
+                } else {
+                  response[idx] = station.Response(time, freq, direction, freq0,
+                                                   station0, tile0, rotate);
+                }
               }
             }
             return py::array_t<std::complex<double>>{cast_tensor(
@@ -255,8 +273,13 @@ void init_telescope(py::module &m) {
               const double freq0 = self.GetOptions().use_channel_frequency
                                        ? freq
                                        : self.GetSubbandFrequency();
-              response[idx] = station.Response(time, freq, direction, freq0,
-                                               station0, tile0, rotate);
+              if (self.GetOptions().use_differential_beam) {
+                // Exploiting R^{-1}R = I
+                response[idx] = aocommon::MC2x2::Unity();
+              } else {
+                response[idx] = station.Response(time, freq, direction, freq0,
+                                                 station0, tile0, rotate);
+              }
             }
             return py::array_t<std::complex<double>>{
                 cast_tensor(response, std::vector<size_t>{nr_channels, 2, 2})};
@@ -309,8 +332,11 @@ void init_telescope(py::module &m) {
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
 
-            const aocommon::MC2x2 response = station.Response(
-                time, freq, direction, freq0, station0, tile0, rotate);
+            const aocommon::MC2x2 response =
+                self.GetOptions().use_differential_beam
+                    ? aocommon::MC2x2::Unity()
+                    : station.Response(time, freq, direction, freq0, station0,
+                                       tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
           R"pbdoc(
@@ -358,8 +384,11 @@ void init_telescope(py::module &m) {
             const Station &station =
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
 
-            const aocommon::MC2x2 response = station.Response(
-                time, freq, direction, freq0, station0, tile0, rotate);
+            const aocommon::MC2x2 response =
+                self.GetOptions().use_differential_beam
+                    ? aocommon::MC2x2::Unity()
+                    : station.Response(time, freq, direction, freq0, station0,
+                                       tile0, rotate);
             return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
           R"pbdoc(
@@ -404,7 +433,23 @@ void init_telescope(py::module &m) {
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
             const aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, tile0, rotate);
-            return py::array_t<std::complex<double>>{cast_matrix(response)};
+
+            if (self.GetOptions().use_differential_beam) {
+              vector3r_t diff_beam_centre;
+              ITRFConverter itrf_converter(time);
+              SetITRFVector(
+                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
+                  diff_beam_centre);
+
+              aocommon::MC2x2 response_diff_beam = station.Response(
+                  time, freq, diff_beam_centre, freq0, station0, tile0, rotate);
+              apply_differential_beam(response_diff_beam, response);
+
+              return py::array_t<std::complex<double>>{
+                  cast_matrix(response_diff_beam)};
+            } else {
+              return py::array_t<std::complex<double>>{cast_matrix(response)};
+            }
           },
           R"pbdoc(
         Get station response in user-specified direction
@@ -456,7 +501,24 @@ void init_telescope(py::module &m) {
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
             const aocommon::MC2x2 response = station.Response(
                 time, freq, direction, freq0, station0, station0, rotate);
-            return py::array_t<std::complex<double>>{cast_matrix(response)};
+
+            if (self.GetOptions().use_differential_beam) {
+              vector3r_t diff_beam_centre;
+              ITRFConverter itrf_converter(time);
+              SetITRFVector(
+                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
+                  diff_beam_centre);
+
+              aocommon::MC2x2 response_diff_beam =
+                  station.Response(time, freq, diff_beam_centre, freq0,
+                                   station0, station0, rotate);
+
+              apply_differential_beam(response_diff_beam, response);
+              return py::array_t<std::complex<double>>{
+                  cast_matrix(response_diff_beam)};
+            } else {
+              return py::array_t<std::complex<double>>{cast_matrix(response)};
+            }
           },
           R"pbdoc(
         Get station response in user-specified direction
@@ -498,7 +560,23 @@ void init_telescope(py::module &m) {
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
             const aocommon::MC2x2 response = station.ComputeElementResponse(
                 time, freq, direction, element_idx, is_local, rotate);
-            return py::array_t<std::complex<double>>{cast_matrix(response)};
+
+            if (self.GetOptions().use_differential_beam) {
+              vector3r_t diff_beam_centre;
+              ITRFConverter itrf_converter(time);
+              SetITRFVector(
+                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
+                  diff_beam_centre);
+
+              aocommon::MC2x2 response_diff_beam =
+                  station.ComputeElementResponse(time, freq, diff_beam_centre,
+                                                 element_idx, is_local, rotate);
+              apply_differential_beam(response_diff_beam, response);
+              return py::array_t<std::complex<double>>{
+                  cast_matrix(response_diff_beam)};
+            } else {
+              return py::array_t<std::complex<double>>{cast_matrix(response)};
+            }
           },
           R"pbdoc(
         Get element response given a station and an element in prescribed direction.
@@ -543,7 +621,25 @@ void init_telescope(py::module &m) {
                 static_cast<const Station &>(*(self.GetStation(idx).get()));
             const aocommon::MC2x2 response = station.ComputeElementResponse(
                 time, freq, direction, is_local, rotate);
-            return py::array_t<std::complex<double>>{cast_matrix(response)};
+
+            if (self.GetOptions().use_differential_beam) {
+              vector3r_t diff_beam_centre;
+              ITRFConverter itrf_converter(time);
+              SetITRFVector(
+                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
+                  diff_beam_centre);
+
+              aocommon::MC2x2 response_diff_beam =
+                  station.ComputeElementResponse(time, freq, diff_beam_centre,
+                                                 is_local, rotate);
+              apply_differential_beam(response_diff_beam, response);
+              return py::array_t<std::complex<double>>{
+                  cast_matrix(response_diff_beam)};
+            } else {
+              return py::array_t<std::complex<double>>{cast_matrix(response)};
+            }
+
+            // return py::array_t<std::complex<double>>{cast_matrix(response)};
           },
           R"pbdoc(
         Get element response given a station index, in prescribed direction.

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # List of tests
-set(UNIT_TESTS tPyLoad)
+set(UNIT_TESTS tPybindings)
 
 # Add tests to "pybindings", can be invoked with
 # "ctest -L pybindings"
