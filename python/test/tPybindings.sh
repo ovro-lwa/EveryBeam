@@ -11,13 +11,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export PYTHONPATH=$LIB_DIR
 
-echo $DATA_DIR
-if [ -d $DATA_DIR/LOFAR_LBA_MOCK.ms ]
-then
-    echo "LBA mock ms exists"
-else
-    echo "Download LBA mock ms"
-    $SCRIPTS_DIR/download_lofar_lba.sh
-fi
-
-pytest -s --exitfirst ${DIR}/test_load.py
+pytest -s --exitfirst ${DIR}/test_pybindings.py
