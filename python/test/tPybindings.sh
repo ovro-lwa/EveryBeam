@@ -11,4 +11,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export PYTHONPATH=$LIB_DIR
 
-pytest -s --exitfirst ${DIR}/test_pybindings.py
+pytest -v --exitfirst ${DIR}/test_pybindings.py
