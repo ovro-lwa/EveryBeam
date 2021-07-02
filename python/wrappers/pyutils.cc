@@ -78,10 +78,13 @@ void init_utils(py::module &m) {
       py::arg("theta"), py::arg("phi"));
 
   // Bindings for CoordinateSystem struct
-  py::class_<CoordinateSystem>(m, "CoordinateSystem",
+  py::class_<CoordinateSystem>(m, "GridSettings",
                                R"pbdoc(
-        Class for specifying the dimensions of the grid.
-        Will be useful for the gridded response.
+        Specifying the grid on which the Telescope can request
+        a gridded_response or undersampled_response.
+
+        NOTE: the GridSettings class wraps the C++ CoordinateSystem class
+
        )pbdoc")
       .def(py::init<>(),
            R"pbdoc(
@@ -108,11 +111,13 @@ void init_utils(py::module &m) {
        )pbdoc")
       .def_readwrite("dl", &CoordinateSystem::dl,
                      R"pbdoc(
-        Grid size in l direction [rad]: double
+        Grid spacing in RA direction [rad]: double
+        dl is the direction cosine of the delta right ascension
        )pbdoc")
       .def_readwrite("dm", &CoordinateSystem::dm,
                      R"pbdoc(
-        Grid size in m direction [rad]: double
+        Grid spacing in Dec direction [rad]: double
+        dm is the direction cosine of the delta declination
        )pbdoc")
       .def_readwrite("l_shift", &CoordinateSystem::phase_centre_dl,
                      R"pbdoc(
