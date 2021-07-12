@@ -8,6 +8,8 @@
 #define EVERYBEAM_TELESCOPE_PHASEDARRAY_H_
 
 #include "telescope.h"
+
+#include "../correctionmode.h"
 #include "../station.h"
 
 #include <casacore/measures/Measures/MPosition.h>
@@ -78,6 +80,7 @@ class PhasedArray : public Telescope {
 
   struct MSProperties {
     double subband_freq;
+    CorrectionMode preapplied_correction_mode = CorrectionMode::kFull;
     casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
     size_t channel_count;
     std::vector<double> channel_freqs;

@@ -14,6 +14,7 @@
 #include "beamformer.h"
 #include "coords/itrfdirection.h"
 #include "common/types.h"
+#include "correctionmode.h"
 #include "options.h"
 #include <memory>
 #include <vector>
@@ -75,31 +76,10 @@ class Station {
   //! Return the number of available antenna fields.
   size_t GetNrFields() const;
 
-  // /*!
-  //  *  \brief Return the requested antenna field.
-  //  *
-  //  *  \param i Antenna field number (0-based).
-  //  *  \return An AntennaField::ConstPtr to the requested AntennaField
-  //  *  instance, or an empty AntennaField::ConstPtr if \p i is out of bounds.
-  //  */
-  //     AntennaField::ConstPtr field(size_t i) const;
-
-  // /*!
-  //  *  \brief Return an iterator that points to the beginning of the list of
-  //  *  antenna fields.
-  //  */
-  //     FieldList::const_iterator beginFields() const;
-
-  // /*!
-  //  *  \brief Return an iterator that points to the end of the list of antenna
-  //  *  fields.
-  //  */
-  //     FieldList::const_iterator endFields() const;
-
-  /*!
-   *  \brief Compute the response of the station for a plane wave of frequency
-   *  \p freq, arriving from direction \p direction, with the %station beam
-   *  former steered towards \p station0, and, for HBA stations, the analog
+  /**
+   *  \brief Compute the full response of the station for a plane wave of
+   * frequency \p freq, arriving from direction \p direction, with the %station
+   * beam former steered towards \p station0, and, for HBA stations, the analog
    *  %tile beam former steered towards \p tile0. For LBA stations, \p tile0
    *  has no effect.
    *
@@ -129,6 +109,29 @@ class Station {
                            const vector3r_t &direction, real_t freq0,
                            const vector3r_t &station0, const vector3r_t &tile0,
                            const bool rotate = true) const;
+
+  /**
+   * \brief This method is similar to the above Response() function, but adds
+   * parameter \p mode to request the response for a specific mode.
+   * \see CorrectionMode.
+   */
+  aocommon::MC2x2 Response(CorrectionMode mode, real_t time, real_t freq,
+                           const vector3r_t &direction, real_t freq0,
+                           const vector3r_t &station0, const vector3r_t &tile0,
+                           const bool rotate = true) const {
+    switch (mode) {
+      case CorrectionMode::kNone:
+        return aocommon::MC2x2::Unity();
+      case CorrectionMode::kFull:
+        return Response(time, freq, direction, freq0, station0, tile0, rotate);
+      case CorrectionMode::kArrayFactor:
+        return aocommon::MC2x2(
+            ArrayFactor(time, freq, direction, freq0, station0, tile0));
+      case CorrectionMode::kElement:
+        return ComputeElementResponse(time, freq, direction, false, rotate);
+    }
+    throw std::runtime_error("Invalid mode");
+  }
 
   /*!
    *  \brief Compute the array factor of the station for a plane wave of
@@ -274,10 +277,6 @@ class Station {
                    U buffer) const;
 
   // @}
-
-  // ===================================================================
-  // New methods introduced in refactor
-  // ==================================================================
 
   //! Returns a pointer to the ElementResponse class
   const ElementResponse::Ptr GetElementResponse() { return element_response_; }

@@ -17,7 +17,7 @@ template <typename T>
 class MutablePtr;
 }
 
-class Options;
+struct Options;
 
 enum ElementResponseModel {
   /// The default will select the default element response model
@@ -36,7 +36,7 @@ ElementResponseModel ElementResponseModelFromString(
     const std::string &element_response);
 
 /**
- * @brief Virtual class for the element response model. All the
+ * @brief Abstract class for the element response model. All the
  * (antenna/element) response models inherit from this class.
  *
  */

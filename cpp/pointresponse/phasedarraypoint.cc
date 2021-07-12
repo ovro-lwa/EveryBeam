@@ -17,11 +17,11 @@ PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope* telescope_ptr,
                                    double time)
     : PointResponse(telescope_ptr, time),
       use_channel_frequency_(true),
+      use_differential_beam_(telescope_->GetOptions().use_differential_beam),
+      preapplied_correction_mode_(CorrectionMode::kFull),
       subband_frequency_(0.0),
       ra_(std::numeric_limits<double>::min()),
-      dec_(std::numeric_limits<double>::min()) {
-  use_differential_beam_ = telescope_->GetOptions().use_differential_beam;
-}
+      dec_(std::numeric_limits<double>::min()) {}
 
 void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
                                         double dec, double freq,
@@ -38,14 +38,15 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
 
   double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
+  aocommon::MC2x2F inverse_central_gain;
   if (use_differential_beam_) {
-    inverse_central_gain_ =
-        aocommon::MC2x2F(phasedarraytelescope.GetStation(station_idx)
-                             ->Response(time_, freq, diff_beam_centre_, sb_freq,
-                                        station0_, tile0_)
-                             .Data());
-    if (!inverse_central_gain_.Invert()) {
-      inverse_central_gain_ = aocommon::MC2x2F::Zero();
+    inverse_central_gain = aocommon::MC2x2F(
+        phasedarraytelescope.GetStation(station_idx)
+            ->Response(preapplied_correction_mode_, time_, freq,
+                       diff_beam_centre_, sb_freq, station0_, tile0_)
+            .Data());
+    if (!inverse_central_gain.Invert()) {
+      inverse_central_gain = aocommon::MC2x2F::Zero();
     }
   }
 
@@ -55,7 +56,7 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
           .Data());
 
   if (use_differential_beam_) {
-    aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain_, gain_matrix);
+    aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain, gain_matrix);
   } else {
     gain_matrix.AssignTo(buffer);
   }

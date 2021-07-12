@@ -19,8 +19,6 @@ namespace pointresponse {
 class LOFARPoint final : public PhasedArrayPoint {
  public:
   /**
-   * @brief Construct a new LOFARGrid object
-   *
    * @param telescope_ptr Pointer to telescope::LOFAR object
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s)
    */
@@ -33,6 +31,8 @@ class LOFARPoint final : public PhasedArrayPoint {
     delay_dir_ = lofartelescope.ms_properties_.delay_dir;
     tile_beam_dir_ = lofartelescope.ms_properties_.tile_beam_dir;
     preapplied_beam_dir_ = lofartelescope.ms_properties_.preapplied_beam_dir;
+    preapplied_correction_mode_ =
+        lofartelescope.ms_properties_.preapplied_correction_mode;
     subband_frequency_ = lofartelescope.ms_properties_.subband_freq;
     use_channel_frequency_ = lofartelescope.GetOptions().use_channel_frequency;
   }
