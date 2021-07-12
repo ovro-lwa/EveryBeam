@@ -9,6 +9,8 @@
 
 #include "griddedresponse.h"
 
+#include "../correctionmode.h"
+
 namespace everybeam {
 namespace griddedresponse {
 class PhasedArrayGrid : public GriddedResponse {
@@ -46,7 +48,9 @@ class PhasedArrayGrid : public GriddedResponse {
   vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_,
       diff_beam_centre_;
 
-  bool use_differential_beam_, use_channel_frequency_;
+  bool use_differential_beam_;
+  CorrectionMode preapplied_correction_mode_;
+  bool use_channel_frequency_;
   double subband_frequency_;
 
  private:

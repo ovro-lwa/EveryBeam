@@ -12,7 +12,10 @@
 #include <cassert>
 #include <casacore/measures/TableMeasures/ArrayMeasColumn.h>
 
+using everybeam::CorrectionMode;
+using everybeam::ParseCorrectionMode;
 using everybeam::Station;
+using everybeam::ToString;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::pointresponse::LOFARPoint;
@@ -20,9 +23,11 @@ using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 
 namespace {
-bool CalculatePreappliedBeamDirection(
-    const casacore::MeasurementSet &ms, const std::string &data_column_name,
-    bool use_differential_beam, casacore::MDirection &preapplied_beam_dir) {
+bool CalculatePreappliedBeamOptions(const casacore::MeasurementSet &ms,
+                                    const std::string &data_column_name,
+                                    bool force_differential_beam,
+                                    casacore::MDirection &preapplied_beam_dir,
+                                    CorrectionMode &correction_mode) {
   casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
@@ -32,16 +37,15 @@ bool CalculatePreappliedBeamDirection(
   casacore::ArrayColumn<std::complex<float>> dataCol(ms, data_column_name);
   bool was_beam_applied = false;
   if (dataCol.keywordSet().isDefined("LOFAR_APPLIED_BEAM_MODE")) {
-    std::string mode = dataCol.keywordSet().asString("LOFAR_APPLIED_BEAM_MODE");
-    if (mode == "None")
-      was_beam_applied = false;
-    else {
-      if (mode == "Element" || mode == "ArrayFactor")
-        throw std::runtime_error(
-            "This observation was corrected for the " + mode +
-            " beam. EveryBeam can only handle a full pre-applied beam (both "
-            "arrayfactor + element).");
-      else if (mode == "Full") {
+    correction_mode = ParseCorrectionMode(
+        dataCol.keywordSet().asString("LOFAR_APPLIED_BEAM_MODE"));
+    switch (correction_mode) {
+      case CorrectionMode::kNone:
+        was_beam_applied = false;
+        break;
+      case CorrectionMode::kElement:
+      case CorrectionMode::kArrayFactor:
+      case CorrectionMode::kFull:
         was_beam_applied = true;
         casacore::String error;
         casacore::MeasureHolder mHolder;
@@ -50,15 +54,15 @@ bool CalculatePreappliedBeamDirection(
           throw std::runtime_error(
               "Error while reading LOFAR_APPLIED_BEAM_DIR keyword: " + error);
         preapplied_beam_dir = mHolder.asMDirection();
-      } else
-        throw std::runtime_error(
-            "Measurement set specifies an unknown beam correction: " + mode);
+        break;
     }
+  } else {
+    if (force_differential_beam)
+      correction_mode = CorrectionMode::kFull;
+    else
+      correction_mode = CorrectionMode::kNone;
   }
-  if (was_beam_applied || use_differential_beam) {
-    use_differential_beam = true;
-  }
-  return use_differential_beam;
+  return was_beam_applied || force_differential_beam;
 }
 }  // namespace
 
@@ -92,10 +96,11 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
   casacore::ArrayMeasColumn<casacore::MDirection> tile_beam_dir_col(
       ms.field(), "LOFAR_TILE_BEAM_DIR");
 
+  CorrectionMode preapplied_correction_mode;
   casacore::MDirection preapplied_beam_dir;
-  options_.use_differential_beam = CalculatePreappliedBeamDirection(
+  options_.use_differential_beam = CalculatePreappliedBeamOptions(
       ms, options_.data_column_name, options_.use_differential_beam,
-      preapplied_beam_dir);
+      preapplied_beam_dir, preapplied_correction_mode);
 
   size_t channel_count = band.ChannelCount();
   std::vector<double> channel_freqs(channel_count);
@@ -108,6 +113,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
   ms_properties_.delay_dir = delay_dir_col(0);
   ms_properties_.tile_beam_dir = *(tile_beam_dir_col(0).data());
   ms_properties_.preapplied_beam_dir = preapplied_beam_dir;
+  ms_properties_.preapplied_correction_mode = preapplied_correction_mode;
   ms_properties_.channel_count = channel_count;
   ms_properties_.channel_freqs = channel_freqs;
 }

@@ -36,11 +36,11 @@ void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
   if (use_differential_beam_) {
     double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
     inverse_central_gain_.resize(1);
-    inverse_central_gain_[0] =
-        aocommon::MC2x2F(phasedarraytelescope.GetStation(station_idx)
-                             ->Response(time, frequency, diff_beam_centre_,
-                                        sb_freq, station0_, tile0_)
-                             .Data());
+    inverse_central_gain_[0] = aocommon::MC2x2F(
+        phasedarraytelescope.GetStation(station_idx)
+            ->Response(preapplied_correction_mode_, time, frequency,
+                       diff_beam_centre_, sb_freq, station0_, tile0_)
+            .Data());
     if (!inverse_central_gain_[0].Invert()) {
       inverse_central_gain_[0] = aocommon::MC2x2F::Zero();
     }

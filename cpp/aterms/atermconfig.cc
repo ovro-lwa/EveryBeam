@@ -271,12 +271,11 @@ std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
     const CoordinateSystem& coordinate_system, const ATermSettings& settings,
     bool frequency_interpolation, bool use_differential_beam,
     bool use_channel_frequency, const std::string& element_response_model) {
-  std::unique_ptr<ATermBeam> beam;
   everybeam::Options options = ConvertToEBOptions(
       ms, settings, frequency_interpolation, use_differential_beam,
       use_channel_frequency, element_response_model);
-  beam.reset(new EveryBeamATerm(ms, coordinate_system, options));
-  return std::move(beam);
+  return std::unique_ptr<ATermBeam>(
+      new EveryBeamATerm(ms, coordinate_system, options));
 }
 
 everybeam::Options ATermConfig::ConvertToEBOptions(

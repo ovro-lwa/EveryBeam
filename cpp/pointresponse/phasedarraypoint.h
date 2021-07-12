@@ -9,6 +9,7 @@
 
 #include "pointresponse.h"
 #include "../common/types.h"
+#include "../correctionmode.h"
 
 #include <aocommon/matrix2x2.h>
 #include <casacore/measures/Measures/MDirection.h>
@@ -51,14 +52,15 @@ class PhasedArrayPoint : public PointResponse {
   void UpdateITRFVectors(double ra, double dec);
 
  protected:
-  casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
+  casacore::MDirection delay_dir_, tile_beam_dir_;
   vector3r_t station0_, tile0_, dir_itrf_, diff_beam_centre_;
-
-  bool use_channel_frequency_, use_differential_beam_;
+  bool use_channel_frequency_;
+  bool use_differential_beam_;
+  casacore::MDirection preapplied_beam_dir_;
+  CorrectionMode preapplied_correction_mode_;
   double subband_frequency_;
 
  private:
-  aocommon::MC2x2F inverse_central_gain_;
   double ra_, dec_;
   std::mutex mutex_;
 };
