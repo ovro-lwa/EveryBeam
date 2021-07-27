@@ -25,16 +25,10 @@
 #include <algorithm>
 
 using everybeam::ATermSettings;
-using everybeam::aterms::ATermBeam;
-using everybeam::aterms::ATermConfig;
-using everybeam::aterms::DLDMATerm;
-using everybeam::aterms::EveryBeamATerm;
-using everybeam::aterms::FitsATerm;
-using everybeam::aterms::H5ParmATerm;
-using everybeam::aterms::PAFBeamTerm;
-using everybeam::aterms::ParsetProvider;
 using everybeam::coords::CoordinateSystem;
 
+namespace everybeam {
+namespace aterms {
 void ATermConfig::Read(const casacore::MeasurementSet& ms,
                        const ParsetProvider& reader,
                        const std::string& ms_filename) {
@@ -300,3 +294,5 @@ everybeam::Options ATermConfig::ConvertToEBOptions(
   options.element_response_model = element_response_enum;
   return options;
 }
+}  // namespace aterms
+}  // namespace everybeam

@@ -12,7 +12,7 @@ std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
                                                double freq) {
   char band = '?';
 
-  size_t sharp = bandName.find('#');
+  const size_t sharp = bandName.find('#');
   if (sharp != std::string::npos) {
     if (sharp > 5 && bandName.substr(0, 5) == "EVLA_") band = bandName[5];
   }
@@ -24,7 +24,7 @@ std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
   auto coeffmap = GetCoefficients();
 
   const std::array<double, 5>* coeff;
-  double freqMHz = freq * 1e-6;
+  const double freqMHz = freq * 1e-6;
   std::map<int, std::array<double, 5>>::iterator low, prev;
   low = coeffmap.lower_bound(freqMHz);
   if (low == coeffmap.end()) {

@@ -13,11 +13,9 @@ pybind11_add_module(
   pyeverybeam wrappers/pyutils.cc wrappers/pyload.cc wrappers/pytelescope.cc
   wrappers/pylobes.cc wrappers/wrapper.cc)
 
-target_include_directories(pyeverybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_include_directories(pyeverybeam
                            PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/cpp>")
 target_link_libraries(pyeverybeam PUBLIC everybeam)
-target_link_libraries(pyeverybeam PUBLIC ${CASACORE_LIBRARIES})
 set_target_properties(pyeverybeam PROPERTIES OUTPUT_NAME everybeam)
 
 add_subdirectory(test)

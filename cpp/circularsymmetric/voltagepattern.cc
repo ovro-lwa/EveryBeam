@@ -14,9 +14,9 @@ using everybeam::circularsymmetric::VoltagePattern;
 void VoltagePattern::EvaluatePolynomial(const UVector<double>& coefficients,
                                         bool invert) {
   // This comes from casa's: void PBMath1DIPoly::fillPBArray(), wideband case
-  size_t nsamples = 10000;
-  size_t nfreq = frequencies_.size();
-  size_t ncoef = coefficients.size() / nfreq;
+  const size_t nsamples = 10000;
+  const size_t nfreq = frequencies_.size();
+  const size_t ncoef = coefficients.size() / nfreq;
   values_.resize(nsamples * nfreq);
   inverse_increment_radius_ = double(nsamples - 1) / maximum_radius_arc_min_;
   double* output = values_.data();
@@ -83,9 +83,9 @@ const double* VoltagePattern::InterpolateValues(
 }
 
 double VoltagePattern::LmMaxSquared(double frequency_hz) const {
-  double factor =
+  const double factor =
       (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
-  double rmax = maximum_radius_arc_min_ / factor;
+  const double rmax = maximum_radius_arc_min_ / factor;
   return rmax * rmax;
 }
 
@@ -95,12 +95,12 @@ void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
                             double phase_centre_dec, double pointing_ra,
                             double pointing_dec, double phase_centre_dl,
                             double phase_centre_dm, double frequency_hz) const {
-  double lmMaxSq = LmMaxSquared(frequency_hz);
+  const double lm_max_sq = LmMaxSquared(frequency_hz);
 
   UVector<double> interpolated_values;
   const double* vp = InterpolateValues(frequency_hz, interpolated_values);
 
-  double factor =
+  const double factor =
       (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
   double l0, m0;
   ImageCoordinates::RaDecToLM(pointing_ra, pointing_dec, phase_centre_ra,
@@ -122,7 +122,7 @@ void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
       m -= m0;
       double r2 = l * l + m * m;
       double out;
-      if (r2 > lmMaxSq) {
+      if (r2 > lm_max_sq) {
         out = 1e-4;
       } else {
         double r = std::sqrt(r2) * factor;
@@ -142,12 +142,12 @@ void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
 void VoltagePattern::Render(std::complex<float>* aterm, double phase_centre_ra,
                             double phase_centre_dec, double pointing_ra,
                             double pointing_dec, double frequency_hz) const {
-  double lmMaxSq = LmMaxSquared(frequency_hz);
+  const double lm_max_sq = LmMaxSquared(frequency_hz);
 
   UVector<double> interpolated_values;
   const double* vp = InterpolateValues(frequency_hz, interpolated_values);
 
-  double factor =
+  const double factor =
       (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
 
   // TODO: probably not all conversions needed?
@@ -161,13 +161,13 @@ void VoltagePattern::Render(std::complex<float>* aterm, double phase_centre_ra,
   ImageCoordinates::RaDecToLM(ra, dec, pointing_ra, pointing_dec, l, m);
   l -= l0;
   m -= m0;
-  double r2 = l * l + m * m;
+  const double r2 = l * l + m * m;
   double out;
-  if (r2 > lmMaxSq) {
+  if (r2 > lm_max_sq) {
     out = 1e-4;
   } else {
-    double r = std::sqrt(r2) * factor;
-    int indx = int(r * inverse_increment_radius_);
+    const double r = std::sqrt(r2) * factor;
+    const int indx = int(r * inverse_increment_radius_);
     out = vp[indx] * (1.0 - 1e-4) + 1e-4;
   }
 

@@ -9,6 +9,8 @@
 #include <limits>
 #include "oskardataset.h"
 
+namespace everybeam {
+
 Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
   H5::DataSet dataset;
   const int freq_mhz = (int)(freq / 1e6);
@@ -95,3 +97,4 @@ std::complex<double>* Dataset::GetAlphaPtr(const unsigned int element) {
   size_t index = GetIndex(element);
   return data_.data() + index;
 }
+}  // namespace everybeam

@@ -1,14 +1,15 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef OSKAR_DATASET_H
-#define OSKAR_DATASET_H
+#ifndef EVERYBEAM_OSKAR_DATASET_H_
+#define EVERYBEAM_OSKAR_DATASET_H_
 
 #include <complex>
 #include <vector>
 
 #include <H5Cpp.h>
 
+namespace everybeam {
 //! OSKAR dataset
 class Dataset {
  public:
@@ -40,5 +41,5 @@ class Dataset {
   size_t nr_coeffs_;
   size_t l_max_;
 };
-
+}  // namespace everybeam
 #endif
