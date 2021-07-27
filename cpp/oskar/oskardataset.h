@@ -36,9 +36,9 @@ class Dataset {
 
   // Members
   std::vector<std::complex<double>> data_;
-  unsigned int nr_elements_;
-  unsigned int nr_coeffs_;
-  unsigned int l_max_;
+  size_t nr_elements_;
+  size_t nr_coeffs_;
+  size_t l_max_;
 };
 
 #endif
