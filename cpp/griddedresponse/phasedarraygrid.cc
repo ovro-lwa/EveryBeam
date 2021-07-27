@@ -71,7 +71,8 @@ void PhasedArrayGrid::CalculateAllStations(std::complex<float>* buffer,
   SetITRFVectors(time);
 
   if (use_differential_beam_) {
-    double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
+    const double sb_freq =
+        use_channel_frequency_ ? frequency : subband_frequency_;
     inverse_central_gain_.resize(phasedarraytelescope.GetNrStations());
     for (size_t i = 0; i != phasedarraytelescope.GetNrStations(); ++i) {
       inverse_central_gain_[i] = aocommon::MC2x2F(
@@ -86,9 +87,9 @@ void PhasedArrayGrid::CalculateAllStations(std::complex<float>* buffer,
   }
 
   // Prepare threads
-  for (size_t i = 0; i != nthreads_; ++i) {
-    threads_[i] = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
-                              frequency);
+  for (auto& thread : threads_) {
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
+                         frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -99,7 +100,7 @@ void PhasedArrayGrid::CalculateAllStations(std::complex<float>* buffer,
   }
 
   lane.write_end();
-  for (size_t i = 0; i != nthreads_; ++i) threads_[i].join();
+  for (auto& thread : threads_) thread.join();
 }
 
 void PhasedArrayGrid::SetITRFVectors(double time) {

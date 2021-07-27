@@ -1,8 +1,8 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef HAMAKER_COEFF_H
-#define HAMAKER_COEFF_H
+#ifndef EVERYBEAM_HAMAKER_COEFF_H_
+#define EVERYBEAM_HAMAKER_COEFF_H_
 
 #include <iostream>
 #include <string>
@@ -13,6 +13,7 @@
 
 #include <H5Cpp.h>
 
+namespace everybeam {
 //! Hamaker coefficients
 class HamakerCoefficients {
  public:
@@ -88,5 +89,5 @@ class HamakerCoefficients {
   std::string dataset_name_ = "coeff";
   const unsigned int dataset_rank_ = 4;
 };
-
+}  // namespace everybeam
 #endif

@@ -1,8 +1,8 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef HAMAKER_ELEMENTRESPONSE_H
-#define HAMAKER_ELEMENTRESPONSE_H
+#ifndef EVERYBEAM_HAMAKER_ELEMENTRESPONSE_H_
+#define EVERYBEAM_HAMAKER_ELEMENTRESPONSE_H_
 
 #include "../elementresponse.h"
 #include "hamakercoeff.h"

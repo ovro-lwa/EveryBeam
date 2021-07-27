@@ -3,6 +3,7 @@
 
 #include "hamakercoeff.h"
 
+namespace everybeam {
 H5::CompType GetComplexDoubleType() {
   H5::CompType complex_type(sizeof(std::complex<double>));
   complex_type.insertMember("r", 0, H5::PredType::NATIVE_DOUBLE);
@@ -140,3 +141,4 @@ void HamakerCoefficients::PrintCoefficients() {
   }
   std::cout << std::endl;
 }
+}  // namespace everybeam

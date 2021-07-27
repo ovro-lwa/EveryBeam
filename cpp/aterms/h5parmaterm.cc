@@ -79,14 +79,14 @@ void H5ParmATerm::Open(const std::vector<std::string>& filenames) {
 
 bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
                             double frequency, size_t, const double*) {
-  bool outdated = std::fabs(time - last_aterm_update_) > update_interval_;
+  const bool outdated = std::fabs(time - last_aterm_update_) > update_interval_;
   if (!outdated) return false;
   last_aterm_update_ = time;
 
-  hsize_t time_index_amplitude = amplitude_soltab_[0].GetTimeIndex(time);
-  hsize_t time_index_phase = phase_soltab_[0].GetTimeIndex(time);
-  bool recalculate_amplitude = (time_index_amplitude != last_ampl_index_);
-  bool recalculate_phase = (time_index_phase != last_phase_index_);
+  const hsize_t time_index_amplitude = amplitude_soltab_[0].GetTimeIndex(time);
+  const hsize_t time_index_phase = phase_soltab_[0].GetTimeIndex(time);
+  const bool recalculate_amplitude = (time_index_amplitude != last_ampl_index_);
+  const bool recalculate_phase = (time_index_phase != last_phase_index_);
 
   // Initialize placeholders for the y coefficient expansions only once for
   // efficiency reasons
@@ -131,12 +131,12 @@ bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
 
 void H5ParmATerm::ReadCoeffs(SolTab& soltab, const std::string& station_name,
                              std::vector<float>& coeffs, hsize_t time_index) {
-  size_t n_times = 1;
-  size_t timestep = 1;
+  const size_t n_times = 1;
+  const size_t timestep = 1;
 
   // Not yet relevant
-  size_t freq_start = 0, n_freq = 1, freq_step = 1;
-  size_t pol = 0;
+  const size_t freq_start = 0, n_freq = 1, freq_step = 1;
+  const size_t pol = 0;
 
   for (size_t idx = 0; idx < coeffs.size(); ++idx) {
     coeffs[idx] = soltab.GetValues(station_name, time_index, n_times, timestep,
