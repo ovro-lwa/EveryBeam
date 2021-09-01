@@ -69,7 +69,7 @@ find_package(
   HDF5
   COMPONENTS C CXX
   REQUIRED)
-add_definitions(${HDF5_DEFINITIONS})
+add_definitions(${HDF5_DEFINITIONS} -DH5_USE_110_API)
 include_directories(${HDF5_INCLUDE_DIR})
 
 # Find and include Casacore
