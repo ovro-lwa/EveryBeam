@@ -62,7 +62,8 @@ std::ostream &operator<<(std::ostream &os, ElementResponseModel model) {
 }
 
 std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
-    ElementResponseModel model, const std::string &name, Options &options) {
+    ElementResponseModel model, const std::string &name,
+    const Options &options) {
   switch (model) {
     case kHamaker:
       return HamakerElementResponse::GetInstance(name);

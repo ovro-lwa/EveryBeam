@@ -14,9 +14,9 @@ void oskar_evaluate_dipole_pattern_double(const int num_points,
                                           const double dipole_length_m,
                                           std::complex<double>* pattern);
 
-void oskar_evaluate_spherical_wave_sum_double(
-    const int num_points, const double* theta, const double* phi_x,
-    const double* phi_y, const int l_max, const std::complex<double>* alpha,
-    std::complex<double>* pattern);
+void oskar_evaluate_spherical_wave_sum_double(double theta, double phi_x,
+                                              double phi_y, int l_max,
+                                              const std::complex<double>* alpha,
+                                              std::complex<double>* pattern);
 
 #endif

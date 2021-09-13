@@ -75,7 +75,8 @@ class ElementResponse {
   }
 
   static std::shared_ptr<ElementResponse> GetInstance(
-      ElementResponseModel model, const std::string &name, Options &options);
+      ElementResponseModel model, const std::string &name,
+      const Options &options);
 };
 }  // namespace everybeam
 #endif

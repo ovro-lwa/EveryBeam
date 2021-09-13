@@ -10,11 +10,13 @@
 #include <cassert>
 
 namespace everybeam {
-std::vector<std::complex<double>> BeamFormerLofar::ComputeGeometricResponse(
-    std::vector<vector3r_t> phase_reference_positions,
+aocommon::UVector<std::complex<double>>
+BeamFormerLofar::ComputeGeometricResponse(
+    const std::vector<vector3r_t> &phase_reference_positions,
     const vector3r_t &direction) const {
   // Initialize and fill result vector by looping over phase_reference_positions
-  std::vector<std::complex<double>> result(phase_reference_positions.size());
+  aocommon::UVector<std::complex<double>> result(
+      phase_reference_positions.size());
 
   for (std::size_t idx = 0; idx < phase_reference_positions.size(); ++idx) {
     // Simplified dot product, since local_phase_reference_position_ = [0, 0, 0]
@@ -42,7 +44,7 @@ aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
       options.freq0 * options.station0 - freq * direction;
 
   // Get geometric response for pointing direction
-  std::vector<std::complex<double>> geometric_response =
+  aocommon::UVector<std::complex<double>> geometric_response =
       ComputeGeometricResponse(antenna_positions, delta_direction);
 
   double weight_sum[2] = {0.0, 0.0};

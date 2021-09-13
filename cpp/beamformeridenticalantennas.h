@@ -32,10 +32,10 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
    * @param phase_reference_position
    */
   BeamFormerIdenticalAntennas(CoordinateSystem coordinate_system,
-                              vector3r_t phase_reference_position)
+                              const vector3r_t &phase_reference_position)
       : BeamFormer(coordinate_system, phase_reference_position) {}
 
-  BeamFormerIdenticalAntennas(vector3r_t phase_reference_position)
+  BeamFormerIdenticalAntennas(const vector3r_t &phase_reference_position)
       : BeamFormer(phase_reference_position) {}
 
   Antenna::Ptr Clone() const override;
