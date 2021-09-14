@@ -41,7 +41,6 @@ class PhasedArray : public Telescope {
    * @return std::shared_ptr<Station>
    */
   std::shared_ptr<Station> GetStation(std::size_t station_idx) const {
-    // Assert only in DEBUG mode
     assert(station_idx < nstations_);
     return stations_[station_idx];
   }

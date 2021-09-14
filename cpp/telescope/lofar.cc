@@ -109,7 +109,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
   }
   // Populate struct
   ms_properties_ = MSProperties();
-  ms_properties_.subband_freq = band.CentreFrequency();
+  ms_properties_.subband_freq = band.ReferenceFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
   ms_properties_.tile_beam_dir = *(tile_beam_dir_col(0).data());
   ms_properties_.preapplied_beam_dir = preapplied_beam_dir;

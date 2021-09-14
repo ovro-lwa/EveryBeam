@@ -8,7 +8,13 @@
 #define EVERYBEAM_POINTRESPONSE_POINTRESPONSE_H_
 
 #include <complex>
+#include <mutex>
+
+#include "../common/types.h"
 #include "../telescope/telescope.h"
+
+#include <aocommon/matrix2x2diag.h>
+#include <aocommon/matrix2x2.h>
 
 namespace everybeam {
 namespace pointresponse {
@@ -53,6 +59,24 @@ class PointResponse {
   bool HasTimeUpdate() const { return has_time_update_; }
 
   /**
+   * @brief See FullBeam.
+   */
+  [[deprecated("Use FullBeam() instead.")]] void CalculateStation(
+      std::complex<float>* response_matrix, double ra, double dec, double freq,
+      size_t station_idx, size_t field_id) {
+    FullBeam(response_matrix, ra, dec, freq, station_idx, field_id);
+  };
+
+  /**
+   * @brief See FullBeamAllStations.
+   */
+  [[deprecated("Use FullBeamAllStations() instead.")]] virtual void
+  CalculateAllStations(std::complex<float>* response_matrices, double ra,
+                       double dec, double freq, size_t field_id) {
+    FullBeamAllStations(response_matrices, ra, dec, freq, field_id);
+  };
+
+  /**
    * @brief Get beam response for a given station at a prescribed ra, dec
    * position.
    *
@@ -65,12 +89,30 @@ class PointResponse {
    * index.
    * @param field_id Field index as used in the measurement set
    */
-  virtual void CalculateStation(std::complex<float>* response_matrix, double ra,
-                                double dec, double freq, size_t station_id,
-                                size_t field_id) = 0;
+  virtual void FullBeam(std::complex<float>* response_matrix, double ra,
+                        double dec, double freq, size_t station_id,
+                        size_t field_id) = 0;
 
   /**
-   * @brief Same as PointResponseStation, but now iterate over all stations in
+   * @brief Get the full beam response for a station, given a pointing direction
+   * in ITRF coordinates
+   *
+   * @param station_idx Station index
+   * @param freq Frequency (Hz)
+   * @param direction Direction in ITRF
+   * @param mutex Optional mutex. When provided, the caller keeps control over
+   * thread-safety. If not provided, the internal mutex will be used and the
+   * caller is assumed to be thread-safe.
+   * @return aocommon::MC2x2
+   */
+  virtual aocommon::MC2x2 FullBeam(size_t station_idx, double freq,
+                                   const vector3r_t& direction,
+                                   std::mutex* mutex = nullptr) {
+    throw std::runtime_error("Not yet implemented");
+  };
+
+  /**
+   * @brief Same as FullBeam, but now iterate over all stations in
    * MS.
    *
    * @param response_matrices Buffer with a size of 4 * nr_stations complex
@@ -80,14 +122,37 @@ class PointResponse {
    * @param freq Frequency (Hz)
    * @param field_id Field index as used in the measurement set
    */
-  virtual void CalculateAllStations(std::complex<float>* response_matrices,
-                                    double ra, double dec, double freq,
-                                    size_t field_id) {
+  virtual void FullBeamAllStations(std::complex<float>* response_matrices,
+                                   double ra, double dec, double freq,
+                                   size_t field_id) {
     for (size_t i = 0; i < telescope_->GetNrStations(); ++i) {
-      CalculateStation(response_matrices, ra, dec, freq, i, field_id);
+      FullBeam(response_matrices, ra, dec, freq, i, field_id);
       response_matrices += 4;
     }
   };
+
+  /**
+   * @brief Get the array factor for a station, given a pointing direction
+   * in ITRF coordinates
+   *
+   * @param station_idx Station index
+   * @param freq Frequency (Hz)
+   * @param direction Direction in ITRF
+   * @param mutex Optional mutex. When provided, the caller keeps control over
+   * thread-safety. If not provided, the internal mutex will be used and the
+   * caller is assumed to be thread-safe.
+   * @return aocommon::MC2x2Diag
+   */
+  virtual aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
+                                          const vector3r_t& direction,
+                                          std::mutex* mutex = nullptr) {
+    throw std::runtime_error("Not yet implemented");
+  };
+
+  virtual aocommon::MC2x2 ElementResponse(size_t station_idx, double freq,
+                                          const vector3r_t& direction) const {
+    throw std::runtime_error("Not yet implemented");
+  }
 
   std::size_t GetAllStationsBufferSize() const {
     return telescope_->GetNrStations() * 4u;

@@ -113,8 +113,8 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
                                                 {0.000982019, -0.00856565}};
   // Compute results via PointResponse (station 0)
   std::complex<float> point_buffer_single_station[4];
-  point_response->CalculateStation(point_buffer_single_station, coord_system.ra,
-                                   coord_system.dec, frequency, 0, 0);
+  point_response->FullBeam(point_buffer_single_station, coord_system.ra,
+                           coord_system.dec, frequency, 0, 0);
 
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer[offset_p88 + i] - oskar_p88[i]) < 1e-6);

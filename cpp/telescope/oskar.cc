@@ -39,7 +39,7 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
 
   // Populate struct
   ms_properties_ = MSProperties();
-  ms_properties_.subband_freq = band.CentreFrequency();
+  ms_properties_.subband_freq = band.ReferenceFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
   // tile_beam_dir and preapplied_beam_dir
   // have dummy values for OSKAR

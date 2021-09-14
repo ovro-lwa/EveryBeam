@@ -202,15 +202,15 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // Compute response for center pixel via PointResponse
   // One station
   std::complex<float> point_buffer_single_station[4];
-  point_response->CalculateStation(point_buffer_single_station, coord_system.ra,
-                                   coord_system.dec, frequency, 23, 0);
+  point_response->FullBeam(point_buffer_single_station, coord_system.ra,
+                           coord_system.dec, frequency, 23, 0);
 
   // All stations
   std::complex<float>
       point_buffer_all_stations[point_response->GetAllStationsBufferSize()];
-  point_response->CalculateAllStations(point_buffer_all_stations,
-                                       coord_system.ra, coord_system.dec,
-                                       frequency, 0);
+  point_response->FullBeamAllStations(point_buffer_all_stations,
+                                      coord_system.ra, coord_system.dec,
+                                      frequency, 0);
 
   // Compare with everybeam
   std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
@@ -293,27 +293,27 @@ BOOST_AUTO_TEST_CASE(point_response_caching) {
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
 
   std::vector<std::complex<float>> point_buffer_1(4);
-  lofar_point.CalculateStation(point_buffer_1.data(), coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  lofar_point.FullBeam(point_buffer_1.data(), coord_system.ra, coord_system.dec,
+                       frequency, 23, 0);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), false);
 
   lofar_point.UpdateTime(time + 100);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
-  lofar_point.CalculateStation(point_buffer_1.data(), coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  lofar_point.FullBeam(point_buffer_1.data(), coord_system.ra, coord_system.dec,
+                       frequency, 23, 0);
 
   lofar_point.SetUpdateInterval(100);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
 
   lofar_point.UpdateTime(time + 100);
-  lofar_point.CalculateStation(point_buffer_1.data(), coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  lofar_point.FullBeam(point_buffer_1.data(), coord_system.ra, coord_system.dec,
+                       frequency, 23, 0);
 
   lofar_point.UpdateTime(time + 199);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), false);
   std::vector<std::complex<float>> point_buffer_2(4);
-  lofar_point.CalculateStation(point_buffer_2.data(), coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  lofar_point.FullBeam(point_buffer_2.data(), coord_system.ra, coord_system.dec,
+                       frequency, 23, 0);
 
   for (size_t i = 0; i != point_buffer_1.size(); ++i) {
     BOOST_CHECK_CLOSE(point_buffer_1[i], point_buffer_2[i], 1e-6);
@@ -321,8 +321,8 @@ BOOST_AUTO_TEST_CASE(point_response_caching) {
 
   lofar_point.UpdateTime(time + 201);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
-  lofar_point.CalculateStation(point_buffer_2.data(), coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  lofar_point.FullBeam(point_buffer_2.data(), coord_system.ra, coord_system.dec,
+                       frequency, 23, 0);
 
   for (size_t i = 0; i != point_buffer_1.size(); ++i) {
     BOOST_CHECK_PREDICATE(std::not_equal_to<std::complex<float>>(),

@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
   // Use ComputeAllStations (should be a repetitive call to CalculateStation)
   std::complex<float>
       point_response_buffer[point_response->GetAllStationsBufferSize()];
-  point_response->CalculateAllStations(point_response_buffer, coord_system.ra,
-                                       coord_system.dec, frequency, 0);
+  point_response->FullBeamAllStations(point_response_buffer, coord_system.ra,
+                                      coord_system.dec, frequency, 0);
   BOOST_CHECK_EQUAL(point_response->HasTimeUpdate(), false);
 
   BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,

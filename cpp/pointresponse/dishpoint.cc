@@ -12,9 +12,8 @@ using aocommon::UVector;
 
 namespace everybeam {
 namespace pointresponse {
-void DishPoint::CalculateStation(std::complex<float>* buffer, double ra,
-                                 double dec, double freq, size_t station_idx,
-                                 size_t field_id) {
+void DishPoint::FullBeam(std::complex<float>* buffer, double ra, double dec,
+                         double freq, size_t station_idx, size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
@@ -29,9 +28,9 @@ void DishPoint::CalculateStation(std::complex<float>* buffer, double ra,
   vp.Render(buffer, ra, dec, pdir_ra, pdir_dec, freq);
 }
 
-void DishPoint::CalculateAllStations(std::complex<float>* buffer, double ra,
-                                     double dec, double freq, size_t field_id) {
-  CalculateStation(buffer, ra, dec, freq, 0., field_id);
+void DishPoint::FullBeamAllStations(std::complex<float>* buffer, double ra,
+                                    double dec, double freq, size_t field_id) {
+  FullBeam(buffer, ra, dec, freq, 0., field_id);
 
   // Just repeat nstations times
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {

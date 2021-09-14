@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.7)
 
 #------------------------------------------------------------------------------
 # Set version name and project number
-set(EVERYBEAM_VERSION 0.2.0)
+set(EVERYBEAM_VERSION 0.2.1)
 if(EVERYBEAM_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)")
   set(EVERYBEAM_VERSION_MAJOR "${CMAKE_MATCH_1}")
   set(EVERYBEAM_VERSION_MINOR "${CMAKE_MATCH_2}")
