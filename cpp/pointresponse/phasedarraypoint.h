@@ -14,8 +14,6 @@
 #include <aocommon/matrix2x2.h>
 #include <casacore/measures/Measures/MDirection.h>
 
-#include <mutex>
-
 namespace everybeam {
 namespace pointresponse {
 
@@ -41,9 +39,21 @@ class PhasedArrayPoint : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void CalculateStation(std::complex<float>* buffer, double ra, double dec,
-                        double freq, size_t station_idx,
-                        size_t field_id) final override;
+  void FullBeam(std::complex<float>* response_matrix, double ra, double dec,
+                double freq, size_t station_idx,
+                size_t field_id) final override;
+
+  aocommon::MC2x2 FullBeam(size_t station_idx, double freq,
+                           const vector3r_t& direction,
+                           std::mutex* mutex) final override;
+
+  aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
+                                  const vector3r_t& direction,
+                                  std::mutex* mutex) final override;
+
+  aocommon::MC2x2 ElementResponse(
+      size_t station_idx, double freq,
+      const vector3r_t& direction) const final override;
 
   /**
    * @brief Method for computing the ITRF-vectors, given ra, dec position in
@@ -61,8 +71,20 @@ class PhasedArrayPoint : public PointResponse {
   double subband_frequency_;
 
  private:
+  /**
+   * @brief Update ITRF coordinates for reference station and reference tile
+   * direction. Member function leaves the responsibility for providing the
+   * mutex to the caller.
+   */
+  void UpdateITRFVectors(std::mutex& mutex);
+
   double ra_, dec_;
   std::mutex mutex_;
+
+  // Marks whether the itrf vectors were only partially updated.
+  // This bool switches to true if UpdateITRFVectors() is called, since
+  // this method doesn't update all the ITRF direction vectors.
+  bool has_partial_itrf_update_;
 };
 
 }  // namespace pointresponse

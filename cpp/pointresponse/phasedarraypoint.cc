@@ -16,27 +16,29 @@ namespace pointresponse {
 PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope* telescope_ptr,
                                    double time)
     : PointResponse(telescope_ptr, time),
-      use_channel_frequency_(true),
+      use_channel_frequency_(telescope_->GetOptions().use_channel_frequency),
       use_differential_beam_(telescope_->GetOptions().use_differential_beam),
       preapplied_correction_mode_(CorrectionMode::kFull),
       subband_frequency_(0.0),
       ra_(std::numeric_limits<double>::min()),
-      dec_(std::numeric_limits<double>::min()) {}
+      dec_(std::numeric_limits<double>::min()),
+      has_partial_itrf_update_(false) {}
 
-void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
-                                        double dec, double freq,
-                                        size_t station_idx, size_t field_id) {
+void PhasedArrayPoint::FullBeam(std::complex<float>* buffer, double ra,
+                                double dec, double freq, size_t station_idx,
+                                size_t field_id) {
   // Only compute ITRF directions if values differ from cached values
-  if (has_time_update_ || std::abs(ra - ra_) > 1e-10 ||
-      std::abs(dec - dec_) > 1e-10) {
+  if (has_time_update_ || has_partial_itrf_update_ ||
+      std::abs(ra - ra_) > 1e-10 || std::abs(dec - dec_) > 1e-10) {
     UpdateITRFVectors(ra, dec);
     has_time_update_ = false;
+    has_partial_itrf_update_ = false;
   }
 
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
 
-  double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
+  const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
   aocommon::MC2x2F inverse_central_gain;
   if (use_differential_beam_) {
@@ -50,6 +52,7 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
     }
   }
 
+  // TODO: alternative could be a call to FullBeam()
   const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
       phasedarraytelescope.GetStation(station_idx)
           ->Response(time_, freq, dir_itrf_, sb_freq, station0_, tile0_)
@@ -60,6 +63,63 @@ void PhasedArrayPoint::CalculateStation(std::complex<float>* buffer, double ra,
   } else {
     gain_matrix.AssignTo(buffer);
   }
+}
+
+aocommon::MC2x2 PhasedArrayPoint::FullBeam(size_t station_idx, double freq,
+                                           const vector3r_t& direction,
+                                           std::mutex* mutex) {
+  if (has_time_update_) {
+    if (mutex != nullptr) {
+      // Caller takes over responsibility to be thread-safe
+      UpdateITRFVectors(*mutex);
+    } else {
+      // Calllee assumes that caller is thread-safe
+      UpdateITRFVectors(mutex_);
+    }
+    has_time_update_ = false;
+    has_partial_itrf_update_ = true;
+  }
+
+  const telescope::PhasedArray& phasedarraytelescope =
+      static_cast<const telescope::PhasedArray&>(*telescope_);
+
+  const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
+
+  return phasedarraytelescope.GetStation(station_idx)
+      ->Response(time_, freq, direction, sb_freq, station0_, tile0_);
+}
+
+aocommon::MC2x2Diag PhasedArrayPoint::ArrayFactor(size_t station_idx,
+                                                  double freq,
+                                                  const vector3r_t& direction,
+                                                  std::mutex* mutex) {
+  if (has_time_update_) {
+    if (mutex != nullptr) {
+      // Caller takes over responsibility to be thread-safe
+      UpdateITRFVectors(*mutex);
+    } else {
+      // Calllee assumes that caller is thread-safe
+      UpdateITRFVectors(mutex_);
+    }
+    has_time_update_ = false;
+    has_partial_itrf_update_ = true;
+  }
+
+  const telescope::PhasedArray& phasedarraytelescope =
+      static_cast<const telescope::PhasedArray&>(*telescope_);
+
+  const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
+
+  return phasedarraytelescope.GetStation(station_idx)
+      ->ArrayFactor(time_, freq, direction, sb_freq, station0_, tile0_);
+}
+
+aocommon::MC2x2 PhasedArrayPoint::ElementResponse(
+    size_t station_idx, double freq, const vector3r_t& direction) const {
+  const telescope::PhasedArray& phasedarraytelescope =
+      static_cast<const telescope::PhasedArray&>(*telescope_);
+  return phasedarraytelescope.GetStation(station_idx)
+      ->ComputeElementResponse(time_, freq, direction);
 }
 
 void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {
@@ -86,5 +146,11 @@ void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {
                         diff_beam_centre_);
 }
 
+void PhasedArrayPoint::UpdateITRFVectors(std::mutex& mutex) {
+  std::unique_lock<std::mutex> lock(mutex);
+  coords::ITRFConverter itrf_converter(time_);
+  coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
+  coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
+}
 }  // namespace pointresponse
 }  // namespace everybeam

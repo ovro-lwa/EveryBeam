@@ -22,12 +22,11 @@ class DishPoint final : public PointResponse {
   DishPoint(const telescope::Telescope* telescope_ptr, double time)
       : PointResponse(telescope_ptr, time){};
 
-  void CalculateStation(std::complex<float>* buffer, double ra, double dec,
-                        double freq, size_t station_idx,
-                        size_t field_id) override;
+  void FullBeam(std::complex<float>* buffer, double ra, double dec, double freq,
+                size_t station_idx, size_t field_id) override;
 
-  void CalculateAllStations(std::complex<float>* buffer, double ra, double dec,
-                            double freq, size_t field_id) override;
+  void FullBeamAllStations(std::complex<float>* buffer, double ra, double dec,
+                           double freq, size_t field_id) override;
 };
 }  // namespace pointresponse
 }  // namespace everybeam

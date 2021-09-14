@@ -23,7 +23,7 @@ class MWAPoint final : public PointResponse {
   /**
    * @brief Get beam response for a given station at a prescribed ra, dec
    * position.
-   * NOTE: CalculateStation complies with the standard
+   * NOTE: function complies with the standard
    * threading rules, but does not guarantee thread-safety itself for efficiency
    * reasons. The caller is responsible to ensure this.
    *
@@ -35,12 +35,11 @@ class MWAPoint final : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void CalculateStation(std::complex<float>* buffer, double ra, double dec,
-                        double freq, size_t station_idx,
-                        size_t field_id) override;
+  void FullBeam(std::complex<float>* buffer, double ra, double dec, double freq,
+                size_t station_idx, size_t field_id) override;
 
-  void CalculateAllStations(std::complex<float>* buffer, double ra, double dec,
-                            double freq, size_t field_id);
+  void FullBeamAllStations(std::complex<float>* buffer, double ra, double dec,
+                           double freq, size_t field_id);
 
  private:
   void SetJ200Vectors();
