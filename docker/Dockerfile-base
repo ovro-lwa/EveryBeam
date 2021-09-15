@@ -15,6 +15,6 @@ RUN apt-get update && \
         libblas-dev liblapack-dev libgsl-dev libxml2-dev \
         libpng-dev libgtkmm-3.0-dev libpython3-dev && \
 # Install python dependencies
-    pip3 install clang-format==9.0.0 cmake-format gcovr pytest pytest-lazy-fixture \
+    pip3 install gcovr pytest pytest-lazy-fixture \
     # Install python requirements for the OSKAR "integration" test
         numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
