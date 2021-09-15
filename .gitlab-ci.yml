@@ -20,19 +20,28 @@ build-base:
   script:
     - docker build --tag everybeam_base:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-base .
 
-format:
-  stage: build
-  needs: ["build-base"]
-  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
-  script:
-    # Update external/aocommon, which contains format.sh.
-    - git submodule update --init external/aocommon
-    - ./scripts/run-format.sh
+.format-common:
   rules:
     # Do not add for schedules
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - when: on_success
+
+build-format:
+  extends: .format-common
+  stage: prepare
+  script:
+    - docker build --tag everybeam_format:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-format .
+
+format:
+  extends: .format-common
+  stage: build
+  needs: ["build-format"]
+  image: everybeam_format:${CI_COMMIT_SHORT_SHA}
+  script:
+    #Update external/aocommon, which contains format.sh.
+    - git submodule update --init external/aocommon && \
+    - ./scripts/run-format.sh
 
 # Build a debug version of EveryBeam from the base image
 test-and-coverage:
