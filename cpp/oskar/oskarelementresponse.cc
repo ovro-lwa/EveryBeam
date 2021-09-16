@@ -32,9 +32,9 @@ OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave(
   datafile_.reset(new Datafile(path));
 }
 
-aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(double freq,
-                                                            double theta,
-                                                            double phi) const {
+aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(
+    [[maybe_unused]] double freq, [[maybe_unused]] double theta,
+    [[maybe_unused]] double phi) const {
   // This ElementResponse model is element specific, so an element_id is
   // required to know for what element the response needs to be evaluated A
   // std::invalid_argument exception is thrown although strictly speaking it are
@@ -42,7 +42,6 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(double freq,
   // a different signature should have been called.
   throw std::invalid_argument(
       "OSKARElementResponseSphericalWave: missing argument element_id");
-  return aocommon::MC2x2::Zero();
 }
 
 aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,

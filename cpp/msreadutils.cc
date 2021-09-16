@@ -148,7 +148,8 @@ std::shared_ptr<BeamFormer> MakeTile(const vector3r_t &position,
 // Make a dedicated HBA "Hamaker" tile, saving only one element, and 16
 // element positions
 void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
-              const vector3r_t &position, const TileConfig &tile_config,
+              [[maybe_unused]] const vector3r_t &position,
+              const TileConfig &tile_config,
               ElementResponse::Ptr element_response) {
   for (unsigned int id = 0; id < tile_config.size(); id++) {
     vector3r_t antenna_position = tile_config[id];
@@ -352,9 +353,10 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
 }
 
 std::shared_ptr<BeamFormer> LofarStationBeamFormer(
-    const MeasurementSet &ms, unsigned int id, const std::string &name,
-    const vector3r_t &position, const vector3r_t &phase_reference,
-    ElementResponse::Ptr element_response) {
+    const MeasurementSet &ms, unsigned int id,
+    [[maybe_unused]] const std::string &name,
+    [[maybe_unused]] const vector3r_t &position,
+    const vector3r_t &phase_reference, ElementResponse::Ptr element_response) {
   // Read antenna field information.
   ROScalarColumn<String> telescope_name_col(
       common::GetSubTable(ms, "OBSERVATION"), "TELESCOPE_NAME");
@@ -408,8 +410,10 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
 }
 
 std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
-    const MeasurementSet &ms, unsigned int id, const std::string &name,
-    const vector3r_t &position, ElementResponse::Ptr element_response) {
+    const MeasurementSet &ms, unsigned int id,
+    [[maybe_unused]] const std::string &name,
+    [[maybe_unused]] const vector3r_t &position,
+    ElementResponse::Ptr element_response) {
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
   // The Station will consist of a BeamFormer that combines the fields

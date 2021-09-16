@@ -35,13 +35,13 @@ class DishGrid final : public GriddedResponse {
       const std::vector<double>& baseline_weights) override;
 
   virtual void CalculateIntegratedResponse(
-      double* buffer, const std::vector<double>& time_array, double frequency,
-      size_t field_id, size_t undersampling_factor,
-      const std::vector<double>& baseline_weights) override {
+      double* buffer, [[maybe_unused]] const std::vector<double>& time_array,
+      double frequency, size_t field_id, size_t undersampling_factor,
+      [[maybe_unused]] const std::vector<double>& baseline_weights) override {
     // Time does not play a role in the integrated response of a dish telescope,
     // so call CalculateIntegratedResponse as if it were one time step
-    CalculateIntegratedResponse(buffer, 0., frequency, field_id,
-                                undersampling_factor, std::vector<double>{0});
+    CalculateIntegratedResponse(buffer, 0.0, frequency, field_id,
+                                undersampling_factor, std::vector<double>{0.0});
   };
 
  private:

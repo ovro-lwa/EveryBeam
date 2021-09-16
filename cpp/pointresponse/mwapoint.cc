@@ -10,7 +10,8 @@ using mwabeam::TileBeam2016;
 namespace pointresponse {
 
 void MWAPoint::FullBeam(std::complex<float>* buffer, double ra, double dec,
-                        double freq, size_t station_idx, size_t) {
+                        double freq, [[maybe_unused]] size_t station_idx,
+                        [[maybe_unused]] size_t field_id) {
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
 

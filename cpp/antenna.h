@@ -209,9 +209,10 @@ class Antenna {
                                         const vector3r_t &direction,
                                         const Options &options) const = 0;
 
-  virtual aocommon::MC2x2Diag LocalArrayFactor(real_t time, real_t freq,
-                                               const vector3r_t &direction,
-                                               const Options &options) const {
+  virtual aocommon::MC2x2Diag LocalArrayFactor(
+      [[maybe_unused]] real_t time, [[maybe_unused]] real_t freq,
+      [[maybe_unused]] const vector3r_t &direction,
+      [[maybe_unused]] const Options &options) const {
     return aocommon::MC2x2Diag::Unity();
   }
 };

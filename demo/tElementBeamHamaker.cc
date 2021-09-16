@@ -7,7 +7,7 @@
 
 using namespace everybeam;
 
-int main(int argc, char** argv) {
+int main() {
   ElementResponseModel model(kHamaker);
   double frequency = 132e6;  // Mhz
   std::string input_filename(TEST_MEASUREMENTSET);

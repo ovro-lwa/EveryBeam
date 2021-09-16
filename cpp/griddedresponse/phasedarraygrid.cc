@@ -26,7 +26,7 @@ PhasedArrayGrid::PhasedArrayGrid(
 
 void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
                                        double frequency, size_t station_idx,
-                                       size_t field_id) {
+                                       [[maybe_unused]] size_t field_id) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
   aocommon::Lane<Job> lane(nthreads_);

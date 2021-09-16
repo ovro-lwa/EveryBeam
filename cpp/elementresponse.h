@@ -69,8 +69,8 @@ class ElementResponse {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @param result Pointer to 2x2 array of Jones matrix
    */
-  virtual aocommon::MC2x2 Response(int element_id, double freq, double theta,
-                                   double phi) const {
+  virtual aocommon::MC2x2 Response([[maybe_unused]] int element_id, double freq,
+                                   double theta, double phi) const {
     return Response(freq, theta, phi);
   }
 
