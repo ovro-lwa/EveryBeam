@@ -16,7 +16,8 @@ Antenna::Ptr ElementHamaker::Clone() const {
   return element_clone;
 }
 
-aocommon::MC2x2 ElementHamaker::LocalResponse(real_t time, real_t freq,
+aocommon::MC2x2 ElementHamaker::LocalResponse([[maybe_unused]] real_t time,
+                                              real_t freq,
                                               const vector3r_t &direction,
                                               size_t id,
                                               const Options &options) const {

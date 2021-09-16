@@ -35,7 +35,7 @@ aocommon::MC2x2Diag BeamFormerLofarHBA::LocalArrayFactor(
 }
 
 std::complex<double> BeamFormerLofarHBA::TileArrayFactor(
-    real_t time, real_t freq, const vector3r_t &direction,
+    [[maybe_unused]] real_t time, real_t freq, const vector3r_t &direction,
     const Options &options) const {
   // Weighted subtraction of the directions, with weights given by corresponding
   // freqs. Purpose is to correctly handle the case in which options.freq0 !=

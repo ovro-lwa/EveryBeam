@@ -77,7 +77,7 @@ void GetITRFDirections(
             double pdl = -0.5*dl;
             double pdm =  0.5*dm;
 
-            double l, m, n, ra, dec;
+            double l, m, n;
 
             aocommon::ImageCoordinates::XYToLM<double>(x, y, dl, dm, subgrid_size, subgrid_size, l, m);
 

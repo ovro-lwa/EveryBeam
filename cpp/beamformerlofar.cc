@@ -30,7 +30,7 @@ std::vector<std::complex<double>> BeamFormerLofar::ComputeGeometricResponse(
 }
 
 aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
-    real_t time, real_t freq, const vector3r_t &direction,
+    [[maybe_unused]] real_t time, real_t freq, const vector3r_t &direction,
     const Options &options, const std::vector<vector3r_t> &antenna_positions,
     const std::vector<std::array<bool, 2>> &antenna_enabled) const {
   assert(antenna_positions.size() == antenna_enabled.size());

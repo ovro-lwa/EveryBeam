@@ -13,7 +13,8 @@ using aocommon::UVector;
 namespace everybeam {
 namespace pointresponse {
 void DishPoint::FullBeam(std::complex<float>* buffer, double ra, double dec,
-                         double freq, size_t station_idx, size_t field_id) {
+                         double freq, [[maybe_unused]] size_t station_idx,
+                         size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 

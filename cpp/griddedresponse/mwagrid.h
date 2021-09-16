@@ -24,7 +24,7 @@ class MWAGrid final : public GriddedResponse {
                         size_t field_id) override;
 
   void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency, const size_t field_id) override;
+                            double frequency, size_t field_id) override;
 
  private:
   std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;

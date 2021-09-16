@@ -78,7 +78,9 @@ void H5ParmATerm::Open(const std::vector<std::string>& filenames) {
 }
 
 bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
-                            double frequency, size_t, const double*) {
+                            [[maybe_unused]] double frequency,
+                            [[maybe_unused]] size_t field_id,
+                            [[maybe_unused]] const double* uvm_in_m) {
   const bool outdated = std::fabs(time - last_aterm_update_) > update_interval_;
   if (!outdated) return false;
   last_aterm_update_ = time;

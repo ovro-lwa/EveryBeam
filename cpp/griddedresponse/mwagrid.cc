@@ -19,7 +19,9 @@ using everybeam::griddedresponse::MWAGrid;
 using everybeam::mwabeam::TileBeam2016;
 
 void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
-                               double frequency, size_t station_idx, size_t) {
+                               double frequency,
+                               [[maybe_unused]] size_t station_idx,
+                               [[maybe_unused]] size_t field_id) {
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
 
@@ -66,7 +68,8 @@ void MWAGrid::CalculateStation(std::complex<float>* buffer, double time,
 }
 
 void MWAGrid::CalculateAllStations(std::complex<float>* buffer, double time,
-                                   double frequency, size_t) {
+                                   double frequency,
+                                   [[maybe_unused]] size_t field_id) {
   CalculateStation(buffer, time, frequency, 0, 0);
   // Repeated copy for nstations
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {

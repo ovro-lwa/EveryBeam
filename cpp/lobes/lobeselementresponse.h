@@ -39,8 +39,9 @@ class LOBESElementResponse : public FieldResponse {
    * @param phi
    * @param response
    */
-  aocommon::MC2x2 Response(double freq, double theta,
-                           double phi) const final override {
+  aocommon::MC2x2 Response([[maybe_unused]] double freq,
+                           [[maybe_unused]] double theta,
+                           [[maybe_unused]] double phi) const final override {
     throw std::invalid_argument(
         "LOBESElementResponse::response needs an element_id");
   };

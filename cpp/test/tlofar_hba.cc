@@ -47,32 +47,34 @@ namespace {
 // A very simple override of the ParsetProvider. Just falls back on the
 // default or on hard-coded values
 struct ParsetATerms : public ParsetProvider {
-  virtual std::string GetString(const std::string& key) const final override {
+  virtual std::string GetString(
+      [[maybe_unused]] const std::string& key) const final override {
     // Not relevant for EveryBeamATerm
     return "";
   }
 
-  std::string GetStringOr(const std::string& key,
+  std::string GetStringOr([[maybe_unused]] const std::string& key,
                           const std::string& or_value) const final override {
     // Default response model
     return or_value;
   }
 
   std::vector<std::string> GetStringList(
-      const std::string& key) const final override {
+      [[maybe_unused]] const std::string& key) const final override {
     return std::vector<std::string>{"beam"};
   }
 
-  double GetDoubleOr(const std::string& key,
-                     double or_value) const final override {
+  double GetDoubleOr([[maybe_unused]] const std::string& key,
+                     [[maybe_unused]] double or_value) const final override {
     // Update interval set to 1200 (s)
     return 1200.0;
   }
-  bool GetBool(const std::string& key) const final override {
+  bool GetBool([[maybe_unused]] const std::string& key) const final override {
     // No use
     return false;
   }
-  bool GetBoolOr(const std::string& key, bool or_value) const final override {
+  bool GetBoolOr([[maybe_unused]] const std::string& key,
+                 bool or_value) const final override {
     return or_value;
   }
 };
@@ -206,9 +208,9 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
                            coord_system.dec, frequency, 23, 0);
 
   // All stations
-  std::complex<float>
-      point_buffer_all_stations[point_response->GetAllStationsBufferSize()];
-  point_response->FullBeamAllStations(point_buffer_all_stations,
+  std::vector<std::complex<float>> point_buffer_all_stations(
+      point_response->GetAllStationsBufferSize());
+  point_response->FullBeamAllStations(point_buffer_all_stations.data(),
                                       coord_system.ra, coord_system.dec,
                                       frequency, 0);
 

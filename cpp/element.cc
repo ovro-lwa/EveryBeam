@@ -17,8 +17,9 @@ Antenna::Ptr Element::Clone() const {
   return element_clone;
 }
 
-aocommon::MC2x2 Element::LocalResponse(real_t time, real_t freq,
-                                       const vector3r_t &direction, size_t id,
+aocommon::MC2x2 Element::LocalResponse([[maybe_unused]] real_t time,
+                                       real_t freq, const vector3r_t &direction,
+                                       size_t id,
                                        const Options &options) const {
   vector2r_t thetaphi = cart2thetaphi(direction);
   aocommon::MC2x2 result =
