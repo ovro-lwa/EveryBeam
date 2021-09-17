@@ -1,0 +1,35 @@
+# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# This is a Dockerfile specifically to test compilation using gcc 6.3.
+
+FROM debian:stretch
+
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && \
+    apt-get install -y \
+    build-essential \
+    casacore-data casacore-dev \
+    cmake \
+    libblas-dev liblapack-dev \
+    libpython3-dev \
+    libboost-filesystem-dev \
+    libboost-system-dev \
+    libboost-test-dev \
+    libcfitsio-dev \
+    libfftw3-dev \
+    libgsl-dev \
+    libhdf5-serial-dev \
+    pkg-config \
+    python3 \
+    wget \
+    software-properties-common
+    
+ADD . /src
+WORKDIR /src
+
+RUN \
+  mkdir /build && \
+  cd /build && \
+  cmake ../src -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial/ && \
+  make -j`nproc` && \
+  make install
