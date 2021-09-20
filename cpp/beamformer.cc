@@ -50,8 +50,7 @@ aocommon::UVector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
   // Allocate and fill result vector by looping over antennas
   assert(antennas_.size() == delta_phase_reference_position_.size());
   aocommon::UVector<std::complex<double>> result(antennas_.size());
-  for (std::size_t idx = 0; idx < delta_phase_reference_position_.size();
-       ++idx) {
+  for (size_t idx = 0; idx < delta_phase_reference_position_.size(); ++idx) {
     const double dl = dot(direction, delta_phase_reference_position_[idx]);
     // Note that the frequency is (and should be!) implicit in dl!
     // We could save a multiplication here, by pre-multiplying the
@@ -96,12 +95,12 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
 
   // Weighted subtraction of the pointing direction (0-direction), and the
   // direction of interest. Weights are given by corresponding freqs.
-  vector3r_t delta_direction =
+  const vector3r_t delta_direction =
       options.freq0 * options.station0 - freq * direction;
 
   // Weights based on (weighted) difference vector between
   // pointing direction and direction of interest of beam
-  std::vector<aocommon::MC2x2Diag> weights =
+  const std::vector<aocommon::MC2x2Diag> weights =
       ComputeWeightedResponses(delta_direction);
 
   // Copy options into local_options. Needed to propagate
@@ -119,12 +118,10 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
   }
 
   aocommon::MC2x2 result(0.0, 0.0, 0.0, 0.0);
-  for (std::size_t antenna_idx = 0; antenna_idx < antennas_.size();
-       ++antenna_idx) {
-    Antenna::Ptr antenna = antennas_[antenna_idx];
+  for (size_t idx = 0; idx < antennas_.size(); ++idx) {
     aocommon::MC2x2 antenna_response =
-        antenna->Response(time, freq, direction, local_options);
-    result += weights[antenna_idx] * antenna_response;
+        antennas_[idx]->Response(time, freq, direction, local_options);
+    result += weights[idx] * antenna_response;
   }
 
   // If the Jones matrix needs to be rotated from theta, phi directions
@@ -155,14 +152,13 @@ aocommon::MC2x2Diag BeamFormer::LocalArrayFactor(real_t time, real_t freq,
 
   // Weights based on (weighted) difference vector between
   // pointing direction and direction of interest of beam
-  std::vector<aocommon::MC2x2Diag> weights =
+  const std::vector<aocommon::MC2x2Diag> weights =
       ComputeWeightedResponses(delta_direction);
 
   aocommon::MC2x2Diag result(0., 0.);
-  for (std::size_t idx = 0; idx < antennas_.size(); ++idx) {
-    std::shared_ptr<Antenna> antenna = antennas_[idx];
+  for (size_t idx = 0; idx < antennas_.size(); ++idx) {
     const aocommon::MC2x2Diag antenna_array_factor =
-        antenna->ArrayFactor(time, freq, direction, options);
+        antennas_[idx]->ArrayFactor(time, freq, direction, options);
     result += weights[idx] * antenna_array_factor;
   }
   return result;

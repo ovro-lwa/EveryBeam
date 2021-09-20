@@ -59,7 +59,7 @@ inline vector3r_t cross(const vector3r_t &arg0, const vector3r_t &arg1) {
           arg0[0] * arg1[1] - arg0[1] * arg1[0]};
 }
 
-// "cross" product with the upward pointing unit normal vector {0, 0, 1}
+// "cross" product with the unit normal vector {0, 0, 1}
 inline vector3r_t cross(const vector3r_t &arg1) {
   return {-arg1[1], arg1[0], 0.0};
 }
