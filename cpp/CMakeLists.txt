@@ -74,8 +74,8 @@ target_include_directories(everybeam PRIVATE "${CMAKE_BINARY_DIR}")
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
 target_link_libraries(everybeam PUBLIC hamaker lobes oskar)
 target_link_libraries(
-  everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_LIBRARIES}
-                   ${HDF5_CXX_LIBRARIES} ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})
+  everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_CXX_LIBRARIES}
+                   ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})
 target_link_libraries(everybeam PRIVATE schaapcommon)
 
 install(
