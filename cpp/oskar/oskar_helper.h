@@ -52,14 +52,22 @@ inline void make_zero2(FP& X) {
 template <typename FP, typename FP2>
 inline void oskar_sph_wave(FP pds, FP dpms, FP sin_p, FP cos_p, int M, FP2 a_tm,
                            FP2 a_te, FP2& c_theta, FP2& c_phi) {
-  FP2 qq, dd;
-  qq.x = -cos_p * dpms;
-  qq.y = -sin_p * dpms;
-  dd.x = -sin_p * pds * (M);
-  dd.y = cos_p * pds * (M);
+  // TODO: should become designated initializers for >=C++20
+  const FP pdsm = pds * (M);
+  const FP2 qq = {-cos_p * dpms, -sin_p * dpms};
+  const FP2 dd = {-sin_p * pdsm, cos_p * pdsm};
   oskar_mul_add_complex(c_phi, qq, a_tm);
   oskar_mul_sub_complex(c_phi, dd, a_te);
   oskar_mul_add_complex(c_theta, dd, a_tm);
+  oskar_mul_add_complex(c_theta, qq, a_te);
+}
+
+template <typename FP, typename FP2>
+inline void oskar_sph_wave_reduced(FP pds, FP dpms, FP cos_p, FP2 a_tm,
+                                   FP2 a_te, FP2& c_theta, FP2& c_phi) {
+  // TODO: should become designated initializer for >=C++20
+  const FP2 qq = {-cos_p * dpms, 0};
+  oskar_mul_add_complex(c_phi, qq, a_tm);
   oskar_mul_add_complex(c_theta, qq, a_te);
 }
 

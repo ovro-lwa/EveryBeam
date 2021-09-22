@@ -20,7 +20,7 @@ Antenna::Ptr BeamFormerIdenticalAntennas::Clone() const {
 aocommon::MC2x2 BeamFormerIdenticalAntennas::LocalResponse(
     real_t time, real_t freq, const vector3r_t &direction,
     const Options &options) const {
-  auto antenna = antennas_[0];
+  std::shared_ptr<Antenna> antenna = antennas_[0];
 
   aocommon::MC2x2 antenna_response =
       antenna->Response(time, freq, direction, options);
@@ -28,5 +28,4 @@ aocommon::MC2x2 BeamFormerIdenticalAntennas::LocalResponse(
       LocalArrayFactor(time, freq, direction, options);
   return array_factor * antenna_response;
 }
-
 }  // namespace everybeam

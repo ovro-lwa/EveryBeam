@@ -82,6 +82,13 @@ class Element : public Antenna {
                                         const vector3r_t &direction, size_t id,
                                         const Options &options) const;
 
+  aocommon::MC2x2Diag ArrayFactor(
+      [[maybe_unused]] real_t time, [[maybe_unused]] real_t freq,
+      [[maybe_unused]] const vector3r_t &direction,
+      [[maybe_unused]] const Options &options) const final override {
+    return aocommon::MC2x2Diag::Unity();
+  };
+
  protected:
   virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
                                         const vector3r_t &direction,

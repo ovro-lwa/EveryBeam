@@ -19,7 +19,7 @@ namespace everybeam {
  * the Element class.
  *
  */
-class ElementHamaker : public Element {
+class ElementHamaker final : public Element {
  public:
   /**
    * @brief Construct a new Element object
@@ -36,7 +36,7 @@ class ElementHamaker : public Element {
 
   aocommon::MC2x2 Response(real_t time, real_t freq,
                            const vector3r_t &direction,
-                           const Options &options) override {
+                           const Options &options) const override {
     // The only transform that is needed is hard-coded in LocalResponse
     return LocalResponse(time, freq, direction, options);
   }
@@ -48,7 +48,7 @@ class ElementHamaker : public Element {
  private:
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
                                 const vector3r_t &direction,
-                                const Options &options) const final override {
+                                const Options &options) const override {
     return LocalResponse(time, freq, direction, id_, options);
   };
 };

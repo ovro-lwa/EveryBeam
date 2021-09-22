@@ -315,10 +315,10 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldAartfaac(const Table &table,
 }
 
 std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
-    const Table &table, unsigned int id,
+    const Table &table, size_t station_id,
     ElementResponse::Ptr element_response) {
   Antenna::CoordinateSystem coordinate_system =
-      common::ReadCoordinateSystem(table, id);
+      common::ReadCoordinateSystem(table, station_id);
   std::shared_ptr<BeamFormer> beam_former =
       std::make_shared<BeamFormerIdenticalAntennas>(coordinate_system);
 
@@ -326,11 +326,11 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
   ROArrayColumn<Bool> c_flag(table, "ELEMENT_FLAG");
 
   // Read element offsets and flags.
-  Matrix<Quantity> aips_offset = c_offset(id);
+  Matrix<Quantity> aips_offset = c_offset(station_id);
 
   assert(aips_offset.shape().isEqual(IPosition(2, aips_offset.nrow(), 3)));
 
-  Matrix<Bool> aips_flag = c_flag(id);
+  Matrix<Bool> aips_flag = c_flag(station_id);
   assert(aips_flag.shape().isEqual(IPosition(2, aips_offset.nrow(), 2)));
 
   for (size_t i = 0; i < aips_offset.nrow(); ++i) {
@@ -353,7 +353,7 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
 }
 
 std::shared_ptr<BeamFormer> LofarStationBeamFormer(
-    const MeasurementSet &ms, unsigned int id,
+    const MeasurementSet &ms, size_t station_id,
     [[maybe_unused]] const std::string &name,
     [[maybe_unused]] const vector3r_t &position,
     const vector3r_t &phase_reference, ElementResponse::Ptr element_response) {
@@ -366,7 +366,8 @@ std::shared_ptr<BeamFormer> LofarStationBeamFormer(
 
   if (telescope_name == "LOFAR") {
     Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
-    tab_field = tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(id));
+    tab_field =
+        tab_field(tab_field.col("ANTENNA_ID") == static_cast<Int>(station_id));
 
     // The Station will consist of a BeamFormer that combines the fields
     // coordinate system is ITRF
@@ -390,7 +391,7 @@ std::shared_ptr<BeamFormer> LofarStationBeamFormer(
 
     Table tab_field = common::GetSubTable(ms, "ANTENNA");
 
-    beam_former = ReadAntennaFieldAartfaac(tab_field, ant_type, id);
+    beam_former = ReadAntennaFieldAartfaac(tab_field, ant_type, station_id);
   }
 
   return beam_former;
@@ -410,7 +411,7 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
 }
 
 std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
-    const MeasurementSet &ms, unsigned int id,
+    const MeasurementSet &ms, size_t station_id,
     [[maybe_unused]] const std::string &name,
     [[maybe_unused]] const vector3r_t &position,
     ElementResponse::Ptr element_response) {
@@ -419,7 +420,7 @@ std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
   // The Station will consist of a BeamFormer that combines the fields
   // coordinate system is ITRF
   auto beam_former =
-      ReadAntennaFieldMSv3(tab_phased_array, id, element_response);
+      ReadAntennaFieldMSv3(tab_phased_array, station_id, element_response);
   return beam_former;
 }
 }  // namespace

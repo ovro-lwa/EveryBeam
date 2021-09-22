@@ -16,13 +16,11 @@ constexpr Antenna::CoordinateSystem Antenna::IdentityCoordinateSystem;
 
 vector3r_t Antenna::TransformToLocalDirection(
     const vector3r_t &direction) const {
-  vector3r_t local_direction{
+  return {
       dot(coordinate_system_.axes.p, direction),
       dot(coordinate_system_.axes.q, direction),
       dot(coordinate_system_.axes.r, direction),
   };
-
-  return local_direction;
 }
 
 void Antenna::Transform(const CoordinateSystem &coordinate_system) {

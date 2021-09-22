@@ -164,7 +164,7 @@ class Antenna {
    */
   virtual aocommon::MC2x2 Response(real_t time, real_t freq,
                                    const vector3r_t &direction,
-                                   const Options &options = {}) {
+                                   const Options &options = {}) const {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
@@ -185,11 +185,11 @@ class Antenna {
    * @param direction Direction of arrival (ITRF, m).
    * @param options
    */
-  aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
-                                  const vector3r_t &direction,
-                                  const Options &options = {}) {
+  virtual aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
+                                          const vector3r_t &direction,
+                                          const Options &options) const {
     // Transform direction and directions in options to local coordinatesystem
-    vector3r_t local_direction = TransformToLocalDirection(direction);
+    const vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
     local_options.freq0 = options.freq0;
     local_options.station0 = TransformToLocalDirection(options.station0);

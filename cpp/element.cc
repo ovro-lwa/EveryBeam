@@ -26,13 +26,11 @@ aocommon::MC2x2 Element::LocalResponse([[maybe_unused]] real_t time,
       element_response_->Response(id, freq, thetaphi[0], thetaphi[1]);
 
   if (options.rotate) {
-    vector3r_t up = {0.0, 0.0, 1.0};
-    vector3r_t e_phi = normalize(cross(up, direction));
-    vector3r_t e_theta = cross(e_phi, direction);
-    aocommon::MC2x2 rotation(
-        dot(e_theta, options.north), dot(e_theta, options.east),
-        dot(e_phi, options.north), dot(e_phi, options.east));
-    result *= rotation;
+    // cross with unit upward pointing vector {0.0, 0.0, 1.0}
+    const vector3r_t e_phi = normalize(cross(direction));
+    const vector3r_t e_theta = cross(e_phi, direction);
+    result *= {dot(e_theta, options.north), dot(e_theta, options.east),
+               dot(e_phi, options.north), dot(e_phi, options.east)};
   }
   return result;
 }

@@ -49,12 +49,10 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
                                                             double theta,
                                                             double phi) const {
   aocommon::MC2x2 response = aocommon::MC2x2::Zero();
-  element_id = 0;
 
   auto dataset = datafile_->Get(freq);
   auto l_max = dataset->GetLMax();
 
-  // std::complex<double>* response_ptr = (std::complex<double>*)response;
   std::complex<double>* alpha_ptr = dataset->GetAlphaPtr(element_id);
 
   double phi_x = phi;
@@ -67,7 +65,7 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
   // That case needs to be detected when the coefficients are read,
   // and here phi_y needs to be set accordingly.
 
-  oskar_evaluate_spherical_wave_sum_double(1, &theta, &phi_x, &phi_y, l_max,
+  oskar_evaluate_spherical_wave_sum_double(theta, phi_x, phi_y, l_max,
                                            alpha_ptr, response.Data());
   return response;
 }

@@ -85,8 +85,8 @@ class BeamFormerLofar : public Antenna {
   // Method assumes that the direction is specified as the
   // (frequency weighted) difference between the pointing_dir
   // and the probing direction
-  std::vector<std::complex<double>> ComputeGeometricResponse(
-      std::vector<vector3r_t> phase_reference_positions,
+  aocommon::UVector<std::complex<double>> ComputeGeometricResponse(
+      const std::vector<vector3r_t> &phase_reference_positions,
       const vector3r_t &direction) const;
 
   // Pure virtual implementation of array factor at station level

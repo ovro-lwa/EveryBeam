@@ -28,7 +28,7 @@ aocommon::MC2x2Diag BeamFormerLofarHBA::LocalArrayFactor(
       time, freq, direction, options, tile_positions_, tile_enabled_);
 
   // Compute the array factor of a tile
-  std::complex<double> array_factor_tile =
+  const std::complex<double> array_factor_tile =
       TileArrayFactor(time, freq, direction, options);
 
   return array_factor_field * array_factor_tile;
@@ -43,17 +43,17 @@ std::complex<double> BeamFormerLofarHBA::TileArrayFactor(
   vector3r_t delta_direction = options.freq0 * options.tile0 - freq * direction;
 
   // Get geometric response for the difference vector stored in "pointing"
-  std::vector<std::complex<double>> geometric_response =
+  const aocommon::UVector<std::complex<double>> geometric_response =
       ComputeGeometricResponse(element_positions_, delta_direction);
 
   // Initialize and fill result
   std::complex<double> result = 0;
-  for (std::size_t idx = 0; idx < element_positions_.size(); ++idx) {
-    result += geometric_response[idx];
+  for (const auto &gr : geometric_response) {
+    result += gr;
   }
 
   // Normalize the result by the number of tiles
-  double weight = element_positions_.size();
+  const double weight = element_positions_.size();
   result /= weight;
 
   return result;
