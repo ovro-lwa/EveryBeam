@@ -6,7 +6,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 # build libhamaker.so
 add_library(hamaker SHARED hamakerelementresponse.cc hamakercoeff.cc)
-target_link_libraries(hamaker PUBLIC ${HDF5_LIBRARIES})
+target_link_libraries(hamaker PUBLIC ${HDF5_CXX_LIBRARIES})
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 set_target_properties(hamaker PROPERTIES LIBRARY_OUTPUT_NAME
                                          "${projectname}-hamaker")

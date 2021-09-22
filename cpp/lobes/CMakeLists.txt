@@ -17,7 +17,7 @@ add_library(lobes SHARED lobeselementresponse.cc
 add_dependencies(lobes download_lobes_coefficients)
 target_include_directories(lobes PUBLIC ${HDF5_INCLUDE_DIRS})
 target_link_libraries(
-  lobes PUBLIC ${HDF5_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
+  lobes PUBLIC ${HDF5_CXX_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
                ${Boost_SYSTEM_LIBRARY})
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 set_target_properties(lobes PROPERTIES LIBRARY_OUTPUT_NAME
