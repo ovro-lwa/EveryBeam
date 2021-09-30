@@ -12,9 +12,9 @@ using aocommon::UVector;
 
 namespace everybeam {
 namespace pointresponse {
-void DishPoint::FullBeam(std::complex<float>* buffer, double ra, double dec,
-                         double freq, [[maybe_unused]] size_t station_idx,
-                         size_t field_id) {
+void DishPoint::FullResponse(std::complex<float>* buffer, double ra, double dec,
+                             double freq, [[maybe_unused]] size_t station_idx,
+                             size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
@@ -23,15 +23,17 @@ void DishPoint::FullBeam(std::complex<float>* buffer, double ra, double dec,
              dishtelescope.ms_properties_.field_pointing[field_id].second;
   std::array<double, 5> coefs =
       circularsymmetric::VLABeam::GetCoefficients("", freq);
-  circularsymmetric::VoltagePattern vp(freq, 53.0);
+  const double max_radius_arc_min = 53.0;
+  circularsymmetric::VoltagePattern vp(freq, max_radius_arc_min);
   aocommon::UVector<double> coefs_vec(coefs.begin(), coefs.end());
   vp.EvaluatePolynomial(coefs_vec, false);
   vp.Render(buffer, ra, dec, pdir_ra, pdir_dec, freq);
 }
 
-void DishPoint::FullBeamAllStations(std::complex<float>* buffer, double ra,
-                                    double dec, double freq, size_t field_id) {
-  FullBeam(buffer, ra, dec, freq, 0., field_id);
+void DishPoint::FullResponseAllStations(std::complex<float>* buffer, double ra,
+                                        double dec, double freq,
+                                        size_t field_id) {
+  FullResponse(buffer, ra, dec, freq, 0., field_id);
 
   // Just repeat nstations times
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {

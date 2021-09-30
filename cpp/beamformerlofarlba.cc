@@ -5,7 +5,7 @@
 
 namespace everybeam {
 
-Antenna::Ptr BeamFormerLofarLBA::Clone() const {
+std::shared_ptr<Antenna> BeamFormerLofarLBA::Clone() const {
   auto beamformer_clone = std::make_shared<BeamFormerLofarLBA>(
       coordinate_system_, phase_reference_position_);
 

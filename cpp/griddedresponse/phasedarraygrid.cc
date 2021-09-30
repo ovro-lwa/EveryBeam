@@ -19,22 +19,23 @@ PhasedArrayGrid::PhasedArrayGrid(
       subband_frequency_(0.0) {
   // Set private members
   use_differential_beam_ = telescope_->GetOptions().use_differential_beam;
-  size_t ncpus = aocommon::ThreadPool::NCPUs();
-  nthreads_ = std::min(ncpus, telescope_->GetNrStations());
-  threads_.resize(nthreads_);
+  const size_t ncpus = aocommon::ThreadPool::NCPUs();
+  const size_t nthreads = std::min(ncpus, telescope_->GetNrStations());
+  threads_.resize(nthreads);
 }
 
-void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
-                                       double frequency, size_t station_idx,
-                                       [[maybe_unused]] size_t field_id) {
+void PhasedArrayGrid::FullResponse(std::complex<float>* buffer, double time,
+                                   double frequency, size_t station_idx,
+                                   [[maybe_unused]] size_t field_id) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
-  aocommon::Lane<Job> lane(nthreads_);
+  aocommon::Lane<Job> lane(threads_.size());
   lane_ = &lane;
 
   SetITRFVectors(time);
   if (use_differential_beam_) {
-    double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
+    const double sb_freq =
+        use_channel_frequency_ ? frequency : subband_frequency_;
     inverse_central_gain_.resize(1);
     inverse_central_gain_[0] = aocommon::MC2x2F(
         phasedarraytelescope.GetStation(station_idx)
@@ -47,9 +48,9 @@ void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
   }
 
   // Prepare threads
-  for (size_t i = 0; i != nthreads_; ++i) {
-    threads_[i] = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
-                              frequency);
+  for (auto& thread : threads_) {
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
+                         frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -57,15 +58,15 @@ void PhasedArrayGrid::CalculateStation(std::complex<float>* buffer, double time,
   }
 
   lane.write_end();
-  for (size_t i = 0; i != nthreads_; ++i) threads_[i].join();
+  for (auto& thread : threads_) thread.join();
 }
 
-void PhasedArrayGrid::CalculateAllStations(std::complex<float>* buffer,
-                                           double time, double frequency,
-                                           size_t) {
+void PhasedArrayGrid::FullResponseAllStations(std::complex<float>* buffer,
+                                              double time, double frequency,
+                                              size_t) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
-  aocommon::Lane<Job> lane(nthreads_);
+  aocommon::Lane<Job> lane(threads_.size());
   lane_ = &lane;
 
   SetITRFVectors(time);
@@ -137,7 +138,8 @@ void PhasedArrayGrid::CalcThread(std::complex<float>* buffer, double time,
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
   const size_t values_per_ant = width_ * height_ * 4;
-  double sb_freq = use_channel_frequency_ ? frequency : subband_frequency_;
+  const double sb_freq =
+      use_channel_frequency_ ? frequency : subband_frequency_;
 
   Job job;
   while (lane_->read(job)) {
@@ -149,14 +151,8 @@ void PhasedArrayGrid::CalcThread(std::complex<float>* buffer, double time,
       m += phase_centre_dm_;
       n = sqrt(1.0 - l * l - m * m);
 
-      vector3r_t itrf_direction;
-
-      itrf_direction[0] =
-          l * l_vector_itrf_[0] + m * m_vector_itrf_[0] + n * n_vector_itrf_[0];
-      itrf_direction[1] =
-          l * l_vector_itrf_[1] + m * m_vector_itrf_[1] + n * n_vector_itrf_[1];
-      itrf_direction[2] =
-          l * l_vector_itrf_[2] + m * m_vector_itrf_[2] + n * n_vector_itrf_[2];
+      const vector3r_t itrf_direction =
+          l * l_vector_itrf_ + m * m_vector_itrf_ + n * n_vector_itrf_;
 
       std::complex<float>* base_buffer = buffer + (x + job.y * width_) * 4;
 

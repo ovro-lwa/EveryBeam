@@ -85,8 +85,8 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
   std::vector<std::complex<float>> antenna_buffer(
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
 
-  grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
-                                      0);
+  grid_response->FullResponseAllStations(antenna_buffer.data(), time, frequency,
+                                         0);
 
   BOOST_CHECK_EQUAL(
       antenna_buffer.size(),
@@ -113,8 +113,8 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
                                                 {0.000982019, -0.00856565}};
   // Compute results via PointResponse (station 0)
   std::complex<float> point_buffer_single_station[4];
-  point_response->FullBeam(point_buffer_single_station, coord_system.ra,
-                           coord_system.dec, frequency, 0, 0);
+  point_response->FullResponse(point_buffer_single_station, coord_system.ra,
+                               coord_system.dec, frequency, 0, 0);
 
   for (std::size_t i = 0; i < 4; ++i) {
     BOOST_CHECK(std::abs(antenna_buffer[offset_p88 + i] - oskar_p88[i]) < 1e-6);
@@ -136,9 +136,9 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
   std::vector<std::complex<float>> antenna_buffer_single(
       grid_response->GetStationBufferSize(1));
 
-  // Get response from station 5
-  grid_response->CalculateStation(antenna_buffer_single.data(), time, frequency,
-                                  5, 0);
+  // Get FullResponse response from station 5
+  grid_response->FullResponse(antenna_buffer_single.data(), time, frequency, 5,
+                              0);
   // Check that results in antenna_buffer_single matches the relevant part in
   // antenna_buffer
   std::size_t offset_s5 = 5 * width * height * 4;

@@ -11,7 +11,7 @@
 
 namespace everybeam {
 
-Antenna::Ptr BeamFormer::Clone() const {
+std::shared_ptr<Antenna> BeamFormer::Clone() const {
   auto beamformer_clone = std::make_shared<BeamFormer>(
       coordinate_system_, phase_reference_position_);
 
@@ -19,13 +19,14 @@ Antenna::Ptr BeamFormer::Clone() const {
   // this creates a shallow copy, in the sense that
   // the antennas are not copied, only the pointers.
   beamformer_clone->antennas_ = antennas_;
-  beamformer_clone->delta_phase_reference_position_ =
-      delta_phase_reference_position_;
+  beamformer_clone->delta_phase_reference_positions_ =
+      delta_phase_reference_positions_;
   return beamformer_clone;
 }
 
-Antenna::Ptr BeamFormer::ExtractAntenna(size_t antenna_index) const {
-  Antenna::Ptr antenna = antennas_[antenna_index]->Clone();
+std::shared_ptr<Antenna> BeamFormer::ExtractAntenna(
+    size_t antenna_index) const {
+  std::shared_ptr<Antenna> antenna = antennas_[antenna_index]->Clone();
   antenna->Transform(coordinate_system_);
   return antenna;
 }
@@ -44,19 +45,18 @@ vector3r_t BeamFormer::TransformToLocalPosition(const vector3r_t &position) {
 }
 
 aocommon::UVector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
-    const vector3r_t &direction) const {
+    const std::vector<vector3r_t> &phase_reference_positions,
+    const vector3r_t &direction) {
   constexpr double two_pi_over_c = -2.0 * M_PI / common::c;
 
   // Allocate and fill result vector by looping over antennas
-  assert(antennas_.size() == delta_phase_reference_position_.size());
-  aocommon::UVector<std::complex<double>> result(antennas_.size());
-  for (size_t idx = 0; idx < delta_phase_reference_position_.size(); ++idx) {
-    const double dl = dot(direction, delta_phase_reference_position_[idx]);
+  aocommon::UVector<std::complex<double>> result(
+      phase_reference_positions.size());
+  for (size_t i = 0; i < phase_reference_positions.size(); ++i) {
+    const double dl = dot(direction, phase_reference_positions[i]);
     // Note that the frequency is (and should be!) implicit in dl!
-    // We could save a multiplication here, by pre-multiplying the
-    // delta_phase_reference_position by two_pi_over_c
     const double phase = two_pi_over_c * dl;
-    result[idx] = {std::cos(phase), std::sin(phase)};
+    result[i] = {std::cos(phase), std::sin(phase)};
   }
   return result;
 }
@@ -65,7 +65,7 @@ std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
     const vector3r_t &pointing) const {
   // Get geometric response for pointing direction
   aocommon::UVector<std::complex<double>> geometric_response =
-      ComputeGeometricResponse(pointing);
+      ComputeGeometricResponse(delta_phase_reference_positions_, pointing);
 
   // Initialize and fill result
   double weight_sum[2] = {0.0, 0.0};

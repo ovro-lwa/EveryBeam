@@ -19,11 +19,11 @@ using aocommon::UVector;
 using everybeam::common::FFTResampler;
 using everybeam::griddedresponse::GriddedResponse;
 
-void GriddedResponse::CalculateIntegratedResponse(
+void GriddedResponse::IntegratedFullResponse(
     double* buffer, double time, double frequency, size_t field_id,
     size_t undersampling_factor, const std::vector<double>& baseline_weights) {
-  size_t nstations = telescope_->GetNrStations();
-  size_t nbaselines = nstations * (nstations + 1) / 2;
+  const size_t nstations = telescope_->GetNrStations();
+  const size_t nbaselines = nstations * (nstations + 1) / 2;
   if (baseline_weights.size() != nbaselines) {
     throw std::runtime_error("baseline_weights vector has incorrect size.");
   }
@@ -32,8 +32,10 @@ void GriddedResponse::CalculateIntegratedResponse(
       std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0.0);
 
   // Copy coordinate members
-  size_t width_original = width_, height_original = height_;
-  double dl_original = dl_, dm_original = dm_;
+  const size_t width_original = width_;
+  const size_t height_original = height_;
+  const double dl_original = dl_;
+  const double dm_original = dm_;
 
   width_ /= undersampling_factor;
   height_ /= undersampling_factor;
@@ -60,7 +62,7 @@ void GriddedResponse::CalculateIntegratedResponse(
   dm_ = dm_original;
 }
 
-void GriddedResponse::CalculateIntegratedResponse(
+void GriddedResponse::IntegratedFullResponse(
     double* buffer, const std::vector<double>& time_array, double frequency,
     size_t field_id, size_t undersampling_factor,
     const std::vector<double>& baseline_weights) {
@@ -112,7 +114,8 @@ void GriddedResponse::MakeIntegratedSnapshot(
   size_t nstations = telescope_->GetNrStations();
   UVector<std::complex<float>> buffer_undersampled(
       GetStationBufferSize(nstations));
-  CalculateAllStations(buffer_undersampled.data(), time, frequency, field_id);
+  FullResponseAllStations(buffer_undersampled.data(), time, frequency,
+                          field_id);
 
   size_t npixels = width_ * height_;
   for (size_t y = 0; y != height_; ++y) {

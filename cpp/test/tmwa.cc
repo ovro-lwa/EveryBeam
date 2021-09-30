@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
 
   try {
-    grid_response->CalculateAllStations(antenna_buffer.data(), time, frequency,
-                                        0);
+    grid_response->FullResponseAllStations(antenna_buffer.data(), time,
+                                           frequency, 0);
   } catch (std::exception& e) {
     throw std::runtime_error(
         std::string(e.what()) +
@@ -113,11 +113,11 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
       telescope->GetPointResponse(time);
   BOOST_CHECK(nullptr != dynamic_cast<MWAPoint*>(point_response.get()));
   BOOST_CHECK_EQUAL(point_response->HasTimeUpdate(), true);
-  // Use ComputeAllStations (should be a repetitive call to CalculateStation)
+  // Use FullResponseAllStations (should be a repetitive call to FullResponse)
   std::complex<float>
       point_response_buffer[point_response->GetAllStationsBufferSize()];
-  point_response->FullBeamAllStations(point_response_buffer, coord_system.ra,
-                                      coord_system.dec, frequency, 0);
+  point_response->FullResponseAllStations(
+      point_response_buffer, coord_system.ra, coord_system.dec, frequency, 0);
   BOOST_CHECK_EQUAL(point_response->HasTimeUpdate(), false);
 
   BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,

@@ -24,9 +24,9 @@ PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope* telescope_ptr,
       dec_(std::numeric_limits<double>::min()),
       has_partial_itrf_update_(false) {}
 
-void PhasedArrayPoint::FullBeam(std::complex<float>* buffer, double ra,
-                                double dec, double freq, size_t station_idx,
-                                [[maybe_unused]] size_t field_id) {
+void PhasedArrayPoint::FullResponse(std::complex<float>* buffer, double ra,
+                                    double dec, double freq, size_t station_idx,
+                                    [[maybe_unused]] size_t field_id) {
   // Only compute ITRF directions if values differ from cached values
   if (has_time_update_ || has_partial_itrf_update_ ||
       std::abs(ra - ra_) > 1e-10 || std::abs(dec - dec_) > 1e-10) {
@@ -52,7 +52,7 @@ void PhasedArrayPoint::FullBeam(std::complex<float>* buffer, double ra,
     }
   }
 
-  // TODO: alternative could be a call to FullBeam()
+  // TODO: alternative could be a call to FullResponse()
   const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
       phasedarraytelescope.GetStation(station_idx)
           ->Response(time_, freq, dir_itrf_, sb_freq, station0_, tile0_)
@@ -65,15 +65,15 @@ void PhasedArrayPoint::FullBeam(std::complex<float>* buffer, double ra,
   }
 }
 
-aocommon::MC2x2 PhasedArrayPoint::FullBeam(size_t station_idx, double freq,
-                                           const vector3r_t& direction,
-                                           std::mutex* mutex) {
+aocommon::MC2x2 PhasedArrayPoint::FullResponse(size_t station_idx, double freq,
+                                               const vector3r_t& direction,
+                                               std::mutex* mutex) {
   if (has_time_update_) {
     if (mutex != nullptr) {
       // Caller takes over responsibility to be thread-safe
       UpdateITRFVectors(*mutex);
     } else {
-      // Calllee assumes that caller is thread-safe
+      // Callee assumes that caller is thread-safe
       UpdateITRFVectors(mutex_);
     }
     has_time_update_ = false;

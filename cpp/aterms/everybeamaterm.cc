@@ -32,7 +32,7 @@ bool EveryBeamATerm::CalculateBeam(std::complex<float>* buffer, double time,
   // Get the gridded response
   std::unique_ptr<griddedresponse::GriddedResponse> grid_response =
       telescope_->GetGriddedResponse(coordinate_system_);
-  grid_response->CalculateAllStations(buffer, time, frequency, field_id);
+  grid_response->FullResponseAllStations(buffer, time, frequency, field_id);
 
   SaveATermsIfNecessary(buffer, telescope_->GetNrStations(),
                         coordinate_system_.width, coordinate_system_.height);

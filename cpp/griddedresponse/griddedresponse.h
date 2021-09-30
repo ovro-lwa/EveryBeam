@@ -37,7 +37,20 @@ class GriddedResponse {
   virtual ~GriddedResponse() {}
 
   /**
-   * @brief Compute the Beam response for a single station
+   * @brief See FullResponse()
+   */
+  [[deprecated(
+      "Use FullResponse() instead. Function will be removed in version "
+      "0.3.0.")]] void
+  CalculateStation(std::complex<float>* buffer, double time, double freq,
+                   size_t station_idx, size_t field_id) {
+    FullResponse(buffer, time, freq, station_idx, field_id);
+  };
+
+  /**
+   * @brief Compute the full beam response for a single station. Result is
+   * stored in the output buffer, which should accommodate a Jones matrix (4
+   * complex valued floats) per pixel.
    *
    * @param buffer Output buffer, compute and set size with
    * GriddedResponse::GetStationBufferSize(1)
@@ -46,23 +59,67 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void CalculateStation(std::complex<float>* buffer, double time,
-                                double freq, size_t station_idx,
-                                size_t field_id) = 0;
+  virtual void FullResponse(std::complex<float>* buffer, double time,
+                            double freq, size_t station_idx,
+                            size_t field_id) = 0;
 
   /**
-   * @brief Compute the Beam response for all stations in a Telescope
+   * @brief See FullResponseAllStations()
+   */
+  [[deprecated(
+      "Use FullResponseAllStations() instead. Function will be removed in "
+      "version "
+      "0.3.0.")]] void
+  CalculateAllStations(std::complex<float>* buffer, double time,
+                       double frequency, size_t field_id) {
+    FullResponseAllStations(buffer, time, frequency, field_id);
+  };
+
+  /**
+   * @brief Compute the full beam response for all stations in a Telescope.
+   * Result is stored in the output buffer, which should accommodate a Jones
+   * matrix (4 complex valued floats) per pixel for each station.
    *
    * @param buffer Output buffer, compute and set size with
    * GriddedResponse::GetStationBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void CalculateAllStations(std::complex<float>* buffer, double time,
-                                    double frequency, size_t field_id) = 0;
+  virtual void FullResponseAllStations(std::complex<float>* buffer, double time,
+                                       double frequency, size_t field_id) = 0;
 
   /**
-   * @brief Calculate integrated beam for a single time step.
+   * @brief See IntegratedFullResponse
+   */
+  [[deprecated(
+      "Use IntegratedFullResponse() instead. Function will be removed in "
+      "version "
+      "0.3.0.")]] void
+  CalculateIntegratedResponse(double* buffer, double time, double frequency,
+                              size_t field_id, size_t undersampling_factor,
+                              const std::vector<double>& baseline_weights) {
+    IntegratedFullResponse(buffer, time, frequency, field_id,
+                           undersampling_factor, baseline_weights);
+  };
+
+  /**
+   * @brief See IntegratedFullResponse()
+   */
+  [[deprecated(
+      "Use IntegratedFullResponse() instead. Function will be removed in "
+      "version "
+      "0.3.0.")]] void
+  CalculateIntegratedResponse(double* buffer,
+                              const std::vector<double>& time_array,
+                              double frequency, size_t field_id,
+                              size_t undersampling_factor,
+                              const std::vector<double>& baseline_weights) {
+    IntegratedFullResponse(buffer, time_array, frequency, field_id,
+                           undersampling_factor, baseline_weights);
+  };
+
+  /**
+   * @brief Calculate integrated/undersampled beam for a single time step.
    * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
    * may override MakeIntegratedSnapshot() to implement a more efficient
    * version.
@@ -76,7 +133,7 @@ class GriddedResponse {
    * @param baseline_weights Baseline weights, size should equal
    * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
    */
-  virtual void CalculateIntegratedResponse(
+  virtual void IntegratedFullResponse(
       double* buffer, double time, double frequency, size_t field_id,
       size_t undersampling_factor, const std::vector<double>& baseline_weights);
 
@@ -97,7 +154,7 @@ class GriddedResponse {
    * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
    * time_array.size()
    */
-  virtual void CalculateIntegratedResponse(
+  virtual void IntegratedFullResponse(
       double* buffer, const std::vector<double>& time_array, double frequency,
       size_t field_id, size_t undersampling_factor,
       const std::vector<double>& baseline_weights);

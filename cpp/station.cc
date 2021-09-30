@@ -44,7 +44,7 @@ const vector3r_t &Station::GetPhaseReference() const {
   return phase_reference_;
 }
 
-void Station::SetAntenna(Antenna::Ptr antenna) {
+void Station::SetAntenna(std::shared_ptr<Antenna> antenna) {
   antenna_ = antenna;
 
   // The antenna can be either an Element or a BeamFormer

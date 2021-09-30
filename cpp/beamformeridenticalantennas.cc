@@ -10,7 +10,7 @@
 
 namespace everybeam {
 
-Antenna::Ptr BeamFormerIdenticalAntennas::Clone() const {
+std::shared_ptr<Antenna> BeamFormerIdenticalAntennas::Clone() const {
   auto beamformer_clone = std::make_shared<BeamFormerIdenticalAntennas>(
       coordinate_system_, phase_reference_position_);
   beamformer_clone->antennas_ = antennas_;

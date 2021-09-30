@@ -53,9 +53,9 @@ class BeamFormerLofar : public Antenna {
   /**
    * @brief Pure virtual method of clone.
    *
-   * @return Antenna::Ptr
+   * @return std::shared_ptr<Antenna>
    */
-  Antenna::Ptr Clone() const override = 0;
+  std::shared_ptr<Antenna> Clone() const override = 0;
 
   /**
    * @brief Set the (unique) Element object for the BeamFormerLofar object.
@@ -81,14 +81,6 @@ class BeamFormerLofar : public Antenna {
   std::shared_ptr<Element> GetElement() const { return element_; };
 
  protected:
-  // Compute the geometric response of the BeamFormer.
-  // Method assumes that the direction is specified as the
-  // (frequency weighted) difference between the pointing_dir
-  // and the probing direction
-  aocommon::UVector<std::complex<double>> ComputeGeometricResponse(
-      const std::vector<vector3r_t> &phase_reference_positions,
-      const vector3r_t &direction) const;
-
   // Pure virtual implementation of array factor at station level
   aocommon::MC2x2Diag LocalArrayFactor(
       real_t time, real_t freq, const vector3r_t &direction,
