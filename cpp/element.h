@@ -33,7 +33,7 @@ class Element : public Antenna {
         id_(id),
         element_response_(element_response) {}
 
-  Antenna::Ptr Clone() const override;
+  std::shared_ptr<Antenna> Clone() const override;
 
   /**
    * @brief Get the Element ID object

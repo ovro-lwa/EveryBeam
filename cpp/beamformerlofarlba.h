@@ -47,9 +47,9 @@ class BeamFormerLofarLBA : public BeamFormerLofar {
    * only the element_ is copied. This method is intended to be exclusively
    * used in Station::SetAntenna!
    *
-   * @return Antenna::Ptr
+   * @return std::shared_ptr<Antenna>
    */
-  Antenna::Ptr Clone() const final override;
+  std::shared_ptr<Antenna> Clone() const final override;
 
   /**
    * @brief Mark whether the element is enabled by pushing back boolean array to

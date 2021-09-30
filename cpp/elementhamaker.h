@@ -32,7 +32,7 @@ class ElementHamaker final : public Element {
                  ElementResponse::Ptr element_response, int id)
       : Element(coordinate_system, element_response, id) {}
 
-  Antenna::Ptr Clone() const override;
+  std::shared_ptr<Antenna> Clone() const override;
 
   aocommon::MC2x2 Response(real_t time, real_t freq,
                            const vector3r_t &direction,

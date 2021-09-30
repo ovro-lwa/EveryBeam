@@ -323,9 +323,9 @@ class Station {
   }
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element
-  void SetAntenna(Antenna::Ptr antenna);
+  void SetAntenna(std::shared_ptr<Antenna> antenna);
 
-  Antenna::Ptr GetAntenna() const { return antenna_; }
+  std::shared_ptr<Antenna> GetAntenna() const { return antenna_; }
 
  private:
   void SetResponseModel(const ElementResponseModel model);

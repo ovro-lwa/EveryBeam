@@ -19,12 +19,11 @@ class MWAGrid final : public GriddedResponse {
           const coords::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 
-  void CalculateStation(std::complex<float>* buffer, double time,
-                        double frequency, size_t station_idx,
-                        size_t field_id) override;
+  void FullResponse(std::complex<float>* buffer, double time, double frequency,
+                    size_t station_idx, size_t field_id) override;
 
-  void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency, size_t field_id) override;
+  void FullResponseAllStations(std::complex<float>* buffer, double time,
+                               double frequency, size_t field_id) override;
 
  private:
   std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;

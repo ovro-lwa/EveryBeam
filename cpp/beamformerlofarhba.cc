@@ -6,7 +6,7 @@
 
 namespace everybeam {
 
-Antenna::Ptr BeamFormerLofarHBA::Clone() const {
+std::shared_ptr<Antenna> BeamFormerLofarHBA::Clone() const {
   auto beamformer_clone = std::make_shared<BeamFormerLofarHBA>(
       coordinate_system_, phase_reference_position_);
 
@@ -44,7 +44,7 @@ std::complex<double> BeamFormerLofarHBA::TileArrayFactor(
 
   // Get geometric response for the difference vector stored in "pointing"
   const aocommon::UVector<std::complex<double>> geometric_response =
-      ComputeGeometricResponse(element_positions_, delta_direction);
+      BeamFormer::ComputeGeometricResponse(element_positions_, delta_direction);
 
   // Initialize and fill result
   std::complex<double> result = 0;

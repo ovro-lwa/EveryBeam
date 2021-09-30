@@ -64,16 +64,16 @@ class BeamFormer : public Antenna {
             TransformToLocalPosition(phase_reference_position_)),
         field_response_(field_response) {}
 
-  Antenna::Ptr Clone() const override;
+  std::shared_ptr<Antenna> Clone() const override;
 
   /**
    * @brief Add an antenna to the antennas_ array.
    *
    * @param antenna
    */
-  void AddAntenna(Antenna::Ptr antenna) {
+  void AddAntenna(std::shared_ptr<Antenna> antenna) {
     antennas_.push_back(antenna);
-    delta_phase_reference_position_.push_back(
+    delta_phase_reference_positions_.push_back(
         antennas_.back()->phase_reference_position_ -
         local_phase_reference_position_);
   }
@@ -94,15 +94,24 @@ class BeamFormer : public Antenna {
    *
    * The beamformer itself remains unchanged.
    */
-  Antenna::Ptr ExtractAntenna(size_t antenna_index) const;
+  std::shared_ptr<Antenna> ExtractAntenna(size_t antenna_index) const;
+
+  /**
+   * @brief Compute the geometric response given the the phase reference
+   * directions in the beam former and a direction of interest. In typical use
+   * cases, the direction of interest is computed as the (frequency weighted)
+   * difference between the pointing direction and the direction of interest,
+   * i.e. direction = pointing_freq * pointing_dir - interest_freq *
+   *
+   * @param phase_reference_positions Phase reference positions.
+   * @param direction The direction of interest.
+   * @return The geometry response for each position.
+   */
+  static aocommon::UVector<std::complex<double>> ComputeGeometricResponse(
+      const std::vector<vector3r_t> &phase_reference_positions,
+      const vector3r_t &direction);
 
  protected:
-  const vector3r_t
-      local_phase_reference_position_;  // in coordinate system of Antenna
-
-  // Transform position vector into a local position vector
-  vector3r_t TransformToLocalPosition(const vector3r_t &position);
-
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
@@ -110,17 +119,24 @@ class BeamFormer : public Antenna {
                                 const Options &options) const override;
 
   // Compute the local ArrayFactor, with ArrayFactor a vectorial
-  // "representation" of Jones matrix
+  // "representation" of a diagonal Jones matrix
   aocommon::MC2x2Diag LocalArrayFactor(real_t time, real_t freq,
                                        const vector3r_t &direction,
                                        const Options &options) const override;
 
-  // Compute the geometric response for all the antennas in the BeamFormer based
-  // on the difference vector between the pointing direction and the direction
-  // of interest. This difference vector should be computed as: direction =
-  // pointing_freq * pointing_dir - interest_freq * interest_dir
-  aocommon::UVector<std::complex<double>> ComputeGeometricResponse(
-      const vector3r_t &direction) const;
+  const vector3r_t
+      local_phase_reference_position_;  // in coordinate system of Antenna
+
+  // List of antennas in BeamFormer
+  std::vector<std::shared_ptr<Antenna>> antennas_;
+  std::vector<vector3r_t> delta_phase_reference_positions_;
+
+  // (Optional) shared pointer to field response model (e.g. LOBES)
+  std::shared_ptr<FieldResponse> field_response_;
+
+ private:
+  // Transform position vector into a local position vector
+  vector3r_t TransformToLocalPosition(const vector3r_t &position);
 
   // Compute the weights based on the difference vector between the pointing
   // direction and the direction of interest. Analogous to
@@ -129,14 +145,6 @@ class BeamFormer : public Antenna {
   std::vector<aocommon::MC2x2Diag> ComputeWeightedResponses(
       const vector3r_t &direction) const;
 
-  // List of antennas in BeamFormer
-  std::vector<Antenna::Ptr> antennas_;
-  std::vector<vector3r_t> delta_phase_reference_position_;
-
-  // (Optional) shared pointer to field response model (e.g. LOBES)
-  std::shared_ptr<FieldResponse> field_response_;
-
- private:
   mutable std::mutex mtx_;
 };
 }  // namespace everybeam

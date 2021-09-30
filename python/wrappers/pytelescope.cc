@@ -185,8 +185,8 @@ void init_telescope(py::module &m) {
                 self.GetGriddedResponse(coordinate_system);
             std::vector<std::complex<float>> buffer(
                 grid_response->GetStationBufferSize(1));
-            grid_response->CalculateStation(buffer.data(), time, freq,
-                                            station_idx, field_idx);
+            grid_response->FullResponse(buffer.data(), time, freq, station_idx,
+                                        field_idx);
             return cast_tensor<float>(
                 buffer.data(),
                 {coordinate_system.height, coordinate_system.width, 2, 2});
@@ -226,8 +226,8 @@ void init_telescope(py::module &m) {
                 self.GetGriddedResponse(coordinate_system);
             std::vector<std::complex<float>> buffer(
                 grid_response->GetStationBufferSize(nr_stations));
-            grid_response->CalculateAllStations(buffer.data(), time, freq,
-                                                field_idx);
+            grid_response->FullResponseAllStations(buffer.data(), time, freq,
+                                                   field_idx);
             return cast_tensor<float>(buffer.data(),
                                       {nr_stations, coordinate_system.height,
                                        coordinate_system.width, 2, 2});
@@ -278,11 +278,11 @@ void init_telescope(py::module &m) {
 
             // Call overload depending on the size of the time_vec
             if (time_vec.size() == 1) {
-              grid_response->CalculateIntegratedResponse(
+              grid_response->IntegratedFullResponse(
                   buffer.data(), time_vec[0], freq, field_id,
                   undersampling_factor, bw_vec);
             } else {
-              grid_response->CalculateIntegratedResponse(
+              grid_response->IntegratedFullResponse(
                   buffer.data(), time_vec, freq, field_id, undersampling_factor,
                   bw_vec);
             }

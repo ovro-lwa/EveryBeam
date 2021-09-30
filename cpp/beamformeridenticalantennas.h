@@ -38,7 +38,7 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
   BeamFormerIdenticalAntennas(const vector3r_t &phase_reference_position)
       : BeamFormer(phase_reference_position) {}
 
-  Antenna::Ptr Clone() const override;
+  std::shared_ptr<Antenna> Clone() const override;
 
  private:
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)

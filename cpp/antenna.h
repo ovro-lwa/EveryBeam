@@ -66,8 +66,6 @@ class Antenna {
   constexpr static CoordinateSystem IdentityCoordinateSystem{
       CoordinateSystem::zero_origin, CoordinateSystem::identity_axes};
 
-  typedef std::shared_ptr<Antenna> Ptr;
-
   /**
    * @brief Struct containing antenna options
    *
@@ -135,7 +133,7 @@ class Antenna {
    * This method is used by the ExtractAntenna method of the BeamFormer
    * class to create a copy of one of the Antennas it contains.
    */
-  virtual Ptr Clone() const = 0;
+  virtual std::shared_ptr<Antenna> Clone() const = 0;
 
   /**
    * @brief Transform internal coordinate systems and positions

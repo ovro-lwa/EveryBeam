@@ -18,30 +18,12 @@ class PhasedArrayGrid : public GriddedResponse {
   PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
                   const coords::CoordinateSystem& coordinate_system);
 
-  /**
-   * @brief Compute the Beam response for a single station
-   *
-   * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetBufferSize(1)
-   * @param station_idx Station index, must be smaller than number of stations
-   * in the Telescope
-   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-   * @param freq Frequency (Hz)
-   */
-  void CalculateStation(std::complex<float>* buffer, double time,
-                        double frequency, size_t station_idx,
-                        size_t field_id) final override;
+  void FullResponse(std::complex<float>* buffer, double time, double frequency,
+                    size_t station_idx, size_t field_id) final override;
 
-  /**
-   * @brief Compute the Beam response for all stations in a Telescope
-   *
-   * @param buffer Output buffer, compute and set size with
-   * GriddedResponse::GetStationBufferSize()
-   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-   * @param freq Frequency (Hz)
-   */
-  void CalculateAllStations(std::complex<float>* buffer, double time,
-                            double frequency, size_t field_id) final override;
+  void FullResponseAllStations(std::complex<float>* buffer, double time,
+                               double frequency,
+                               size_t field_id) final override;
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
@@ -56,7 +38,6 @@ class PhasedArrayGrid : public GriddedResponse {
  private:
   std::vector<aocommon::MC2x2F> inverse_central_gain_;
 
-  std::size_t nthreads_;
   std::vector<std::thread> threads_;
 
   struct Job {
