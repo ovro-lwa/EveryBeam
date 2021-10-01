@@ -310,7 +310,7 @@ def test_lofar_integrated_beam(ref):
         ref["coordinate_system"],
         np.array([ref["time"], ref["time"]]),
         ref["freq"],
-        2,
+        undersampling,
         baseline_weights,
     )
 

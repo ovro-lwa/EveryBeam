@@ -19,7 +19,7 @@ namespace pointresponse {
 
 class PhasedArrayPoint : public PointResponse {
  public:
-  PhasedArrayPoint(const telescope::Telescope* telescope_ptr, double time);
+  PhasedArrayPoint(const telescope::Telescope *telescope_ptr, double time);
 
   /**
    * @brief Get beam response for a given station at a prescribed ra, dec
@@ -39,27 +39,75 @@ class PhasedArrayPoint : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void FullResponse(std::complex<float>* response_matrix, double ra, double dec,
+  void FullResponse(std::complex<float> *response_matrix, double ra, double dec,
                     double freq, size_t station_idx,
                     size_t field_id) final override;
 
   aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
-                               const vector3r_t& direction,
-                               std::mutex* mutex) final override;
+                               const vector3r_t &direction,
+                               std::mutex *mutex) final override;
+
+  /**
+   * @brief Convenience function for the python bindings
+   */
+  aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
+                               const vector3r_t &direction,
+                               const vector3r_t &station0,
+                               const vector3r_t &tile0);
 
   aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
-                                  const vector3r_t& direction,
-                                  std::mutex* mutex) final override;
+                                  const vector3r_t &direction,
+                                  std::mutex *mutex) final override;
+
+  /**
+   * @brief Compute the array factor given a direction, station0 direction
+   * and tile0 direction. Method is used in the python bindings.
+   */
+  aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
+                                  const vector3r_t &direction,
+                                  const vector3r_t &station0,
+                                  const vector3r_t &tile0);
+
+  /**
+   * @brief Convenience method for computing the element response, for a
+   * prescribed element index.
+   *
+   * @param station_idx Station index
+   * @param freq Frequency (Hz)
+   * @param direction Direction in ITRF
+   * @param element_idx Element index
+   * @param is_local Use local east-north-up system (true) or global coordinate
+   * system (false).
+   * @param rotate Apply parallactic angle rotation
+   * @return aocommon::MC2x2
+   */
+  aocommon::MC2x2 ElementResponse(size_t station_idx, double freq,
+                                  const vector3r_t &direction,
+                                  size_t element_idx) const;
 
   aocommon::MC2x2 ElementResponse(
       size_t station_idx, double freq,
-      const vector3r_t& direction) const final override;
+      const vector3r_t &direction) const final override;
 
   /**
    * @brief Method for computing the ITRF-vectors, given ra, dec position in
    * radians and using the cached \param time ((MJD(UTC), s))
    */
   void UpdateITRFVectors(double ra, double dec);
+
+  /**
+   * @brief Use local east-north-up system (true) or global coordinate
+   * system (false).
+   */
+  void SetUseLocalCoordinateSystem(bool is_local){};
+  bool GetUseLocalCoordinateSystem() const { return is_local_; };
+
+  /**
+   * @brief Apply paralactic rotation when computing the full response or the
+   * element response?
+   */
+  void SetParalacticRotation(bool rotate) { rotate_ = rotate; }
+  bool GetParalacticRotation() const { return rotate_; };
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_;
@@ -76,7 +124,7 @@ class PhasedArrayPoint : public PointResponse {
    * direction. Member function leaves the responsibility for providing the
    * mutex to the caller.
    */
-  void UpdateITRFVectors(std::mutex& mutex);
+  void UpdateITRFVectors(std::mutex &mutex);
 
   double ra_, dec_;
   std::mutex mutex_;
@@ -85,6 +133,12 @@ class PhasedArrayPoint : public PointResponse {
   // This bool switches to true if UpdateITRFVectors() is called, since
   // this method doesn't update all the ITRF direction vectors.
   bool has_partial_itrf_update_;
+
+  // Local east-north-up or global coordinate system?
+  bool is_local_;
+
+  // Apply paralactic rotation?
+  bool rotate_;
 };
 
 }  // namespace pointresponse

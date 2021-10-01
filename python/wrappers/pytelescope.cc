@@ -9,6 +9,7 @@
 #include "load.h"
 #include "station.h"
 #include "griddedresponse/griddedresponse.h"
+#include "pointresponse/phasedarraypoint.h"
 #include "common/types.h"
 #include "coords/coordutils.h"
 #include "coords/itrfconverter.h"
@@ -23,12 +24,13 @@ namespace py = pybind11;
 using casacore::MeasurementSet;
 
 using everybeam::Options;
-using everybeam::Station;
 using everybeam::vector3r_t;
 using everybeam::coords::CoordinateSystem;
 using everybeam::coords::ITRFConverter;
 using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;
+using everybeam::pointresponse::PhasedArrayPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::PhasedArray;
 using everybeam::telescope::Telescope;
@@ -40,7 +42,7 @@ vector3r_t np2vector3r_t(const py::array_t<double> &pyarray) {
   if (r.size() != 3) {
     throw std::runtime_error("Pyarry is of incorrect size, must be 3.");
   }
-  return vector3r_t{r[0], r[1], r[2]};
+  return {r[0], r[1], r[2]};
 }
 
 // Cast complex buffer to numpy array
@@ -181,15 +183,14 @@ void init_telescope(py::module &m) {
              size_t field_idx) -> py::array_t<std::complex<float>> {
             check_station_index(station_idx, self.GetNrStations(),
                                 "gridded_response");
+            py::array_t<std::complex<float>> buffer({coordinate_system.height,
+                                                     coordinate_system.width,
+                                                     size_t(2), size_t(2)});
             std::unique_ptr<GriddedResponse> grid_response =
                 self.GetGriddedResponse(coordinate_system);
-            std::vector<std::complex<float>> buffer(
-                grid_response->GetStationBufferSize(1));
-            grid_response->FullResponse(buffer.data(), time, freq, station_idx,
-                                        field_idx);
-            return cast_tensor<float>(
-                buffer.data(),
-                {coordinate_system.height, coordinate_system.width, 2, 2});
+            grid_response->FullResponse(buffer.mutable_data(), time, freq,
+                                        station_idx, field_idx);
+            return buffer;
           },
           R"pbdoc(
         Compute the gridded response for a single station.
@@ -224,13 +225,12 @@ void init_telescope(py::module &m) {
             const size_t nr_stations = self.GetNrStations();
             std::unique_ptr<GriddedResponse> grid_response =
                 self.GetGriddedResponse(coordinate_system);
-            std::vector<std::complex<float>> buffer(
-                grid_response->GetStationBufferSize(nr_stations));
-            grid_response->FullResponseAllStations(buffer.data(), time, freq,
-                                                   field_idx);
-            return cast_tensor<float>(buffer.data(),
-                                      {nr_stations, coordinate_system.height,
-                                       coordinate_system.width, 2, 2});
+            py::array_t<std::complex<float>> buffer(
+                {nr_stations, coordinate_system.height, coordinate_system.width,
+                 size_t(2), size_t(2)});
+            grid_response->FullResponseAllStations(buffer.mutable_data(), time,
+                                                   freq, field_idx);
+            return buffer;
           },
           R"pbdoc(
         Compute the gridded response for all stations
@@ -342,8 +342,9 @@ void init_telescope(py::module &m) {
                throw std::runtime_error(
                    "Requested station index exceeds number of stations.");
              }
-             const Station &station =
-                 static_cast<const Station &>(*(self.GetStation(idx).get()));
+             const everybeam::Station &station =
+                 static_cast<const everybeam::Station &>(
+                     *(self.GetStation(idx).get()));
              return station.GetName();
            })
       .def("channel_frequency", &PhasedArray::GetChannelFrequency,
@@ -360,207 +361,30 @@ void init_telescope(py::module &m) {
         float
        )pbdoc",
            py::arg("channel_index"))
-      // Corresponds to evaluate0 in lofarbeam
-      .def(
-          "station_response",
-          [](PhasedArray &self, double time,
-             bool rotate) -> py::array_t<std::complex<double>> {
-            vector3r_t direction, station0, tile0;
-            ITRFConverter itrf_converter(time);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                direction);
-            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
-                          station0);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
-
-            const size_t nr_stations = self.GetNrStations();
-            const size_t nr_channels = self.GetNrChannels();
-            std::vector<aocommon::MC2x2> response(nr_stations * nr_channels);
-            for (size_t station_idx = 0; station_idx < nr_stations;
-                 ++station_idx) {
-              const Station &station = static_cast<const Station &>(
-                  *(self.GetStation(station_idx).get()));
-              for (size_t channel_idx = 0; channel_idx < nr_channels;
-                   ++channel_idx) {
-                const size_t idx = station_idx * nr_channels + channel_idx;
-                const double freq = self.GetChannelFrequency(channel_idx);
-                const double freq0 = self.GetOptions().use_channel_frequency
-                                         ? freq
-                                         : self.GetSubbandFrequency();
-
-                if (self.GetOptions().use_differential_beam) {
-                  // Exploiting: R^{-1}R = I
-                  response[idx] = aocommon::MC2x2::Unity();
-                } else {
-                  response[idx] = station.Response(time, freq, direction, freq0,
-                                                   station0, tile0, rotate);
-                }
-              }
-            }
-            return cast_tensor_mc<4, aocommon::MC2x2>(
-                response, {nr_stations, nr_channels, 2, 2});
-          },
-          R"pbdoc(
-        Get station response in beam former direction for all stations and channels.
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
-
-        Returns
-        -------
-        np.ndarray
-            rank 4 numpy array of shape (nr_stations, nr_channels, 2, 2)
-       )pbdoc",
-          py::arg("time"), py::arg("rotate") = true)
-      // Corresponds to evaluate1 in lofarbeam
-      .def(
-          "station_response",
-          [](PhasedArray &self, double time, size_t idx,
-             bool rotate) -> py::array_t<std::complex<double>> {
-            check_station_index(idx, self.GetNrStations(), "station_response");
-            vector3r_t direction, station0, tile0;
-            ITRFConverter itrf_converter(time);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                direction);
-            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
-                          station0);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
-
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-
-            const size_t nr_channels = self.GetNrChannels();
-            std::vector<aocommon::MC2x2> response(nr_channels);
-            for (size_t idx = 0; idx < nr_channels; ++idx) {
-              const double freq = self.GetChannelFrequency(idx);
-              const double freq0 = self.GetOptions().use_channel_frequency
-                                       ? freq
-                                       : self.GetSubbandFrequency();
-              if (self.GetOptions().use_differential_beam) {
-                // Exploiting R^{-1}R = I
-                response[idx] = aocommon::MC2x2::Unity();
-              } else {
-                response[idx] = station.Response(time, freq, direction, freq0,
-                                                 station0, tile0, rotate);
-              }
-            }
-            return cast_tensor_mc<4, aocommon::MC2x2>(response,
-                                                      {nr_channels, 2, 2});
-          },
-          R"pbdoc(
-        Get station response in beam former direction for all channels.
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        station_idx: int
-            Get response for station index
-        rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
-
-        Returns
-        -------
-        np.ndarray
-            rank 3 numpy array of shape (nr_channels, 2, 2)
-       )pbdoc",
-          py::arg("time"), py::arg("station_idx"), py::arg("rotate") = true)
-      // Corresponds to evaluate2 in lofarbeam
-      .def(
-          "station_response",
-          [](PhasedArray &self, double time, size_t idx, size_t channel,
-             bool rotate) -> py::array_t<std::complex<double>> {
-            check_station_index(idx, self.GetNrStations(), "station_response");
-            if (channel >= self.GetNrChannels()) {
-              throw std::runtime_error(
-                  "Requested channel index exceeds channel count.");
-            }
-
-            const double freq = self.GetChannelFrequency(channel);
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
-
-            vector3r_t direction, station0, tile0;
-            ITRFConverter itrf_converter(time);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                direction);
-            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
-                          station0);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
-
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-
-            const aocommon::MC2x2 response =
-                self.GetOptions().use_differential_beam
-                    ? aocommon::MC2x2::Unity()
-                    : station.Response(time, freq, direction, freq0, station0,
-                                       tile0, rotate);
-            return cast_matrix(response);
-          },
-          R"pbdoc(
-        Get station response in beam former direction for specified channel.
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        station_idx: int
-            Get response for station index
-        channel_idx: int
-            Index of channel.
-        rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
-
-        Returns
-        -------
-        np.ndarray
-            Response (Jones) matrix
-       )pbdoc",
-          py::arg("time"), py::arg("station_idx"), py::arg("channel_idx"),
-          py::arg("rotate") = true)
       // Corresponds to evaluate3 in lofarbeam
       .def(
           "station_response",
           [](PhasedArray &self, double time, size_t idx, double freq,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "station_response");
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
-
-            vector3r_t direction, station0, tile0;
+            vector3r_t direction;
             ITRFConverter itrf_converter(time);
             SetITRFVector(
                 itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
                 direction);
-            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
-                          station0);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
 
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+            phased_array_point.SetParalacticRotation(rotate);
 
+            std::mutex mutex;
             const aocommon::MC2x2 response =
                 self.GetOptions().use_differential_beam
                     ? aocommon::MC2x2::Unity()
-                    : station.Response(time, freq, direction, freq0, station0,
-                                       tile0, rotate);
+                    : phased_array_point.FullResponse(idx, freq, direction,
+                                                      &mutex);
             return cast_matrix(response);
           },
           R"pbdoc(
@@ -585,6 +409,120 @@ void init_telescope(py::module &m) {
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("rotate") = true)
+      // Corresponds to evaluate2 in lofarbeam
+      .def(
+          "station_response",
+          [](PhasedArray &self, double time, size_t idx, size_t channel,
+             bool rotate) -> py::array_t<std::complex<double>> {
+            if (channel >= self.GetNrChannels()) {
+              throw std::runtime_error(
+                  "Requested channel index exceeds channel count.");
+            }
+            const double freq = self.GetChannelFrequency(channel);
+            py::object py_station_response =
+                py::cast(self).attr("station_response");
+            return py_station_response(time, idx, freq, rotate);
+          },
+          R"pbdoc(
+        Get station response in beam former direction for specified channel.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        station_idx: int
+            Get response for station index
+        channel_idx: int
+            Index of channel.
+        rotate: bool, optional
+            Apply paralactic angle rotation? [True/False] Defaults to True
+
+        Returns
+        -------
+        np.ndarray
+            Response (Jones) matrix
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("channel_idx"),
+          py::arg("rotate") = true)
+      // Corresponds to evaluate1 in lofarbeam
+      .def(
+          "station_response",
+          [](PhasedArray &self, double time, size_t idx,
+             bool rotate) -> py::array_t<std::complex<double>> {
+            // NOTE: reusing another station_response can be expected
+            // to be slightly less efficient than making a dedicated
+            // implementation - no use can be made of cached direction vectors.
+            // It, however, considerably reduces the code base.
+            const size_t nr_channels = self.GetNrChannels();
+
+            py::array_t<std::complex<double>> response(
+                {nr_channels, size_t(2), size_t(2)});
+            py::object obj = py::cast(self);
+            py::object py_station_response = obj.attr("station_response");
+            for (size_t chan = 0; chan < nr_channels; ++chan) {
+              response[py::make_tuple(chan, py::ellipsis())] =
+                  py_station_response(time, idx, chan, rotate);
+            }
+            return response;
+          },
+          R"pbdoc(
+        Get station response in beam former direction for all channels.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        station_idx: int
+            Get response for station index
+        rotate: bool, optional
+            Apply paralactic angle rotation? [True/False] Defaults to True
+
+        Returns
+        -------
+        np.ndarray
+            rank 3 numpy array of shape (nr_channels, 2, 2)
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("rotate") = true)
+      // Corresponds to evaluate0 in lofarbeam
+      .def(
+          "station_response",
+          [](PhasedArray &self, double time,
+             bool rotate) -> py::array_t<std::complex<double>> {
+            const size_t nr_stations = self.GetNrStations();
+            const size_t nr_channels = self.GetNrChannels();
+
+            py::object py_station_response =
+                py::cast(self).attr("station_response");
+            py::array_t<std::complex<double>> response(
+                {nr_stations, nr_channels, size_t(2), size_t(2)});
+
+            for (size_t sidx = 0; sidx < nr_stations; ++sidx) {
+              for (size_t cidx = 0; cidx < nr_channels; ++cidx) {
+                response[py::make_tuple(sidx, cidx, py::ellipsis())] =
+                    py_station_response(time, sidx, cidx, rotate);
+              }
+            }
+            return response;
+          },
+          R"pbdoc(
+        Get station response in beam former direction for all stations and channels.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        rotate: bool, optional
+            Apply paralactic angle rotation? [True/False] Defaults to True
+
+        Returns
+        -------
+        np.ndarray
+            rank 4 numpy array of shape (nr_stations, nr_channels, 2, 2)
+       )pbdoc",
+          py::arg("time"), py::arg("rotate") = true)
       // Corresponds to evaluate4 from lofarbeam
       .def(
           "station_response",
@@ -594,17 +532,18 @@ void init_telescope(py::module &m) {
              const py::array_t<double> &pytile0,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "station_response");
+
             const vector3r_t direction = np2vector3r_t(pydirection);
             const vector3r_t station0 = np2vector3r_t(pystation0);
             const vector3r_t tile0 = np2vector3r_t(pytile0);
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
 
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2 response = station.Response(
-                time, freq, direction, freq0, station0, tile0, rotate);
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+            phased_array_point.SetParalacticRotation(rotate);
+            const aocommon::MC2x2 response = phased_array_point.FullResponse(
+                idx, freq, direction, station0, tile0);
 
             if (self.GetOptions().use_differential_beam) {
               vector3r_t diff_beam_centre;
@@ -613,10 +552,10 @@ void init_telescope(py::module &m) {
                   itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
                   diff_beam_centre);
 
-              aocommon::MC2x2 response_diff_beam = station.Response(
-                  time, freq, diff_beam_centre, freq0, station0, tile0, rotate);
+              aocommon::MC2x2 response_diff_beam =
+                  phased_array_point.FullResponse(idx, freq, diff_beam_centre,
+                                                  station0, tile0);
               apply_differential_beam(response_diff_beam, response);
-
               return cast_matrix(response_diff_beam);
             } else {
               return cast_matrix(response);
@@ -659,36 +598,10 @@ void init_telescope(py::module &m) {
              const py::array_t<double> pydirection,
              const py::array_t<double> pystation0,
              bool rotate) -> py::array_t<std::complex<double>> {
-            check_station_index(idx, self.GetNrStations(), "station_response");
-            const vector3r_t direction = np2vector3r_t(pydirection);
-            const vector3r_t station0 = np2vector3r_t(pystation0);
-            // tile0 direction identical to station0
-
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
-
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2 response = station.Response(
-                time, freq, direction, freq0, station0, station0, rotate);
-
-            if (self.GetOptions().use_differential_beam) {
-              vector3r_t diff_beam_centre;
-              ITRFConverter itrf_converter(time);
-              SetITRFVector(
-                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                  diff_beam_centre);
-
-              aocommon::MC2x2 response_diff_beam =
-                  station.Response(time, freq, diff_beam_centre, freq0,
-                                   station0, station0, rotate);
-
-              apply_differential_beam(response_diff_beam, response);
-              return cast_matrix(response_diff_beam);
-            } else {
-              return cast_matrix(response);
-            }
+            py::object py_station_response =
+                py::cast(self).attr("station_response");
+            return py_station_response(time, idx, freq, pydirection, pystation0,
+                                       pystation0, rotate);
           },
           R"pbdoc(
         Get station response in user-specified direction
@@ -724,12 +637,17 @@ void init_telescope(py::module &m) {
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "element_response");
             // TODO: need such a check for element index too
-
             const vector3r_t direction = np2vector3r_t(pydirection);
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2 response = station.ComputeElementResponse(
-                time, freq, direction, element_idx, is_local, rotate);
+
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+            phased_array_point.SetUseLocalCoordinateSystem(is_local);
+            phased_array_point.SetParalacticRotation(rotate);
+
+            const aocommon::MC2x2 response = phased_array_point.ElementResponse(
+                idx, freq, direction, element_idx);
 
             if (self.GetOptions().use_differential_beam) {
               vector3r_t diff_beam_centre;
@@ -739,8 +657,8 @@ void init_telescope(py::module &m) {
                   diff_beam_centre);
 
               aocommon::MC2x2 response_diff_beam =
-                  station.ComputeElementResponse(time, freq, diff_beam_centre,
-                                                 element_idx, is_local, rotate);
+                  phased_array_point.ElementResponse(
+                      idx, freq, diff_beam_centre, element_idx);
               apply_differential_beam(response_diff_beam, response);
               return cast_matrix(response_diff_beam);
             } else {
@@ -784,12 +702,17 @@ void init_telescope(py::module &m) {
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "element_response");
             // TODO: need such a check for element index too
-
             const vector3r_t direction = np2vector3r_t(pydirection);
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2 response = station.ComputeElementResponse(
-                time, freq, direction, is_local, rotate);
+
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+            phased_array_point.SetUseLocalCoordinateSystem(is_local);
+            phased_array_point.SetParalacticRotation(rotate);
+
+            const aocommon::MC2x2 response =
+                phased_array_point.ElementResponse(idx, freq, direction);
 
             if (self.GetOptions().use_differential_beam) {
               vector3r_t diff_beam_centre;
@@ -799,8 +722,8 @@ void init_telescope(py::module &m) {
                   diff_beam_centre);
 
               aocommon::MC2x2 response_diff_beam =
-                  station.ComputeElementResponse(time, freq, diff_beam_centre,
-                                                 is_local, rotate);
+                  phased_array_point.ElementResponse(idx, freq,
+                                                     diff_beam_centre);
               apply_differential_beam(response_diff_beam, response);
               return cast_matrix(response_diff_beam);
             } else {
@@ -839,52 +762,6 @@ void init_telescope(py::module &m) {
           "array_factor",
           [](PhasedArray &self, double time, size_t idx, double freq,
              const py::array_t<double> pydirection,
-             const py::array_t<double> pystation0)
-              -> py::array_t<std::complex<double>> {
-            check_station_index(idx, self.GetNrStations(), "array_factor");
-            const vector3r_t direction = np2vector3r_t(pydirection);
-            const vector3r_t station0 = np2vector3r_t(pystation0);
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
-
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2Diag response_diag = station.ArrayFactor(
-                time, freq, direction, freq0, station0, station0);
-            // Diagonal to 2x2 matrix
-            const aocommon::MC2x2 response(response_diag[0], 0.0, 0.0,
-                                           response_diag[1]);
-            return cast_matrix(response);
-          },
-          R"pbdoc(
-        Get array factor for a given station in prescribed direction.
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        station_idx: int
-            station index
-        freq: float
-            Frequency of the plane wave (Hz)
-        direction: np.1darray
-            Direction of arrival in ITRF (m)
-        station0_direction: np.1darray
-            Station beam former reference direction (ITRF, m)
-
-        Returns
-        -------
-        np.ndarray
-            Response diagonal (Jones) matrix
-       )pbdoc",
-          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
-          py::arg("direction"), py::arg("station0_direction"))
-      .def(
-          "array_factor",
-          [](PhasedArray &self, double time, size_t idx, double freq,
-             const py::array_t<double> pydirection,
              const py::array_t<double> pystation0,
              const py::array_t<double> pytile0)
               -> py::array_t<std::complex<double>> {
@@ -892,21 +769,20 @@ void init_telescope(py::module &m) {
             const vector3r_t direction = np2vector3r_t(pydirection);
             const vector3r_t station0 = np2vector3r_t(pystation0);
             const vector3r_t tile0 = np2vector3r_t(pytile0);
-            const double freq0 = self.GetOptions().use_channel_frequency
-                                     ? freq
-                                     : self.GetSubbandFrequency();
 
-            const Station &station =
-                static_cast<const Station &>(*(self.GetStation(idx).get()));
-            const aocommon::MC2x2Diag response_diag = station.ArrayFactor(
-                time, freq, direction, freq0, station0, tile0);
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+
             // Diagonal to 2x2 matrix
-            const aocommon::MC2x2 response(response_diag[0], 0.0, 0.0,
-                                           response_diag[1]);
+            const aocommon::MC2x2 response(phased_array_point.ArrayFactor(
+                idx, freq, direction, station0, tile0));
             return cast_matrix(response);
           },
           R"pbdoc(
-        Get array factor for a given station in prescribed direction.
+        Get array factor for a given station in prescribed direction, with user-defined
+        station0 and tile0 directions.
 
         Parameters
         ----------
@@ -931,7 +807,41 @@ void init_telescope(py::module &m) {
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"),
-          py::arg("tile0_direction"));
+          py::arg("tile0_direction"))
+      .def(
+          "array_factor",
+          [](PhasedArray &self, double time, size_t idx, double freq,
+             const py::array_t<double> pydirection,
+             const py::array_t<double> pystation0)
+              -> py::array_t<std::complex<double>> {
+            py::object py_array_factor = py::cast(self).attr("array_factor");
+            return py_array_factor(time, idx, freq, pydirection, pystation0,
+                                   pystation0);
+          },
+          R"pbdoc(
+        Get array factor for a given station in prescribed direction.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        station_idx: int
+            station index
+        freq: float
+            Frequency of the plane wave (Hz)
+        direction: np.1darray
+            Direction of arrival in ITRF (m)
+        station0_direction: np.1darray
+            Station beam former reference direction (ITRF, m)
+
+        Returns
+        -------
+        np.ndarray
+            Response diagonal (Jones) matrix
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
+          py::arg("direction"), py::arg("station0_direction"));
 
   py::class_<LOFAR, PhasedArray>(m, "LOFAR").def(py::init(&create_lofar));
 

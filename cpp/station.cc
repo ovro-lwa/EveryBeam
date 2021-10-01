@@ -18,9 +18,9 @@ Station::Station(const std::string &name, const vector3r_t &position,
       phase_reference_(position),
       element_response_(ElementResponse::GetInstance(
           options.element_response_model, name_, options_)) {
-  vector3r_t ncp = {{0.0, 0.0, 1.0}};
+  const vector3r_t ncp = {0.0, 0.0, 1.0};
   ncp_.reset(new coords::ITRFDirection(ncp));
-  vector3r_t ncppol0 = {{1.0, 0.0, 0.0}};
+  const vector3r_t ncppol0 = {1.0, 0.0, 0.0};
   ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
 }
 
@@ -80,9 +80,9 @@ aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
   options.rotate = rotate;
 
   if (rotate) {
-    vector3r_t ncp_ = NCP(time);
-    vector3r_t east = normalize(cross(ncp_, direction));
-    vector3r_t north = cross(direction, east);
+    const vector3r_t ncp_t = NCP(time);
+    const vector3r_t east = normalize(cross(ncp_t, direction));
+    const vector3r_t north = cross(direction, east);
     options.east = east;
     options.north = north;
   }
@@ -95,20 +95,8 @@ aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
                                                 const vector3r_t &direction,
                                                 bool is_local,
                                                 bool rotate) const {
-  Antenna::Options options;
-  options.rotate = rotate;
-
-  if (options.rotate) {
-    vector3r_t ncp_ = NCP(time);
-    vector3r_t east = normalize(cross(ncp_, direction));
-    vector3r_t north = cross(direction, east);
-    options.east = east;
-    options.north = north;
-  }
-
-  return is_local ? element_->LocalResponse(time, freq, direction,
-                                            element_->GetElementID(), options)
-                  : element_->Response(time, freq, direction, options);
+  return ComputeElementResponse(time, freq, direction, element_->GetElementID(),
+                                is_local, rotate);
 }
 
 aocommon::MC2x2 Station::Response(real_t time, real_t freq,
@@ -123,16 +111,14 @@ aocommon::MC2x2 Station::Response(real_t time, real_t freq,
   options.rotate = rotate;
 
   if (rotate) {
-    vector3r_t ncp_ = NCP(time);
-    vector3r_t east = normalize(cross(ncp_, direction));
-    vector3r_t north = cross(direction, east);
+    const vector3r_t ncp_t = NCP(time);
+    const vector3r_t east = normalize(cross(ncp_t, direction));
+    const vector3r_t north = cross(direction, east);
     options.east = east;
     options.north = north;
   }
 
-  aocommon::MC2x2 response = antenna_->Response(time, freq, direction, options);
-
-  return response;
+  return antenna_->Response(time, freq, direction, options);
 }
 
 aocommon::MC2x2Diag Station::ArrayFactor(real_t time, real_t freq,

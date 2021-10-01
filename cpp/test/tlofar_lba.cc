@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(19).get()));
   aocommon::MC2x2 element_response =
-      station.ComputeElementResponse(time, frequency, direction, false);
+      station.ComputeElementResponse(time, frequency, direction, false, true);
 
   for (size_t i = 0; i != 4; ++i) {
     BOOST_CHECK(std::abs(element_response[i] - target_element_response[i]) <
