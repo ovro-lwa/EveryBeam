@@ -289,15 +289,14 @@ class Station {
    * @param direction Direction of arrival. If is_local is true: (ENU, m) else
    * direction vector in global coord system is assumed.
    * @param is_local Use local east-north-up system (true) or global coordinate
-   * system (false, default).
+   * system (false).
    * @param id Element id
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return aocommon::MC2x2 Jones matrix of element response
    */
   aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
                                          const vector3r_t &direction, size_t id,
-                                         bool is_local = false,
-                                         bool rotate = true) const;
+                                         bool is_local, bool rotate) const;
 
   /**
    * @brief Compute the Jones matrix for the element response
@@ -307,14 +306,13 @@ class Station {
    * @param direction Direction of arrival. If is_local is true: (ENU, m) else
    * direction vector in global coord system is assumed.
    * @param is_local Use local east-north-up system (true) or global coordinate
-   * system (false, default).
+   * system (false).
    * @param rotate Boolean deciding if paralactic rotation should be applied.
    * @return aocommon::MC2x2 Jones matrix of element response
    */
   aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
                                          const vector3r_t &direction,
-                                         bool is_local = false,
-                                         bool rotate = true) const;
+                                         bool is_local, bool rotate) const;
 
   //! Specialized implementation of response function.
   aocommon::MC2x2 Response(real_t time, real_t freq,

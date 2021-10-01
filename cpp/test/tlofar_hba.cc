@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(element_response) {
   const Station& station =
       static_cast<const Station&>(*(lofartelescope.GetStation(11).get()));
   aocommon::MC2x2 element_response =
-      station.ComputeElementResponse(time, frequency, direction, false);
+      station.ComputeElementResponse(time, frequency, direction, false, true);
 
   // Check whether element_response and target_element_response are "equal"
   for (size_t i = 0; i != 4; ++i) {
@@ -343,8 +343,8 @@ BOOST_AUTO_TEST_CASE(gridded_response_array_factor) {
   vector3r_t direction_p13 = {0.397408, 0.527527, 0.750855};
   aocommon::MC2x2 full_beam_p13 = station.Response(
       time, frequency, direction_p13, frequency, station0, station0);
-  aocommon::MC2x2 element_beam_p13 =
-      station.ComputeElementResponse(time, frequency, direction_p13);
+  aocommon::MC2x2 element_beam_p13 = station.ComputeElementResponse(
+      time, frequency, direction_p13, false, true);
   aocommon::MC2x2Diag array_factor_p13 = station.ArrayFactor(
       time, frequency, direction_p13, frequency, station0, station0);
   aocommon::MC2x2 full_beam_product_p13 = array_factor_p13 * element_beam_p13;
@@ -356,8 +356,8 @@ BOOST_AUTO_TEST_CASE(gridded_response_array_factor) {
   vector3r_t direction_p22 = {0.408326, 0.527345, 0.745102};
   aocommon::MC2x2 full_beam_p22 = station.Response(
       time, frequency, direction_p22, frequency, station0, station0);
-  aocommon::MC2x2 element_beam_p22 =
-      station.ComputeElementResponse(time, frequency, direction_p22);
+  aocommon::MC2x2 element_beam_p22 = station.ComputeElementResponse(
+      time, frequency, direction_p22, false, true);
   aocommon::MC2x2Diag array_factor_p22 = station.ArrayFactor(
       time, frequency, direction_p22, frequency, station0, station0);
   aocommon::MC2x2 full_beam_product_p22 = array_factor_p22 * element_beam_p22;

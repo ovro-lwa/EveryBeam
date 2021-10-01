@@ -90,9 +90,9 @@ class Element : public Antenna {
   };
 
  protected:
-  virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                        const vector3r_t &direction,
-                                        const Options &options) const override {
+  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+                                const vector3r_t &direction,
+                                const Options &options) const override {
     return LocalResponse(time, freq, direction, id_, options);
   };
 

@@ -60,8 +60,8 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
         // Compute gain
         aocommon::MC2x2 gainMatrix(0., 0., 0., 0.);
         if (std::isfinite(direction[0])) {
-          gainMatrix = station->ComputeElementResponse(time, frequency,
-                                                       direction, a, true);
+          gainMatrix = station->ComputeElementResponse(
+              time, frequency, direction, a, true, false);
         }
 
         // Store gain
