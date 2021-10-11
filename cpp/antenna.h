@@ -107,19 +107,17 @@ class Antenna {
    * phase reference position.
    *
    * @param coordinate_system Coordinate system
-   * @param phase_reference_position Phase reference position
+   * @param phase_reference_position Phase reference position (ITRF, m)
    */
   Antenna(const CoordinateSystem &coordinate_system,
-          const vector3r_t &phase_reference_position)
-      : coordinate_system_(coordinate_system),
-        phase_reference_position_(phase_reference_position),
-        enabled_{true, true} {}
+          const vector3r_t &phase_reference_position);
 
-  Antenna(const vector3r_t &phase_reference_position)
-      : coordinate_system_({phase_reference_position,  // origin
-                            CoordinateSystem::identity_axes}),
-        phase_reference_position_(phase_reference_position),
-        enabled_{true, true} {}
+  /**
+   * @brief Construct a new Antenna object
+   *
+   * @param phase_reference_position Phase reference position (ITRF, m)
+   */
+  Antenna(const vector3r_t &phase_reference_position);
 
   /**
    * @brief Makes a copy of this Antenna object

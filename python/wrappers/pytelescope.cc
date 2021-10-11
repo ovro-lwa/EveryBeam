@@ -162,7 +162,7 @@ void init_telescope(py::module &m) {
        )pbdoc")
       .def_property_readonly("nr_stations", &Telescope::GetNrStations,
                              R"pbdoc(
-        Retrieve the number of stations.
+        Number of stations in telescope.
 
         Returns
         -------
@@ -174,8 +174,11 @@ void init_telescope(py::module &m) {
 
         Returns
         -------
-        pyeverybeam.Options
+        everybeam.Options
+            Struct with options
        )pbdoc")
+      // Documentation of overloaded function might not be parsed in the most
+      // elegant way, see https://github.com/pybind/pybind11/issues/2619
       .def(
           "gridded_response",
           [](Telescope &self, const CoordinateSystem &coordinate_system,
@@ -204,16 +207,17 @@ void init_telescope(py::module &m) {
         freq: double
             Frequency in Hz
         station_index: int
-            Station index, where 0 <= station_index < telescope.nr_stations
+            Station index, where ``0 <= station_index < telescope.nr_stations``
         field_index: int, optional
             Field index. Only relevant for dish telescopes such as VLA and ATCA. Default
-            value is 0
-            NOTE: field_index is a keyword-only argument
+            value is 0.
+
+            **NOTE**: field_index is a keyword-only argument
 
         Returns
         -------
         np.ndarray, np.complex64
-            4d numpy array [height, width, 2, 2]
+            4d numpy array ``[height, width, 2, 2]``
        )pbdoc",
           py::arg("coordinate_system"), py::arg("time"), py::arg("freq"),
           py::arg("station_index"), py::kw_only(), py::arg("field_index") = 0)
@@ -233,7 +237,7 @@ void init_telescope(py::module &m) {
             return buffer;
           },
           R"pbdoc(
-        Compute the gridded response for all stations
+        Compute the gridded response for all stations.
 
         Parameters
         ----------
@@ -245,13 +249,14 @@ void init_telescope(py::module &m) {
             Frequency in Hz
         field_index: int, optional
             Field index. Only relevant for dish telescopes such as VLA and ATCA. Default
-            value is 0
-            NOTE: field_index is a keyword-only argument
+            value is 0.
+
+            **NOTE**: field_index is a keyword-only argument
 
         Returns
         -------
         np.ndarray, np.complex64
-            5d numpy array [nr_stations, height, width, 2, 2]
+            5d numpy array ``[nr_stations, height, width, 2, 2]``
        )pbdoc",
           py::arg("coordinate_system"), py::arg("time"), py::arg("freq"),
           py::kw_only(), py::arg("field_index") = 0)
@@ -314,13 +319,14 @@ void init_telescope(py::module &m) {
             where nr_baselines equal telescope.nr_stations * (telescope.nr_stations + 1) // 2
         field_index: int, optional
             Field index. Only relevant for dish telescopes such as VLA and ATCA. Default
-            value is 0
-            NOTE: field_index is a keyword-only argument
+            value is 0.
+
+            **NOTE**: field_index is a keyword-only argument
 
         Returns
         -------
         np.ndarray, np.complex64
-            4d numpy array [height, width, 4, 4], i.e. a Mueller matrix
+            4d numpy array ``[height, width, 4, 4]``, i.e. a Mueller matrix
             for every pixel in the image
        )pbdoc",
           py::arg("coordinate_system"), py::arg("time"), py::arg("freq"),
@@ -335,18 +341,33 @@ void init_telescope(py::module &m) {
         Returns
         -------
         int
+            Number of channels
        )pbdoc")
-      .def("station_name",
-           [](PhasedArray &self, size_t idx) {
-             if (idx >= self.GetNrStations()) {
-               throw std::runtime_error(
-                   "Requested station index exceeds number of stations.");
-             }
-             const everybeam::Station &station =
-                 static_cast<const everybeam::Station &>(
-                     *(self.GetStation(idx).get()));
-             return station.GetName();
-           })
+      .def(
+          "station_name",
+          [](PhasedArray &self, size_t idx) {
+            if (idx >= self.GetNrStations()) {
+              throw std::runtime_error(
+                  "Requested station index exceeds number of stations.");
+            }
+            const everybeam::Station &station =
+                static_cast<const everybeam::Station &>(
+                    *(self.GetStation(idx).get()));
+            return station.GetName();
+          },
+          R"pbdoc(
+        Get the station name given a station index.
+
+        Parameters
+        ----------
+        station_index: int
+            Station index
+
+        Returns
+        -------
+        str
+        )pbdoc",
+          py::arg("station_index"))
       .def("channel_frequency", &PhasedArray::GetChannelFrequency,
            R"pbdoc(
         Retrieve channel frequency for a given (zero-based) channel index.
@@ -436,7 +457,7 @@ void init_telescope(py::module &m) {
         channel_idx: int
             Index of channel.
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
@@ -477,12 +498,12 @@ void init_telescope(py::module &m) {
         station_idx: int
             Get response for station index
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
         np.ndarray
-            rank 3 numpy array of shape (nr_channels, 2, 2)
+            rank 3 numpy array of shape ``[nr_channels, 2, 2]``
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("rotate") = true)
       // Corresponds to evaluate0 in lofarbeam
@@ -515,12 +536,12 @@ void init_telescope(py::module &m) {
             Evaluation response at time.
             Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
         np.ndarray
-            rank 4 numpy array of shape (nr_stations, nr_channels, 2, 2)
+            rank 4 numpy array of shape ``[nr_stations, nr_channels, 2, 2]``
        )pbdoc",
           py::arg("time"), py::arg("rotate") = true)
       // Corresponds to evaluate4 from lofarbeam
@@ -580,7 +601,7 @@ void init_telescope(py::module &m) {
         tile0: np.1darray
             Tile beam former reference direction (ITRF, m)
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
@@ -620,7 +641,7 @@ void init_telescope(py::module &m) {
         station0: np.1darray
             Station beam former reference direction (ITRF, m)
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
@@ -683,9 +704,9 @@ void init_telescope(py::module &m) {
             Direction of arrival either in ITRF (m) or local East-North-Up (m)
         is_local: bool, optional
             Is the specified direction in local East-North-Up? If not, global coordinate
-            system is assumed. [True/False] Defaults to False.
+            system is assumed. ``[True/False]`` Defaults to ``False``.
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------
@@ -746,9 +767,9 @@ void init_telescope(py::module &m) {
             Direction of arrival either in ITRF (m) or local East-North-Up (m)
         is_local: bool, optional
             Is the specified direction in local East-North-Up? If not, global coordinate
-            system is assumed. [True/False] Defaults to False.
+            system is assumed. ``[True/False]`` Defaults to ``False``.
         rotate: bool, optional
-            Apply paralactic angle rotation? [True/False] Defaults to True
+            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
         Returns
         -------

@@ -7,6 +7,18 @@
 
 namespace everybeam {
 
+Antenna::Antenna(const CoordinateSystem &coordinate_system,
+                 const vector3r_t &phase_reference_position)
+    : coordinate_system_(coordinate_system),
+      phase_reference_position_(phase_reference_position),
+      enabled_{true, true} {}
+
+Antenna::Antenna(const vector3r_t &phase_reference_position)
+    : coordinate_system_(
+          {phase_reference_position, CoordinateSystem::identity_axes}),
+      phase_reference_position_(phase_reference_position),
+      enabled_{true, true} {}
+
 constexpr Antenna::CoordinateSystem::Axes
     Antenna::CoordinateSystem::identity_axes;
 
