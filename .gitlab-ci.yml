@@ -81,18 +81,19 @@ build-doc:
   stage: build
   needs: ["build-base"]
   image: everybeam_base:${CI_COMMIT_SHORT_SHA}
+  before_script:
+    - pip3 install sphinx sphinx_rtd_theme breathe myst-parser
   script:
     - EVERYBEAM_PATH=$PWD
     - mkdir build && cd build
-    - cmake $EVERYBEAM_PATH
+    - cmake -DBUILD_WITH_PYTHON=ON $EVERYBEAM_PATH
+    - make -j20
     - make doc
   artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
     paths:
     - build/doc/html
   rules:
-    # Only add job for commits to master or on merge_request_event
-    # NOTE: creates duplicate pipelines in case of open MR,
-    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
+    # Only add job for commits to master or on merge_request_events
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
@@ -145,8 +146,6 @@ build-compare-oskar:
     - make VERBOSE=1 comparison-oskar-station-response
   rules:
     # Only add job for schedules, on merge_request_event, and on master
-    # NOTE: creates duplicate pipelines in case of open MR,
-    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -213,6 +212,4 @@ check-stack:
     strategy: depend
   rules:
     # Only add job during merge request event
-    # NOTE: creates duplicate pipelines in case of open MR,
-    # see https://gitlab.com/gitlab-org/gitlab/-/issues/201845
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

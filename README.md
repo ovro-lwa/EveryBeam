@@ -11,18 +11,18 @@ radio telescopes, i.e.:
 
 This package also provides an abstract interface to a selection of beam responses for apperture arrays (LOFAR/OSKAR), and beamformed versions thereof. Currently implemented are:
 
- * Hamaker
+ * Hamaker LOFAR model
  * OSKAR spherical wave model
  * OSKAR-dipole: work in progress
  * LOBES: work in progress. A coefficient file is currently only available for LOFAR station CS302LBA. Selecting the LOBES model defaults back to Hamaker, except for the aforementioned station.
 
-EveryBeam aims to gradually replace the stand alone version of the LOFAR station response library (LOFARBeam).
+EveryBeam replaces the stand alone version of the LOFAR station response library (LOFARBeam).
 
-EveryBeam is licensed under the terms of the [GNU GPL3 license](LICENSE). 
- 
+EveryBeam is licensed under the terms of the GNU GPL3 license.
+
 ## Installation
 
-On a clean ubuntu 18.04 computer, the following packages are required, see also the [docker file](docker/Dockerfile-base):
+On a clean ubuntu 18.04 computer, the following packages are required (see also the `docker` directory):
 
 General packages
 
@@ -43,36 +43,23 @@ Installation is then typically done as:
     make
     make install
 
-The `BUILD_WITH_PYTHON` option indicates whether the python bindings for EveryBeam should be generated. If switched `On` (non-default), a shared `everybeam.cpython` should appear in the `[INSTALL_DIR]/lib/python[MAJOR].[MINOR]/site-packages` directory. 
+The `BUILD_WITH_PYTHON` option indicates whether the python bindings for EveryBeam should be generated. If switched `On` (non-default), a shared `everybeam.cpython` should appear in the `[INSTALL_DIR]/lib/python[MAJOR].[MINOR]/site-packages` directory.
 
-A [`Dockerfile`](docker/Dockerfile-everybeam) to compile a working version of DPPP and EveryBeam is included in the `test` directory.
+## Usage with DP3
 
-## Usage with DPPP
+To use Everybeam within DP3 - the streaming visibility framework, https://git.astron.nl/RD/DP3 - DP3 needs to be compiled against EveryBeam. To do so, make sure DP3 can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
 
-To use with DPPP, the streaming visibility framework used for LOFAR, currently the `development` branch from that repository is required, 
-see https://git.astron.nl/RD/DP3/.
+A test measurement set is included in DP3 (`tNDP3-generic.in_MS.tgz`).
 
-A test measurementset is included in DPPP (`tNDPPP-generic.in_MS.tgz`).
+To simulate visibilities with a certain element model, use `DP3 DP3.parset` with `DP3.parset` a parset file with the following contents:
 
-To simulate visibilities with a certain element model, use `DPPP DPPP.parset` where `DPPP.parset` contains:
-
-    msin=tNDPPP-generic.MS
+    msin=tNDP3-generic.MS
     msout=.
     steps=[predict]
     predict.usebeammodel=True
     predict.elementmodel=oskardipole
-    predict.sourcedb=tNDPPP-generic.MS/sky  # sourcedb file
+    predict.sourcedb=tNDP3-generic.MS/sky  # sourcedb file
 
 ## Usage with WSClean
 
 To use EveryBeam with WSClean (for A-term or primary beam corrections), WSClean needs to be compiled against EveryBeam. In order to do so, make sure WSClean can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
-
-## Design
-
-See [docs/design.md](@ref designpage) for design considerations.
-
-## Documentation
-The `doxygen` documentation for EveryBeam can be found at https://www.astron.nl/citt/EveryBeam/
-
-## Compatibility note
-This package has undergone the same branching process as [the DP3 package](https://github.com/lofar-astron/DP3): it is a continuation of the LOFAR beam library at svn.astron.nl/LOFAR, and was extracted from and branched off LOFAR Release 3.2. The LOFAR beam package will likely not be maintained in the ASTRON repository.

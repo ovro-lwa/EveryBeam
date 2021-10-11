@@ -22,7 +22,7 @@ namespace aterms {
 
 class ParsetProvider;
 
-class ATermConfig : public ATermBase {
+class ATermConfig final : public ATermBase {
  public:
   ATermConfig(size_t n_antennas,
               const coords::CoordinateSystem& coordinate_system,
@@ -45,10 +45,10 @@ class ATermConfig : public ATermBase {
 
   /** Reimplemented from ATermBase */
   bool Calculate(std::complex<float>* buffer, double time, double frequency,
-                 size_t fieldId, const double* uvwInM) final override;
+                 size_t fieldId, const double* uvwInM) override;
 
   /** Reimplemented from ATermBase */
-  double AverageUpdateTime() const final override {
+  double AverageUpdateTime() const override {
     double avgTime = aterms_.front()->AverageUpdateTime();
     for (size_t i = 1; i < aterms_.size(); ++i)
       avgTime = std::min(avgTime, aterms_[i]->AverageUpdateTime());
