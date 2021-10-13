@@ -18,8 +18,6 @@ target_include_directories(pyeverybeam
 target_link_libraries(pyeverybeam PUBLIC everybeam)
 set_target_properties(pyeverybeam PROPERTIES OUTPUT_NAME everybeam)
 
-add_subdirectory(test)
-
 # If the PYTHON_LIBRARY_DIR is not specified, install in lib dir
 if(NOT DEFINED ${PYTHON_LIBRARY_DIR})
   execute_process(
@@ -42,5 +40,3 @@ install(
   TARGETS pyeverybeam
   COMPONENT python
   LIBRARY DESTINATION ${PYTHON_LIBRARY_DIR})
-
-# ${PYTHON_LIBRARY_DIR}
