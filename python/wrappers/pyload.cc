@@ -27,9 +27,12 @@ std::unique_ptr<Telescope> pyload_telescope(
   MeasurementSet ms(name);
 
   if (everybeam::GetTelescopeType(ms) !=
-      everybeam::TelescopeType::kLofarTelescope) {
+          everybeam::TelescopeType::kLofarTelescope &&
+      everybeam::GetTelescopeType(ms) !=
+          everybeam::TelescopeType::kOSKARTelescope) {
     throw std::runtime_error(
-        "Currently the python bindings only support the LOFAR telescope");
+        "Currently the python bindings only support the LOFAR and the OSKAR "
+        "telescope");
   }
 
   // Fill everybeam options

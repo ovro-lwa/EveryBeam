@@ -29,5 +29,5 @@ if [ ! -f ${LOFAR_HBA_MOCK_MS}/table.f0 ] ; then
     mkdir -p $LOFAR_HBA_MOCK_MS
 
     tar -xf $LOFAR_MOCK_ARCHIVE  -C $LOFAR_HBA_MOCK_MS --strip-components=1
-    rm $LOFAR_MOCK_ARCHIVE
+    rm -f $LOFAR_MOCK_ARCHIVE
 fi

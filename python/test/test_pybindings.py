@@ -5,7 +5,7 @@ from everybeam import load_telescope, LOFAR, GridSettings
 import pytest
 import os
 import numpy as np
-from subprocess import check_call, call
+from subprocess import call
 
 DATADIR = os.environ["DATA_DIR"]
 

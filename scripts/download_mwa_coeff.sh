@@ -25,5 +25,5 @@ if [ ! -f ${MWA_COEFF_H5} ] ; then
     wget -q www.astron.nl/citt/EveryBeam/mwa_full_embedded_element_pattern.tar.bz2 -O ${MWA_COEFF_ARCHIVE}
 
     tar -xjf $MWA_COEFF_ARCHIVE
-    rm $MWA_COEFF_ARCHIVE
+    rm -f $MWA_COEFF_ARCHIVE
 fi
