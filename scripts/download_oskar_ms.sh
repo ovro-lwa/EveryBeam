@@ -30,5 +30,5 @@ if [ ! -f ${OSKAR_MOCK_MS}/table.f0 ] ; then
     mkdir -p $OSKAR_MOCK_MS
 
     tar -xf $OSKAR_MOCK_ARCHIVE  -C $OSKAR_MOCK_MS --strip-components=1
-    rm $OSKAR_MOCK_ARCHIVE
+    rm -f $OSKAR_MOCK_ARCHIVE
 fi

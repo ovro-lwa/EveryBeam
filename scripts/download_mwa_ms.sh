@@ -29,5 +29,5 @@ if [ ! -f ${MWA_MOCK_MS}/table.f1 ]; then
     mkdir -p $MWA_MOCK_MS
 
     tar -xf $MWA_MOCK_ARCHIVE  -C $MWA_MOCK_MS --strip-components=1
-    rm $MWA_MOCK_ARCHIVE
+    rm -f $MWA_MOCK_ARCHIVE
 fi

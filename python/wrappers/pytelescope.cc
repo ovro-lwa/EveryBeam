@@ -14,8 +14,9 @@
 #include "coords/coordutils.h"
 #include "coords/itrfconverter.h"
 #include "coords/itrfdirection.h"
-#include "telescope/lofar.h"
 #include "telescope/phasedarray.h"
+#include "telescope/lofar.h"
+#include "telescope/oskar.h"
 
 #include <aocommon/matrix2x2.h>
 
@@ -32,6 +33,7 @@ using everybeam::griddedresponse::GriddedResponse;
 using everybeam::pointresponse::PhasedArrayPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
+using everybeam::telescope::OSKAR;
 using everybeam::telescope::PhasedArray;
 using everybeam::telescope::Telescope;
 
@@ -135,19 +137,48 @@ class PyTelescope : public Telescope {
   }
 };
 
+/**
+ * @brief Create a telescope object. As soon as the pybindings
+ * support all the telescopes that are supported by the C++-interface,
+ * this function becomes obsolete, and \c everybeam::Load() can be
+ * used instead.
+ *
+ * @param name Path to MSet
+ * @param options Options
+ * @return std::unique_ptr<Telescope>
+ */
+std::unique_ptr<Telescope> create_telescope(const std::string &name,
+                                            const everybeam::Options &options) {
+  MeasurementSet ms(name);
+  std::unique_ptr<Telescope> telescope;
+  const everybeam::TelescopeType telescope_name =
+      everybeam::GetTelescopeType(ms);
+  switch (telescope_name) {
+    case everybeam::TelescopeType::kAARTFAAC:
+    case everybeam::TelescopeType::kLofarTelescope:
+      telescope.reset(new LOFAR(ms, options));
+      break;
+    case everybeam::TelescopeType::kOSKARTelescope:
+      telescope.reset(new OSKAR(ms, options));
+      break;
+    default:
+      throw std::runtime_error(
+          "Currently, pybindings are only available for LOFAR and OSKAR "
+          "MSets.");
+  }
+  return telescope;
+}
+
 std::unique_ptr<LOFAR> create_lofar(const std::string &name,
                                     const everybeam::Options &options) {
-  MeasurementSet ms(name);
+  return std::unique_ptr<LOFAR>{
+      static_cast<LOFAR *>(create_telescope(name, options).release())};
+}
 
-  if (everybeam::GetTelescopeType(ms) !=
-      everybeam::TelescopeType::kLofarTelescope) {
-    throw std::runtime_error(
-        "LOFAR telescope requested, but specified path name does not contain a "
-        "LOFAR MS.");
-  }
-  std::unique_ptr<LOFAR> telescope =
-      std::unique_ptr<LOFAR>(new LOFAR(ms, options));
-  return telescope;
+std::unique_ptr<OSKAR> create_oskar(const std::string &name,
+                                    const everybeam::Options &options) {
+  return std::unique_ptr<OSKAR>{
+      static_cast<OSKAR *>(create_telescope(name, options).release())};
 }
 
 void init_telescope(py::module &m) {
@@ -473,8 +504,8 @@ void init_telescope(py::module &m) {
              bool rotate) -> py::array_t<std::complex<double>> {
             // NOTE: reusing another station_response can be expected
             // to be slightly less efficient than making a dedicated
-            // implementation - no use can be made of cached direction vectors.
-            // It, however, considerably reduces the code base.
+            // implementation - no use can be made of cached direction
+            // vectors. It, however, considerably reduces the code base.
             const size_t nr_channels = self.GetNrChannels();
 
             py::array_t<std::complex<double>> response(
@@ -651,6 +682,47 @@ void init_telescope(py::module &m) {
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"),
           py::arg("rotate") = true)
+      .def(
+          "station_response",
+          [](PhasedArray &self, double time, size_t idx, double freq, double ra,
+             double dec, size_t field_id) -> py::array_t<std::complex<float>> {
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+            PhasedArrayPoint &phased_array_point =
+                static_cast<PhasedArrayPoint &>(*point_response);
+
+            py::array_t<std::complex<float>> response({size_t(2), size_t(2)});
+            phased_array_point.FullResponse(response.mutable_data(), ra, dec,
+                                            freq, idx, field_id);
+            return response;
+          },
+          R"pbdoc(
+        Get station response in user-specified (ra, dec) direction. Delay direction is
+        directly inferred from the provided MSet.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        station_idx: int
+            station index
+        freq: float
+            Frequency of the plane wave. (Hz)
+        ra: float
+            Right ascension coordinate of point of interest. (rad)
+        dec: float
+            Declination coordinate of point of interest. (rad)
+        field_id: bool, optional
+            Field index. (defaults to 0)
+
+        Returns
+        -------
+        np.2darray
+            Response (Jones) matrix
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
+          py::arg("ra"), py::arg("dec"), py::arg("field_id") = 0)
       .def(
           "element_response",
           [](PhasedArray &self, double time, size_t idx, size_t element_idx,
@@ -866,9 +938,9 @@ void init_telescope(py::module &m) {
 
   py::class_<LOFAR, PhasedArray>(m, "LOFAR").def(py::init(&create_lofar));
 
-  // TODO: other telescopes:
-  // py::class_<OSKAR, PhasedArray>(m, "OSKAR");
+  py::class_<OSKAR, PhasedArray>(m, "OSKAR").def(py::init(&create_oskar));
 
+  // TODO: other telescopes:
   // py::class_<MWA, Telescope>(m, "MWA");
 
   // py::class_<Dish, Telescope>(m, "Dish");

@@ -29,5 +29,5 @@ if [ ! -f ${VLA_MOCK_MS}/table.f1 ] ; then
     mkdir -p $VLA_MOCK_MS
 
     tar -xf $VLA_MOCK_ARCHIVE  -C $VLA_MOCK_MS --strip-components=1
-    rm $VLA_MOCK_ARCHIVE
+    rm -f $VLA_MOCK_ARCHIVE
 fi
