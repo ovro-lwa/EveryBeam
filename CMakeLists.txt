@@ -167,6 +167,10 @@ install(FILES ${CMAKE_BINARY_DIR}/config.h ${CMAKE_BINARY_DIR}/version.h
 #------------------------------------------------------------------------------
 if(BUILD_WITH_PYTHON)
   add_subdirectory(python)
+
+  if(BUILD_TESTING)
+    add_subdirectory(python/test)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------

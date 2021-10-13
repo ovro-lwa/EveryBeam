@@ -5,20 +5,8 @@ from everybeam import load_telescope, OSKAR, GridSettings
 import pytest
 import os
 import numpy as np
-from subprocess import call
 
 DATADIR = os.environ["DATA_DIR"]
-
-
-@pytest.fixture(scope="session", autouse=True)
-def download_msets():
-    """
-    Download OSKAR measurement set if not yet present.
-    Fixture is run only once at start of session.
-    """
-    download_scripts = ["download_oskar_ms.sh"]
-    for script in download_scripts:
-        call(f"sh {os.path.join(os.environ['SCRIPTS_DIR'], script)}", shell=True)
 
 
 @pytest.fixture

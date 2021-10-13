@@ -5,20 +5,8 @@ from everybeam import load_telescope, LOFAR, GridSettings
 import pytest
 import os
 import numpy as np
-from subprocess import call
 
 DATADIR = os.environ["DATA_DIR"]
-
-
-@pytest.fixture(scope="session", autouse=True)
-def download_msets():
-    """
-    Download LBA and HBA measurement sets if they are not yet found.
-    Fixture is run only once at start of session.
-    """
-    download_scripts = ["download_lofar_lba_ms.sh", "download_lofar_hba_ms.sh"]
-    for script in download_scripts:
-        call(f"sh {os.path.join(os.environ['SCRIPTS_DIR'], script)}", shell=True)
 
 
 @pytest.fixture
