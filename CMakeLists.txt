@@ -58,7 +58,7 @@ endif()
 include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
 include_directories("${CMAKE_SOURCE_DIR}/external/eigen/")
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/pybind11")
-include_directories(${pybind11_INCLUDE_DIR})
+include_directories(${pybind11_INCLUDE_DIRS})
 
 # Include schaapcommon
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/schaapcommon")
@@ -70,12 +70,12 @@ find_package(
   COMPONENTS C CXX
   REQUIRED)
 add_definitions(${HDF5_DEFINITIONS} -DH5_USE_110_API)
-include_directories(${HDF5_INCLUDE_DIR})
+include_directories(${HDF5_INCLUDE_DIRS})
 
 # Find and include Casacore
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
 find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
-include_directories(${CASACORE_INCLUDE_DIR})
+include_directories(${CASACORE_INCLUDE_DIRS})
 
 # Find and include OpenMP
 find_package(OpenMP REQUIRED)
@@ -86,7 +86,7 @@ find_package(
   Boost
   COMPONENTS filesystem system
   REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
 
 # Find and include FFTW3 float libraries
 find_package(
@@ -96,7 +96,7 @@ find_package(
 
 # Find CFITSIO, needed for everybeam::aterms only
 find_package(CFITSIO REQUIRED)
-include_directories(${CFITSIO_INCLUDE_DIR})
+include_directories(${CFITSIO_INCLUDE_DIRS})
 
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
