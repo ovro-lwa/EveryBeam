@@ -4,23 +4,22 @@
 from everybeam import load_telescope, LOFAR, Options, thetaphi2cart
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import logging
 
-# MS
-try:
-    datadir = os.environ["DATA_DIR"]
-except:
-    ValueError("DATA_DIR variable not found in environment variables")
+"""
+Demo script illustrating how the EveryBeam Python
+bindings can be used to generate all-sky images
+for the beam response for a LOFAR observation.
 
+Script requires a LOFAR Measurement Set in order to run.
+A minimal LOFAR MSet can be downloaded here:
+https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
+"""
 
-# LOFAR_LBA_MOCK.ms can be retrieved from https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
-filename = "LOFAR_LBA_MOCK.ms"
-ms_path = os.path.join(datadir, filename)
+ms_path = "../../test_data/LOFAR_LBA_MOCK.ms"
 
 # Response settings
-# mode = "element"
-mode = "station"
+mode = "station"  # Change to "element" to obtain the element response
 time = 4.92183348e09
 frequency = 57812500.0
 station_id = 20

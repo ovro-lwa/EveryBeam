@@ -19,7 +19,7 @@ The :code:`everybeam` module can now be imported in python with:
 
     import everybeam
 
-For further examples on how the :code:`everybeam` module can be used, reference is made to the test script :code:`test_pybindings.py` in the :code:`python/test` directory.
+For further examples on how the :code:`everybeam` module can be used, reference is made to the :ref:`pythondemos`.
 
 .. toctree::
    :maxdepth: 1
