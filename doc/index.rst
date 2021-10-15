@@ -21,6 +21,14 @@
 .. toctree::
    :maxdepth: 2
    :hidden:
+   :titlesonly:
+   :caption: Examples
+
+   tree/python-demos
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
    :caption: Indices and Tables
 
    indices-and-tables
