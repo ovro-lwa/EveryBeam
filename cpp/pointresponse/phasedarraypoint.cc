@@ -55,11 +55,11 @@ void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float> *buffer,
     }
   }
 
-  // TODO: alternative could be a call to FullResponse()
-  const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
-      phasedarraytelescope.GetStation(station_idx)
-          ->Response(time_, freq, dir_itrf_, sb_freq, station0_, tile0_)
-          .Data());
+  const aocommon::MC2x2F gain_matrix =
+      aocommon::MC2x2F(phasedarraytelescope.GetStation(station_idx)
+                           ->Response(beam_mode, time_, freq, dir_itrf_,
+                                      sb_freq, station0_, tile0_)
+                           .Data());
 
   if (use_differential_beam_) {
     aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain, gain_matrix);
