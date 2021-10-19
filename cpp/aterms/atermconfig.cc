@@ -12,6 +12,7 @@
 
 #include "../load.h"
 #include "../options.h"
+#include "../beammode.h"
 #include "parsetprovider.h"
 
 #include <aocommon/matrix2x2.h>
@@ -100,17 +101,21 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       f->SetDownSample(reader.GetBoolOr(aterm_name + ".downsample", true));
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "beam") {
-      bool frequency_interpolation =
+      const bool frequency_interpolation =
           reader.GetBoolOr(aterm_name + ".frequency_interpolation", true);
-      bool differential = reader.GetBoolOr(aterm_name + ".differential", false);
-      bool use_channel_frequency =
+      const bool differential =
+          reader.GetBoolOr(aterm_name + ".differential", false);
+      const bool use_channel_frequency =
           reader.GetBoolOr(aterm_name + ".usechannelfreq", true);
-      std::string element_response_model =
+      const std::string element_response_model =
           reader.GetStringOr(aterm_name + ".element_response_model", "default");
+      const std::string beam_mode =
+          reader.GetStringOr(aterm_name + ".beam_mode", "full");
 
       std::unique_ptr<ATermBeam> beam = GetATermBeam(
           ms, coordinate_system_, settings_, frequency_interpolation,
-          differential, use_channel_frequency, element_response_model);
+          differential, use_channel_frequency, element_response_model,
+          beam_mode);
       double update_interval = reader.GetDoubleOr(
           aterm_name + ".update_interval", settings_.aterm_update_interval);
       beam->SetUpdateInterval(update_interval);
@@ -264,10 +269,11 @@ std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
     const casacore::MeasurementSet& ms,
     const CoordinateSystem& coordinate_system, const ATermSettings& settings,
     bool frequency_interpolation, bool use_differential_beam,
-    bool use_channel_frequency, const std::string& element_response_model) {
+    bool use_channel_frequency, const std::string& element_response_model,
+    const std::string& beam_mode) {
   everybeam::Options options = ConvertToEBOptions(
       ms, settings, frequency_interpolation, use_differential_beam,
-      use_channel_frequency, element_response_model);
+      use_channel_frequency, element_response_model, beam_mode);
   return std::unique_ptr<ATermBeam>(
       new EveryBeamATerm(ms, coordinate_system, options));
 }
@@ -275,7 +281,8 @@ std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
 everybeam::Options ATermConfig::ConvertToEBOptions(
     const casacore::MeasurementSet& ms, const ATermSettings& settings,
     bool frequency_interpolation, bool use_differential_beam,
-    bool use_channel_frequency, const std::string& element_response_model) {
+    bool use_channel_frequency, const std::string& element_response_model,
+    const std::string& beam_mode) {
   everybeam::Options options;
   // MWA related
   if (everybeam::GetTelescopeType(ms) ==
@@ -288,10 +295,13 @@ everybeam::Options ATermConfig::ConvertToEBOptions(
   everybeam::ElementResponseModel element_response_enum =
       GetElementResponseEnum(element_response_model);
 
+  const everybeam::BeamMode beam_mode_enum = ParseBeamMode(beam_mode);
+
   options.data_column_name = settings.data_column_name;
   options.use_differential_beam = use_differential_beam;
   options.use_channel_frequency = use_channel_frequency;
   options.element_response_model = element_response_enum;
+  options.beam_mode = beam_mode_enum;
   return options;
 }
 }  // namespace aterms

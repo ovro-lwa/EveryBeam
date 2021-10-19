@@ -9,8 +9,6 @@
 
 #include "griddedresponse.h"
 
-#include "../correctionmode.h"
-
 namespace everybeam {
 namespace griddedresponse {
 class PhasedArrayGrid : public GriddedResponse {
@@ -18,12 +16,13 @@ class PhasedArrayGrid : public GriddedResponse {
   PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
                   const coords::CoordinateSystem& coordinate_system);
 
-  void FullResponse(std::complex<float>* buffer, double time, double frequency,
-                    size_t station_idx, size_t field_id) final override;
+  void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
+                double frequency, size_t station_idx,
+                size_t field_id) final override;
 
-  void FullResponseAllStations(std::complex<float>* buffer, double time,
-                               double frequency,
-                               size_t field_id) final override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
+                           double time, double frequency,
+                           size_t field_id) final override;
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
@@ -56,7 +55,8 @@ class PhasedArrayGrid : public GriddedResponse {
    */
   void SetITRFVectors(double time);
 
-  void CalcThread(std::complex<float>* buffer, double time, double frequency);
+  void CalcThread(BeamMode beam_mode, std::complex<float>* buffer, double time,
+                  double frequency);
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

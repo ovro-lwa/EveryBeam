@@ -19,9 +19,10 @@ using aocommon::UVector;
 using everybeam::common::FFTResampler;
 using everybeam::griddedresponse::GriddedResponse;
 
-void GriddedResponse::IntegratedFullResponse(
-    double* buffer, double time, double frequency, size_t field_id,
-    size_t undersampling_factor, const std::vector<double>& baseline_weights) {
+void GriddedResponse::IntegratedResponse(
+    BeamMode beam_mode, double* buffer, double time, double frequency,
+    size_t field_id, size_t undersampling_factor,
+    const std::vector<double>& baseline_weights) {
   const size_t nstations = telescope_->GetNrStations();
   const size_t nbaselines = nstations * (nstations + 1) / 2;
   if (baseline_weights.size() != nbaselines) {
@@ -45,7 +46,7 @@ void GriddedResponse::IntegratedFullResponse(
   // Init (Hermitian) Mueller matrix for every pixel in the coarse grid
   size_t npixels = width_ * height_;
   std::vector<HMC4x4> matrices(npixels, HMC4x4::Zero());
-  MakeIntegratedSnapshot(matrices, time, frequency, field_id,
+  MakeIntegratedSnapshot(beam_mode, matrices, time, frequency, field_id,
                          baseline_weights.data());
 
   for (HMC4x4& matrix : matrices) {
@@ -62,9 +63,9 @@ void GriddedResponse::IntegratedFullResponse(
   dm_ = dm_original;
 }
 
-void GriddedResponse::IntegratedFullResponse(
-    double* buffer, const std::vector<double>& time_array, double frequency,
-    size_t field_id, size_t undersampling_factor,
+void GriddedResponse::IntegratedResponse(
+    BeamMode beam_mode, double* buffer, const std::vector<double>& time_array,
+    double frequency, size_t field_id, size_t undersampling_factor,
     const std::vector<double>& baseline_weights) {
   size_t nstations = telescope_->GetNrStations();
   size_t nbaselines = nstations * (nstations + 1) / 2;
@@ -90,7 +91,8 @@ void GriddedResponse::IntegratedFullResponse(
   std::vector<HMC4x4> matrices(npixels, HMC4x4::Zero());
 
   for (std::size_t tstep = 0; tstep != time_array.size(); ++tstep) {
-    MakeIntegratedSnapshot(matrices, time_array[tstep], frequency, field_id,
+    MakeIntegratedSnapshot(beam_mode, matrices, time_array[tstep], frequency,
+                           field_id,
                            baseline_weights.data() + tstep * nbaselines);
   }
 
@@ -109,13 +111,14 @@ void GriddedResponse::IntegratedFullResponse(
 }
 
 void GriddedResponse::MakeIntegratedSnapshot(
-    std::vector<HMC4x4>& matrices, double time, double frequency,
-    size_t field_id, const double* baseline_weights_interval) {
+    BeamMode beam_mode, std::vector<HMC4x4>& matrices, double time,
+    double frequency, size_t field_id,
+    const double* baseline_weights_interval) {
   size_t nstations = telescope_->GetNrStations();
   UVector<std::complex<float>> buffer_undersampled(
       GetStationBufferSize(nstations));
-  FullResponseAllStations(buffer_undersampled.data(), time, frequency,
-                          field_id);
+  ResponseAllStations(beam_mode, buffer_undersampled.data(), time, frequency,
+                      field_id);
 
   size_t npixels = width_ * height_;
   for (size_t y = 0; y != height_; ++y) {

@@ -26,9 +26,10 @@ PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope *telescope_ptr,
       is_local_(false),
       rotate_(true) {}
 
-void PhasedArrayPoint::FullResponse(std::complex<float> *buffer, double ra,
-                                    double dec, double freq, size_t station_idx,
-                                    [[maybe_unused]] size_t field_id) {
+void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float> *buffer,
+                                double ra, double dec, double freq,
+                                size_t station_idx,
+                                [[maybe_unused]] size_t field_id) {
   // Only compute ITRF directions if values differ from cached values
   if (has_time_update_ || has_partial_itrf_update_ ||
       std::abs(ra - ra_) > 1e-10 || std::abs(dec - dec_) > 1e-10) {

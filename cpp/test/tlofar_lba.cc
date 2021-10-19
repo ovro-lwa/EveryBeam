@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "../load.h"
+#include "../beammode.h"
 #include "../options.h"
 #include "../griddedresponse/lofargrid.h"
 #include "../elementresponse.h"
@@ -108,8 +109,8 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   std::vector<std::complex<float>> antenna_buffer_single(
       grid_response->GetStationBufferSize(1));
 
-  grid_response->FullResponse(antenna_buffer_single.data(), time, frequency, 31,
-                              0);
+  grid_response->Response(everybeam::BeamMode::kFull,
+                          antenna_buffer_single.data(), time, frequency, 31, 0);
 
   // Compare with everybeam at pixel (1, 3), reference solution obtained with
   // everybeam at commit sha 70a286e7dace4616417b0e973a624477f15c9ce3
@@ -151,8 +152,8 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
       grid_response->GetStationBufferSize(1));
 
   // Get the gridded response for station 20 (of course!)
-  grid_response->FullResponse(antenna_buffer_single.data(), time, frequency, 20,
-                              0);
+  grid_response->Response(everybeam::BeamMode::kFull,
+                          antenna_buffer_single.data(), time, frequency, 20, 0);
 
   // Compare with everybeam at pixel (1, 3). This solution only is a "reference"
   // certainly not a "ground-truth"

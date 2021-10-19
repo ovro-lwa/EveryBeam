@@ -16,10 +16,9 @@ using everybeam::mwabeam::TileBeam2016;
 
 namespace everybeam {
 namespace griddedresponse {
-void MWAGrid::FullResponse(std::complex<float>* buffer, double time,
-                           double frequency,
-                           [[maybe_unused]] size_t station_idx,
-                           [[maybe_unused]] size_t field_id) {
+void MWAGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
+                       double time, double frequency, size_t /* station_idx */,
+                       size_t /* field_id */) {
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
 
@@ -62,10 +61,11 @@ void MWAGrid::FullResponse(std::complex<float>* buffer, double time,
   }
 }
 
-void MWAGrid::FullResponseAllStations(std::complex<float>* buffer, double time,
-                                      double frequency,
-                                      [[maybe_unused]] size_t field_id) {
-  FullResponse(buffer, time, frequency, 0, 0);
+void MWAGrid::ResponseAllStations(BeamMode beam_mode,
+                                  std::complex<float>* buffer, double time,
+                                  double frequency,
+                                  [[maybe_unused]] size_t field_id) {
+  Response(beam_mode, buffer, time, frequency, 0, 0);
   const size_t station_buffer = width_ * height_ * 4;
   // Repeated copy for nstations
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
@@ -73,15 +73,16 @@ void MWAGrid::FullResponseAllStations(std::complex<float>* buffer, double time,
   }
 }
 
-void MWAGrid::MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
+void MWAGrid::MakeIntegratedSnapshot(BeamMode beam_mode,
+                                     std::vector<aocommon::HMC4x4>& matrices,
                                      double time, double frequency,
                                      size_t field_id,
                                      const double* baseline_weights_interval) {
   const size_t nstations = telescope_->GetNrStations();
   aocommon::UVector<std::complex<float>> buffer_undersampled(
       GetStationBufferSize(nstations));
-  FullResponseAllStations(buffer_undersampled.data(), time, frequency,
-                          field_id);
+  ResponseAllStations(beam_mode, buffer_undersampled.data(), time, frequency,
+                      field_id);
 
   // For MWA, we can simply weight a (time) snapshot with the accumulated
   // baseline weights

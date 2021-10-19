@@ -4,7 +4,7 @@
 # This is the cmake config script for EveryBeam.
 #
 # It sets the following variables:
-# - EVERYBEAM_INCLUDE_DIR
+# - EVERYBEAM_INCLUDE_DIR / EVERYBEAM_INCLUDE_DIRS
 # - EVERYBEAM_LIB
 # - EVERYBEAM_LIB_PATH
 # - EVERYBEAM_VERSION[_MAJOR/_MINOR/_PATCH]
@@ -23,6 +23,8 @@ set(EVERYBEAM_ROOT_DIR "${_EVERYBEAM_ROOT_DIR}"
 
 set(EVERYBEAM_INCLUDE_DIR "${EVERYBEAM_ROOT_DIR}/include"
     CACHE PATH "EveryBeam include directory")
+
+set(EVERYBEAM_INCLUDE_DIRS ${EVERYBEAM_INCLUDE_DIR})
 
 set(EVERYBEAM_LIB_PATH "${EVERYBEAM_ROOT_DIR}/lib"
     CACHE PATH "EveryBeam library directory")

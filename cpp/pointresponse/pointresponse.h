@@ -91,7 +91,58 @@ class PointResponse {
    */
   virtual void FullResponse(std::complex<float>* response_matrix, double ra,
                             double dec, double freq, size_t station_id,
-                            size_t field_id) = 0;
+                            size_t field_id) {
+    Response(BeamMode::kFull, response_matrix, ra, dec, freq, station_id,
+             field_id);
+  }
+
+  /**
+   * @brief Get beam response for a given station at a prescribed ra, dec
+   * position.
+   *
+   * @param beam_mode Selects beam mode (BeamMode::kElement,
+   * BeamMode::kArrayFactor or BeamMode::kFull)
+   * @param response_matrix Buffer with a size of 4 complex floats to receive
+   * the beam response
+   * @param ra Right ascension (rad)
+   * @param dec Declination (rad)
+   * @param freq Frequency (Hz)
+   * @param station_id Station index, corresponding to measurement set antenna
+   * index.
+   * @param field_id Field index as used in the measurement set
+   */
+  virtual void Response(BeamMode beam_mode,
+                        std::complex<float>* response_matrix, double ra,
+                        double dec, double freq, size_t station_id,
+                        size_t field_id) = 0;
+
+  /**
+   * @brief Get the full beam response for a station, given a pointing direction
+   * in ITRF coordinates
+   *
+   * @param beam_mode Selects beam mode (element, array factor or full)
+   * @param station_idx Station index
+   * @param freq Frequency (Hz)
+   * @param direction Direction in ITRF
+   * @param mutex Optional mutex. When provided, the caller keeps control over
+   * thread-safety. If not provided, the internal mutex will be used and the
+   * caller is assumed to be thread-safe.
+   * @return aocommon::MC2x2
+   */
+  virtual aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx,
+                                   double freq, const vector3r_t& direction,
+                                   std::mutex* mutex = nullptr) {
+    switch (beam_mode) {
+      case BeamMode::kFull:
+        return FullResponse(station_idx, freq, direction, mutex);
+      case BeamMode::kElement:
+        return ElementResponse(station_idx, freq, direction);
+      case BeamMode::kArrayFactor:
+        return ArrayFactor(station_idx, freq, direction, mutex);
+      default:
+        throw std::runtime_error("Not yet implemented");
+    }
+  }
 
   /**
    * @brief Get the full beam response for a station, given a pointing direction
@@ -109,7 +160,7 @@ class PointResponse {
                                        const vector3r_t& direction,
                                        std::mutex* mutex = nullptr) {
     throw std::runtime_error("Not yet implemented");
-  };
+  }
 
   /**
    * @brief Same as FullResponse, but now iterate over all stations in
@@ -125,11 +176,31 @@ class PointResponse {
   virtual void FullResponseAllStations(std::complex<float>* response_matrices,
                                        double ra, double dec, double freq,
                                        size_t field_id) {
+    ResponseAllStations(BeamMode::kFull, response_matrices, ra, dec, freq,
+                        field_id);
+  }
+
+  /**
+   * @brief Same as FullResponse, but now iterate over all stations in
+   * MS.
+   *
+   * @param beam_mode Selects beam mode (element, array factor or full)
+   * @param response_matrices Buffer with a size of 4 * nr_stations complex
+   * floats to receive the beam response
+   * @param ra Right ascension (rad)
+   * @param dec Declination (rad)
+   * @param freq Frequency (Hz)
+   * @param field_id Field index as used in the measurement set
+   */
+  virtual void ResponseAllStations(BeamMode beam_mode,
+                                   std::complex<float>* response_matrices,
+                                   double ra, double dec, double freq,
+                                   size_t field_id) {
     for (size_t i = 0; i < telescope_->GetNrStations(); ++i) {
-      FullResponse(response_matrices, ra, dec, freq, i, field_id);
+      Response(beam_mode, response_matrices, ra, dec, freq, i, field_id);
       response_matrices += 4;
     }
-  };
+  }
 
   /**
    * @brief Get the array factor for a station, given a pointing direction

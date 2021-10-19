@@ -73,7 +73,8 @@ class ATermConfig final : public ATermBase {
       const coords::CoordinateSystem& coordinate_system,
       const ATermSettings& settings, bool frequency_interpolation,
       bool use_differential_beam, bool use_channel_frequency,
-      const std::string& element_response_model);
+      const std::string& element_response_model,
+      const std::string& beam_mode = "full");
 
   /**
    * @brief Static method to construct an everybeam::Options struct
@@ -91,7 +92,8 @@ class ATermConfig final : public ATermBase {
   static everybeam::Options ConvertToEBOptions(
       const casacore::MeasurementSet& ms, const ATermSettings& settings,
       bool frequency_interpolation, bool use_differential_beam,
-      bool use_channel_frequency, const std::string& element_response_model);
+      bool use_channel_frequency, const std::string& element_response_model,
+      const std::string& beam_mode = "full");
 
  private:
   const size_t n_antennas_;

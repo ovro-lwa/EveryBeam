@@ -18,10 +18,9 @@ using aocommon::UVector;
 namespace everybeam {
 namespace griddedresponse {
 
-void DishGrid::FullResponse(std::complex<float>* buffer, double,
-                            double frequency,
-                            [[maybe_unused]] size_t station_idx,
-                            size_t field_id) {
+void DishGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
+                        double, double frequency,
+                        [[maybe_unused]] size_t station_idx, size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
@@ -38,9 +37,10 @@ void DishGrid::FullResponse(std::complex<float>* buffer, double,
             phase_centre_dl_, phase_centre_dm_, frequency);
 }
 
-void DishGrid::FullResponseAllStations(std::complex<float>* buffer, double,
-                                       double frequency, size_t field_id) {
-  FullResponse(buffer, 0.0, frequency, 0, field_id);
+void DishGrid::ResponseAllStations(BeamMode beam_mode,
+                                   std::complex<float>* buffer, double,
+                                   double frequency, size_t field_id) {
+  Response(beam_mode, buffer, 0.0, frequency, 0, field_id);
 
   const size_t station_buffer = width_ * height_ * 4;
   // Just repeat nstations times
@@ -49,10 +49,10 @@ void DishGrid::FullResponseAllStations(std::complex<float>* buffer, double,
   }
 }
 
-void DishGrid::IntegratedFullResponse(double* buffer, double, double frequency,
-                                      size_t field_id,
-                                      size_t undersampling_factor,
-                                      const std::vector<double>&) {
+void DishGrid::IntegratedResponse(
+    BeamMode /* beam_mode */, double* buffer, double, double frequency,
+    size_t field_id, size_t undersampling_factor,
+    const std::vector<double>& /*baseline_weights*/) {
   // Copy coordinate members
   const size_t width_original = width_;
   const size_t height_original = height_;
@@ -88,7 +88,8 @@ void DishGrid::MakeIntegratedDishSnapshot(
   // Assert that buffer size can accomodate Jones matrix on pixels
   assert(buffer_undersampled.size() >= width_ * height_ * 4);
 
-  FullResponseAllStations(buffer_undersampled.data(), 0.0, frequency, field_id);
+  ResponseAllStations(BeamMode::kFull, buffer_undersampled.data(), 0.0,
+                      frequency, field_id);
   // Loop over the pixels just once, and compute auto correlation
   for (size_t y = 0; y != height_; ++y) {
     for (size_t x = 0; x != width_; ++x) {

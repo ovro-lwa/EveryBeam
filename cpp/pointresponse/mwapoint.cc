@@ -9,9 +9,9 @@ namespace everybeam {
 using mwabeam::TileBeam2016;
 namespace pointresponse {
 
-void MWAPoint::FullResponse(std::complex<float>* buffer, double ra, double dec,
-                            double freq, [[maybe_unused]] size_t station_idx,
-                            [[maybe_unused]] size_t field_id) {
+void MWAPoint::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
+                        double ra, double dec, double freq,
+                        size_t /* station_idx */, size_t /* field_id */) {
   const telescope::MWA& mwatelescope =
       static_cast<const telescope::MWA&>(*telescope_);
 
@@ -38,9 +38,10 @@ void MWAPoint::FullResponse(std::complex<float>* buffer, double ra, double dec,
   }
 }
 
-void MWAPoint::FullResponseAllStations(std::complex<float>* buffer, double ra,
-                                       double dec, double freq, size_t) {
-  FullResponse(buffer, ra, dec, freq, 0.0, 0);
+void MWAPoint::ResponseAllStations(BeamMode beam_mode,
+                                   std::complex<float>* buffer, double ra,
+                                   double dec, double freq, size_t) {
+  Response(beam_mode, buffer, ra, dec, freq, 0.0, 0);
   // Just repeat nstations times
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
     std::copy_n(buffer, 4, buffer + i * 4);
