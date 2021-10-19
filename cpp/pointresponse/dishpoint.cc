@@ -12,9 +12,9 @@ using aocommon::UVector;
 
 namespace everybeam {
 namespace pointresponse {
-void DishPoint::FullResponse(std::complex<float>* buffer, double ra, double dec,
-                             double freq, [[maybe_unused]] size_t station_idx,
-                             size_t field_id) {
+void DishPoint::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
+                         double ra, double dec, double freq,
+                         size_t /* station_idx */, size_t field_id) {
   const telescope::Dish& dishtelescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
@@ -30,10 +30,10 @@ void DishPoint::FullResponse(std::complex<float>* buffer, double ra, double dec,
   vp.Render(buffer, ra, dec, pdir_ra, pdir_dec, freq);
 }
 
-void DishPoint::FullResponseAllStations(std::complex<float>* buffer, double ra,
-                                        double dec, double freq,
-                                        size_t field_id) {
-  FullResponse(buffer, ra, dec, freq, 0., field_id);
+void DishPoint::ResponseAllStations(BeamMode beam_mode,
+                                    std::complex<float>* buffer, double ra,
+                                    double dec, double freq, size_t field_id) {
+  Response(beam_mode, buffer, ra, dec, freq, 0u, field_id);
 
   // Just repeat nstations times
   for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {

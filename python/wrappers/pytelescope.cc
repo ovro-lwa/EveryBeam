@@ -6,6 +6,7 @@
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 
+#include "beammode.h"
 #include "load.h"
 #include "station.h"
 #include "griddedresponse/griddedresponse.h"
@@ -24,6 +25,7 @@ namespace py = pybind11;
 
 using casacore::MeasurementSet;
 
+using everybeam::BeamMode;
 using everybeam::Options;
 using everybeam::vector3r_t;
 using everybeam::coords::CoordinateSystem;
@@ -42,7 +44,7 @@ namespace {
 vector3r_t np2vector3r_t(const py::array_t<double> &pyarray) {
   auto r = pyarray.unchecked<1>();
   if (r.size() != 3) {
-    throw std::runtime_error("Pyarry is of incorrect size, must be 3.");
+    throw std::runtime_error("Pyarray is of incorrect size, must be 3.");
   }
   return {r[0], r[1], r[2]};
 }
@@ -222,8 +224,8 @@ void init_telescope(py::module &m) {
                                                      size_t(2), size_t(2)});
             std::unique_ptr<GriddedResponse> grid_response =
                 self.GetGriddedResponse(coordinate_system);
-            grid_response->FullResponse(buffer.mutable_data(), time, freq,
-                                        station_idx, field_idx);
+            grid_response->Response(BeamMode::kFull, buffer.mutable_data(),
+                                    time, freq, station_idx, field_idx);
             return buffer;
           },
           R"pbdoc(
@@ -263,8 +265,8 @@ void init_telescope(py::module &m) {
             py::array_t<std::complex<float>> buffer(
                 {nr_stations, coordinate_system.height, coordinate_system.width,
                  size_t(2), size_t(2)});
-            grid_response->FullResponseAllStations(buffer.mutable_data(), time,
-                                                   freq, field_idx);
+            grid_response->ResponseAllStations(
+                BeamMode::kFull, buffer.mutable_data(), time, freq, field_idx);
             return buffer;
           },
           R"pbdoc(
@@ -314,13 +316,13 @@ void init_telescope(py::module &m) {
 
             // Call overload depending on the size of the time_vec
             if (time_vec.size() == 1) {
-              grid_response->IntegratedFullResponse(
-                  buffer.data(), time_vec[0], freq, field_id,
-                  undersampling_factor, bw_vec);
+              grid_response->IntegratedResponse(BeamMode::kFull, buffer.data(),
+                                                time_vec[0], freq, field_id,
+                                                undersampling_factor, bw_vec);
             } else {
-              grid_response->IntegratedFullResponse(
-                  buffer.data(), time_vec, freq, field_id, undersampling_factor,
-                  bw_vec);
+              grid_response->IntegratedResponse(BeamMode::kFull, buffer.data(),
+                                                time_vec, freq, field_id,
+                                                undersampling_factor, bw_vec);
             }
             // The Hermitian matrices need to be stored as a Matrix4x4
             const size_t npixels =
@@ -692,8 +694,9 @@ void init_telescope(py::module &m) {
                 static_cast<PhasedArrayPoint &>(*point_response);
 
             py::array_t<std::complex<float>> response({size_t(2), size_t(2)});
-            phased_array_point.FullResponse(response.mutable_data(), ra, dec,
-                                            freq, idx, field_id);
+            phased_array_point.Response(BeamMode::kFull,
+                                        response.mutable_data(), ra, dec, freq,
+                                        idx, field_id);
             return response;
           },
           R"pbdoc(

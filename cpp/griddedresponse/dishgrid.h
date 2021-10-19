@@ -22,26 +22,28 @@ class DishGrid final : public GriddedResponse {
            const coords::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 
-  void FullResponse(std::complex<float>* buffer, double time, double frequency,
-                    size_t station_idx, size_t field_id) override;
+  void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
+                double frequency, size_t station_idx, size_t field_id) override;
 
-  void FullResponseAllStations(std::complex<float>* buffer, double time,
-                               double frequency, size_t field_id) override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
+                           double time, double frequency,
+                           size_t field_id) override;
 
-  void IntegratedFullResponse(
-      double* buffer, double time, double frequency, size_t field_id,
-      size_t undersampling_factor,
-      const std::vector<double>& baseline_weights) override;
+  void IntegratedResponse(BeamMode beam_mode, double* buffer, double time,
+                          double frequency, size_t field_id,
+                          size_t undersampling_factor,
+                          const std::vector<double>& baseline_weights) override;
 
-  void IntegratedFullResponse(
-      double* buffer, [[maybe_unused]] const std::vector<double>& time_array,
-      double frequency, size_t field_id, size_t undersampling_factor,
-      [[maybe_unused]] const std::vector<double>& baseline_weights) override {
+  void IntegratedResponse(
+      BeamMode beam_mode, double* buffer,
+      const std::vector<double>& /* time_array */, double frequency,
+      size_t field_id, size_t undersampling_factor,
+      const std::vector<double>& /* baseline_weights */) override {
     // Time does not play a role in the integrated response of a dish telescope,
-    // so call IntegratedFullResponse as if it were one time step
-    IntegratedFullResponse(buffer, 0.0, frequency, field_id,
-                           undersampling_factor, {0.0});
-  };
+    // so call IntegratedResponse as if it were one time step
+    IntegratedResponse(beam_mode, buffer, 0.0, frequency, field_id,
+                       undersampling_factor, {0.0});
+  }
 
  private:
   /**

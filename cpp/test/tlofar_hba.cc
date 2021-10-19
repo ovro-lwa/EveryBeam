@@ -6,6 +6,7 @@
 
 #include "../load.h"
 #include "../options.h"
+#include "../beammode.h"
 #include "../griddedresponse/lofargrid.h"
 #include "../pointresponse/lofarpoint.h"
 #include "../elementresponse.h"
@@ -26,6 +27,7 @@
 #include <aocommon/matrix2x2diag.h>
 
 using everybeam::ATermSettings;
+using everybeam::BeamMode;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::Options;
@@ -190,8 +192,9 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // Define buffer and get gridded responses
   std::vector<std::complex<float>> antenna_buffer_single(
       grid_response->GetStationBufferSize(1));
-  grid_response->FullResponse(antenna_buffer_single.data(), time, frequency, 23,
-                              0);
+  const BeamMode beam_mode = BeamMode::kFull;
+  grid_response->Response(beam_mode, antenna_buffer_single.data(), time,
+                          frequency, 23, 0);
   BOOST_CHECK_EQUAL(
       antenna_buffer_single.size(),
       std::size_t(coord_system.width * coord_system.height * 2 * 2));
@@ -204,15 +207,15 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // Compute response for center pixel via PointResponse
   // One station
   std::complex<float> point_buffer_single_station[4];
-  point_response->FullResponse(point_buffer_single_station, coord_system.ra,
-                               coord_system.dec, frequency, 23, 0);
+  point_response->Response(beam_mode, point_buffer_single_station,
+                           coord_system.ra, coord_system.dec, frequency, 23, 0);
 
   // All stations
   std::vector<std::complex<float>> point_buffer_all_stations(
       point_response->GetAllStationsBufferSize());
-  point_response->FullResponseAllStations(point_buffer_all_stations.data(),
-                                          coord_system.ra, coord_system.dec,
-                                          frequency, 0);
+  point_response->ResponseAllStations(
+      beam_mode, point_buffer_all_stations.data(), coord_system.ra,
+      coord_system.dec, frequency, 0);
 
   // Compare with everybeam
   std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
@@ -244,8 +247,8 @@ BOOST_AUTO_TEST_CASE(gridded_response) {
   // All stations
   std::vector<std::complex<float>> antenna_buffer_all(
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
-  grid_response->FullResponseAllStations(antenna_buffer_all.data(), time,
-                                         frequency, 0);
+  grid_response->ResponseAllStations(beam_mode, antenna_buffer_all.data(), time,
+                                     frequency, 0);
   BOOST_CHECK_EQUAL(antenna_buffer_all.size(),
                     std::size_t(telescope->GetNrStations() *
                                 coord_system.width * coord_system.height * 4));
@@ -295,27 +298,29 @@ BOOST_AUTO_TEST_CASE(point_response_caching) {
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
 
   std::vector<std::complex<float>> point_buffer_1(4);
-  lofar_point.FullResponse(point_buffer_1.data(), coord_system.ra,
-                           coord_system.dec, frequency, 23, 0);
+  const BeamMode beam_mode = BeamMode::kFull;
+  lofar_point.Response(beam_mode, point_buffer_1.data(), coord_system.ra,
+                       coord_system.dec, frequency, 23, 0);
+
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), false);
 
   lofar_point.UpdateTime(time + 100);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
-  lofar_point.FullResponse(point_buffer_1.data(), coord_system.ra,
-                           coord_system.dec, frequency, 23, 0);
+  lofar_point.Response(beam_mode, point_buffer_1.data(), coord_system.ra,
+                       coord_system.dec, frequency, 23, 0);
 
   lofar_point.SetUpdateInterval(100);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
 
   lofar_point.UpdateTime(time + 100);
-  lofar_point.FullResponse(point_buffer_1.data(), coord_system.ra,
-                           coord_system.dec, frequency, 23, 0);
+  lofar_point.Response(beam_mode, point_buffer_1.data(), coord_system.ra,
+                       coord_system.dec, frequency, 23, 0);
 
   lofar_point.UpdateTime(time + 199);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), false);
   std::vector<std::complex<float>> point_buffer_2(4);
-  lofar_point.FullResponse(point_buffer_2.data(), coord_system.ra,
-                           coord_system.dec, frequency, 23, 0);
+  lofar_point.Response(beam_mode, point_buffer_2.data(), coord_system.ra,
+                       coord_system.dec, frequency, 23, 0);
 
   for (size_t i = 0; i != point_buffer_1.size(); ++i) {
     BOOST_CHECK_CLOSE(point_buffer_1[i], point_buffer_2[i], 1e-6);
@@ -323,8 +328,8 @@ BOOST_AUTO_TEST_CASE(point_response_caching) {
 
   lofar_point.UpdateTime(time + 201);
   BOOST_CHECK_EQUAL(lofar_point.HasTimeUpdate(), true);
-  lofar_point.FullResponse(point_buffer_2.data(), coord_system.ra,
-                           coord_system.dec, frequency, 23, 0);
+  lofar_point.Response(beam_mode, point_buffer_2.data(), coord_system.ra,
+                       coord_system.dec, frequency, 23, 0);
 
   for (size_t i = 0; i != point_buffer_1.size(); ++i) {
     BOOST_CHECK_PREDICATE(std::not_equal_to<std::complex<float>>(),
@@ -382,8 +387,8 @@ BOOST_AUTO_TEST_CASE(differential_beam) {
 
   std::vector<std::complex<float>> antenna_buffer_diff_beam(
       grid_response_diff_beam->GetStationBufferSize(1));
-  grid_response_diff_beam->FullResponse(antenna_buffer_diff_beam.data(), time,
-                                        frequency, 15, 0);
+  grid_response_diff_beam->Response(
+      BeamMode::kFull, antenna_buffer_diff_beam.data(), time, frequency, 15, 0);
 
   std::size_t offset_22 = (2 + 2 * coord_system.width) * 4;
   double norm_jones_mat = 0.;
@@ -394,14 +399,15 @@ BOOST_AUTO_TEST_CASE(differential_beam) {
 }
 
 BOOST_AUTO_TEST_CASE(integrated_beam) {
-  // Just check whether IntegratedFullResponse does run and reproduces
+  // Just check whether IntegratedResponse does run and reproduces
   // results for One time interval
   std::vector<double> antenna_buffer_integrated(
       grid_response->GetIntegratedBufferSize());
   std::vector<double> baseline_weights(
       telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);
-  grid_response->IntegratedFullResponse(antenna_buffer_integrated.data(), time,
-                                        frequency, 0, 2, baseline_weights);
+  grid_response->IntegratedResponse(BeamMode::kFull,
+                                    antenna_buffer_integrated.data(), time,
+                                    frequency, 0, 2, baseline_weights);
 
   // Just check whether some (rather arbitrary) numbers are reproduced
   BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[10] - 0.0309436), 1e-6);
@@ -414,9 +420,9 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
   std::vector<double> tarray = {time, time};
   baseline_weights.resize(baseline_weights.size() * tarray.size());
   std::fill(baseline_weights.begin(), baseline_weights.end(), 1.);
-  grid_response->IntegratedFullResponse(antenna_buffer_integrated.data(),
-                                        tarray, frequency, 0, 2,
-                                        baseline_weights);
+  grid_response->IntegratedResponse(BeamMode::kFull,
+                                    antenna_buffer_integrated.data(), tarray,
+                                    frequency, 0, 2, baseline_weights);
 
   BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[10] - 0.0309436), 1e-6);
   BOOST_CHECK_LT(std::abs(antenna_buffer_integrated[20] - 0.156267), 1e-6);
@@ -460,8 +466,9 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
       grid_response_pb->GetIntegratedBufferSize());
   std::vector<double> baseline_weights_pb(
       telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);
-  grid_response_pb->IntegratedFullResponse(
-      antenna_buffer_pb.data(), time, frequency, 0, 8, baseline_weights_pb);
+  grid_response_pb->IntegratedResponse(BeamMode::kFull,
+                                       antenna_buffer_pb.data(), time,
+                                       frequency, 0, 8, baseline_weights_pb);
   // Check diagonal and off-diagonal term in component 0 and 5 of HMC4x4
   // representation of Mueller matrix
   std::size_t offset_01616 = 16 * width_pb + 16,

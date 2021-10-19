@@ -14,7 +14,9 @@ namespace aterms {
 EveryBeamATerm::EveryBeamATerm(
     const casacore::MeasurementSet& ms,
     const coords::CoordinateSystem& coordinate_system, const Options& options)
-    : telescope_(Load(ms, options)), coordinate_system_(coordinate_system) {}
+    : telescope_(Load(ms, options)),
+      coordinate_system_(coordinate_system),
+      beam_mode_(options.beam_mode) {}
 
 bool EveryBeamATerm::CalculateBeam(std::complex<float>* buffer, double time,
                                    double frequency, size_t field_id) {
@@ -32,7 +34,9 @@ bool EveryBeamATerm::CalculateBeam(std::complex<float>* buffer, double time,
   // Get the gridded response
   std::unique_ptr<griddedresponse::GriddedResponse> grid_response =
       telescope_->GetGriddedResponse(coordinate_system_);
-  grid_response->FullResponseAllStations(buffer, time, frequency, field_id);
+
+  grid_response->ResponseAllStations(beam_mode_, buffer, time, frequency,
+                                     field_id);
 
   SaveATermsIfNecessary(buffer, telescope_->GetNrStations(),
                         coordinate_system_.width, coordinate_system_.height);

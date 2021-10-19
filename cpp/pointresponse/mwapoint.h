@@ -35,11 +35,12 @@ class MWAPoint final : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void FullResponse(std::complex<float>* buffer, double ra, double dec,
-                    double freq, size_t station_idx, size_t field_id) override;
+  void Response(BeamMode beam_mode, std::complex<float>* buffer, double ra,
+                double dec, double freq, size_t station_idx,
+                size_t field_id) override;
 
-  void FullResponseAllStations(std::complex<float>* buffer, double ra,
-                               double dec, double freq, size_t field_id);
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
+                           double ra, double dec, double freq, size_t field_id);
 
  private:
   void SetJ200Vectors();

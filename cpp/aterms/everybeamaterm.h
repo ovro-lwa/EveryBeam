@@ -6,6 +6,7 @@
 
 #include "atermbeam.h"
 #include "../coords/coordutils.h"
+#include "../beammode.h"
 
 namespace casacore {
 class MeasurementSet;
@@ -43,6 +44,7 @@ class EveryBeamATerm final : public ATermBeam {
 
   std::unique_ptr<telescope::Telescope> telescope_;
   coords::CoordinateSystem coordinate_system_;
+  BeamMode beam_mode_;
 
   size_t cached_field_id;
   double cached_frequency_;

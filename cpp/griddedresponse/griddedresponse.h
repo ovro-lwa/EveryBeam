@@ -9,6 +9,7 @@
 #include "./../coords/coordutils.h"
 #include "./../coords/itrfdirection.h"
 #include "./../coords/itrfconverter.h"
+#include "../beammode.h"
 
 #include <memory>
 #include <vector>
@@ -37,14 +38,14 @@ class GriddedResponse {
   virtual ~GriddedResponse() {}
 
   /**
-   * @brief See FullResponse()
+   * @brief See Response()
    */
   [[deprecated(
-      "Use FullResponse() instead. Function will be removed in version "
+      "Use Response() instead. Function will be removed in version "
       "0.3.0.")]] void
   CalculateStation(std::complex<float>* buffer, double time, double freq,
                    size_t station_idx, size_t field_id) {
-    FullResponse(buffer, time, freq, station_idx, field_id);
+    Response(BeamMode::kFull, buffer, time, freq, station_idx, field_id);
   };
 
   /**
@@ -59,20 +60,42 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void FullResponse(std::complex<float>* buffer, double time,
-                            double freq, size_t station_idx,
-                            size_t field_id) = 0;
+  [[deprecated(
+      "Use Response() instead. Function will be removed in version "
+      "0.3.0.")]] void
+  FullResponse(std::complex<float>* buffer, double time, double freq,
+               size_t station_idx, size_t field_id) {
+    Response(BeamMode::kFull, buffer, time, freq, station_idx, field_id);
+  }
 
   /**
-   * @brief See FullResponseAllStations()
+   * @brief Compute the beam for a single station, given a prescribed beam mode.
+   * Result is stored in the output buffer, which should accommodate a Jones
+   * matrix (4 complex floats per pixel.
+   *
+   * @param beam_mode Selects beam mode (BeamMode::kElement,
+   * BeamMode::kArrayFactor or BeamMode::kFull)
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetStationBufferSize(1)
+   * @param station_idx Station index, must be smaller than number of stations
+   * in the Telescope
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   */
+  virtual void Response(BeamMode beam_mode, std::complex<float>* buffer,
+                        double time, double freq, size_t station_idx,
+                        size_t field_id) = 0;
+
+  /**
+   * @brief See ResponseAllStations()
    */
   [[deprecated(
-      "Use FullResponseAllStations() instead. Function will be removed in "
+      "Use ResponseAllStations() instead. Function will be removed in "
       "version "
       "0.3.0.")]] void
   CalculateAllStations(std::complex<float>* buffer, double time,
                        double frequency, size_t field_id) {
-    FullResponseAllStations(buffer, time, frequency, field_id);
+    ResponseAllStations(BeamMode::kFull, buffer, time, frequency, field_id);
   };
 
   /**
@@ -85,28 +108,49 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void FullResponseAllStations(std::complex<float>* buffer, double time,
-                                       double frequency, size_t field_id) = 0;
+  [[deprecated(
+      "Use ResponseAllStations() instead. Function will be removed in "
+      "version "
+      "0.3.0.")]] void
+  FullResponseAllStations(std::complex<float>* buffer, double time,
+                          double frequency, size_t field_id) {
+    ResponseAllStations(BeamMode::kFull, buffer, time, frequency, field_id);
+  }
 
   /**
-   * @brief See IntegratedFullResponse
+   * @brief Compute the array factor for all stations in a Telescope.
+   * Result is stored in the output buffer, which should accommodate a Jones
+   * matrix (4 complex valued floats) per pixel for each station.
+   *
+   * @param beam_mode Selects beam mode (element, array factor or full)
+   * @param buffer Output buffer, compute and set size with
+   * GriddedResponse::GetStationBufferSize()
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   */
+  virtual void ResponseAllStations(BeamMode beam_mode,
+                                   std::complex<float>* buffer, double time,
+                                   double frequency, size_t field_id) = 0;
+
+  /**
+   * @brief See IntegratedResponse()
    */
   [[deprecated(
-      "Use IntegratedFullResponse() instead. Function will be removed in "
+      "Use IntegratedResponse() instead. Function will be removed in "
       "version "
       "0.3.0.")]] void
   CalculateIntegratedResponse(double* buffer, double time, double frequency,
                               size_t field_id, size_t undersampling_factor,
                               const std::vector<double>& baseline_weights) {
-    IntegratedFullResponse(buffer, time, frequency, field_id,
-                           undersampling_factor, baseline_weights);
+    IntegratedResponse(BeamMode::kFull, buffer, time, frequency, field_id,
+                       undersampling_factor, baseline_weights);
   };
 
   /**
-   * @brief See IntegratedFullResponse()
+   * @brief See IntegratedResponse()
    */
   [[deprecated(
-      "Use IntegratedFullResponse() instead. Function will be removed in "
+      "Use IntegratedResponse() instead. Function will be removed in "
       "version "
       "0.3.0.")]] void
   CalculateIntegratedResponse(double* buffer,
@@ -114,8 +158,8 @@ class GriddedResponse {
                               double frequency, size_t field_id,
                               size_t undersampling_factor,
                               const std::vector<double>& baseline_weights) {
-    IntegratedFullResponse(buffer, time_array, frequency, field_id,
-                           undersampling_factor, baseline_weights);
+    IntegratedResponse(BeamMode::kFull, buffer, time_array, frequency, field_id,
+                       undersampling_factor, baseline_weights);
   };
 
   /**
@@ -133,9 +177,42 @@ class GriddedResponse {
    * @param baseline_weights Baseline weights, size should equal
    * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
    */
-  virtual void IntegratedFullResponse(
-      double* buffer, double time, double frequency, size_t field_id,
-      size_t undersampling_factor, const std::vector<double>& baseline_weights);
+
+  /**
+   * @brief See IntegratedResponse()
+   *
+   */
+  [[deprecated(
+      "Use IntegratedResponse() instead. Function will be removed in "
+      "version "
+      "0.3.0.")]] void
+  IntegratedFullResponse(double* buffer, double time, double frequency,
+                         size_t field_id, size_t undersampling_factor,
+                         const std::vector<double>& baseline_weights) {
+    IntegratedResponse(BeamMode::kFull, buffer, time, frequency, field_id,
+                       undersampling_factor, baseline_weights);
+  }
+
+  /**
+   * @brief Calculate integrated/undersampled beam for a single time step.
+   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
+   * may override MakeIntegratedSnapshot() to implement a more efficient
+   * version.
+   *
+   * @param beam_mode Selects beam mode (element, array factor or full)
+   * @param buffer Buffer for storing the result, should have size width *
+   * height * 16
+   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   * @param field_id Field id
+   * @param undersampling_factor Undersampling factor
+   * @param baseline_weights Baseline weights, size should equal
+   * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
+   */
+  virtual void IntegratedResponse(BeamMode beam_mode, double* buffer,
+                                  double time, double frequency,
+                                  size_t field_id, size_t undersampling_factor,
+                                  const std::vector<double>& baseline_weights);
 
   /**
    * @brief Calculate integrated beam over multiple time steps.
@@ -157,7 +234,35 @@ class GriddedResponse {
   virtual void IntegratedFullResponse(
       double* buffer, const std::vector<double>& time_array, double frequency,
       size_t field_id, size_t undersampling_factor,
-      const std::vector<double>& baseline_weights);
+      const std::vector<double>& baseline_weights) {
+    IntegratedResponse(BeamMode::kFull, buffer, time_array, frequency, field_id,
+                       undersampling_factor, baseline_weights);
+  }
+
+  /**
+   * @brief Calculate integrated beam over multiple time steps.
+   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
+   * may override MakeIntegratedSnapshot() to implement a more efficient
+   * version.
+   *
+   * @param beam_mode Selects beam mode (element, array factor or full)
+   * @param buffer Buffer for storing the result, should have size width *
+   * height * 16
+   * @param time_array Vector with probing times, modified Julian date, UTC, in
+   * seconds (MJD(UTC), s).
+   * @param frequency Frequency (Hz)
+   * @param field_id Field id
+   * @param undersampling_factor Undersampling factor
+   * @param baseline_weights Baseline weights, size should equal
+   * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
+   * time_array.size()
+   */
+
+  virtual void IntegratedResponse(BeamMode beam_mode, double* buffer,
+                                  const std::vector<double>& time_array,
+                                  double frequency, size_t field_id,
+                                  size_t undersampling_factor,
+                                  const std::vector<double>& baseline_weights);
 
   std::size_t GetStationBufferSize(std::size_t nstations) const {
     return nstations * width_ * height_ * 4u;
@@ -199,7 +304,8 @@ class GriddedResponse {
    * perform a weighted average. (Partly) homogenous arrays may implement a
    * faster implementation by overriding this method.
    */
-  virtual void MakeIntegratedSnapshot(std::vector<aocommon::HMC4x4>& matrices,
+  virtual void MakeIntegratedSnapshot(BeamMode beam_mode,
+                                      std::vector<aocommon::HMC4x4>& matrices,
                                       double time, double frequency,
                                       size_t field_id,
                                       const double* baseline_weights_interval);

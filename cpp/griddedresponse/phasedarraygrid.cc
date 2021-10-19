@@ -24,9 +24,10 @@ PhasedArrayGrid::PhasedArrayGrid(
   threads_.resize(nthreads);
 }
 
-void PhasedArrayGrid::FullResponse(std::complex<float>* buffer, double time,
-                                   double frequency, size_t station_idx,
-                                   [[maybe_unused]] size_t field_id) {
+void PhasedArrayGrid::Response(BeamMode beam_mode, std::complex<float>* buffer,
+                               double time, double frequency,
+                               size_t station_idx,
+                               [[maybe_unused]] size_t field_id) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
   aocommon::Lane<Job> lane(threads_.size());
@@ -49,8 +50,8 @@ void PhasedArrayGrid::FullResponse(std::complex<float>* buffer, double time,
 
   // Prepare threads
   for (auto& thread : threads_) {
-    thread = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
-                         frequency);
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode, buffer,
+                         time, frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -61,9 +62,10 @@ void PhasedArrayGrid::FullResponse(std::complex<float>* buffer, double time,
   for (auto& thread : threads_) thread.join();
 }
 
-void PhasedArrayGrid::FullResponseAllStations(std::complex<float>* buffer,
-                                              double time, double frequency,
-                                              size_t) {
+void PhasedArrayGrid::ResponseAllStations(BeamMode beam_mode,
+                                          std::complex<float>* buffer,
+                                          double time, double frequency,
+                                          size_t) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
   aocommon::Lane<Job> lane(threads_.size());
@@ -89,8 +91,8 @@ void PhasedArrayGrid::FullResponseAllStations(std::complex<float>* buffer,
 
   // Prepare threads
   for (auto& thread : threads_) {
-    thread = std::thread(&PhasedArrayGrid::CalcThread, this, buffer, time,
-                         frequency);
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode, buffer,
+                         time, frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -133,7 +135,8 @@ void PhasedArrayGrid::SetITRFVectors(double time) {
                         diff_beam_centre_);
 }
 
-void PhasedArrayGrid::CalcThread(std::complex<float>* buffer, double time,
+void PhasedArrayGrid::CalcThread(BeamMode beam_mode,
+                                 std::complex<float>* buffer, double time,
                                  double frequency) {
   const telescope::PhasedArray& phasedarraytelescope =
       static_cast<const telescope::PhasedArray&>(*telescope_);
@@ -159,11 +162,11 @@ void PhasedArrayGrid::CalcThread(std::complex<float>* buffer, double time,
       std::complex<float>* ant_buffer_ptr =
           base_buffer + job.buffer_offset * values_per_ant;
 
-      const aocommon::MC2x2F gain_matrix =
-          aocommon::MC2x2F(phasedarraytelescope.GetStation(job.antenna_idx)
-                               ->Response(time, frequency, itrf_direction,
-                                          sb_freq, station0_, tile0_)
-                               .Data());
+      const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
+          phasedarraytelescope.GetStation(job.antenna_idx)
+              ->Response(beam_mode, time, frequency, itrf_direction, sb_freq,
+                         station0_, tile0_)
+              .Data());
 
       if (use_differential_beam_) {
         aocommon::MC2x2F::ATimesB(ant_buffer_ptr,

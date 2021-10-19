@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../load.h"
+#include "../beammode.h"
 #include "../options.h"
 #include "../griddedresponse/dishgrid.h"
 #include "../pointresponse/dishpoint.h"
@@ -61,8 +62,8 @@ BOOST_AUTO_TEST_CASE(load_vla) {
 
   std::vector<std::complex<float>> antenna_buffer(
       grid_response->GetStationBufferSize(telescope->GetNrStations()));
-  grid_response->FullResponseAllStations(antenna_buffer.data(), time, frequency,
-                                         0);
+  grid_response->ResponseAllStations(everybeam::BeamMode::kFull,
+                                     antenna_buffer.data(), time, frequency, 0);
 
   // Check that XX/YY are equal
   // Loop over pixels to check that off-diagonals are 0
@@ -109,8 +110,9 @@ BOOST_AUTO_TEST_CASE(load_vla) {
 
   // Use ComputeAllStations (should be a repetitive call to CalculateStation)
   std::complex<float> point_response_buffer[4 * telescope->GetNrStations()];
-  point_response->FullResponseAllStations(
-      point_response_buffer, coord_system.ra, coord_system.dec, frequency, 0);
+  point_response->ResponseAllStations(everybeam::BeamMode::kFull,
+                                      point_response_buffer, coord_system.ra,
+                                      coord_system.dec, frequency, 0);
 
   BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,
                                 point_response_buffer + 4,

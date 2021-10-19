@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "elementresponse.h"
+#include "beammode.h"
 
 namespace everybeam {
 
@@ -30,6 +31,7 @@ struct Options {
   bool use_channel_frequency = true;
   std::string data_column_name = "DATA";
   ElementResponseModel element_response_model = ElementResponseModel::kHamaker;
+  BeamMode beam_mode = BeamMode::kFull;
 
   // MWA specific (Lofar probably will follow)
   bool frequency_interpolation = false;

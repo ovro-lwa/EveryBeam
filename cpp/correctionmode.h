@@ -44,7 +44,7 @@ inline CorrectionMode ParseCorrectionMode(const std::string& str) {
   else
     throw std::runtime_error(
         "Invalid beam correction mode \'" + str +
-        "\', options are: None, Default, ArrayFactor or Element");
+        "\', options are: None, Default, Full, ArrayFactor or Element");
 }
 }  // namespace everybeam
 

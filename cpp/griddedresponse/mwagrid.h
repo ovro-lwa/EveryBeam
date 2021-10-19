@@ -19,19 +19,21 @@ class MWAGrid final : public GriddedResponse {
           const coords::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 
-  void FullResponse(std::complex<float>* buffer, double time, double frequency,
-                    size_t station_idx, size_t field_id) override;
+  void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
+                double frequency, size_t station_idx, size_t field_id) override;
 
-  void FullResponseAllStations(std::complex<float>* buffer, double time,
-                               double frequency, size_t field_id) override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
+                           double time, double frequency,
+                           size_t field_id) override;
 
  private:
   std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;
 
   // Override MakeIntegrated snapshot for efficiency
   virtual void MakeIntegratedSnapshot(
-      std::vector<aocommon::HMC4x4>& matrices, double time, double frequency,
-      size_t field_id, const double* baseline_weights_interval) override;
+      BeamMode beam_mode, std::vector<aocommon::HMC4x4>& matrices, double time,
+      double frequency, size_t field_id,
+      const double* baseline_weights_interval) override;
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

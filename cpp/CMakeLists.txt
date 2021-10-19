@@ -87,6 +87,7 @@ install(
   FILES antenna.h
         beamformer.h
         beamformeridenticalantennas.h
+        beammode.h
         correctionmode.h
         element.h
         elementhamaker.h

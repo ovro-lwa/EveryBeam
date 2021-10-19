@@ -39,9 +39,9 @@ class PhasedArrayPoint : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void FullResponse(std::complex<float> *response_matrix, double ra, double dec,
-                    double freq, size_t station_idx,
-                    size_t field_id) final override;
+  void Response(BeamMode beam_mode, std::complex<float> *response_matrix,
+                double ra, double dec, double freq, size_t station_idx,
+                size_t field_id) final override;
 
   aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
                                const vector3r_t &direction,
