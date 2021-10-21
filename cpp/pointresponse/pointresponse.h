@@ -129,10 +129,12 @@ class PointResponse {
    * caller is assumed to be thread-safe.
    * @return aocommon::MC2x2
    */
-  virtual aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx,
-                                   double freq, const vector3r_t& direction,
-                                   std::mutex* mutex = nullptr) {
+  aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx, double freq,
+                           const vector3r_t& direction,
+                           std::mutex* mutex = nullptr) {
     switch (beam_mode) {
+      case BeamMode::kNone:
+        return aocommon::MC2x2::Unity();
       case BeamMode::kFull:
         return FullResponse(station_idx, freq, direction, mutex);
       case BeamMode::kElement:
@@ -140,7 +142,7 @@ class PointResponse {
       case BeamMode::kArrayFactor:
         return ArrayFactor(station_idx, freq, direction, mutex);
       default:
-        throw std::runtime_error("Not yet implemented");
+        throw std::runtime_error("Invalid beam mode.");
     }
   }
 

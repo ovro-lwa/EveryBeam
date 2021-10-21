@@ -125,8 +125,7 @@ class Station {
       case CorrectionMode::kFull:
         return Response(time, freq, direction, freq0, station0, tile0, rotate);
       case CorrectionMode::kArrayFactor:
-        return aocommon::MC2x2(
-            ArrayFactor(time, freq, direction, freq0, station0, tile0));
+        return ArrayFactor(time, freq, direction, freq0, station0, tile0);
       case CorrectionMode::kElement:
         return ComputeElementResponse(time, freq, direction, false, rotate);
     }
