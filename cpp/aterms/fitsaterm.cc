@@ -10,16 +10,17 @@ FitsATerm::FitsATerm(size_t nAntenna,
                      size_t max_support)
     : FitsATermBase(nAntenna, coordinate_system, max_support) {}
 
-FitsATerm::~FitsATerm() {}
+FitsATerm::~FitsATerm() = default;
 
 void FitsATerm::OpenTECFiles(const std::vector<std::string>& filenames) {
   mode_ = Mode::kTEC;
   readers_.reserve(filenames.size());
   for (const std::string& filename : filenames) {
     readers_.emplace_back(filename, true, true);
-    if (readers_.back().NFrequencies() != 1)
+    if (readers_.back().NFrequencies() != 1) {
       throw std::runtime_error(
           "FITS file for TEC A-terms has multiple frequencies in it");
+    }
   }
   InitializeFromFiles(readers_);
 }
@@ -29,9 +30,10 @@ void FitsATerm::OpenDiagGainFiles(const std::vector<std::string>& filenames) {
   readers_.reserve(filenames.size());
   for (const std::string& filename : filenames) {
     readers_.emplace_back(filename, true, true);
-    if (readers_.back().NMatrixElements() != 4)
+    if (readers_.back().NMatrixElements() != 4) {
       throw std::runtime_error(
           "FITS file for diagonal gains did not have 4 matrix elements in it");
+    }
   }
   InitializeFromFiles(readers_);
 }
@@ -42,9 +44,9 @@ bool FitsATerm::Calculate(std::complex<float>* buffer, double time,
   bool requires_recalculation;
   bool position_changed = FindFilePosition(buffer, time, frequency, time_index,
                                            requires_recalculation);
-  if (!position_changed)
+  if (!position_changed) {
     return false;
-  else {
+  } else {
     if (requires_recalculation) {
       ReadImages(buffer, time_index, frequency);
       StoreInCache(frequency, buffer);

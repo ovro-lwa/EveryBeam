@@ -22,7 +22,7 @@ FitsATermBase::FitsATermBase(size_t n_antennas,
       coordinate_system_(coordinate_system),
       resampler_(coordinate_system, max_support) {}
 
-FitsATermBase::~FitsATermBase() {}
+FitsATermBase::~FitsATermBase() = default;
 
 void FitsATermBase::InitializeFromFiles(
     std::vector<aocommon::FitsReader>& readers) {
@@ -49,25 +49,28 @@ void FitsATermBase::InitializeFromFiles(
       throw std::runtime_error(str.str());
     }
     double time0 = reader.TimeDimensionStart();
-    if (!timesteps_.empty() && time0 < timesteps_.back().time)
+    if (!timesteps_.empty() && time0 < timesteps_.back().time) {
       throw std::runtime_error(
           "Time axis of FITS files seem to overlap (start of fitsfile " +
           std::to_string(reader_index) + " (t=" + std::to_string(time0) +
           " was before end of previous fitsfile)");
-    for (size_t i = 0; i != reader.NTimesteps(); ++i)
+    }
+    for (size_t i = 0; i != reader.NTimesteps(); ++i) {
       timesteps_.emplace_back(time0 + i * reader.TimeDimensionIncr(),
                               reader_index, i);
+    }
   }
   cur_timeindex_ = std::numeric_limits<size_t>::max();
   cur_frequency_ = std::numeric_limits<double>::max();
 }
 
 double FitsATermBase::AverageUpdateTime() const {
-  if (timesteps_.size() < 2)
+  if (timesteps_.size() < 2) {
     return 60.0 * 30.0;
-  else
+  } else {
     return (timesteps_.back().time - timesteps_.front().time) /
            (timesteps_.size() - 1);
+  }
 }
 
 bool FitsATermBase::FindFilePosition(std::complex<float>* buffer, double time,
@@ -103,9 +106,9 @@ bool FitsATermBase::FindFilePosition(std::complex<float>* buffer, double time,
     if (cur_frequency_ == frequency) return false;
     // If it did change: do we have this frequency in the cache?
     size_t cache_index = cache_.Find(frequency);
-    if (cache_index == Cache::kNotFound)
+    if (cache_index == Cache::kNotFound) {
       requires_recalculation = true;
-    else {
+    } else {
       cache_.Get(cache_index, buffer);
       cur_frequency_ = frequency;
       return true;

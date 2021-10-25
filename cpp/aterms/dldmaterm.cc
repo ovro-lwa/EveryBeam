@@ -20,9 +20,10 @@ void DLDMATerm::Open(const std::vector<std::string>& filenames) {
   readers_.reserve(filenames.size());
   for (const std::string& filename : filenames) {
     readers_.emplace_back(filename, true, true);
-    if (readers_.back().NMatrixElements() != 2)
+    if (readers_.back().NMatrixElements() != 2) {
       throw std::runtime_error(
           "FITS file for dl,dm offsets did not have 2 matrix elements in it");
+    }
   }
   InitializeFromFiles(readers_);
 }
@@ -34,9 +35,9 @@ bool DLDMATerm::Calculate(std::complex<float>* buffer, double time,
   bool position_changed = FindFilePosition(buffer, time, frequency, time_index,
                                            requires_recalculation);
   bool outdated = std::fabs(time - previous_time_) > update_interval_;
-  if (!position_changed && !outdated)
+  if (!position_changed && !outdated) {
     return false;
-  else {
+  } else {
     if (requires_recalculation || outdated) {
       previous_time_ = time;
       ReadImages(buffer, time_index, frequency, uvw_in_m);
@@ -98,15 +99,14 @@ void DLDMATerm::EvaluateDLDM(std::complex<float>* dest, const float* dl,
       ImageCoordinates::XYToLM(x, y, cs.dl, cs.dm, cs.width, cs.height, l, m);
       l += cs.phase_centre_dl;
       m += cs.phase_centre_dm;
-      double lproj = l + (*dl);
-      double mproj = m + (*dm);
-      double lm_sq = l * l + m * m;
-      double lmproj_sq = lproj * lproj + mproj * mproj;
-      double dn;
-      if (lm_sq >= 1.0 || lmproj_sq >= 1.0)
-        dn = 0.0;
-      else
-        dn = std::sqrt(1.0 - lmproj_sq) - std::sqrt(1.0 - lm_sq);
+      const double lproj = l + (*dl);
+      const double mproj = m + (*dm);
+      const double lm_sq = l * l + m * m;
+      const double lmproj_sq = lproj * lproj + mproj * mproj;
+      const double dn =
+          (lm_sq >= 1.0 || lmproj_sq >= 1.0)
+              ? 0.0
+              : std::sqrt(1.0 - lmproj_sq) - std::sqrt(1.0 - lm_sq);
       dest[0] = std::polar(1.0, 2.0 * M_PI * (u * (*dl) + v * (*dm) + w * dn));
       dest[1] = 0.0;
       dest[2] = 0.0;

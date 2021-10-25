@@ -60,19 +60,21 @@ void H5ParmATerm::Open(const std::vector<std::string>& filenames) {
     }
 
     for (size_t i = 0; i < station_names_ms_.size(); ++i) {
-      if (station_names_ms_[i] != station_names_ampl[i])
+      if (station_names_ms_[i] != station_names_ampl[i]) {
         throw std::runtime_error(
             "At index " + std::to_string(i) + ": station name " +
             station_names_ms_[i] +
             " provided by ms does not match station name " +
             station_names_ampl[i] + " provided by amplitude soltab");
+      }
 
-      if (station_names_ms_[i] != station_names_phase[i])
+      if (station_names_ms_[i] != station_names_phase[i]) {
         throw std::runtime_error(
             "At index " + std::to_string(i) + ": station name " +
             station_names_ms_[i] +
             " provided by ms does not match station name " +
             station_names_phase[i] + " provided by phase soltab");
+      }
     }
   }
 }

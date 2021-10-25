@@ -108,7 +108,7 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
   Options local_options = options;
   // If field_response_ not nullptr, set/precompute quantities
   // related to the field
-  if (nullptr != field_response_.get()) {
+  if (nullptr != field_response_) {
     // Lock the associated mutex, thus avoiding that the LOBESElementResponse
     // basefunctions_ are overwritten before response is computed
     lock.lock();
@@ -135,7 +135,7 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
   }
 
   // Wipe out basefunctions cache
-  if (nullptr != field_response_.get()) {
+  if (nullptr != field_response_) {
     field_response_->ClearFieldQuantities();
   }
   return result;

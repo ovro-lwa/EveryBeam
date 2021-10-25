@@ -78,7 +78,7 @@ LOBESElementResponse::LOBESElementResponse(const std::string &name,
 
   // Get the dimension size of each dimension in the dataspace and display them.
   std::vector<hsize_t> dims_coefficients(ndims_coefficients);
-  dataspace.getSimpleExtentDims(dims_coefficients.data(), NULL);
+  dataspace.getSimpleExtentDims(dims_coefficients.data(), nullptr);
   coefficients_shape_ = std::vector<unsigned int>(dims_coefficients.begin(),
                                                   dims_coefficients.end());
 
@@ -105,7 +105,7 @@ LOBESElementResponse::LOBESElementResponse(const std::string &name,
 
   // Get the dimension size of each dimension in the dataspace and display them.
   std::vector<hsize_t> dims_nms(ndims_nms);
-  dataspace.getSimpleExtentDims(dims_nms.data(), NULL);
+  dataspace.getSimpleExtentDims(dims_nms.data(), nullptr);
 
   nms_.resize(dims_nms[0]);
   dataset.read(nms_.data(), H5::PredType::NATIVE_INT);

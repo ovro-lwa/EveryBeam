@@ -35,9 +35,10 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
                        const std::string& ms_filename) {
   std::vector<std::string> aterms = reader.GetStringList("aterms");
 
-  if (aterms.empty())
+  if (aterms.empty()) {
     throw std::runtime_error(
         "No a-term correction given in parset (aterms key is an empty list)");
+  }
 
   for (const std::string& aterm_name : aterms) {
     // Allows to "alias" the aterm type.
@@ -222,9 +223,10 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
   }
   if (aterms_.size() > 1) {
     previous_aterm_values_.resize(aterms_.size());
-    for (aocommon::UVector<std::complex<float>>& buf : previous_aterm_values_)
+    for (aocommon::UVector<std::complex<float>>& buf : previous_aterm_values_) {
       buf.resize(coordinate_system_.width * coordinate_system_.height *
                  n_antennas_ * 4);
+    }
   }
 }
 

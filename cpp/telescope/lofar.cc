@@ -49,18 +49,20 @@ bool CalculatePreappliedBeamOptions(const casacore::MeasurementSet &ms,
         was_beam_applied = true;
         casacore::String error;
         casacore::MeasureHolder mHolder;
-        if (!mHolder.fromRecord(
-                error, dataCol.keywordSet().asRecord("LOFAR_APPLIED_BEAM_DIR")))
+        if (!mHolder.fromRecord(error, dataCol.keywordSet().asRecord(
+                                           "LOFAR_APPLIED_BEAM_DIR"))) {
           throw std::runtime_error(
               "Error while reading LOFAR_APPLIED_BEAM_DIR keyword: " + error);
+        }
         preapplied_beam_dir = mHolder.asMDirection();
         break;
     }
   } else {
-    if (force_differential_beam)
+    if (force_differential_beam) {
       correction_mode = CorrectionMode::kFull;
-    else
+    } else {
       correction_mode = CorrectionMode::kNone;
+    }
   }
   return was_beam_applied || force_differential_beam;
 }
@@ -68,8 +70,9 @@ bool CalculatePreappliedBeamOptions(const casacore::MeasurementSet &ms,
 
 LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
-  if (options_.element_response_model == kDefault)
+  if (options_.element_response_model == kDefault) {
     options_.element_response_model = kHamaker;
+  }
   ReadAllStations(ms, stations_.begin(), options_);
 
   // Populate MeasurementSet properties struct
@@ -82,8 +85,9 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
 
   // Following is ms.field() related, first check whether field complies with
   // LOFAR field
-  if (ms.field().nrow() != 1)
+  if (ms.field().nrow() != 1) {
     throw std::runtime_error("LOFAR MeasurementSet has multiple fields");
+  }
 
   if (!ms.field().tableDesc().isColumn("LOFAR_TILE_BEAM_DIR")) {
     throw std::runtime_error("LOFAR_TILE_BEAM_DIR column not found");

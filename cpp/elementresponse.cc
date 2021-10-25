@@ -18,18 +18,18 @@ ElementResponseModel ElementResponseModelFromString(
                  element_response_upper.begin(), ::toupper);
 
   everybeam::ElementResponseModel element_response_enum;
-  if (element_response_upper == "" || element_response_upper == "DEFAULT")
+  if (element_response_upper == "" || element_response_upper == "DEFAULT") {
     element_response_enum = everybeam::ElementResponseModel::kDefault;
-  else if (element_response_upper == "HAMAKER")
+  } else if (element_response_upper == "HAMAKER") {
     element_response_enum = everybeam::ElementResponseModel::kHamaker;
-  else if (element_response_upper == "LOBES")
+  } else if (element_response_upper == "LOBES") {
     element_response_enum = everybeam::ElementResponseModel::kLOBES;
-  else if (element_response_upper == "OSKARDIPOLE")
+  } else if (element_response_upper == "OSKARDIPOLE") {
     element_response_enum = everybeam::ElementResponseModel::kOSKARDipole;
-  else if (element_response_upper == "OSKARSPHERICALWAVE")
+  } else if (element_response_upper == "OSKARSPHERICALWAVE") {
     element_response_enum =
         everybeam::ElementResponseModel::kOSKARSphericalWave;
-  else {
+  } else {
     std::stringstream message;
     message << "The specified element response model " << element_response
             << " is not implemented.";

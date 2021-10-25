@@ -109,11 +109,11 @@ TileConfig ReadTileConfig(const Table &table, unsigned int row) {
 
 void TransformToFieldCoordinates(TileConfig &config,
                                  const Antenna::CoordinateSystem::Axes &axes) {
-  for (unsigned int i = 0; i < config.size(); ++i) {
-    const vector3r_t position = config[i];
-    config[i][0] = dot(position, axes.p);
-    config[i][1] = dot(position, axes.q);
-    config[i][2] = dot(position, axes.r);
+  for (auto &val : config) {
+    const vector3r_t position = val;
+    val[0] = dot(position, axes.p);
+    val[1] = dot(position, axes.q);
+    val[2] = dot(position, axes.r);
   }
 }
 
