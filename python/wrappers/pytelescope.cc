@@ -939,9 +939,43 @@ void init_telescope(py::module &m) {
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"));
 
-  py::class_<LOFAR, PhasedArray>(m, "LOFAR").def(py::init(&create_lofar));
+  py::class_<LOFAR, PhasedArray>(m, "LOFAR",
+                                 R"pbdoc(
+        Class to get beam responses for LOFAR observations.
+        Inherits from :func:`~everybeam.PhasedArray`.
+        )pbdoc")
+      .def(py::init(&create_lofar),
+           R"pbdoc(
+        Initializes a LOFAR telescope.
 
-  py::class_<OSKAR, PhasedArray>(m, "OSKAR").def(py::init(&create_oskar));
+        Parameters
+        ----------
+        ms: str
+            Path to (LOFAR) Measurement Set
+        options: everybeam.Options
+            Struct specifying (beam) options for the provided
+            Measurment Set
+        )pbdoc",
+           py::arg("ms"), py::arg("options"));
+
+  py::class_<OSKAR, PhasedArray>(m, "OSKAR",
+                                 R"pbdoc(
+        Class to get beam responses for (simulated) SKA observations.
+        Inherits from :func:`~everybeam.PhasedArray`.
+        )pbdoc")
+      .def(py::init(&create_oskar),
+           R"pbdoc(
+        Initializes an OSKAR telescope.
+
+        Parameters
+        ----------
+        ms: str
+            Path to (LOFAR) Measurement Set
+        options: everybeam.Options
+            Struct specifying (beam) options for the provided
+            Measurment Set
+        )pbdoc",
+           py::arg("ms"), py::arg("options"));
 
   // TODO: other telescopes:
   // py::class_<MWA, Telescope>(m, "MWA");

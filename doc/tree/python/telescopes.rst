@@ -12,6 +12,11 @@ Classes
    :members:
    :inherited-members:
 
+.. autoclass:: everybeam::PhasedArray
+   :members:
+
 .. autoclass:: everybeam.LOFAR
    :members:
-   :inherited-members:
+
+.. autoclass:: everybeam.OSKAR
+   :members:

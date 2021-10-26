@@ -95,37 +95,37 @@ void init_utils(py::module &m) {
        )pbdoc")
       .def_readwrite("width", &CoordinateSystem::width,
                      R"pbdoc(
-        Width of grid in pixels: int
+        int: Width of grid in pixels.
        )pbdoc")
       .def_readwrite("height", &CoordinateSystem::height,
                      R"pbdoc(
-        Height of grid in pixels: int
+        int: Height of grid in pixels.
        )pbdoc")
       .def_readwrite("ra", &CoordinateSystem::ra,
                      R"pbdoc(
-        Right ascension (pointing direction) of telescope [rad]: double
+        double: Right ascension (pointing direction) of telescope [rad].
        )pbdoc")
       .def_readwrite("dec", &CoordinateSystem::dec,
                      R"pbdoc(
-        Declination (pointing direction) of telescope [rad]: double
+        double: Declination (pointing direction) of telescope [rad].
        )pbdoc")
       .def_readwrite("dl", &CoordinateSystem::dl,
                      R"pbdoc(
-        Grid spacing in RA direction [rad]: double
+        double: Grid spacing in RA direction [rad],
         dl is the direction cosine of the delta right ascension
        )pbdoc")
       .def_readwrite("dm", &CoordinateSystem::dm,
                      R"pbdoc(
-        Grid spacing in Dec direction [rad]: double
-        dm is the direction cosine of the delta declination
+        double: Grid spacing in Dec direction [rad], where
+        dm is the direction cosine of the delta declination.
        )pbdoc")
       .def_readwrite("l_shift", &CoordinateSystem::phase_centre_dl,
                      R"pbdoc(
-        Shift in l from pointing direction to grid center [rad]: double
+        double: Shift in l from pointing direction to grid center [rad].
        )pbdoc")
       .def_readwrite("m_shift", &CoordinateSystem::phase_centre_dm,
                      R"pbdoc(
-        Shift in m from pointing direction to grid center [rad]: double
+        double: Shift in m from pointing direction to grid center [rad].
        )pbdoc");
 
   // Bindings for ElementResponseModel enum
@@ -143,10 +143,6 @@ void init_utils(py::module &m) {
              R"pbdoc(
         SKA dipole element response model
        )pbdoc")
-      .value("osker_spherical", ElementResponseModel::kOSKARSphericalWave,
-             R"pbdoc(
-        SKA spherical wave element response model
-       )pbdoc")
       .export_values();
 
   // Bindings for Options struct
@@ -154,9 +150,16 @@ void init_utils(py::module &m) {
                       R"pbdoc(
         Class for specifying some beam forming options.
        )pbdoc")
-      .def(py::init<>())
-      .def_readwrite("coeff_path", &Options::coeff_path, R"pbdoc(
-        Full path to coefficients file (MWA) or path to directory where
+      .def(py::init<>(),
+           R"pbdoc(
+        Initialize Options struct
+
+        Parameters
+        ----------
+       )pbdoc")
+      .def_readwrite("coeff_path", &Options::coeff_path,
+                     R"pbdoc(
+        str: Full path to coefficients file (MWA) or path to directory where
         coefficient files can be found (LOFAR LOBEs model)
        )pbdoc")
       // [TODO] MWA specific
@@ -165,18 +168,18 @@ void init_utils(py::module &m) {
       // specific)")
       .def_readwrite("use_differential_beam", &Options::use_differential_beam,
                      R"pbdoc(
-        Use differential beam: bool
+        bool: Use differential beam?
        )pbdoc")
       .def_readwrite("use_channel_frequency", &Options::use_channel_frequency,
                      R"pbdoc(
-        Use channel frequency: bool
+        bool: Use channel frequency?
        )pbdoc")
       .def_readwrite("data_column_name", &Options::data_column_name,
                      R"pbdoc(
-        Data column name: str
+        str: Data column name
        )pbdoc")
       .def_readwrite("element_response_model", &Options::element_response_model,
                      R"pbdoc(
-        Element response model: ElementResponseModel
+        ElementResponseModel: Element response model.
        )pbdoc");
 }

@@ -5,7 +5,7 @@ LOFAR telescope: computing the gridded response
 
 The EveryBeam Python bindings can be used to evalute the response on a "grid" (e.g. an
 image). This demo illustrates in a step-by-step manner a minimal example of doing this. A slightly more involved
-(and graphically appealing) demo can be found in **REF**. The complete code is shown at the bottom of this page.
+(and graphically appealing) demo can be found in  :ref:`lofardemolobes`. The complete code is shown at the bottom of this page.
 
 It all starts with importing the ``everybeam`` python module, along with any other
 libraries that are needed for your project and specifying a path to the Measurement Set

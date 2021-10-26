@@ -15,6 +15,7 @@ Classes
     :members:
 
 .. autoclass:: everybeam.Options
+    :members:
 
 Enums
 -----
