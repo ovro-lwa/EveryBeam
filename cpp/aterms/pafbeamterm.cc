@@ -78,9 +78,10 @@ void PAFBeamTerm::Open(const std::string& filename_template,
     } else {
       if (freq0_ != readers_.back().FrequencyDimensionStart() ||
           dfreq_ != readers_.back().FrequencyDimensionIncr() ||
-          n_frequencies_ != readers_.back().NFrequencies())
+          n_frequencies_ != readers_.back().NFrequencies()) {
         throw std::runtime_error(
             "All antenna fits files should have the same frequency axis");
+      }
     }
   }
 }

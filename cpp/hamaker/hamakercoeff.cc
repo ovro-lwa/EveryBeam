@@ -82,7 +82,7 @@ void HamakerCoefficients::ReadCoefficients(std::string& filename) {
   unsigned int rank = dataspace.getSimpleExtentNdims();
   assert(rank == dataset_rank_);
   std::vector<hsize_t> dims(rank);
-  dataspace.getSimpleExtentDims(dims.data(), NULL);
+  dataspace.getSimpleExtentDims(dims.data(), nullptr);
   nHarmonics_ = dims[0];
   nPowerTheta_ = dims[1];
   nPowerFreq_ = dims[2];
@@ -103,15 +103,13 @@ void HamakerCoefficients::WriteCoefficients(std::string& filename) {
   hsize_t dims[rank] = {nHarmonics_, nPowerTheta_, nPowerFreq_, nInner_};
   H5::DataSpace coeff_dataspace(rank, dims);
 
-  std::complex<double>* coeff_ptr = (std::complex<double>*)coeff_.data();
-
   // Create complex type
   H5::CompType complex_type = GetComplexDoubleType();
 
   // Write dataset
   H5::DataSet dataset =
       file.createDataSet("coeff", complex_type, coeff_dataspace);
-  dataset.write(coeff_ptr, complex_type);
+  dataset.write(coeff_.data(), complex_type);
 
   // Create new dataspace for attribute
   H5::DataSpace attr_dataspace(H5S_SCALAR);

@@ -23,21 +23,22 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
   std::for_each(telescope_name.begin(), telescope_name.end(),
                 [](char &c) { c = ::toupper(c); });
 
-  if (telescope_name == "LOFAR")
+  if (telescope_name == "LOFAR") {
     return kLofarTelescope;
-  else if (telescope_name == "AARTFAAC")
+  } else if (telescope_name == "AARTFAAC") {
     return kAARTFAAC;
-  else if (telescope_name.compare(0, 4, "EVLA") == 0)
+  } else if (telescope_name.compare(0, 4, "EVLA") == 0) {
     return kVLATelescope;
-  else if (telescope_name.compare(0, 4, "ATCA") == 0)
+  } else if (telescope_name.compare(0, 4, "ATCA") == 0) {
     return kATCATelescope;
-  else if (telescope_name == "MWA")
+  } else if (telescope_name == "MWA") {
     return kMWATelescope;
-  // check if telescope_name starts with "OSKAR"
-  else if (telescope_name.rfind("OSKAR", 0) == 0)
+    // check if telescope_name starts with "OSKAR"
+  } else if (telescope_name.rfind("OSKAR", 0) == 0) {
     return kOSKARTelescope;
-  else
+  } else {
     return kUnknownTelescope;
+  }
 }
 
 std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,

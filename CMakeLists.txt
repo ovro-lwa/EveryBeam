@@ -185,3 +185,5 @@ if(BUILD_APT_PACKAGES)
   add_subdirectory(package)
 endif()
 #------------------------------------------------------------------------------
+
+option(CMAKE_EXPORT_COMPILE_COMMANDS ON)

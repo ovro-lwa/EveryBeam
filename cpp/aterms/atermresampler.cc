@@ -26,7 +26,7 @@ ATermResampler::ATermResampler(
       override_ra_(0.0),
       override_dec_(0.0) {}
 
-ATermResampler::~ATermResampler() {}
+ATermResampler::~ATermResampler() = default;
 
 void ATermResampler::ReadAndResample(aocommon::FitsReader& reader,
                                      size_t file_index,
@@ -37,10 +37,11 @@ void ATermResampler::ReadAndResample(aocommon::FitsReader& reader,
     resampler_.reset(new common::FFTResampler(
         allocated_width_, allocated_height_, coordinate_system_.width,
         coordinate_system_.height));
-    if (window_ == WindowFunction::Tukey)
+    if (window_ == WindowFunction::Tukey) {
       resampler_->SetTukeyWindow(double(allocated_width_) / padding_, false);
-    else
+    } else {
       resampler_->SetWindowFunction(window_, true);
+    }
   }
 
   if (downsample_) {
@@ -119,9 +120,9 @@ void ATermResampler::regrid(const aocommon::FitsReader& reader, float* dest,
       int inX, inY;
       ImageCoordinates::LMToXY(l, m, in_pixel_size_x, in_pixel_size_y, in_width,
                                in_height, inX, inY);
-      if (inX < 0 || inY < 0 || inX >= int(in_width) || inY >= int(in_height))
+      if (inX < 0 || inY < 0 || inX >= int(in_width) || inY >= int(in_height)) {
         dest[index] = 0;
-      else {
+      } else {
         dest[index] = source[inX + inY * in_width];
       }
       ++index;

@@ -46,33 +46,41 @@ std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
 
 char VLABeam::DetermineFeed(double freq, double freq_center) {
   if ((freq_center > 224e6 && freq_center < 480e6) ||
-      (freq > 224e6 && freq < 480e6))
+      (freq > 224e6 && freq < 480e6)) {
     return 'P';
+  }
   if ((freq_center > 900e6 && freq_center < 2003.0e6) ||
-      (freq > 900e6 && freq < 2003e6))
+      (freq > 900e6 && freq < 2003e6)) {
     return 'L';
+  }
   if ((freq_center > 1990e6 && freq_center < 4001.0e6) ||
-      (freq > 1990e6 && freq < 4001e6))
+      (freq > 1990e6 && freq < 4001e6)) {
     return 'S';
+  }
   if ((freq_center > 3990e6 && freq_center < 8001.0e6) ||
-      (freq > 3990e6 && freq < 8001e6))
+      (freq > 3990e6 && freq < 8001e6)) {
     return 'C';
+  }
   if ((freq_center > 7990e6 && freq_center < 12001.0e6) ||
-      (freq > 7990e6 && freq < 12001e6))
+      (freq > 7990e6 && freq < 12001e6)) {
     return 'X';
+  }
   if ((freq_center > 12000e6 && freq_center < 18000.0e6) ||
-      (freq > 12000e6 && freq < 18000e6))
+      (freq > 12000e6 && freq < 18000e6)) {
     return 'U';
+  }
   if ((freq_center > 19000e6 && freq_center < 26000.0e6) ||
-      (freq > 19000e6 && freq < 26000e6))
+      (freq > 19000e6 && freq < 26000e6)) {
     return 'K';
+  }
   if ((freq_center > 28000e6 && freq_center < 38000.0e6) ||
-      (freq > 28000e6 && freq < 38000e6))
+      (freq > 28000e6 && freq < 38000e6)) {
     return 'A';
+  }
   if ((freq_center > 41000e6 && freq_center < 50000.0e6) ||
-      (freq > 41000e6 && freq < 50000e6))
+      (freq > 41000e6 && freq < 50000e6)) {
     return 'Q';
-
+  }
   return '?';
 }
 
