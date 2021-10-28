@@ -128,6 +128,8 @@ build-compare-oskar:
     # Check-out at specific version, before HDF5 got broken
     - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee
     - cd /opt/oskar/build
+    - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
+    - export PYTHONPATH=/opt/everybeam/lib/python${PYVERSION}/dist-packages
   script:
     # OSKAR cpp install
     - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
@@ -140,6 +142,8 @@ build-compare-oskar:
     # Run OSKAR comparison, set some env variables for this session
     - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
     - cd /opt/everybeam/build
+    # Run cmake again, to update the cache with the updated $PATH
+    - cmake .
     - make VERBOSE=1 comparison-oskar-basefunctions
     # Run OSKAR stationresponse comparison
     - export NPIXELS=32 TOLERANCE=1e-5
