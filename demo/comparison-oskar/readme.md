@@ -1,5 +1,5 @@
 OSKAR-demo
-===================
+==========
 
 # Introduction
 
@@ -43,4 +43,3 @@ This test is part of the 'integration' configuration of CTests. It will be run w
 
 # Notes
 The `read_oskar_beam.py` script tranforms the polarization vector from a X,Y coordinate system to a theta,phi coordinate system. It still needs to be verified that this transformation is the same as in OSKAR.
-

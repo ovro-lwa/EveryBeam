@@ -6,11 +6,12 @@ set(MS "testdata.ms")
 # Generate the test MeasurementSet
 add_custom_command(
   OUTPUT testdata.ms
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMAND
-    ${CMAKE_COMMAND} -E env EXTRA_PATH="${CMAKE_SOURCE_DIR}/scripts/misc"
-    DATA_DIR="${CMAKE_SOURCE_DIR}/test_data"
-    "${CMAKE_CURRENT_SOURCE_DIR}/run_oskar_simulation.sh"
-  DEPENDS run_oskar_simulation.sh run_oskar_simulation.py)
+    ${CMAKE_COMMAND} -E env PATH="${CMAKE_SOURCE_DIR}/scripts/misc:$ENV{PATH}"
+    PYTHONPATH="${CMAKE_CURRENT_SOURCE_DIR}/../utils:$ENV{PYTHONPATH}"
+    DATA_DIR="${CMAKE_SOURCE_DIR}/test_data" python3 -B
+    "${CMAKE_CURRENT_SOURCE_DIR}/run_oskar_simulation.py")
 
 # Generate a template image using the pointing in the test MeasurementSet
 add_custom_command(
@@ -25,9 +26,8 @@ set(MODEL_IMAGES wsclean-I-model.fits wsclean-Q-model.fits wsclean-U-model.fits
 # Use template image to generate model images with pointsources
 add_custom_command(
   OUTPUT ${MODEL_IMAGES}
-  COMMAND ${CMAKE_COMMAND} -E env EXTRA_PATH=""
-          "${CMAKE_CURRENT_SOURCE_DIR}/make_model_images.sh"
-  DEPENDS template-image.fits make_model_images.sh make_model_images.py)
+  COMMAND python3 -B "${CMAKE_CURRENT_SOURCE_DIR}/make_model_images.py"
+  DEPENDS template-image.fits make_model_images.py)
 
 # Main target to run the wsclean-oskar tests
 # Uses the test MeasurementSet and model images as input
