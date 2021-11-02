@@ -42,7 +42,7 @@ def test_oskar(ref):
     telescope = load_telescope(
         ms_path,
         use_differential_beam=differential_beam,
-        element_response_model="oskarsphericalwave",
+        element_response_model="skala40_wave",
     )
 
     assert type(telescope) is OSKAR

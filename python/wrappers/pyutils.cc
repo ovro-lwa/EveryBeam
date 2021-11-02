@@ -143,6 +143,11 @@ void init_utils(py::module &m) {
              R"pbdoc(
         SKA dipole element response model
        )pbdoc")
+      .value("skala40_spherical", ElementResponseModel::kOSKARSphericalWave,
+             R"pbdoc(
+        Use SKALA 4.0 element response model. Please note that this response model is somewhat misleadingly named
+        OSKAR spherical wave internally (ElementResponseModel::kOSKARSphericalWave). This will be refactored in the future.
+       )pbdoc")
       .export_values();
 
   // Bindings for Options struct

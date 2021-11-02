@@ -47,9 +47,9 @@ std::unique_ptr<Telescope> pyload_telescope(
     element_response_enum = everybeam::ElementResponseModel::kHamaker;
   else if (element_response_tmp == "LOBES")
     element_response_enum = everybeam::ElementResponseModel::kLOBES;
-  else if (element_response_tmp == "OSKARDIPOLE")
+  else if (element_response_tmp == "OSKAR_DIPOLE")
     element_response_enum = everybeam::ElementResponseModel::kOSKARDipole;
-  else if (element_response_tmp == "OSKARSPHERICALWAVE")
+  else if (element_response_tmp == "SKALA40_WAVE")
     element_response_enum =
         everybeam::ElementResponseModel::kOSKARSphericalWave;
   else {
@@ -85,7 +85,10 @@ void init_load(py::module& m) {
             Use channel frequency? Defaults to True.
         element_response_model: str
             Specify the element response model, should be any of
-            ["hamaker", "lobes", "oskardipole", "oskarsphericalwave"]
+            ["hamaker", "lobes", "oskar_dipole", "skala40_wave"]
+            Please note that the SKALA40 Wave model is
+            currently named OSKAR Spherical Wave in the EveryBeam internals.
+            This will be refactored to SKALA40_WAVE in the future.
 
         Returns
         -------

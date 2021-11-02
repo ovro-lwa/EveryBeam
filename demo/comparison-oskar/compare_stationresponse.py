@@ -52,7 +52,7 @@ q = np.array([-0.2032142175, 0.4029167976, 0.89239119])
 r = np.array([-0.4018648212, 0.7967852292, -0.451262633])
 
 telescope = eb.load_telescope(
-    "skalowmini-coef.MS", element_response_model="oskarsphericalwave"
+    "skalowmini-coef.MS", element_response_model="skala40_wave"
 )
 x_v = np.linspace(-1.0, 1.0, npixels)
 y_v = np.linspace(-1.0, 1.0, npixels)

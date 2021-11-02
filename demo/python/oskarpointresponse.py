@@ -20,7 +20,7 @@ ms_path = "../../test_data/OSKAR_MOCK.ms"
 use_differential_beam = False
 
 # Set element response model
-element_response_model = "oskarsphericalwave"
+element_response_model = "skala40_wave"
 
 # Load the telescope
 telescope = eb.load_telescope(

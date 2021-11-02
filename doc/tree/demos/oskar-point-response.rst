@@ -16,10 +16,10 @@ libraries that are needed for your project.
 
 In order to evaluate the beam response, we need to specify which Measurement Set will
 be used, whether or not to apply the differential beam and which element response model
-should be used. The element response should be eihter one of ``["hamaker", "lobes", "oskardipole", "oskarsphericalwave"]``.
+should be used. The element response should be eihter one of ``["hamaker", "lobes", "oskar_dipole", "skala40_wave"]``.
 Even more important, the element response model needs to be chosen such that it is consistent with the provided telescope.
-So for an OSKAR Measurement Set, the element response model should be either ``"oskardipole"`` or ``"oskarsphericalwave"``.
-In this demo we opt for ``"oskarsphericalwave"``:
+So for an OSKAR Measurement Set, the element response model should be either ``"oskar_dipole"`` or ``"skala40_wave"``.
+In this demo we opt for ``"skala40_wave"`` - which is the element response model that is currently used in OSKAR simulations:
 
 ::
 
@@ -30,7 +30,7 @@ In this demo we opt for ``"oskarsphericalwave"``:
     use_differential_beam = False
 
     # Set element response model
-    element_response_model = "oskarsphericalwave"
+    element_response_model = "skala40_wave"
 
 Given the Measurement Set and the options, we can now load the telescope.
 Given your Measurement Set, EveryBeam sorts out which telescope should be returned.
