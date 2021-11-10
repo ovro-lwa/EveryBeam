@@ -20,3 +20,7 @@ Classes
 Enums
 -----
 .. autodata:: everybeam.ElementResponseModel
+
+.. autodata:: everybeam.BeamMode
+
+.. autodata:: everybeam.BeamNormalisationMode

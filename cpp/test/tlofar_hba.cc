@@ -28,6 +28,7 @@
 
 using everybeam::ATermSettings;
 using everybeam::BeamMode;
+using everybeam::BeamNormalisationMode;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::Options;
@@ -377,7 +378,7 @@ BOOST_AUTO_TEST_CASE(differential_beam) {
   // Test with differential beam, single
   Options options_diff_beam = options;
   options_diff_beam.element_response_model = ElementResponseModel::kHamaker;
-  options_diff_beam.use_differential_beam = true;
+  options_diff_beam.beam_normalisation_mode = BeamNormalisationMode::kFull;
 
   // Load (a new) LOFAR Telescope
   std::unique_ptr<Telescope> telescope_diff_beam = Load(ms, options_diff_beam);

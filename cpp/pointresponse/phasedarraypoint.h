@@ -10,6 +10,7 @@
 #include "pointresponse.h"
 #include "../common/types.h"
 #include "../correctionmode.h"
+#include "../beamnormalisationmode.h"
 
 #include <aocommon/matrix2x2.h>
 #include <casacore/measures/Measures/MDirection.h>
@@ -116,6 +117,7 @@ class PhasedArrayPoint : public PointResponse {
   bool use_differential_beam_;
   casacore::MDirection preapplied_beam_dir_;
   CorrectionMode preapplied_correction_mode_;
+  BeamNormalisationMode beam_normalisation_mode_;
   double subband_frequency_;
 
  private:
@@ -125,6 +127,10 @@ class PhasedArrayPoint : public PointResponse {
    * mutex to the caller.
    */
   void UpdateITRFVectors(std::mutex &mutex);
+
+  bool CalculateBeamNormalisation(BeamMode beam_mode, double time,
+                                  double frequency, size_t station_idx,
+                                  aocommon::MC2x2F &inverse_gain) const;
 
   double ra_, dec_;
   std::mutex mutex_;

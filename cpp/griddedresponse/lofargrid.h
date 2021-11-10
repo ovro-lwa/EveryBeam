@@ -26,18 +26,7 @@ class LOFARGrid final : public PhasedArrayGrid {
    */
   LOFARGrid(const telescope::Telescope* telescope_ptr,
             const coords::CoordinateSystem& coordinate_system)
-      : PhasedArrayGrid(telescope_ptr, coordinate_system) {
-    // Extract LOFAR specific options from ms_properties_ and telescope::Options
-    const telescope::LOFAR& lofartelescope =
-        dynamic_cast<const telescope::LOFAR&>(*telescope_);
-    delay_dir_ = lofartelescope.ms_properties_.delay_dir;
-    tile_beam_dir_ = lofartelescope.ms_properties_.tile_beam_dir;
-    preapplied_beam_dir_ = lofartelescope.ms_properties_.preapplied_beam_dir;
-    preapplied_correction_mode_ =
-        lofartelescope.ms_properties_.preapplied_correction_mode;
-    subband_frequency_ = lofartelescope.ms_properties_.subband_freq;
-    use_channel_frequency_ = lofartelescope.GetOptions().use_channel_frequency;
-  };
+      : PhasedArrayGrid(telescope_ptr, coordinate_system){};
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

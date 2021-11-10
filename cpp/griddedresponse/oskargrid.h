@@ -27,13 +27,10 @@ class OSKARGrid final : public PhasedArrayGrid {
   OSKARGrid(const telescope::Telescope* telescope_ptr,
             const coords::CoordinateSystem& coordinate_system)
       : PhasedArrayGrid(telescope_ptr, coordinate_system) {
-    const telescope::OSKAR& oskartelescope =
-        dynamic_cast<const telescope::OSKAR&>(*telescope_);
-
-    delay_dir_ = oskartelescope.ms_properties_.delay_dir;
-    tile_beam_dir_ = oskartelescope.ms_properties_.delay_dir;
     // NOTE: for OSKAR, it always holds that:
-    // use_channel_frequency_ = true (i.e. never use the subband_frequency_)
+    use_channel_frequency_ = true;
+    // i.e. never use the subband frequency (which is explicitly set to 0):
+    subband_frequency_ = 0.0;
   };
 };
 }  // namespace griddedresponse

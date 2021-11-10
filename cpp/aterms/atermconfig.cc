@@ -104,8 +104,17 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
     } else if (aterm_type == "beam") {
       const bool frequency_interpolation =
           reader.GetBoolOr(aterm_name + ".frequency_interpolation", true);
-      const bool differential =
-          reader.GetBoolOr(aterm_name + ".differential", false);
+      std::string beam_normalisation_mode =
+          reader.GetStringOr(aterm_name + ".beam_normalisation_mode", "");
+      if (beam_normalisation_mode.empty()) {
+        const bool differential =
+            reader.GetBoolOr(aterm_name + ".differential", false);
+        if (differential) {
+          beam_normalisation_mode = "full";
+        } else {
+          beam_normalisation_mode = "preapplied";
+        }
+      }
       const bool use_channel_frequency =
           reader.GetBoolOr(aterm_name + ".usechannelfreq", true);
       const std::string element_response_model =
@@ -115,8 +124,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
 
       std::unique_ptr<ATermBeam> beam = GetATermBeam(
           ms, coordinate_system_, settings_, frequency_interpolation,
-          differential, use_channel_frequency, element_response_model,
-          beam_mode);
+          beam_normalisation_mode, use_channel_frequency,
+          element_response_model, beam_mode);
       double update_interval = reader.GetDoubleOr(
           aterm_name + ".update_interval", settings_.aterm_update_interval);
       beam->SetUpdateInterval(update_interval);
@@ -270,6 +279,19 @@ bool ATermConfig::Calculate(std::complex<float>* buffer, double time,
 std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
     const casacore::MeasurementSet& ms,
     const CoordinateSystem& coordinate_system, const ATermSettings& settings,
+    bool frequency_interpolation, const std::string& beam_normalisation_mode,
+    bool use_channel_frequency, const std::string& element_response_model,
+    const std::string& beam_mode) {
+  everybeam::Options options = ConvertToEBOptions(
+      ms, settings, frequency_interpolation, beam_normalisation_mode,
+      use_channel_frequency, element_response_model, beam_mode);
+  return std::unique_ptr<ATermBeam>(
+      new EveryBeamATerm(ms, coordinate_system, options));
+}
+
+std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
+    const casacore::MeasurementSet& ms,
+    const CoordinateSystem& coordinate_system, const ATermSettings& settings,
     bool frequency_interpolation, bool use_differential_beam,
     bool use_channel_frequency, const std::string& element_response_model,
     const std::string& beam_mode) {
@@ -282,7 +304,7 @@ std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
 
 everybeam::Options ATermConfig::ConvertToEBOptions(
     const casacore::MeasurementSet& ms, const ATermSettings& settings,
-    bool frequency_interpolation, bool use_differential_beam,
+    bool frequency_interpolation, const std::string& beam_normalisation_mode,
     bool use_channel_frequency, const std::string& element_response_model,
     const std::string& beam_mode) {
   everybeam::Options options;
@@ -298,13 +320,31 @@ everybeam::Options ATermConfig::ConvertToEBOptions(
       GetElementResponseEnum(element_response_model);
 
   const everybeam::BeamMode beam_mode_enum = ParseBeamMode(beam_mode);
+  const everybeam::BeamNormalisationMode beam_normalisation_mode_enum =
+      ParseBeamNormalisationMode(beam_normalisation_mode);
 
   options.data_column_name = settings.data_column_name;
-  options.use_differential_beam = use_differential_beam;
   options.use_channel_frequency = use_channel_frequency;
   options.element_response_model = element_response_enum;
   options.beam_mode = beam_mode_enum;
+  options.beam_normalisation_mode = beam_normalisation_mode_enum;
   return options;
 }
+
+everybeam::Options ATermConfig::ConvertToEBOptions(
+    const casacore::MeasurementSet& ms, const ATermSettings& settings,
+    bool frequency_interpolation, bool use_differential_beam,
+    bool use_channel_frequency, const std::string& element_response_model,
+    const std::string& beam_mode) {
+  const std::string beam_normalisation_mode_none_str = "none";
+  everybeam::Options options = ConvertToEBOptions(
+      ms, settings, frequency_interpolation, beam_normalisation_mode_none_str,
+      use_channel_frequency, element_response_model, beam_mode);
+  options.beam_normalisation_mode = use_differential_beam
+                                        ? BeamNormalisationMode::kFull
+                                        : BeamNormalisationMode::kPreApplied;
+  return options;
+}
+
 }  // namespace aterms
 }  // namespace everybeam

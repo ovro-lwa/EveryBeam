@@ -15,10 +15,21 @@ PhasedArrayGrid::PhasedArrayGrid(
     const telescope::Telescope* telescope_ptr,
     const coords::CoordinateSystem& coordinate_system)
     : GriddedResponse(telescope_ptr, coordinate_system),
-      use_channel_frequency_(true),
-      subband_frequency_(0.0) {
-  // Set private members
-  use_differential_beam_ = telescope_->GetOptions().use_differential_beam;
+      beam_normalisation_mode_(
+          telescope_->GetOptions().beam_normalisation_mode) {
+  // Extract PhasedArrayPoint specific options from ms_properties_ and
+  // telescope::Options
+  const telescope::PhasedArray& phasedarray =
+      dynamic_cast<const telescope::PhasedArray&>(*telescope_ptr);
+  delay_dir_ = phasedarray.GetMSProperties().delay_dir;
+  tile_beam_dir_ = phasedarray.GetMSProperties().tile_beam_dir;
+  preapplied_beam_dir_ = phasedarray.GetMSProperties().preapplied_beam_dir;
+  preapplied_correction_mode_ =
+      phasedarray.GetMSProperties().preapplied_correction_mode;
+  subband_frequency_ = phasedarray.GetMSProperties().subband_freq;
+  use_channel_frequency_ = phasedarray.GetOptions().use_channel_frequency;
+
+  // Compute and set number of threads
   const size_t ncpus = aocommon::ThreadPool::NCPUs();
   const size_t nthreads = std::min(ncpus, telescope_->GetNrStations());
   threads_.resize(nthreads);
@@ -28,30 +39,19 @@ void PhasedArrayGrid::Response(BeamMode beam_mode, std::complex<float>* buffer,
                                double time, double frequency,
                                size_t station_idx,
                                [[maybe_unused]] size_t field_id) {
-  const telescope::PhasedArray& phasedarraytelescope =
-      static_cast<const telescope::PhasedArray&>(*telescope_);
   aocommon::Lane<Job> lane(threads_.size());
   lane_ = &lane;
 
   SetITRFVectors(time);
-  if (use_differential_beam_) {
-    const double sb_freq =
-        use_channel_frequency_ ? frequency : subband_frequency_;
-    inverse_central_gain_.resize(1);
-    inverse_central_gain_[0] = aocommon::MC2x2F(
-        phasedarraytelescope.GetStation(station_idx)
-            ->Response(preapplied_correction_mode_, time, frequency,
-                       diff_beam_centre_, sb_freq, station0_, tile0_)
-            .Data());
-    if (!inverse_central_gain_[0].Invert()) {
-      inverse_central_gain_[0] = aocommon::MC2x2F::Zero();
-    }
-  }
+
+  inverse_central_gain_.resize(1);
+  bool apply_normalisation = CalculateBeamNormalisation(
+      beam_mode, time, frequency, station_idx, inverse_central_gain_[0]);
 
   // Prepare threads
   for (auto& thread : threads_) {
-    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode, buffer,
-                         time, frequency);
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode,
+                         apply_normalisation, buffer, time, frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -73,26 +73,17 @@ void PhasedArrayGrid::ResponseAllStations(BeamMode beam_mode,
 
   SetITRFVectors(time);
 
-  if (use_differential_beam_) {
-    const double sb_freq =
-        use_channel_frequency_ ? frequency : subband_frequency_;
-    inverse_central_gain_.resize(phasedarraytelescope.GetNrStations());
-    for (size_t i = 0; i != phasedarraytelescope.GetNrStations(); ++i) {
-      inverse_central_gain_[i] = aocommon::MC2x2F(
-          phasedarraytelescope.GetStation(i)
-              ->Response(preapplied_correction_mode_, time, frequency,
-                         diff_beam_centre_, sb_freq, station0_, tile0_)
-              .Data());
-      if (!inverse_central_gain_[i].Invert()) {
-        inverse_central_gain_[i] = aocommon::MC2x2F::Zero();
-      }
-    }
+  bool apply_normalisation;
+  inverse_central_gain_.resize(phasedarraytelescope.GetNrStations());
+  for (size_t i = 0; i != phasedarraytelescope.GetNrStations(); ++i) {
+    apply_normalisation = CalculateBeamNormalisation(
+        beam_mode, time, frequency, i, inverse_central_gain_[i]);
   }
 
   // Prepare threads
   for (auto& thread : threads_) {
-    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode, buffer,
-                         time, frequency);
+    thread = std::thread(&PhasedArrayGrid::CalcThread, this, beam_mode,
+                         apply_normalisation, buffer, time, frequency);
   }
 
   for (size_t y = 0; y != height_; ++y) {
@@ -135,7 +126,69 @@ void PhasedArrayGrid::SetITRFVectors(double time) {
                         diff_beam_centre_);
 }
 
-void PhasedArrayGrid::CalcThread(BeamMode beam_mode,
+bool PhasedArrayGrid::CalculateBeamNormalisation(
+    BeamMode beam_mode, double time, double frequency, size_t station_idx,
+    aocommon::MC2x2F& inverse_gain) const {
+  const telescope::PhasedArray& phasedarraytelescope =
+      static_cast<const telescope::PhasedArray&>(*telescope_);
+  if (beam_normalisation_mode_ == BeamNormalisationMode::kNone) {
+    return false;
+  }
+
+  const double sb_freq =
+      use_channel_frequency_ ? frequency : subband_frequency_;
+
+  // if the normalisation mode is kPreApplied, but no beam correction was pre
+  // applied then there is nothing to do
+  if (beam_normalisation_mode_ == BeamNormalisationMode::kPreApplied &&
+      preapplied_correction_mode_ == BeamMode::kNone) {
+    return false;
+  }
+
+  // If the normalisation mode is kPreApplied, or kPreAppliedOrFull and the
+  // fallback to Full is not needed then the response for the diff_beam_centre_
+  // with preapplied_correction_mode_ needs to be computed
+  if (beam_normalisation_mode_ == BeamNormalisationMode::kPreApplied ||
+      (beam_normalisation_mode_ == BeamNormalisationMode::kPreAppliedOrFull &&
+       preapplied_correction_mode_ != BeamMode::kNone)) {
+    inverse_gain = aocommon::MC2x2F(
+        phasedarraytelescope.GetStation(station_idx)
+            ->Response(preapplied_correction_mode_, time, frequency,
+                       diff_beam_centre_, sb_freq, station0_, tile0_)
+            .Data());
+  } else {
+    // in all other cases the response for the reference direction with
+    // beam_mode is needed
+    inverse_gain = aocommon::MC2x2F(
+        phasedarraytelescope.GetStation(station_idx)
+            ->Response(beam_mode, time, frequency, diff_beam_centre_, sb_freq,
+                       station0_, tile0_)
+            .Data());
+  }
+
+  switch (beam_normalisation_mode_) {
+    case BeamNormalisationMode::kFull:
+    case BeamNormalisationMode::kPreApplied:
+    case BeamNormalisationMode::kPreAppliedOrFull:
+      if (!inverse_gain.Invert()) {
+        inverse_gain = aocommon::MC2x2F::Zero();
+      }
+      break;
+    case BeamNormalisationMode::kAmplitude: {
+      const float amplitude_inv = 1.0 / std::sqrt(0.5 * Norm(inverse_gain));
+      inverse_gain[0] = std::isfinite(amplitude_inv) ? amplitude_inv : 0.0;
+      inverse_gain[1] = 0.0;
+      inverse_gain[2] = 0.0;
+      inverse_gain[3] = std::isfinite(amplitude_inv) ? amplitude_inv : 0.0;
+      break;
+    }
+    default:
+      throw std::runtime_error("Invalid beam normalisation mode here");
+  }
+  return true;
+}
+
+void PhasedArrayGrid::CalcThread(BeamMode beam_mode, bool apply_normalisation,
                                  std::complex<float>* buffer, double time,
                                  double frequency) {
   const telescope::PhasedArray& phasedarraytelescope =
@@ -168,7 +221,7 @@ void PhasedArrayGrid::CalcThread(BeamMode beam_mode,
                          station0_, tile0_)
               .Data());
 
-      if (use_differential_beam_) {
+      if (apply_normalisation) {
         aocommon::MC2x2F::ATimesB(ant_buffer_ptr,
                                   inverse_central_gain_[job.buffer_offset],
                                   gain_matrix);
