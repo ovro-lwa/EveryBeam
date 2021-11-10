@@ -26,6 +26,7 @@ namespace py = pybind11;
 using casacore::MeasurementSet;
 
 using everybeam::BeamMode;
+using everybeam::BeamNormalisationMode;
 using everybeam::Options;
 using everybeam::vector3r_t;
 using everybeam::coords::CoordinateSystem;
@@ -435,7 +436,8 @@ void init_telescope(py::module &m) {
 
             std::mutex mutex;
             const aocommon::MC2x2 response =
-                self.GetOptions().use_differential_beam
+                (self.GetOptions().beam_normalisation_mode ==
+                 BeamNormalisationMode::kPreApplied)
                     ? aocommon::MC2x2::Unity()
                     : phased_array_point.FullResponse(idx, freq, direction,
                                                       &mutex);
@@ -599,7 +601,8 @@ void init_telescope(py::module &m) {
             const aocommon::MC2x2 response = phased_array_point.FullResponse(
                 idx, freq, direction, station0, tile0);
 
-            if (self.GetOptions().use_differential_beam) {
+            if (self.GetOptions().beam_normalisation_mode ==
+                BeamNormalisationMode::kPreApplied) {
               vector3r_t diff_beam_centre;
               ITRFConverter itrf_converter(time);
               SetITRFVector(
@@ -745,13 +748,13 @@ void init_telescope(py::module &m) {
             const aocommon::MC2x2 response = phased_array_point.ElementResponse(
                 idx, freq, direction, element_idx);
 
-            if (self.GetOptions().use_differential_beam) {
+            if (self.GetOptions().beam_normalisation_mode ==
+                BeamNormalisationMode::kPreApplied) {
               vector3r_t diff_beam_centre;
               ITRFConverter itrf_converter(time);
               SetITRFVector(
                   itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
                   diff_beam_centre);
-
               aocommon::MC2x2 response_diff_beam =
                   phased_array_point.ElementResponse(
                       idx, freq, diff_beam_centre, element_idx);
@@ -810,7 +813,8 @@ void init_telescope(py::module &m) {
             const aocommon::MC2x2 response =
                 phased_array_point.ElementResponse(idx, freq, direction);
 
-            if (self.GetOptions().use_differential_beam) {
+            if (self.GetOptions().beam_normalisation_mode ==
+                BeamNormalisationMode::kPreApplied) {
               vector3r_t diff_beam_centre;
               ITRFConverter itrf_converter(time);
               SetITRFVector(

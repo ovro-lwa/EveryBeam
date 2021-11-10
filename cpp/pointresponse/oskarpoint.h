@@ -26,13 +26,10 @@ class OSKARPoint final : public PhasedArrayPoint {
    */
   OSKARPoint(const telescope::Telescope* telescope_ptr, double time)
       : PhasedArrayPoint(telescope_ptr, time) {
-    const telescope::OSKAR& oskartelescope =
-        dynamic_cast<const telescope::OSKAR&>(*telescope_);
-
-    delay_dir_ = oskartelescope.ms_properties_.delay_dir;
-    tile_beam_dir_ = oskartelescope.ms_properties_.delay_dir;
     // NOTE: for OSKAR, it always holds that:
-    // use_channel_frequency_ = true (i.e. never use the subband_frequency_)
+    use_channel_frequency_ = true;
+    // i.e. never use the subband frequency (which is explicitly set to 0):
+    subband_frequency_ = 0.0;
   }
 };
 }  // namespace pointresponse

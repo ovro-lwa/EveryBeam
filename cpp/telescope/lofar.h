@@ -17,22 +17,17 @@
 namespace everybeam {
 
 namespace griddedresponse {
-class LOFARGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
 namespace pointresponse {
 class PointResponse;
-class LOFARPoint;
 }  // namespace pointresponse
 
 namespace telescope {
 
 //! LOFAR telescope class
 class LOFAR final : public PhasedArray {
-  friend class griddedresponse::LOFARGrid;
-  friend class pointresponse::LOFARPoint;
-
  public:
   /**
    * @brief Construct a new LOFAR object

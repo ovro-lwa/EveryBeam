@@ -11,6 +11,7 @@
 
 #include "elementresponse.h"
 #include "beammode.h"
+#include "beamnormalisationmode.h"
 
 namespace everybeam {
 
@@ -25,9 +26,9 @@ struct Options {
   // - in case of LOBES, this should be the directory containing LOBES
   // coefficient files
   std::string coeff_path = "";
+  BeamNormalisationMode beam_normalisation_mode = BeamNormalisationMode::kNone;
 
   // LOFAR specific
-  bool use_differential_beam = false;
   bool use_channel_frequency = true;
   std::string data_column_name = "DATA";
   ElementResponseModel element_response_model = ElementResponseModel::kHamaker;

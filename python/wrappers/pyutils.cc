@@ -7,10 +7,14 @@
 
 #include "elementresponse.h"
 #include "options.h"
+#include "beammode.h"
+#include "beamnormalisationmode.h"
 #include "common/mathutils.h"
 #include "coords/coordutils.h"
 
 namespace py = pybind11;
+using everybeam::BeamMode;
+using everybeam::BeamNormalisationMode;
 using everybeam::cart2thetaphi;
 using everybeam::ElementResponseModel;
 using everybeam::Options;
@@ -150,6 +154,46 @@ void init_utils(py::module &m) {
        )pbdoc")
       .export_values();
 
+  // Bindings for BeamMode enum
+  py::enum_<BeamMode>(m, "BeamMode", py::arithmetic(), "Beam Mode enumeration")
+      .value("none", BeamMode::kNone,
+             R"pbdoc(
+        Beam Mode None
+       )pbdoc")
+      .value("full", BeamMode::kFull,
+             R"pbdoc(
+        Full beam (array factor and element response)
+       )pbdoc")
+      .value("array_factor", BeamMode::kArrayFactor,
+             R"pbdoc(
+        Beam Mode array factor
+       )pbdoc")
+      .value("element", BeamMode::kElement,
+             R"pbdoc(
+        Beam Mode element
+       )pbdoc")
+      .export_values();
+
+  py::enum_<BeamNormalisationMode>(m, "BeamNormalisationMode", py::arithmetic(),
+                                   "Beam Normalisation Mode enumeration")
+      .value("none", BeamNormalisationMode::kNone,
+             R"pbdoc(
+        No Beam Normalisation
+       )pbdoc")
+      .value("pre_applied", BeamNormalisationMode::kPreApplied,
+             R"pbdoc(
+        Normalise by pre-applied (from MS) beam
+       )pbdoc")
+      .value("amplitude", BeamNormalisationMode::kAmplitude,
+             R"pbdoc(
+        Normalise by amplitude
+       )pbdoc")
+      .value("full", BeamNormalisationMode::kFull,
+             R"pbdoc(
+        Normalise by the inverse of the Jones matrix
+       )pbdoc")
+      .export_values();
+
   // Bindings for Options struct
   py::class_<Options>(m, "Options",
                       R"pbdoc(
@@ -171,9 +215,10 @@ void init_utils(py::module &m) {
       // .def_readwrite("frequency_interpolation",
       // &Options::frequency_interpolation, "Use frequency interpolation (MWA
       // specific)")
-      .def_readwrite("use_differential_beam", &Options::use_differential_beam,
+      .def_readwrite("beam_normalisation_mode",
+                     &Options::beam_normalisation_mode,
                      R"pbdoc(
-        bool: Use differential beam?
+        BeamNormalisationMode: What normalisation to apply to the beam?
        )pbdoc")
       .def_readwrite("use_channel_frequency", &Options::use_channel_frequency,
                      R"pbdoc(

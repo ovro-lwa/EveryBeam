@@ -17,12 +17,10 @@
 namespace everybeam {
 
 namespace griddedresponse {
-class OSKARGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
 namespace pointresponse {
-class OSKARPoint;
 class PointResponse;
 }  // namespace pointresponse
 
@@ -30,9 +28,6 @@ namespace telescope {
 
 //! OSKAR telescope class
 class OSKAR final : public PhasedArray {
-  friend class griddedresponse::OSKARGrid;
-  friend class pointresponse::OSKARPoint;
-
  public:
   /**
    * @brief Construct a new OSKAR object

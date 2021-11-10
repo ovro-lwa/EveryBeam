@@ -49,6 +49,7 @@ add_library(
   telescope/lofar.cc
   telescope/dish.cc
   telescope/mwa.cc
+  telescope/phasedarray.cc
   telescope/oskar.cc
   griddedresponse/griddedresponse.cc
   griddedresponse/dishgrid.cc
@@ -88,6 +89,7 @@ install(
         beamformer.h
         beamformeridenticalantennas.h
         beammode.h
+        beamnormalisationmode.h
         correctionmode.h
         element.h
         elementhamaker.h

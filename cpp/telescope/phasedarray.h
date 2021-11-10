@@ -20,6 +20,15 @@
 namespace everybeam {
 namespace telescope {
 
+struct MSProperties {
+  double subband_freq;
+  CorrectionMode preapplied_correction_mode = CorrectionMode::kFull;
+  casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir,
+      reference_dir;
+  size_t channel_count;
+  std::vector<double> channel_freqs;
+};
+
 //! PhasedArray telescope class, is parent to OSKAR and LOFAR
 class PhasedArray : public Telescope {
  public:
@@ -74,16 +83,15 @@ class PhasedArray : public Telescope {
     return ms_properties_.channel_freqs[idx];
   };
 
- protected:
-  std::vector<std::shared_ptr<Station>> stations_;
+  MSProperties GetMSProperties() const { return ms_properties_; }
 
-  struct MSProperties {
-    double subband_freq;
-    CorrectionMode preapplied_correction_mode = CorrectionMode::kFull;
-    casacore::MDirection delay_dir, tile_beam_dir, preapplied_beam_dir;
-    size_t channel_count;
-    std::vector<double> channel_freqs;
-  };
+ protected:
+  static void CalculatePreappliedBeamOptions(
+      const casacore::MeasurementSet &ms, const std::string &data_column_name,
+      casacore::MDirection &preapplied_beam_dir,
+      CorrectionMode &correction_mode);
+
+  std::vector<std::shared_ptr<Station>> stations_;
 
   MSProperties ms_properties_;
 };

@@ -11,6 +11,7 @@
 
 using casacore::MeasurementSet;
 
+using everybeam::BeamNormalisationMode;
 using everybeam::GetTelescopeType;
 using everybeam::Load;
 using everybeam::telescope::Telescope;
@@ -59,7 +60,9 @@ std::unique_ptr<Telescope> pyload_telescope(
     throw std::runtime_error(message.str());
   }
   options.data_column_name = data_column;
-  options.use_differential_beam = differential_beam;
+  options.beam_normalisation_mode = differential_beam
+                                        ? BeamNormalisationMode::kPreApplied
+                                        : BeamNormalisationMode::kNone;
   options.use_channel_frequency = channel_frequency;
   options.element_response_model = element_response_enum;
   options.coeff_path = coeff_path;

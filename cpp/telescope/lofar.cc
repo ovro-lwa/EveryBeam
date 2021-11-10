@@ -22,52 +22,6 @@ using everybeam::pointresponse::LOFARPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 
-namespace {
-bool CalculatePreappliedBeamOptions(const casacore::MeasurementSet &ms,
-                                    const std::string &data_column_name,
-                                    bool force_differential_beam,
-                                    casacore::MDirection &preapplied_beam_dir,
-                                    CorrectionMode &correction_mode) {
-  casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
-      ms.field(),
-      casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
-  preapplied_beam_dir = referenceDirColumn(0);
-
-  // Read beam keywords of input datacolumn
-  casacore::ArrayColumn<std::complex<float>> dataCol(ms, data_column_name);
-  bool was_beam_applied = false;
-  if (dataCol.keywordSet().isDefined("LOFAR_APPLIED_BEAM_MODE")) {
-    correction_mode = ParseCorrectionMode(
-        dataCol.keywordSet().asString("LOFAR_APPLIED_BEAM_MODE"));
-    switch (correction_mode) {
-      case CorrectionMode::kNone:
-        was_beam_applied = false;
-        break;
-      case CorrectionMode::kElement:
-      case CorrectionMode::kArrayFactor:
-      case CorrectionMode::kFull:
-        was_beam_applied = true;
-        casacore::String error;
-        casacore::MeasureHolder mHolder;
-        if (!mHolder.fromRecord(error, dataCol.keywordSet().asRecord(
-                                           "LOFAR_APPLIED_BEAM_DIR"))) {
-          throw std::runtime_error(
-              "Error while reading LOFAR_APPLIED_BEAM_DIR keyword: " + error);
-        }
-        preapplied_beam_dir = mHolder.asMDirection();
-        break;
-    }
-  } else {
-    if (force_differential_beam) {
-      correction_mode = CorrectionMode::kFull;
-    } else {
-      correction_mode = CorrectionMode::kNone;
-    }
-  }
-  return was_beam_applied || force_differential_beam;
-}
-}  // namespace
-
 LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
   if (options_.element_response_model == kDefault) {
@@ -97,14 +51,18 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::DELAY_DIR));
 
+  casacore::ScalarMeasColumn<casacore::MDirection> reference_dir_col(
+      ms.field(),
+      casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));
+
   casacore::ArrayMeasColumn<casacore::MDirection> tile_beam_dir_col(
       ms.field(), "LOFAR_TILE_BEAM_DIR");
 
   CorrectionMode preapplied_correction_mode;
   casacore::MDirection preapplied_beam_dir;
-  options_.use_differential_beam = CalculatePreappliedBeamOptions(
-      ms, options_.data_column_name, options_.use_differential_beam,
-      preapplied_beam_dir, preapplied_correction_mode);
+  PhasedArray::CalculatePreappliedBeamOptions(ms, options_.data_column_name,
+                                              preapplied_beam_dir,
+                                              preapplied_correction_mode);
 
   size_t channel_count = band.ChannelCount();
   std::vector<double> channel_freqs(channel_count);
@@ -115,6 +73,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
   ms_properties_ = MSProperties();
   ms_properties_.subband_freq = band.ReferenceFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
+  ms_properties_.reference_dir = reference_dir_col(0);
   ms_properties_.tile_beam_dir = *(tile_beam_dir_col(0).data());
   ms_properties_.preapplied_beam_dir = preapplied_beam_dir;
   ms_properties_.preapplied_correction_mode = preapplied_correction_mode;

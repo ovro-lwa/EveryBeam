@@ -32,6 +32,12 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::DELAY_DIR));
 
+  CorrectionMode preapplied_correction_mode;
+  casacore::MDirection preapplied_beam_dir;
+  PhasedArray::CalculatePreappliedBeamOptions(ms, options_.data_column_name,
+                                              preapplied_beam_dir,
+                                              preapplied_correction_mode);
+
   size_t channel_count = band.ChannelCount();
   std::vector<double> channel_freqs(channel_count);
   for (size_t idx = 0; idx < channel_count; ++idx) {
@@ -42,10 +48,10 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
   ms_properties_ = MSProperties();
   ms_properties_.subband_freq = band.ReferenceFrequency();
   ms_properties_.delay_dir = delay_dir_col(0);
-  // tile_beam_dir and preapplied_beam_dir
-  // have dummy values for OSKAR
+  // tile_beam_dir has dummy values for OSKAR
   ms_properties_.tile_beam_dir = delay_dir_col(0);
-  ms_properties_.preapplied_beam_dir = delay_dir_col(0);
+  ms_properties_.preapplied_beam_dir = preapplied_beam_dir;
+  ms_properties_.preapplied_correction_mode = preapplied_correction_mode;
   ms_properties_.channel_count = channel_count;
   ms_properties_.channel_freqs = channel_freqs;
 }
