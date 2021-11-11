@@ -1,4 +1,4 @@
-# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# Copyright (C) 2021 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # This is a Dockerfile specifically to test compilation using gcc 6.3.
@@ -23,13 +23,13 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && \
     python3 \
     wget \
     software-properties-common
-    
+
 ADD . /src
 WORKDIR /src
 
 RUN \
   mkdir /build && \
   cd /build && \
-  cmake ../src -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial/ && \
+  cmake ../src -DBUILD_LOBES=ON -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial/ && \
   make -j`nproc` && \
   make install
