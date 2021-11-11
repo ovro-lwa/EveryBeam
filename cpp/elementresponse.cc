@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2021 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "elementresponse.h"
@@ -73,7 +73,11 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
       return OSKARElementResponseSphericalWave::GetInstance();
     case kLOBES:
       try {
+#ifdef BUILD_LOBES
         return LOBESElementResponse::GetInstance(name, options);
+#else
+        throw std::runtime_error("EveryBeam was built without LOBEs support");
+#endif
       } catch (const std::runtime_error &e) {
         std::cout << "Creating LOBESElementResponse for station " << name
                   << " failed because: " << std::endl;

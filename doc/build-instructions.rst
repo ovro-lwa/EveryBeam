@@ -28,6 +28,7 @@ Installation options:
 
 (Use :code:`ccmake` or :code:`cmake -i` to configure all options.)
 
+* :code:`BUILD_LOBES`: include LOBEs support and download LOBEs coefficients
 * :code:`BUILD_WITH_PYTHON`: build Python module 'everybeam' to use everybeam from Python
 * :code:`BUILD_TESTING`: compile tests when building EveryBeam
 

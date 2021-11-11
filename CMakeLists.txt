@@ -1,4 +1,4 @@
-# Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+# Copyright (C) 2021 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 #------------------------------------------------------------------------------
@@ -19,6 +19,7 @@ endif()
 
 project(EveryBeam VERSION ${EVERYBEAM_VERSION})
 
+option(BUILD_LOBES "Build LOBEs support and download LOBEs coefficients" OFF)
 option(BUILD_WITH_PYTHON "Build python bindings" OFF)
 option(BUILD_APT_PACKAGES "Build apt package" OFF)
 option(BUILD_TESTING "Build tests" OFF)
