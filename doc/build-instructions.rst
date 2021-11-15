@@ -5,13 +5,32 @@ Build instructions
 
 Dependencies:
 ~~~~~~~~~~~~~
+EveryBeam needs a number of dependencies in order to successfully compile. On a clean (ubuntu 18.04) system,
+the dependencies can be installed with (see also the ``docker`` directory):
 
-To compile EveryBeam, the following dependencies are needed:
+General packages:
 
-* Boost
-* Casacore
-* FFTW3 (float precision)
-* CFITSIO
+::
+
+    apt-get -y install wget git make cmake g++ doxygen \
+    libboost-all-dev libhdf5-dev libfftw3-dev \
+    libblas-dev liblapack-dev libgsl-dev libxml2-dev \
+    libgtkmm-3.0-dev libpython3-dev python3-distutils
+
+Astronomy-specific packages:
+
+::
+
+    apt-get -y install casacore-dev libcfitsio-dev wcslib-dev
+
+In order to be able to build the documentation with ``make doc``, ``sphinx`` and some other documentation tools need to be installed:
+
+::
+
+    pip3 install sphinx sphinx_rtd_theme breathe myst-parser
+
+
+
 
 Quick installation guide:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,7 +53,7 @@ Installation options:
 * :code:`BUILD_TESTING`: compile tests when building EveryBeam
 * :code:`DOWNLOAD_LOBES`: download and install available LOBEs coefficients files (``OFF`` by default)
 
-All other build options are for development purposes only, and should be left at the default values by a regular user.
+All other build options serve development purposes only, and can/should be left at the default values by a regular user.
 
 All libraries are installed in :code:`<installpath>/lib`. The header files in
 :code:`<installpath>/include`. The Python module in
