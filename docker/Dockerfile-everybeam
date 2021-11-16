@@ -9,5 +9,5 @@ ADD . ${EVERYBEAMDIR}/EveryBeam
 
 RUN cd ${EVERYBEAMDIR}/EveryBeam && git fetch --unshallow \
     && mkdir -p ${EVERYBEAMDIR}/build && cd ${EVERYBEAMDIR}/build \
-    && cmake -DBUILD_LOBES=ON -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DBUILD_APT_PACKAGES=ON -DCMAKE_INSTALL_PREFIX=.. ../EveryBeam \
+    && cmake -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DBUILD_APT_PACKAGES=ON -DCMAKE_INSTALL_PREFIX=.. ../EveryBeam \
     && make -j8 && make install -j8

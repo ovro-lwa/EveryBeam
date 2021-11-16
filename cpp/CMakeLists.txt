@@ -13,10 +13,7 @@ add_subdirectory(hamaker)
 add_subdirectory(oskar)
 add_subdirectory(telescope)
 add_subdirectory(circularsymmetric)
-if(BUILD_LOBES)
-  add_definitions(-DBUILD_LOBES)
-  add_subdirectory(lobes)
-endif()
+add_subdirectory(lobes)
 
 #------------------------------------------------------------------------------
 add_library(
@@ -76,10 +73,7 @@ target_include_directories(
 target_include_directories(everybeam PRIVATE "${CMAKE_BINARY_DIR}")
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
-target_link_libraries(everybeam PUBLIC hamaker oskar)
-if(BUILD_LOBES)
-  target_link_libraries(everybeam PUBLIC lobes)
-endif()
+target_link_libraries(everybeam PUBLIC hamaker oskar lobes)
 target_link_libraries(
   everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_CXX_LIBRARIES}
                    ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})

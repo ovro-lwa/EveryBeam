@@ -19,10 +19,10 @@ endif()
 
 project(EveryBeam VERSION ${EVERYBEAM_VERSION})
 
-option(BUILD_LOBES "Build LOBEs support and download LOBEs coefficients" OFF)
 option(BUILD_WITH_PYTHON "Build python bindings" OFF)
 option(BUILD_APT_PACKAGES "Build apt package" OFF)
 option(BUILD_TESTING "Build tests" OFF)
+option(DOWNLOAD_LOBES "Download and install LOBEs coefficient files" OFF)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 

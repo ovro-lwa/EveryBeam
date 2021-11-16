@@ -36,6 +36,6 @@ WORKDIR /src
 RUN \
   mkdir /build && \
   cd /build && \
-  CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11 cmake -DBUILD_LOBES=ON ../src && \
+  CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11 cmake ../src && \
   make -j`nproc` && \
   make install

@@ -73,11 +73,7 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
       return OSKARElementResponseSphericalWave::GetInstance();
     case kLOBES:
       try {
-#ifdef BUILD_LOBES
         return LOBESElementResponse::GetInstance(name, options);
-#else
-        throw std::runtime_error("EveryBeam was built without LOBEs support");
-#endif
       } catch (const std::runtime_error &e) {
         std::cout << "Creating LOBESElementResponse for station " << name
                   << " failed because: " << std::endl;

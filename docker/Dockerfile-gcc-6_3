@@ -30,6 +30,6 @@ WORKDIR /src
 RUN \
   mkdir /build && \
   cd /build && \
-  cmake ../src -DBUILD_LOBES=ON -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial/ && \
+  cmake ../src -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial/ && \
   make -j`nproc` && \
   make install
