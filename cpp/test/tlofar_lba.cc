@@ -127,6 +127,9 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   }
 }
 
+// DOWNLOAD_LOBES required since we need to make sure
+// coefficient file for CS302LBA is present in build dir.
+#ifdef DOWNLOAD_LOBES
 BOOST_AUTO_TEST_CASE(test_lobes) {
   Options options;
   // Effectively, all the computations will be done as if the Hamaker model was
@@ -173,5 +176,6 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
   // npy::SaveArrayAsNumpy("lobes_station_response.npy", false, 4, leshape,
   //                       antenna_buffer_single);
 }
+#endif  // DOWNLOAD_LOBES
 
 BOOST_AUTO_TEST_SUITE_END()

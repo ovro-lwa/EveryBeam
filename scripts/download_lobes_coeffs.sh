@@ -6,14 +6,11 @@
 # Email: jakob.maljaars_@_stcorp.nl
 
 # Script for downloading and extracting the LOBES coefficients
-
+# When invoked from within CMAKE, the WORKING_DIRECTORY is
+# assumed to be the CMAKE_BINARY_DIR
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
 # Make directory coeffs/lobes in source directory
-cd ..
 mkdir -p coeffs/lobes
 cd coeffs/lobes
 

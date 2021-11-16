@@ -27,6 +27,14 @@
    tree/python-demos
 
 .. toctree::
+    :maxdepth: 2
+    :hidden:
+    :titlesonly:
+    :caption: Technicalities
+
+    tree/lobes
+
+.. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Indices and Tables

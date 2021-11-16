@@ -7,6 +7,10 @@ find_package(
   COMPONENTS unit_test_framework
   REQUIRED)
 
+if(DOWNLOAD_LOBES)
+  add_definitions(-DDOWNLOAD_LOBES)
+endif()
+
 # Set cache values if not specified
 set(LOFAR_HBA_MOCK_MS
     ${CMAKE_SOURCE_DIR}/test_data/LOFAR_HBA_MOCK.ms
@@ -30,7 +34,7 @@ set(MOCK_H5PARM_PATH
     ${CMAKE_SOURCE_DIR}/test_data/MOCK_H5PARM.h5
     CACHE PATH "")
 set(LOBES_COEFF_PATH
-    ${CMAKE_SOURCE_DIR}/coeffs/lobes
+    ${CMAKE_BINARY_DIR}/coeffs/lobes
     CACHE PATH "")
 
 #------------------------------------------------------------------------------

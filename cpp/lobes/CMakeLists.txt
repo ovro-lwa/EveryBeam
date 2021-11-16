@@ -6,15 +6,23 @@
 include_directories(${CMAKE_BINARY_DIR})
 
 #------------------------------------------------------------------------------
-# Download the LOBES coefficient files, leads to a relatively small amount of overhead
-# in make command, even if the coefficient files have been dowloaded
-add_custom_target(download_lobes_coefficients
-                  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lobes_coeffs.sh)
-
+if(DOWNLOAD_LOBES)
+  # Download the LOBES coefficient files if DOWNLOAD_LOBES=On, leads to a relatively small amount of overhead
+  # in make command, even if the coefficient files have been dowloaded
+  add_custom_target(
+    download_lobes_coefficients
+    COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lobes_coeffs.sh
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
 #------------------------------------------------------------------------------
 add_library(lobes SHARED lobeselementresponse.cc
                          ${CMAKE_SOURCE_DIR}/cpp/common/sphericalharmonics.cc)
-add_dependencies(lobes download_lobes_coefficients)
+
+if(DOWNLOAD_LOBES)
+  #Execute downloading of LOBEs coefficients here
+  add_dependencies(lobes download_lobes_coefficients)
+endif()
+
 target_include_directories(lobes PUBLIC ${HDF5_INCLUDE_DIRS})
 target_link_libraries(
   lobes PUBLIC ${HDF5_CXX_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY}
@@ -33,7 +41,7 @@ install(
 # install coefficients
 message("install lobes coefficients in: " ${CMAKE_INSTALL_DATA_DIR}/lobes)
 install(
-  DIRECTORY "${CMAKE_SOURCE_DIR}/coeffs/lobes"
+  DIRECTORY "${CMAKE_BINARY_DIR}/coeffs/lobes"
   DESTINATION ${CMAKE_INSTALL_DATA_DIR}
   FILES_MATCHING
   PATTERN "LOBES_*")
