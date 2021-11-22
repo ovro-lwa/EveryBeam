@@ -13,19 +13,16 @@ namespace mwabeam {
 class FactorialTable {
  public:
   FactorialTable(size_t nprecalculated) : table_(nprecalculated) {
-    for (unsigned i = 0; i <= nprecalculated; i++)
+    for (size_t i = 0; i != nprecalculated; i++)
       table_[i] = boost::math::factorial<double>(i);
   }
 
-  double operator()(unsigned n) const {
+  double operator()(size_t n) const {
     if (n >= table_.size()) {
       return boost::math::factorial<double>(n);
-    }
-
-    if (n < table_.size())
+    } else {
       return table_[n];
-    else
-      return boost::math::factorial<double>(n);
+    }
   }
 
  private:
