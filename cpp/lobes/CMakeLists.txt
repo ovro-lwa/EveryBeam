@@ -49,8 +49,6 @@ install(
 #------------------------------------------------------------------------------
 # TODO: can't we remove all this?
 set(MISC_DIR ${CMAKE_SOURCE_DIR}/scripts/misc)
-configure_file(${MISC_DIR}/test_lobes.py
-               ${CMAKE_CURRENT_BINARY_DIR}/test_lobes.py COPYONLY)
 
 configure_file(${MISC_DIR}/F4far_new.py
                ${CMAKE_CURRENT_BINARY_DIR}/F4far_new.py COPYONLY)
@@ -60,6 +58,3 @@ configure_file(${MISC_DIR}/hamaker_vs_lobes.py
                ${CMAKE_CURRENT_BINARY_DIR}/hamaker_vs_lobes.py COPYONLY)
 configure_file(${MISC_DIR}/test_beam_model.py
                ${CMAKE_CURRENT_BINARY_DIR}/test_beam_model.py COPYONLY)
-
-configure_file(${CMAKE_SOURCE_DIR}/coeffs/CS302_coords.mat
-               ${CMAKE_CURRENT_BINARY_DIR}/CS302_coords.mat COPYONLY)

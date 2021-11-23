@@ -14,40 +14,19 @@ This package also provides an abstract interface to a selection of beam response
  * Hamaker LOFAR model
  * OSKAR spherical wave model
  * OSKAR-dipole: work in progress
- * LOBES: work in progress. A coefficient file is currently only available for LOFAR station CS302LBA. Selecting the LOBES model defaults back to Hamaker, except for the aforementioned station.
+ * LOBEs: work in progress. A coefficient file is currently only available for a limited number of LOFAR stations. Selecting the LOBEs model defaults back to Hamaker, in case no coefficient file is available.
 
 EveryBeam replaces the stand alone version of the LOFAR station response library (LOFARBeam).
 
 EveryBeam is licensed under the terms of the GNU GPL3 license.
 
-## Installation
+## Documentation and Installation Instructions
 
-On a clean ubuntu 18.04 computer, the following packages are required (see also the `docker` directory):
-
-General packages
-
-    apt-get -y install wget git make cmake g++ doxygen \
-    libboost-all-dev libhdf5-dev libfftw3-dev \
-    libblas-dev liblapack-dev libgsl-dev libxml2-dev \
-    libgtkmm-3.0-dev libpython3-dev python3-distutils
-
-Astronomy packages:
-
-    apt-get -y install casacore-dev libcfitsio-dev wcslib-dev
-
-Installation is then typically done as:
-
-    mkdir build
-    cd build
-    cmake -DBUILD_WITH_PYTHON=On/Off ..
-    make
-    make install
-
-The `BUILD_WITH_PYTHON` option indicates whether the python bindings for EveryBeam should be generated. If switched `On` (non-default), a shared `everybeam.cpython` should appear in the `[INSTALL_DIR]/lib/python[MAJOR].[MINOR]/site-packages` directory.
+[Documentation](https://www.astron.nl/citt/EveryBeam/) along with [installation instructions](https://www.astron.nl/citt/EveryBeam/build-instructions.html) can be found at the provided links.
 
 ## Usage with DP3
 
-To use Everybeam within DP3 - the streaming visibility framework, https://git.astron.nl/RD/DP3 - DP3 needs to be compiled against EveryBeam. To do so, make sure DP3 can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
+To use Everybeam within [DP3](https://git.astron.nl/RD/DP3) - the streaming visibility framework - DP3 needs to be compiled against EveryBeam. To do so, make sure DP3 can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
 
 A test measurement set is included in DP3 (`tNDP3-generic.in_MS.tgz`).
 
@@ -62,4 +41,4 @@ To simulate visibilities with a certain element model, use `DP3 DP3.parset` with
 
 ## Usage with WSClean
 
-To use EveryBeam with WSClean (for A-term or primary beam corrections), WSClean needs to be compiled against EveryBeam. In order to do so, make sure WSClean can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
+To use EveryBeam with [WSClean](https://gitlab.com/aroffringa/wsclean) (for A-term or primary beam corrections), WSClean needs to be compiled against EveryBeam. In order to do so, make sure WSClean can find EveryBeam by adding the EveryBeam install dir to the `CMAKE_PREFIX_PATH`.
