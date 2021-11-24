@@ -114,13 +114,13 @@ void GriddedResponse::MakeIntegratedSnapshot(
     BeamMode beam_mode, std::vector<HMC4x4>& matrices, double time,
     double frequency, size_t field_id,
     const double* baseline_weights_interval) {
-  size_t nstations = telescope_->GetNrStations();
+  const size_t nstations = telescope_->GetNrStations();
   UVector<std::complex<float>> buffer_undersampled(
       GetStationBufferSize(nstations));
   ResponseAllStations(beam_mode, buffer_undersampled.data(), time, frequency,
                       field_id);
 
-  size_t npixels = width_ * height_;
+  const size_t npixels = width_ * height_;
   for (size_t y = 0; y != height_; ++y) {
     for (size_t x = 0; x != width_; ++x) {
       size_t index = 0;

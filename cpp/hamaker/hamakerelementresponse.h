@@ -18,6 +18,17 @@ class HamakerElementResponse : public ElementResponse {
   aocommon::MC2x2 Response(double freq, double theta,
                            double phi) const final override;
 
+  /**
+   * @brief Get instance of Hamaker LBA response
+   */
+  static std::shared_ptr<HamakerElementResponse> GetLbaInstance();
+
+  /**
+   * @brief Get instance of HamakerElementResponse, infer type (LBA/HBA)
+   * from station name.
+   *
+   * @param name Station Name
+   */
   static std::shared_ptr<HamakerElementResponse> GetInstance(
       const std::string &name);
 

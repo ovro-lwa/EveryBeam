@@ -1,4 +1,4 @@
-// load_telescope.h: Main interface function for loading a telescope
+// load.h: Main interface for loading a telescope
 //
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later

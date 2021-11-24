@@ -247,7 +247,7 @@ unsigned int GetNrAntennas(
     unsigned int field_id)
 {
     casacore::Table fieldTable = ms.keywordSet().asTable("LOFAR_ANTENNA_FIELD");
-    casacore::ROArrayQuantColumn<casacore::Double> offsetColumn(fieldTable, "ELEMENT_OFFSET", "m");
+    casacore::ArrayQuantColumn<double> offsetColumn(fieldTable, "ELEMENT_OFFSET", "m");
     casacore::Matrix<casacore::Quantity> aips_offset = offsetColumn(field_id);
     return aips_offset.ncolumn();
 }

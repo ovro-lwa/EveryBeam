@@ -12,21 +12,14 @@ if(DOWNLOAD_LOBES)
 endif()
 
 # Set cache values if not specified
-set(LOFAR_HBA_MOCK_MS
-    ${CMAKE_SOURCE_DIR}/test_data/LOFAR_HBA_MOCK.ms
-    CACHE PATH "")
-set(LOFAR_LBA_MOCK_MS
-    ${CMAKE_SOURCE_DIR}/test_data/LOFAR_LBA_MOCK.ms
-    CACHE PATH "")
-set(OSKAR_MOCK_MS
-    ${CMAKE_SOURCE_DIR}/test_data/OSKAR_MOCK.ms
-    CACHE PATH "")
-set(VLA_MOCK_MS
-    ${CMAKE_SOURCE_DIR}/test_data/VLA_MOCK.ms
-    CACHE PATH "")
-set(MWA_MOCK_MS
-    ${CMAKE_SOURCE_DIR}/test_data/MWA_MOCK.ms
-    CACHE PATH "")
+set(MOCK_MS LOFAR_HBA_MOCK LOFAR_LBA_MOCK AARTFAAC_LBA_MOCK OSKAR_MOCK VLA_MOCK
+            MWA_MOCK)
+foreach(mock ${MOCK_MS})
+  set(${mock}_MS
+      ${CMAKE_SOURCE_DIR}/test_data/${mock}.ms
+      CACHE PATH "")
+endforeach()
+
 set(MWA_COEFF_PATH
     ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_pattern.h5
     CACHE PATH "")
@@ -42,6 +35,7 @@ set(TEST_FILENAMES
     runtests.cc
     tlofar_hba.cc
     tlofar_lba.cc
+    tlofar_aartfaac.cc
     toskar.cc
     tmwa.cc
     tstation.cc
@@ -60,6 +54,7 @@ add_custom_target(
   download_mocks
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_aartfaac_lba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_oskar_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh

@@ -23,8 +23,12 @@ enum ElementResponseModel {
   /// The default will select the default element response model
   /// based on the telescope: e.g. LOFAR will use kHamaker,
   /// OSKAR will select kOSKARSphericalWave.
+  //
+  // kHamakerLba is specifically introduced for AARTFAAC observations, in which
+  // case the type HBA/LBA cannot be inferred from the station name
   kDefault,
   kHamaker,
+  kHamakerLba,
   kLOBES,
   kOSKARDipole,
   kOSKARSphericalWave

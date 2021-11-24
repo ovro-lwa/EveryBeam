@@ -43,6 +43,9 @@ class LOFAR final : public PhasedArray {
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
+
+ private:
+  bool is_aartfaac_ = false;
 };
 }  // namespace telescope
 }  // namespace everybeam

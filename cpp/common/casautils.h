@@ -25,6 +25,23 @@ namespace everybeam {
 namespace common {
 
 /**
+ * @brief Read origin of coordinate system from MS
+ *
+ * @param table measurement set
+ * @param id Id of the antenna field in the station (int)
+ * @return vector3r_t
+ */
+inline vector3r_t ReadOrigin(const casacore::Table &table, size_t id) {
+  casacore::ArrayQuantColumn<double> position_column(table, "POSITION", "m");
+  // Read antenna field center (ITRF).
+  casacore::Vector<casacore::Quantity> position = position_column(id);
+  assert(position.size() == 3);
+
+  return {position(0).getValue(), position(1).getValue(),
+          position(2).getValue()};
+}
+
+/**
  * @brief Read coordinate system from MeasurementSet
  *
  * @param table Measurement set (casacore::Table)
@@ -32,33 +49,44 @@ namespace common {
  * @return Antenna::CoordinateSystem
  */
 inline Antenna::CoordinateSystem ReadCoordinateSystem(
-    const casacore::Table &table, unsigned int id) {
-  casacore::ArrayQuantColumn<casacore::Double> c_position(table, "POSITION",
-                                                          "m");
+    const casacore::Table &table, size_t id) {
+  const vector3r_t origin = ReadOrigin(table, id);
   casacore::ArrayQuantColumn<casacore::Double> c_axes(table, "COORDINATE_AXES",
                                                       "m");
-
-  // Read antenna field center (ITRF).
-  casacore::Vector<casacore::Quantity> aips_position = c_position(id);
-  assert(aips_position.size() == 3);
-
-  vector3r_t position = {{aips_position(0).getValue(),
-                          aips_position(1).getValue(),
-                          aips_position(2).getValue()}};
 
   // Read antenna field coordinate axes (ITRF).
   casacore::Matrix<casacore::Quantity> aips_axes = c_axes(id);
   assert(aips_axes.shape().isEqual(casacore::IPosition(2, 3, 3)));
 
-  vector3r_t p = {{aips_axes(0, 0).getValue(), aips_axes(1, 0).getValue(),
-                   aips_axes(2, 0).getValue()}};
-  vector3r_t q = {{aips_axes(0, 1).getValue(), aips_axes(1, 1).getValue(),
-                   aips_axes(2, 1).getValue()}};
-  vector3r_t r = {{aips_axes(0, 2).getValue(), aips_axes(1, 2).getValue(),
-                   aips_axes(2, 2).getValue()}};
+  const vector3r_t p = {aips_axes(0, 0).getValue(), aips_axes(1, 0).getValue(),
+                        aips_axes(2, 0).getValue()};
+  const vector3r_t q = {aips_axes(0, 1).getValue(), aips_axes(1, 1).getValue(),
+                        aips_axes(2, 1).getValue()};
+  const vector3r_t r = {aips_axes(0, 2).getValue(), aips_axes(1, 2).getValue(),
+                        aips_axes(2, 2).getValue()};
+  return {origin, {p, q, r}};
+}
 
-  Antenna::CoordinateSystem coordinate_system = {position, {p, q, r}};
-  return coordinate_system;
+/**
+ * @brief Read coordinate system for an AARTFAAC MeasurementSet
+ *
+ * @param table Measurement set (casacore::Table)
+ * @param station_index Station index
+ * @return Antenna::CoordinateSystem
+ */
+inline Antenna::CoordinateSystem ReadAartfaacCoordinateSystem(
+    const casacore::Table &table, size_t station_index) {
+  const vector3r_t origin = ReadOrigin(table, station_index);
+
+  casacore::TableRecord keywordset = table.keywordSet();
+  casacore::Matrix<double> aips_axes;
+  keywordset.get("AARTFAAC_COORDINATE_AXES", aips_axes);
+  assert(aips_axes.shape().isEqual(IPosition(2, 3, 3)));
+
+  const vector3r_t p = {aips_axes(0, 0), aips_axes(1, 0), aips_axes(2, 0)};
+  const vector3r_t q = {aips_axes(0, 1), aips_axes(1, 1), aips_axes(2, 1)};
+  const vector3r_t r = {aips_axes(0, 2), aips_axes(1, 2), aips_axes(2, 2)};
+  return {origin, {p, q, r}};
 }
 
 /**

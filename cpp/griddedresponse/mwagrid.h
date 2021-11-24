@@ -30,10 +30,10 @@ class MWAGrid final : public GriddedResponse {
   std::unique_ptr<everybeam::mwabeam::TileBeam2016> tile_beam_;
 
   // Override MakeIntegrated snapshot for efficiency
-  virtual void MakeIntegratedSnapshot(
-      BeamMode beam_mode, std::vector<aocommon::HMC4x4>& matrices, double time,
-      double frequency, size_t field_id,
-      const double* baseline_weights_interval) override;
+  void MakeIntegratedSnapshot(BeamMode beam_mode,
+                              std::vector<aocommon::HMC4x4>& matrices,
+                              double time, double frequency, size_t field_id,
+                              const double* baseline_weights_interval) override;
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

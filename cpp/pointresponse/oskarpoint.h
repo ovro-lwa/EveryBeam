@@ -13,7 +13,7 @@ namespace everybeam {
 namespace pointresponse {
 
 /**
- * @brief Class for computing the LOFAR response for given ra/dec
+ * @brief Class for computing the OSKAR SKALA 4.0 response for given ra/dec
  *
  */
 class OSKARPoint final : public PhasedArrayPoint {

@@ -27,31 +27,39 @@ std::unique_ptr<Telescope> pyload_telescope(
   // Load measurement set
   MeasurementSet ms(name);
 
-  if (everybeam::GetTelescopeType(ms) !=
-          everybeam::TelescopeType::kLofarTelescope &&
-      everybeam::GetTelescopeType(ms) !=
-          everybeam::TelescopeType::kOSKARTelescope) {
-    throw std::runtime_error(
-        "Currently the python bindings only support the LOFAR and the OSKAR "
-        "telescope");
+  const everybeam::TelescopeType telescope_type =
+      everybeam::GetTelescopeType(ms);
+
+  switch (telescope_type) {
+    case everybeam::TelescopeType::kAARTFAAC:
+    case everybeam::TelescopeType::kLofarTelescope:
+    case everybeam::TelescopeType::kOSKARTelescope:
+      break;
+    default:
+      throw std::runtime_error(
+          "Currently the python bindings only support AARTFAAC (LBA), LOFAR "
+          "and OSKAR "
+          "observations");
   }
 
   // Fill everybeam options
   everybeam::Options options;
 
-  // LOFAR related
   std::string element_response_tmp = element_response_model;
   std::for_each(element_response_tmp.begin(), element_response_tmp.end(),
                 [](char& c) { c = ::toupper(c); });
-  everybeam::ElementResponseModel element_response_enum;
   if (element_response_tmp == "HAMAKER")
-    element_response_enum = everybeam::ElementResponseModel::kHamaker;
+    options.element_response_model = everybeam::ElementResponseModel::kHamaker;
+  else if (element_response_tmp == "HAMAKER_LBA")
+    options.element_response_model =
+        everybeam::ElementResponseModel::kHamakerLba;
   else if (element_response_tmp == "LOBES")
-    element_response_enum = everybeam::ElementResponseModel::kLOBES;
+    options.element_response_model = everybeam::ElementResponseModel::kLOBES;
   else if (element_response_tmp == "OSKAR_DIPOLE")
-    element_response_enum = everybeam::ElementResponseModel::kOSKARDipole;
+    options.element_response_model =
+        everybeam::ElementResponseModel::kOSKARDipole;
   else if (element_response_tmp == "SKALA40_WAVE")
-    element_response_enum =
+    options.element_response_model =
         everybeam::ElementResponseModel::kOSKARSphericalWave;
   else {
     std::stringstream message;
@@ -64,12 +72,9 @@ std::unique_ptr<Telescope> pyload_telescope(
                                         ? BeamNormalisationMode::kPreApplied
                                         : BeamNormalisationMode::kNone;
   options.use_channel_frequency = channel_frequency;
-  options.element_response_model = element_response_enum;
   options.coeff_path = coeff_path;
 
-  // Return the telescope
-  std::unique_ptr<Telescope> telescope = Load(ms, options);
-  return telescope;
+  return Load(ms, options);
 }
 
 void init_load(py::module& m) {

@@ -23,7 +23,7 @@ class PhasedArrayGrid : public GriddedResponse {
 
   void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
                            double time, double frequency,
-                           size_t field_id) final override;
+                           size_t field_id) override;
 
  protected:
   casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;

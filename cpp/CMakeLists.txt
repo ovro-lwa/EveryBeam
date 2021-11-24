@@ -54,6 +54,7 @@ add_library(
   griddedresponse/griddedresponse.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
+  griddedresponse/aartfaacgrid.cc
   pointresponse/phasedarraypoint.cc
   pointresponse/dishpoint.cc
   pointresponse/mwapoint.cc
