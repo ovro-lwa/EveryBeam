@@ -67,6 +67,8 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
   switch (model) {
     case kHamaker:
       return HamakerElementResponse::GetInstance(name);
+    case kHamakerLba:
+      return HamakerElementResponse::GetLbaInstance();
     case kOSKARDipole:
       return OSKARElementResponseDipole::GetInstance();
     case kOSKARSphericalWave:

@@ -16,6 +16,9 @@
 #include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
+/** AARTFAAC antenna column name in MS */
+const std::string kAartfaacAntennaTypeName = "AARTFAAC_ANTENNA_TYPE";
+
 /**
  * @brief Read single station from MeasurementSet by index
  *

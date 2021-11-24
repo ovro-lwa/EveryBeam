@@ -78,17 +78,17 @@ void MWAGrid::MakeIntegratedSnapshot(BeamMode beam_mode,
                                      double time, double frequency,
                                      size_t field_id,
                                      const double* baseline_weights_interval) {
-  const size_t nstations = telescope_->GetNrStations();
+  const size_t n_stations = telescope_->GetNrStations();
   aocommon::UVector<std::complex<float>> buffer_undersampled(
-      GetStationBufferSize(nstations));
+      GetStationBufferSize(n_stations));
   ResponseAllStations(beam_mode, buffer_undersampled.data(), time, frequency,
                       field_id);
 
   // For MWA, we can simply weight a (time) snapshot with the accumulated
   // baseline weights
-  const size_t nbaselines = nstations * (nstations + 1) / 2;
+  const size_t n_baselines = n_stations * (n_stations + 1) / 2;
   double snapshot_weight = 0.;
-  for (size_t index = 0; index != nbaselines; ++index) {
+  for (size_t index = 0; index != n_baselines; ++index) {
     snapshot_weight += baseline_weights_interval[index];
   }
 

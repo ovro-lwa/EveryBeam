@@ -139,6 +139,10 @@ void init_utils(py::module &m) {
              R"pbdoc(
         Hamaker element response model
        )pbdoc")
+      .value("hamaker_lba", ElementResponseModel::kHamakerLba,
+             R"pbdoc(
+        Hamaker LBA element response model
+       )pbdoc")
       .value("lobes", ElementResponseModel::kLOBES,
              R"pbdoc(
         LOBEs element response model

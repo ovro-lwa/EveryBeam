@@ -16,6 +16,11 @@
 
 namespace everybeam {
 
+std::shared_ptr<HamakerElementResponse>
+HamakerElementResponse::GetLbaInstance() {
+  return common::Singleton<HamakerElementResponseLBA>::GetInstance();
+}
+
 std::shared_ptr<HamakerElementResponse> HamakerElementResponse::GetInstance(
     const std::string& name) {
   if (name.find("LBA") != std::string::npos) {
