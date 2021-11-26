@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(differential_beam) {
 BOOST_AUTO_TEST_CASE(integrated_beam) {
   // Just check whether IntegratedResponse does run and reproduces
   // results for One time interval
-  std::vector<double> antenna_buffer_integrated(
+  std::vector<float> antenna_buffer_integrated(
       grid_response->GetIntegratedBufferSize());
   std::vector<double> baseline_weights(
       telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
   std::unique_ptr<GriddedResponse> grid_response_pb =
       telescope->GetGriddedResponse(coord_system_pb);
 
-  std::vector<double> antenna_buffer_pb(
+  std::vector<float> antenna_buffer_pb(
       grid_response_pb->GetIntegratedBufferSize());
   std::vector<double> baseline_weights_pb(
       telescope->GetNrStations() * (telescope->GetNrStations() + 1) / 2, 1.);

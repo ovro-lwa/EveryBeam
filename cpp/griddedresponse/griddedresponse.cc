@@ -20,7 +20,7 @@ using everybeam::common::FFTResampler;
 using everybeam::griddedresponse::GriddedResponse;
 
 void GriddedResponse::IntegratedResponse(
-    BeamMode beam_mode, double* buffer, double time, double frequency,
+    BeamMode beam_mode, float* buffer, double time, double frequency,
     size_t field_id, size_t undersampling_factor,
     const std::vector<double>& baseline_weights) {
   const size_t nstations = telescope_->GetNrStations();
@@ -64,7 +64,7 @@ void GriddedResponse::IntegratedResponse(
 }
 
 void GriddedResponse::IntegratedResponse(
-    BeamMode beam_mode, double* buffer, const std::vector<double>& time_array,
+    BeamMode beam_mode, float* buffer, const std::vector<double>& time_array,
     double frequency, size_t field_id, size_t undersampling_factor,
     const std::vector<double>& baseline_weights) {
   size_t nstations = telescope_->GetNrStations();
@@ -158,7 +158,7 @@ void GriddedResponse::MakeIntegratedSnapshot(
 }
 
 void GriddedResponse::DoFFTResampling(
-    double* buffer, int width_in, int height_in, int width_out, int height_out,
+    float* buffer, int width_in, int height_in, int width_out, int height_out,
     const std::vector<aocommon::HMC4x4>& matrices) {
   // (FFT) resampling, run multi-threaded?
   FFTResampler resampler(width_in, height_in, width_out, height_out);
@@ -169,12 +169,8 @@ void GriddedResponse::DoFFTResampling(
     for (int i = 0; i != width_in * height_in; ++i) {
       lowres_input[i] = matrices[i].Data(p);
     }
-    // Resample and write to the output buffer
-    UVector<float> hires_output(width_out * height_out);
-    resampler.Resample(lowres_input.data(), hires_output.data());
-    // Copy hires_output (float) to buffer (double), conversion is implicit in
-    // std::copy
-    std::copy(hires_output.begin(), hires_output.end(),
-              buffer + p * width_out * height_out);
+    // Resample and write to the "p-th image" in the output buffer
+    resampler.Resample(lowres_input.data(),
+                       buffer + p * width_out * height_out);
   }
 }
