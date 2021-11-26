@@ -96,7 +96,7 @@ void check_station_index(size_t idx, size_t idx_max,
 // Convenience method to convert a buffer of [npixels * 16]
 // (where 16 the number of entries of an aocmmon::HMC4x4 matrix
 // to a vector of MC4x4 matrices
-std::vector<aocommon::MC4x4> hmc_to_mc(double *buffer, size_t npixels) {
+std::vector<aocommon::MC4x4> hmc_to_mc(float *buffer, size_t npixels) {
   std::vector<aocommon::MC4x4> vec_mc4x4(npixels);
   for (size_t pixel = 0; pixel != npixels; ++pixel) {
     std::array<double, 16> tmp;
@@ -302,8 +302,7 @@ void init_telescope(py::module &m) {
              const py::array_t<double> &baseline_weights, size_t field_id) {
             std::unique_ptr<GriddedResponse> grid_response =
                 self.GetGriddedResponse(coordinate_system);
-            std::vector<double> buffer(
-                grid_response->GetIntegratedBufferSize());
+            std::vector<float> buffer(grid_response->GetIntegratedBufferSize());
 
             // Copy numpy to std::vector
             // NOTE: this could be optimized by making it a "view" rather than

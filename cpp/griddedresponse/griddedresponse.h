@@ -133,36 +133,6 @@ class GriddedResponse {
                                    double frequency, size_t field_id) = 0;
 
   /**
-   * @brief See IntegratedResponse()
-   */
-  [[deprecated(
-      "Use IntegratedResponse() instead. Function will be removed in "
-      "version "
-      "0.3.0.")]] void
-  CalculateIntegratedResponse(double* buffer, double time, double frequency,
-                              size_t field_id, size_t undersampling_factor,
-                              const std::vector<double>& baseline_weights) {
-    IntegratedResponse(BeamMode::kFull, buffer, time, frequency, field_id,
-                       undersampling_factor, baseline_weights);
-  };
-
-  /**
-   * @brief See IntegratedResponse()
-   */
-  [[deprecated(
-      "Use IntegratedResponse() instead. Function will be removed in "
-      "version "
-      "0.3.0.")]] void
-  CalculateIntegratedResponse(double* buffer,
-                              const std::vector<double>& time_array,
-                              double frequency, size_t field_id,
-                              size_t undersampling_factor,
-                              const std::vector<double>& baseline_weights) {
-    IntegratedResponse(BeamMode::kFull, buffer, time_array, frequency, field_id,
-                       undersampling_factor, baseline_weights);
-  };
-
-  /**
    * @brief Calculate integrated/undersampled beam for a single time step.
    * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
    * may override MakeIntegratedSnapshot() to implement a more efficient
@@ -177,21 +147,6 @@ class GriddedResponse {
    * @param baseline_weights Baseline weights, size should equal
    * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
    */
-
-  /**
-   * @brief See IntegratedResponse()
-   *
-   */
-  [[deprecated(
-      "Use IntegratedResponse() instead. Function will be removed in "
-      "version "
-      "0.3.0.")]] void
-  IntegratedFullResponse(double* buffer, double time, double frequency,
-                         size_t field_id, size_t undersampling_factor,
-                         const std::vector<double>& baseline_weights) {
-    IntegratedResponse(BeamMode::kFull, buffer, time, frequency, field_id,
-                       undersampling_factor, baseline_weights);
-  }
 
   /**
    * @brief Calculate integrated/undersampled beam for a single time step.
@@ -209,34 +164,22 @@ class GriddedResponse {
    * @param baseline_weights Baseline weights, size should equal
    * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
    */
-  virtual void IntegratedResponse(BeamMode beam_mode, double* buffer,
+  virtual void IntegratedResponse(BeamMode beam_mode, float* buffer,
                                   double time, double frequency,
                                   size_t field_id, size_t undersampling_factor,
                                   const std::vector<double>& baseline_weights);
 
-  /**
-   * @brief Calculate integrated beam over multiple time steps.
-   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
-   * may override MakeIntegratedSnapshot() to implement a more efficient
-   * version.
-   *
-   * @param buffer Buffer for storing the result, should have size width *
-   * height * 16
-   * @param time_array Vector with probing times, modified Julian date, UTC, in
-   * seconds (MJD(UTC), s).
-   * @param frequency Frequency (Hz)
-   * @param field_id Field id
-   * @param undersampling_factor Undersampling factor
-   * @param baseline_weights Baseline weights, size should equal
-   * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
-   * time_array.size()
-   */
-  virtual void IntegratedFullResponse(
-      double* buffer, const std::vector<double>& time_array, double frequency,
-      size_t field_id, size_t undersampling_factor,
-      const std::vector<double>& baseline_weights) {
-    IntegratedResponse(BeamMode::kFull, buffer, time_array, frequency, field_id,
-                       undersampling_factor, baseline_weights);
+  [[deprecated(
+      "Overload will be kept alive to allow WSClean migrating to float "
+      "implementation")]] void
+  IntegratedResponse(BeamMode beam_mode, double* buffer, double time,
+                     double frequency, size_t field_id,
+                     size_t undersampling_factor,
+                     const std::vector<double>& baseline_weights) {
+    std::vector<float> buffer_float(GetIntegratedBufferSize());
+    IntegratedResponse(beam_mode, buffer_float.data(), time, frequency,
+                       field_id, undersampling_factor, baseline_weights);
+    std::copy_n(buffer_float.begin(), GetIntegratedBufferSize(), buffer);
   }
 
   /**
@@ -257,12 +200,24 @@ class GriddedResponse {
    * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
    * time_array.size()
    */
-
-  virtual void IntegratedResponse(BeamMode beam_mode, double* buffer,
+  virtual void IntegratedResponse(BeamMode beam_mode, float* buffer,
                                   const std::vector<double>& time_array,
                                   double frequency, size_t field_id,
                                   size_t undersampling_factor,
                                   const std::vector<double>& baseline_weights);
+
+  [[deprecated(
+      "Overload will be kept alive to allow WSClean migrating to float "
+      "implementation")]] void
+  IntegratedResponse(BeamMode beam_mode, double* buffer,
+                     const std::vector<double>& time_array, double frequency,
+                     size_t field_id, size_t undersampling_factor,
+                     const std::vector<double>& baseline_weights) {
+    std::vector<float> buffer_float(GetIntegratedBufferSize());
+    IntegratedResponse(beam_mode, buffer_float.data(), time_array, frequency,
+                       field_id, undersampling_factor, baseline_weights);
+    std::copy_n(buffer_float.begin(), GetIntegratedBufferSize(), buffer);
+  }
 
   std::size_t GetStationBufferSize(std::size_t nstations) const {
     return nstations * width_ * height_ * 4u;
@@ -289,7 +244,7 @@ class GriddedResponse {
         phase_centre_dl_(coordinate_system.phase_centre_dl),
         phase_centre_dm_(coordinate_system.phase_centre_dm){};
 
-  static void DoFFTResampling(double* buffer, int width_in, int height_in,
+  static void DoFFTResampling(float* buffer, int width_in, int height_in,
                               int width_out, int height_out,
                               const std::vector<aocommon::HMC4x4>& matrices);
 

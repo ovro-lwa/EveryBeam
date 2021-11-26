@@ -29,13 +29,13 @@ class DishGrid final : public GriddedResponse {
                            double time, double frequency,
                            size_t field_id) override;
 
-  void IntegratedResponse(BeamMode beam_mode, double* buffer, double time,
+  void IntegratedResponse(BeamMode beam_mode, float* buffer, double time,
                           double frequency, size_t field_id,
                           size_t undersampling_factor,
                           const std::vector<double>& baseline_weights) override;
 
   void IntegratedResponse(
-      BeamMode beam_mode, double* buffer,
+      BeamMode beam_mode, float* buffer,
       const std::vector<double>& /* time_array */, double frequency,
       size_t field_id, size_t undersampling_factor,
       const std::vector<double>& /* baseline_weights */) override {

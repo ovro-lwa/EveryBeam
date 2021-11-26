@@ -50,7 +50,7 @@ void DishGrid::ResponseAllStations(BeamMode beam_mode,
 }
 
 void DishGrid::IntegratedResponse(
-    BeamMode /* beam_mode */, double* buffer, double, double frequency,
+    BeamMode /* beam_mode */, float* buffer, double, double frequency,
     size_t field_id, size_t undersampling_factor,
     const std::vector<double>& /*baseline_weights*/) {
   // Copy coordinate members
