@@ -47,10 +47,14 @@ class FFTResampler {
    * @param output Output image buffer
    */
   void Resample(float* input, float* output) {
-    Task task;
-    task.input = input;
-    task.output = output;
-    RunSingle(task, false);
+    if (width_in_ == width_out_ && height_in_ == height_out_) {
+      std::copy_n(input, width_in_ * height_in_, output);
+    } else {
+      Task task;
+      task.input = input;
+      task.output = output;
+      RunSingle(task, false);
+    }
   }
 
   /**

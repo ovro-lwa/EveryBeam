@@ -58,8 +58,10 @@ add_library(
   pointresponse/phasedarraypoint.cc
   pointresponse/dishpoint.cc
   pointresponse/mwapoint.cc
+  circularsymmetric/atcacoefficients.cc
+  circularsymmetric/gmrtcoefficients.cc
+  circularsymmetric/vlacoefficients.cc
   circularsymmetric/voltagepattern.cc
-  circularsymmetric/vlabeam.cc
   # Phased array telescopes (SKA, LOFAR)
   griddedresponse/phasedarraygrid.cc
   # MWA(beam) related

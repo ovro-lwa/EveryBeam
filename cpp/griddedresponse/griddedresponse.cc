@@ -38,6 +38,8 @@ void GriddedResponse::IntegratedResponse(
   const double dl_original = dl_;
   const double dm_original = dm_;
 
+  if (!PerformUndersampling()) undersampling_factor = 1;
+
   width_ /= undersampling_factor;
   height_ /= undersampling_factor;
   dl_ *= (double(width_original) / double(width_));

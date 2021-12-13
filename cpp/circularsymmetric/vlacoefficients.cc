@@ -1,20 +1,20 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "vlabeam.h"
+#include "vlacoefficients.h"
 
 #include <cmath>
 #include <vector>
 
-using everybeam::circularsymmetric::VLABeam;
+using everybeam::circularsymmetric::VLACoefficients;
 
-std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
-                                               double freq) {
+std::array<double, 5> VLACoefficients::GetCoefficients(
+    const std::string& band_name, double freq) {
   char band = '?';
 
-  const size_t sharp = bandName.find('#');
+  const size_t sharp = band_name.find('#');
   if (sharp != std::string::npos) {
-    if (sharp > 5 && bandName.substr(0, 5) == "EVLA_") band = bandName[5];
+    if (sharp > 5 && band_name.substr(0, 5) == "EVLA_") band = band_name[5];
   }
   if (band == '?') {
     band = DetermineFeed(freq);
@@ -44,7 +44,7 @@ std::array<double, 5> VLABeam::GetCoefficients(const std::string& bandName,
   return *coeff;
 }
 
-char VLABeam::DetermineFeed(double freq, double freq_center) {
+char VLACoefficients::DetermineFeed(double freq, double freq_center) {
   if ((freq_center > 224e6 && freq_center < 480e6) ||
       (freq > 224e6 && freq < 480e6)) {
     return 'P';
@@ -85,7 +85,7 @@ char VLABeam::DetermineFeed(double freq, double freq_center) {
 }
 
 // From PBMath1DEVLA::limitFreqForBand
-void VLABeam::LimitFreqForBand(char band, double& freq) {
+void VLACoefficients::LimitFreqForBand(char band, double& freq) {
   if (band == 'P') {
     if (freq <= 224e6) freq = 232e6;
     if (freq >= 480e6) freq = 470e6;
@@ -116,7 +116,7 @@ void VLABeam::LimitFreqForBand(char band, double& freq) {
   }
 }
 
-std::map<char, double> VLABeam::GetFeedConf() {
+std::map<char, double> VLACoefficients::GetFeedConf() {
   std::map<char, double> feed_conf;
   feed_conf['L'] =
       (-185.9) * M_PI / 180.0;  // squint orientation, rads, North of +AZ axis
@@ -130,14 +130,18 @@ std::map<char, double> VLABeam::GetFeedConf() {
   return feed_conf;
 }
 
-std::map<int, std::array<double, 5>> VLABeam::GetCoefficients() {
+std::map<int, std::array<double, 5>> VLACoefficients::GetCoefficients() {
   // This comes from PBMath1DEVLA::init()
   // Also see https://library.nrao.edu/public/memos/evla/EVLAM_195.pdf
-  std::vector<double> wFreqs_p{232., 246., 281., 296., 312., 328., 344., 357.,
-                               382., 392., 403., 421., 458., 470., 1040, 1104,
-                               1168, 1232, 1296, 1360, 1424, 1488, 1552, 1680,
-                               1744, 1808, 1872, 1936, 2000};
-  for (double& f : wFreqs_p) f *= 1e6;
+
+  /*
+   * For reference, these are the correponding frequencies in MHz:
+   *
+   * {232., 246., 281., 296., 312., 328., 344., 357.,
+   *  382., 392., 403., 421., 458., 470., 1040, 1104,
+   *  1168, 1232, 1296, 1360, 1424, 1488, 1552, 1680,
+   *  1744, 1808, 1872, 1936, 2000};
+   */
 
   std::map<int, std::array<double, 5>> coeffmap;
   ////P

@@ -13,8 +13,10 @@ using everybeam::pointresponse::DishPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::Dish;
 
-Dish::Dish(const casacore::MeasurementSet &ms, const Options &options)
-    : Telescope(ms, options) {
+Dish::Dish(const casacore::MeasurementSet &ms,
+           std::unique_ptr<circularsymmetric::Coefficients> coefficients,
+           const Options &options)
+    : Telescope(ms, options), coefficients_(std::move(coefficients)) {
   casacore::MSField field_table = ms.field();
   casacore::ArrayColumn<double> pointing_dir_col(
       field_table, casacore::MSField::columnName(casacore::MSField::DELAY_DIR));

@@ -9,6 +9,8 @@
 
 #include "telescope.h"
 
+#include "../circularsymmetric/coefficients.h"
+
 #include <casacore/measures/Measures/MDirection.h>
 
 namespace everybeam {
@@ -34,7 +36,9 @@ class Dish final : public Telescope {
   friend class pointresponse::DishPoint;
 
  public:
-  Dish(const casacore::MeasurementSet &ms, const Options &options);
+  Dish(const casacore::MeasurementSet &ms,
+       std::unique_ptr<circularsymmetric::Coefficients> coefficients,
+       const Options &options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
       const coords::CoordinateSystem &coordinate_system) const override;
@@ -47,6 +51,7 @@ class Dish final : public Telescope {
     std::vector<std::pair<double, double>> field_pointing;
   };
   MSProperties ms_properties_;
+  std::unique_ptr<circularsymmetric::Coefficients> coefficients_;
 };
 }  // namespace telescope
 }  // namespace everybeam

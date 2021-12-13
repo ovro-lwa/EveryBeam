@@ -4,7 +4,7 @@
 #include "dishgrid.h"
 #include "../telescope/dish.h"
 #include "../circularsymmetric/voltagepattern.h"
-#include "../circularsymmetric/vlabeam.h"
+#include "../circularsymmetric/vlacoefficients.h"
 
 #include <aocommon/uvector.h>
 #include <aocommon/matrix2x2.h>
@@ -21,17 +21,22 @@ namespace griddedresponse {
 void DishGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
                         double, double frequency,
                         [[maybe_unused]] size_t station_idx, size_t field_id) {
-  const telescope::Dish& dishtelescope =
+  const telescope::Dish& dish_telescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
   const double pdir_ra =
-      dishtelescope.ms_properties_.field_pointing[field_id].first;
+      dish_telescope.ms_properties_.field_pointing[field_id].first;
   const double pdir_dec =
-      dishtelescope.ms_properties_.field_pointing[field_id].second;
-  const std::array<double, 5> coefs =
-      circularsymmetric::VLABeam::GetCoefficients("", frequency);
-  const aocommon::UVector<double> coefs_vec(coefs.begin(), coefs.end());
-  circularsymmetric::VoltagePattern vp(frequency, 53.0);
+      dish_telescope.ms_properties_.field_pointing[field_id].second;
+  const double max_radius_arc_min =
+      dish_telescope.coefficients_->MaxRadiusInArcMin();
+  const double reference_frequency =
+      dish_telescope.coefficients_->ReferenceFrequency();
+  circularsymmetric::VoltagePattern vp(
+      dish_telescope.coefficients_->GetFrequencies(frequency),
+      max_radius_arc_min, reference_frequency);
+  const aocommon::UVector<double> coefs_vec =
+      dish_telescope.coefficients_->GetCoefficients(frequency);
   vp.EvaluatePolynomial(coefs_vec, false);
   vp.Render(buffer, width_, height_, dl_, dm_, ra_, dec_, pdir_ra, pdir_dec,
             phase_centre_dl_, phase_centre_dm_, frequency);
