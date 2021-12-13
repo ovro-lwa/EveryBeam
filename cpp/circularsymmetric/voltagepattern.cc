@@ -20,16 +20,18 @@ void VoltagePattern::EvaluatePolynomial(const UVector<double>& coefficients,
   values_.resize(nsamples * nfreq);
   inverse_increment_radius_ = double(nsamples - 1) / maximum_radius_arc_min_;
   double* output = values_.data();
+  const double referenced_increment =
+      std::sqrt(reference_frequency_ / 1e9) / inverse_increment_radius_;
   for (size_t n = 0; n != nfreq; n++) {
-    const double* freqcoefficients = &coefficients[n * ncoef];
+    const double* freq_coefficients = &coefficients[n * ncoef];
     for (size_t i = 0; i < nsamples; i++) {
       double taper = 0.0;
-      double x2 = double(i) / inverse_increment_radius_;
+      double x2 = double(i) * referenced_increment;
       x2 = x2 * x2;
       double y = 1.0;
 
       for (size_t j = 0; j < ncoef; j++) {
-        taper += y * freqcoefficients[j];
+        taper += y * freq_coefficients[j];
         y *= x2;
       }
       if (taper >= 0.0) {
@@ -84,7 +86,7 @@ const double* VoltagePattern::InterpolateValues(
 
 double VoltagePattern::LmMaxSquared(double frequency_hz) const {
   const double factor =
-      (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
+      (180.0 / M_PI) * 60.0 * frequency_hz * 1e-9;  // arcminutes * GHz
   const double rmax = maximum_radius_arc_min_ / factor;
   return rmax * rmax;
 }
@@ -101,7 +103,7 @@ void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
   const double* vp = InterpolateValues(frequency_hz, interpolated_values);
 
   const double factor =
-      (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
+      (180.0 / M_PI) * 60.0 * frequency_hz * 1e-9;  // arcminutes * GHz
   double l0, m0;
   ImageCoordinates::RaDecToLM(pointing_ra, pointing_dec, phase_centre_ra,
                               phase_centre_dec, l0, m0);
@@ -148,7 +150,7 @@ void VoltagePattern::Render(std::complex<float>* aterm, double phase_centre_ra,
   const double* vp = InterpolateValues(frequency_hz, interpolated_values);
 
   const double factor =
-      (180.0 / M_PI) * 60.0 * frequency_hz * 1.0e-9;  // arcminutes * GHz
+      (180.0 / M_PI) * 60.0 * frequency_hz * 1e-9;  // arcminutes * GHz
 
   // TODO: probably not all conversions needed?
   double l0, m0;

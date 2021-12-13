@@ -8,6 +8,10 @@
 #include "telescope/mwa.h"
 #include "telescope/oskar.h"
 
+#include "circularsymmetric/atcacoefficients.h"
+#include "circularsymmetric/gmrtcoefficients.h"
+#include "circularsymmetric/vlacoefficients.h"
+
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
@@ -23,14 +27,16 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
   std::for_each(telescope_name.begin(), telescope_name.end(),
                 [](char &c) { c = ::toupper(c); });
 
-  if (telescope_name == "LOFAR") {
-    return kLofarTelescope;
-  } else if (telescope_name == "AARTFAAC") {
+  if (telescope_name == "AARTFAAC") {
     return kAARTFAAC;
-  } else if (telescope_name.compare(0, 4, "EVLA") == 0) {
-    return kVLATelescope;
   } else if (telescope_name.compare(0, 4, "ATCA") == 0) {
     return kATCATelescope;
+  } else if (telescope_name.compare(0, 4, "EVLA") == 0) {
+    return kVLATelescope;
+  } else if (telescope_name == "GMRT") {
+    return kGMRTTelescope;
+  } else if (telescope_name == "LOFAR") {
+    return kLofarTelescope;
   } else if (telescope_name == "MWA") {
     return kMWATelescope;
     // check if telescope_name starts with "OSKAR"
@@ -50,10 +56,21 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
     case kLofarTelescope:
       telescope.reset(new telescope::LOFAR(ms, options));
       break;
-    case kATCATelescope:  // fall through
-    case kVLATelescope:
-      telescope.reset(new telescope::Dish(ms, options));
-      break;
+    case kATCATelescope: {
+      std::unique_ptr<circularsymmetric::Coefficients> coefs(
+          new circularsymmetric::ATCACoefficients());
+      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+    } break;
+    case kGMRTTelescope: {
+      std::unique_ptr<circularsymmetric::Coefficients> coefs(
+          new circularsymmetric::GMRTCoefficients());
+      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+    } break;
+    case kVLATelescope: {
+      std::unique_ptr<circularsymmetric::Coefficients> coefs(
+          new circularsymmetric::VLACoefficients(""));
+      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+    } break;
     case kMWATelescope: {
       telescope.reset(new telescope::MWA(ms, options));
       break;

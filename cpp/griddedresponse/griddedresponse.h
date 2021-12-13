@@ -225,6 +225,16 @@ class GriddedResponse {
 
   std::size_t GetIntegratedBufferSize() const { return width_ * height_ * 16u; }
 
+  /**
+   * Allow undersampled calculation of the beam grid? If true, the beam
+   * will be calculated on a smaller grid and FFT resampled to a larger
+   * grid. This is important for arrays that produce large images and for
+   * which the beam calculations are expensive, such as MWA, LOFAR and
+   * SKA. On the other hand, beams that are fast to calculate and might
+   * have sharp cut-offs, should not be undersampled.
+   */
+  virtual bool PerformUndersampling() const { return true; }
+
  protected:
   /**
    * @brief Construct a new Gridded Response object

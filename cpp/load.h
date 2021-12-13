@@ -17,12 +17,13 @@ namespace everybeam {
  */
 enum TelescopeType {
   kUnknownTelescope,
-  kLofarTelescope,
   kAARTFAAC,
-  kVLATelescope,
   kATCATelescope,
+  kGMRTTelescope,
+  kLofarTelescope,
+  kOSKARTelescope,
   kMWATelescope,
-  kOSKARTelescope
+  kVLATelescope,
 };
 
 /**

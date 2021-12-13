@@ -45,6 +45,8 @@ class DishGrid final : public GriddedResponse {
                        undersampling_factor, {0.0});
   }
 
+  bool PerformUndersampling() const override { return false; }
+
  private:
   /**
    * @brief Make integrated snapshot, specialized/simplified for dish
