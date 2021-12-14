@@ -24,19 +24,18 @@ void DishGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
   const telescope::Dish& dish_telescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
-  const double pdir_ra =
-      dish_telescope.ms_properties_.field_pointing[field_id].first;
-  const double pdir_dec =
-      dish_telescope.ms_properties_.field_pointing[field_id].second;
+  double pdir_ra;
+  double pdir_dec;
+  std::tie(pdir_ra, pdir_dec) = dish_telescope.GetFieldPointing()[field_id];
   const double max_radius_arc_min =
-      dish_telescope.coefficients_->MaxRadiusInArcMin();
+      dish_telescope.GetDishCoefficients()->MaxRadiusInArcMin();
   const double reference_frequency =
-      dish_telescope.coefficients_->ReferenceFrequency();
+      dish_telescope.GetDishCoefficients()->ReferenceFrequency();
   circularsymmetric::VoltagePattern vp(
-      dish_telescope.coefficients_->GetFrequencies(frequency),
+      dish_telescope.GetDishCoefficients()->GetFrequencies(frequency),
       max_radius_arc_min, reference_frequency);
   const aocommon::UVector<double> coefs_vec =
-      dish_telescope.coefficients_->GetCoefficients(frequency);
+      dish_telescope.GetDishCoefficients()->GetCoefficients(frequency);
   vp.EvaluatePolynomial(coefs_vec, false);
   vp.Render(buffer, width_, height_, dl_, dm_, ra_, dec_, pdir_ra, pdir_dec,
             phase_centre_dl_, phase_centre_dm_, frequency);

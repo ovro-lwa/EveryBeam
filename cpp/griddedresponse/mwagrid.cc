@@ -23,8 +23,7 @@ void MWAGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
       static_cast<const telescope::MWA&>(*telescope_);
 
   casacore::MEpoch time_epoch(casacore::Quantity(time, "s"));
-  casacore::MeasFrame frame(mwatelescope.ms_properties_.array_position,
-                            time_epoch);
+  casacore::MeasFrame frame(mwatelescope.GetArrayPosition(), time_epoch);
 
   const casacore::MDirection::Ref hadec_ref(casacore::MDirection::HADEC, frame);
   const casacore::MDirection::Ref azelgeo_ref(casacore::MDirection::AZELGEO,
@@ -33,12 +32,12 @@ void MWAGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
   casacore::MDirection::Convert j2000_to_hadecref(j2000_ref, hadec_ref),
       j2000_to_azelgeoref(j2000_ref, azelgeo_ref);
   casacore::MPosition wgs = casacore::MPosition::Convert(
-      mwatelescope.ms_properties_.array_position, casacore::MPosition::WGS84)();
-  double arr_latitude = wgs.getValue().getLat();
+      mwatelescope.GetArrayPosition(), casacore::MPosition::WGS84)();
+  const double arr_latitude = wgs.getValue().getLat();
 
   if (!tile_beam_) {
     tile_beam_.reset(
-        new TileBeam2016(mwatelescope.ms_properties_.delays,
+        new TileBeam2016(mwatelescope.GetDelays().data(),
                          mwatelescope.GetOptions().frequency_interpolation,
                          mwatelescope.GetOptions().coeff_path));
   }

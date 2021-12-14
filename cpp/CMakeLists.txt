@@ -46,6 +46,7 @@ add_library(
   coords/itrfdirection.cc
   msreadutils.cc
   station.cc
+  phasedarrayresponse.cc
   telescope/lofar.cc
   telescope/dish.cc
   telescope/mwa.cc
@@ -102,6 +103,7 @@ install(
         station.h
         load.h
         options.h
+        phasedarrayresponse.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}")
 
 # TODO: not sure whether this is needed at all

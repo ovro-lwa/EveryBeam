@@ -11,6 +11,7 @@
 #include "../common/types.h"
 #include "../correctionmode.h"
 #include "../beamnormalisationmode.h"
+#include "../phasedarrayresponse.h"
 
 #include <aocommon/matrix2x2.h>
 #include <casacore/measures/Measures/MDirection.h>
@@ -18,7 +19,7 @@
 namespace everybeam {
 namespace pointresponse {
 
-class PhasedArrayPoint : public PointResponse {
+class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
  public:
   PhasedArrayPoint(const telescope::Telescope *telescope_ptr, double time);
 
@@ -44,30 +45,31 @@ class PhasedArrayPoint : public PointResponse {
                 double ra, double dec, double freq, size_t station_idx,
                 size_t field_id) final override;
 
-  aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
-                               const vector3r_t &direction,
-                               std::mutex *mutex) final override;
+  /**
+   * @brief Compute beam response. Optional beam normalisation is
+   * done in this function
+   *
+   * @param beam_mode BeamMode, can be any of kNone, kFull, kArrayFactor or
+   * kElement
+   * @param station_idx Station index for which to compute the beam response.
+   * @param freq Freq [Hz]
+   * @param direction Direction in ITRF
+   * @param mutex mutex. When provided, the caller keeps control over
+   * thread-safety. If not provided, the internal mutex will be used and the
+   * caller is assumed to be thread-safe.
+   * @return aocommon::MC2x2
+   */
+  aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx, double freq,
+                           const vector3r_t &direction,
+                           std::mutex *mutex) final override;
 
   /**
-   * @brief Convenience function for the python bindings
+   * @brief Compute the unnormalised response.
    */
-  aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
-                               const vector3r_t &direction,
-                               const vector3r_t &station0,
-                               const vector3r_t &tile0);
-
-  aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
-                                  const vector3r_t &direction,
-                                  std::mutex *mutex) final override;
-
-  /**
-   * @brief Compute the array factor given a direction, station0 direction
-   * and tile0 direction. Method is used in the python bindings.
-   */
-  aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
-                                  const vector3r_t &direction,
-                                  const vector3r_t &station0,
-                                  const vector3r_t &tile0);
+  aocommon::MC2x2 UnnormalisedResponse(BeamMode beam_mode, size_t station_idx,
+                                       double freq, const vector3r_t &direction,
+                                       const vector3r_t &station0,
+                                       const vector3r_t &tile0) const;
 
   /**
    * @brief Convenience method for computing the element response, for a
@@ -85,10 +87,6 @@ class PhasedArrayPoint : public PointResponse {
   aocommon::MC2x2 ElementResponse(size_t station_idx, double freq,
                                   const vector3r_t &direction,
                                   size_t element_idx) const;
-
-  aocommon::MC2x2 ElementResponse(
-      size_t station_idx, double freq,
-      const vector3r_t &direction) const final override;
 
   /**
    * @brief Method for computing the ITRF-vectors, given ra, dec position in
@@ -110,16 +108,6 @@ class PhasedArrayPoint : public PointResponse {
   void SetParalacticRotation(bool rotate) { rotate_ = rotate; }
   bool GetParalacticRotation() const { return rotate_; };
 
- protected:
-  casacore::MDirection delay_dir_, tile_beam_dir_;
-  vector3r_t station0_, tile0_, dir_itrf_, diff_beam_centre_;
-  bool use_channel_frequency_;
-  bool use_differential_beam_;
-  casacore::MDirection preapplied_beam_dir_;
-  CorrectionMode preapplied_correction_mode_;
-  BeamNormalisationMode beam_normalisation_mode_;
-  double subband_frequency_;
-
  private:
   /**
    * @brief Update ITRF coordinates for reference station and reference tile
@@ -128,10 +116,7 @@ class PhasedArrayPoint : public PointResponse {
    */
   void UpdateITRFVectors(std::mutex &mutex);
 
-  bool CalculateBeamNormalisation(BeamMode beam_mode, double time,
-                                  double frequency, size_t station_idx,
-                                  aocommon::MC2x2F &inverse_gain) const;
-
+  vector3r_t itrf_direction_;
   double ra_, dec_;
   std::mutex mutex_;
 

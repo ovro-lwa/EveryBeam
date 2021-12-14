@@ -14,21 +14,16 @@
 namespace everybeam {
 
 namespace griddedresponse {
-class MWAGrid;
 class GriddedResponse;
 }  // namespace griddedresponse
 
 namespace pointresponse {
-class MWAPoint;
 class PointResponse;
 }  // namespace pointresponse
 
 namespace telescope {
 
 class MWA final : public Telescope {
-  friend class griddedresponse::MWAGrid;
-  friend class pointresponse::MWAPoint;
-
  public:
   /**
    * @brief Construct a new MWA object
@@ -45,12 +40,12 @@ class MWA final : public Telescope {
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
 
+  casacore::MPosition GetArrayPosition() const { return array_position_; }
+  const std::array<double, 16> &GetDelays() const { return delays_; }
+
  private:
-  struct MSProperties {
-    double delays[16];
-    casacore::MPosition array_position;
-  };
-  MSProperties ms_properties_;
+  casacore::MPosition array_position_;
+  std::array<double, 16> delays_;
 };
 
 }  // namespace telescope

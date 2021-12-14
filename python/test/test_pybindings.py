@@ -170,13 +170,6 @@ def test_coordinate_system():
 def test_lofar(ref, differential_beam):
     ms_path = os.path.join(DATADIR, ref["filename"])
     telescope = load_telescope(ms_path, use_differential_beam=differential_beam)
-    a = telescope.gridded_response(
-        ref["coordinate_system"],
-        ref["time"],
-        ref["freq"],
-        ref["station_id"],
-        field_index=10,
-    )
     assert isinstance(telescope, LOFAR)
 
     time = ref["time"]

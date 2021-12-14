@@ -20,12 +20,11 @@ namespace everybeam {
 namespace pointresponse {
 
 /**
- * @brief Virtual base class to compute the point response
- *
+ * @brief Virtual base class to compute the point response.
  */
 class PointResponse {
  public:
-  virtual ~PointResponse() {}
+  virtual ~PointResponse() = default;
 
   /**
    * @brief Update the (cached) time
@@ -59,44 +58,6 @@ class PointResponse {
   bool HasTimeUpdate() const { return has_time_update_; }
 
   /**
-   * @brief See FullResponse.
-   */
-  [[deprecated("Use FullResponse() instead.")]] void CalculateStation(
-      std::complex<float>* response_matrix, double ra, double dec, double freq,
-      size_t station_idx, size_t field_id) {
-    FullResponse(response_matrix, ra, dec, freq, station_idx, field_id);
-  };
-
-  /**
-   * @brief See FullResponseAllStations.
-   */
-  [[deprecated("Use FullResponseAllStations() instead.")]] void
-  CalculateAllStations(std::complex<float>* response_matrices, double ra,
-                       double dec, double freq, size_t field_id) {
-    FullResponseAllStations(response_matrices, ra, dec, freq, field_id);
-  };
-
-  /**
-   * @brief Get beam response for a given station at a prescribed ra, dec
-   * position.
-   *
-   * @param response_matrix Buffer with a size of 4 complex floats to receive
-   * the beam response
-   * @param ra Right ascension (rad)
-   * @param dec Declination (rad)
-   * @param freq Frequency (Hz)
-   * @param station_id Station index, corresponding to measurement set antenna
-   * index.
-   * @param field_id Field index as used in the measurement set
-   */
-  virtual void FullResponse(std::complex<float>* response_matrix, double ra,
-                            double dec, double freq, size_t station_id,
-                            size_t field_id) {
-    Response(BeamMode::kFull, response_matrix, ra, dec, freq, station_id,
-             field_id);
-  }
-
-  /**
    * @brief Get beam response for a given station at a prescribed ra, dec
    * position.
    *
@@ -117,74 +78,8 @@ class PointResponse {
                         size_t field_id) = 0;
 
   /**
-   * @brief Get the full beam response for a station, given a pointing direction
-   * in ITRF coordinates
-   *
-   * @param beam_mode Selects beam mode (element, array factor or full)
-   * @param station_idx Station index
-   * @param freq Frequency (Hz)
-   * @param direction Direction in ITRF
-   * @param mutex Optional mutex. When provided, the caller keeps control over
-   * thread-safety. If not provided, the internal mutex will be used and the
-   * caller is assumed to be thread-safe.
-   * @return aocommon::MC2x2
-   */
-  aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx, double freq,
-                           const vector3r_t& direction,
-                           std::mutex* mutex = nullptr) {
-    switch (beam_mode) {
-      case BeamMode::kNone:
-        return aocommon::MC2x2::Unity();
-      case BeamMode::kFull:
-        return FullResponse(station_idx, freq, direction, mutex);
-      case BeamMode::kElement:
-        return ElementResponse(station_idx, freq, direction);
-      case BeamMode::kArrayFactor:
-        return ArrayFactor(station_idx, freq, direction, mutex);
-      default:
-        throw std::runtime_error("Invalid beam mode.");
-    }
-  }
-
-  /**
-   * @brief Get the full beam response for a station, given a pointing direction
-   * in ITRF coordinates
-   *
-   * @param station_idx Station index
-   * @param freq Frequency (Hz)
-   * @param direction Direction in ITRF
-   * @param mutex Optional mutex. When provided, the caller keeps control over
-   * thread-safety. If not provided, the internal mutex will be used and the
-   * caller is assumed to be thread-safe.
-   * @return aocommon::MC2x2
-   */
-  virtual aocommon::MC2x2 FullResponse(size_t station_idx, double freq,
-                                       const vector3r_t& direction,
-                                       std::mutex* mutex = nullptr) {
-    throw std::runtime_error("Not yet implemented");
-  }
-
-  /**
-   * @brief Same as FullResponse, but now iterate over all stations in
-   * MS.
-   *
-   * @param response_matrices Buffer with a size of 4 * nr_stations complex
-   * floats to receive the beam response
-   * @param ra Right ascension (rad)
-   * @param dec Declination (rad)
-   * @param freq Frequency (Hz)
-   * @param field_id Field index as used in the measurement set
-   */
-  virtual void FullResponseAllStations(std::complex<float>* response_matrices,
-                                       double ra, double dec, double freq,
-                                       size_t field_id) {
-    ResponseAllStations(BeamMode::kFull, response_matrices, ra, dec, freq,
-                        field_id);
-  }
-
-  /**
-   * @brief Same as FullResponse, but now iterate over all stations in
-   * MS.
+   * @brief Same as Response, but now iterate over all stations in
+   * measurement set.
    *
    * @param beam_mode Selects beam mode (element, array factor or full)
    * @param response_matrices Buffer with a size of 4 * nr_stations complex
@@ -205,7 +100,7 @@ class PointResponse {
   }
 
   /**
-   * @brief Get the array factor for a station, given a pointing direction
+   * @brief Get the beam response for a station, given a pointing direction
    * in ITRF coordinates
    *
    * @param station_idx Station index
@@ -214,16 +109,11 @@ class PointResponse {
    * @param mutex Optional mutex. When provided, the caller keeps control over
    * thread-safety. If not provided, the internal mutex will be used and the
    * caller is assumed to be thread-safe.
-   * @return aocommon::MC2x2Diag
+   * @return aocommon::MC2x2
    */
-  virtual aocommon::MC2x2Diag ArrayFactor(size_t station_idx, double freq,
-                                          const vector3r_t& direction,
-                                          std::mutex* mutex = nullptr) {
-    throw std::runtime_error("Not yet implemented");
-  };
-
-  virtual aocommon::MC2x2 ElementResponse(size_t station_idx, double freq,
-                                          const vector3r_t& direction) const {
+  virtual aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx,
+                                   double freq, const vector3r_t& direction,
+                                   std::mutex* mutex = nullptr) {
     throw std::runtime_error("Not yet implemented");
   }
 

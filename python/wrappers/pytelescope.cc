@@ -438,8 +438,8 @@ void init_telescope(py::module &m) {
                 (self.GetOptions().beam_normalisation_mode ==
                  BeamNormalisationMode::kPreApplied)
                     ? aocommon::MC2x2::Unity()
-                    : phased_array_point.FullResponse(idx, freq, direction,
-                                                      &mutex);
+                    : phased_array_point.Response(BeamMode::kFull, idx, freq,
+                                                  direction, &mutex);
             return cast_matrix(response);
           },
           R"pbdoc(
@@ -597,9 +597,12 @@ void init_telescope(py::module &m) {
             PhasedArrayPoint &phased_array_point =
                 static_cast<PhasedArrayPoint &>(*point_response);
             phased_array_point.SetParalacticRotation(rotate);
-            const aocommon::MC2x2 response = phased_array_point.FullResponse(
-                idx, freq, direction, station0, tile0);
+            aocommon::MC2x2 response = phased_array_point.UnnormalisedResponse(
+                BeamMode::kFull, idx, freq, direction, station0, tile0);
 
+            // We can't delegate the normalisation to Response, in this case.
+            // Since the diff_beam_centre direction would not be computed
+            // correctly.
             if (self.GetOptions().beam_normalisation_mode ==
                 BeamNormalisationMode::kPreApplied) {
               vector3r_t diff_beam_centre;
@@ -609,13 +612,15 @@ void init_telescope(py::module &m) {
                   diff_beam_centre);
 
               aocommon::MC2x2 response_diff_beam =
-                  phased_array_point.FullResponse(idx, freq, diff_beam_centre,
-                                                  station0, tile0);
+                  phased_array_point.UnnormalisedResponse(
+                      BeamMode::kFull, idx, freq, diff_beam_centre, station0,
+                      tile0);
               apply_differential_beam(response_diff_beam, response);
               return cast_matrix(response_diff_beam);
             } else {
               return cast_matrix(response);
             }
+            return cast_matrix(response);
           },
           R"pbdoc(
         Get station response in user-specified direction
@@ -809,20 +814,30 @@ void init_telescope(py::module &m) {
             phased_array_point.SetUseLocalCoordinateSystem(is_local);
             phased_array_point.SetParalacticRotation(rotate);
 
+            // Avoid any beam normalisations, so compute station0 and tile0
+            // manually
+            ITRFConverter itrf_converter(time);
+            vector3r_t station0;
+            vector3r_t tile0;
+            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
+                          station0);
+            SetITRFVector(
+                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
             const aocommon::MC2x2 response =
-                phased_array_point.ElementResponse(idx, freq, direction);
+                phased_array_point.UnnormalisedResponse(
+                    BeamMode::kElement, idx, freq, direction, station0, tile0);
 
             if (self.GetOptions().beam_normalisation_mode ==
                 BeamNormalisationMode::kPreApplied) {
               vector3r_t diff_beam_centre;
-              ITRFConverter itrf_converter(time);
               SetITRFVector(
                   itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
                   diff_beam_centre);
 
               aocommon::MC2x2 response_diff_beam =
-                  phased_array_point.ElementResponse(idx, freq,
-                                                     diff_beam_centre);
+                  phased_array_point.UnnormalisedResponse(
+                      BeamMode::kElement, idx, freq, diff_beam_centre, station0,
+                      tile0);
               apply_differential_beam(response_diff_beam, response);
               return cast_matrix(response_diff_beam);
             } else {
@@ -875,8 +890,10 @@ void init_telescope(py::module &m) {
                 static_cast<PhasedArrayPoint &>(*point_response);
 
             // Diagonal to 2x2 matrix
-            const aocommon::MC2x2 response(phased_array_point.ArrayFactor(
-                idx, freq, direction, station0, tile0));
+            const aocommon::MC2x2 response(
+                phased_array_point.UnnormalisedResponse(BeamMode::kArrayFactor,
+                                                        idx, freq, direction,
+                                                        station0, tile0));
             return cast_matrix(response);
           },
           R"pbdoc(

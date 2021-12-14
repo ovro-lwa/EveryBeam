@@ -9,10 +9,16 @@
 
 #include "griddedresponse.h"
 #include "../beamnormalisationmode.h"
+#include "../phasedarrayresponse.h"
+
+namespace aocommon {
+template <typename Tp>
+class Lane;
+}
 
 namespace everybeam {
 namespace griddedresponse {
-class PhasedArrayGrid : public GriddedResponse {
+class PhasedArrayGrid : public GriddedResponse, protected PhasedArrayResponse {
  public:
   PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
                   const coords::CoordinateSystem& coordinate_system);
@@ -25,17 +31,10 @@ class PhasedArrayGrid : public GriddedResponse {
                            double time, double frequency,
                            size_t field_id) override;
 
- protected:
-  casacore::MDirection delay_dir_, tile_beam_dir_, preapplied_beam_dir_;
-  vector3r_t station0_, tile0_, l_vector_itrf_, m_vector_itrf_, n_vector_itrf_,
-      diff_beam_centre_;
-
-  CorrectionMode preapplied_correction_mode_;
-  BeamNormalisationMode beam_normalisation_mode_;
-  bool use_channel_frequency_;
-  double subband_frequency_;
-
  private:
+  vector3r_t l_vector_itrf_;
+  vector3r_t m_vector_itrf_;
+  vector3r_t n_vector_itrf_;
   std::vector<aocommon::MC2x2F> inverse_central_gain_;
 
   std::vector<std::thread> threads_;
@@ -47,10 +46,6 @@ class PhasedArrayGrid : public GriddedResponse {
     size_t y, antenna_idx, buffer_offset;
   };
   aocommon::Lane<Job>* lane_;
-
-  bool CalculateBeamNormalisation(BeamMode beam_mode, double time,
-                                  double frequency, size_t station_idx,
-                                  aocommon::MC2x2F& inverse_gain) const;
 
   /**
    * @brief Method for computing the ITRF-vectors.

@@ -3,6 +3,8 @@
 
 #include "aartfaacgrid.h"
 
+#include <aocommon/uvector.h>
+
 namespace everybeam {
 namespace griddedresponse {
 
@@ -27,7 +29,7 @@ void AartfaacGrid::MakeIntegratedSnapshot(
   ResponseAllStations(beam_mode, buffer_undersampled.data(), time, frequency,
                       field_id);
 
-  // For Aartfaac, we can simply weight a (time) snapshot with the accumulated
+  // For Aartfaac, simply weight a (time) snapshot with the accumulated
   // baseline weights
   const size_t n_baselines = n_stations * (n_stations + 1) / 2;
   double snapshot_weight = 0.;

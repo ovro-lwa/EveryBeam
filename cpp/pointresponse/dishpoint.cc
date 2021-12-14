@@ -16,20 +16,20 @@ void DishPoint::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
   const telescope::Dish& dish_telescope =
       static_cast<const telescope::Dish&>(*telescope_);
 
-  const double pdir_ra =
-      dish_telescope.ms_properties_.field_pointing[field_id].first;
-  const double pdir_dec =
-      dish_telescope.ms_properties_.field_pointing[field_id].second;
+  double pdir_ra;
+  double pdir_dec;
+  std::tie(pdir_ra, pdir_dec) = dish_telescope.GetFieldPointing()[field_id];
   const double max_radius_arc_min =
-      dish_telescope.coefficients_->MaxRadiusInArcMin();
+      dish_telescope.GetDishCoefficients()->MaxRadiusInArcMin();
   const double reference_frequency =
-      dish_telescope.coefficients_->ReferenceFrequency();
+      dish_telescope.GetDishCoefficients()->ReferenceFrequency();
   circularsymmetric::VoltagePattern vp(
-      dish_telescope.coefficients_->GetFrequencies(freq), max_radius_arc_min,
-      reference_frequency);
+      dish_telescope.GetDishCoefficients()->GetFrequencies(freq),
+      max_radius_arc_min, reference_frequency);
   const aocommon::UVector<double> coefs_vec =
-      dish_telescope.coefficients_->GetCoefficients(freq);
-  vp.EvaluatePolynomial(coefs_vec, dish_telescope.coefficients_->AreInverted());
+      dish_telescope.GetDishCoefficients()->GetCoefficients(freq);
+  vp.EvaluatePolynomial(coefs_vec,
+                        dish_telescope.GetDishCoefficients()->AreInverted());
   vp.Render(buffer, ra, dec, pdir_ra, pdir_dec, freq);
 }
 

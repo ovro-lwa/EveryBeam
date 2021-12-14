@@ -17,12 +17,10 @@ namespace everybeam {
 
 namespace griddedresponse {
 class DishGrid;
-class GriddedResponse;
 }  // namespace griddedresponse
 
 namespace pointresponse {
 class PointResponse;
-class DishPoint;
 }  // namespace pointresponse
 
 namespace telescope {
@@ -32,9 +30,6 @@ namespace telescope {
  * response.
  */
 class Dish final : public Telescope {
-  friend class griddedresponse::DishGrid;
-  friend class pointresponse::DishPoint;
-
  public:
   Dish(const casacore::MeasurementSet &ms,
        std::unique_ptr<circularsymmetric::Coefficients> coefficients,
@@ -46,12 +41,24 @@ class Dish final : public Telescope {
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
 
+  /**
+   * @brief Get (ra, dec) pointings of fields.
+   *
+   * @return std::vector<std::pair<double, double>> Vector of size number of
+   * fields, and (ra, dec) pointings as entries.
+   */
+  const std::vector<std::pair<double, double>> &GetFieldPointing() const {
+    return field_pointing_;
+  }
+
+  const circularsymmetric::Coefficients *GetDishCoefficients() const {
+    return dish_coefficients_.get();
+  }
+
  private:
-  struct MSProperties {
-    std::vector<std::pair<double, double>> field_pointing;
-  };
-  MSProperties ms_properties_;
-  std::unique_ptr<circularsymmetric::Coefficients> coefficients_;
+  std::unique_ptr<circularsymmetric::Coefficients> dish_coefficients_;
+  /// Store ra, dec pointing per field id from measurement set
+  std::vector<std::pair<double, double>> field_pointing_;
 };
 }  // namespace telescope
 }  // namespace everybeam

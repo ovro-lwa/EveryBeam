@@ -6,8 +6,10 @@
 
 #include "../telescope/telescope.h"
 
+#include <aocommon/uvector.h>
 #include <aocommon/matrix2x2.h>
 #include <aocommon/matrix4x4.h>
+#include <aocommon/hmatrix4x4.h>
 #include <vector>
 #include <complex>
 #include <stdexcept>
@@ -16,9 +18,9 @@ using aocommon::HMC4x4;
 using aocommon::MC2x2;
 using aocommon::MC4x4;
 using aocommon::UVector;
-using everybeam::common::FFTResampler;
-using everybeam::griddedresponse::GriddedResponse;
 
+namespace everybeam {
+namespace griddedresponse {
 void GriddedResponse::IntegratedResponse(
     BeamMode beam_mode, float* buffer, double time, double frequency,
     size_t field_id, size_t undersampling_factor,
@@ -163,7 +165,7 @@ void GriddedResponse::DoFFTResampling(
     float* buffer, int width_in, int height_in, int width_out, int height_out,
     const std::vector<aocommon::HMC4x4>& matrices) {
   // (FFT) resampling, run multi-threaded?
-  FFTResampler resampler(width_in, height_in, width_out, height_out);
+  common::FFTResampler resampler(width_in, height_in, width_out, height_out);
   resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
   UVector<float> lowres_input(width_in * height_in);
   // Loop over the "double"  representation of the HMC4x4 Hermitian matrix
@@ -176,3 +178,5 @@ void GriddedResponse::DoFFTResampling(
                        buffer + p * width_out * height_out);
   }
 }
+}  // namespace griddedresponse
+}  // namespace everybeam

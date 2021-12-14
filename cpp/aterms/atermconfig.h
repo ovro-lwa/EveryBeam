@@ -63,30 +63,6 @@ class ATermConfig final : public ATermBase {
    * @param settings aterm specific settings
    * @param frequency_interpolation Interpolate between frequencies? Relevant
    * for MWA only.
-   * @param use_differential_beam Apply differential beam
-   * @param use_channel_frequency Use channel frequency
-   * @param element_response_model Element response model
-   * @return std::unique_ptr<ATermBeam>
-   */
-  [[deprecated(
-      "Use other overload of GetATermBeam() instead. Function will be removed "
-      "in version "
-      "0.3.0.")]] static std::unique_ptr<ATermBeam>
-  GetATermBeam(const casacore::MeasurementSet& ms,
-               const coords::CoordinateSystem& coordinate_system,
-               const ATermSettings& settings, bool frequency_interpolation,
-               bool use_differential_beam, bool use_channel_frequency,
-               const std::string& element_response_model,
-               const std::string& beam_mode = "full");
-
-  /**
-   * @brief Static method for constructing an (EveryBeam)ATerm
-   *
-   * @param ms Measurement set
-   * @param coordinate_system struct with image settings
-   * @param settings aterm specific settings
-   * @param frequency_interpolation Interpolate between frequencies? Relevant
-   * for MWA only.
    * @param beam_normalisation_mode What type of normalisation will be applied?
    * @param use_channel_frequency Use channel frequency
    * @param element_response_model Element response model
@@ -118,17 +94,6 @@ class ATermConfig final : public ATermBase {
       bool frequency_interpolation, const std::string& beam_normalisation_mode,
       bool use_channel_frequency, const std::string& element_response_model,
       const std::string& beam_mode = "full");
-
-  [[deprecated(
-      "Use other overload of GetATermBeam() instead. Function will be removed "
-      "in version "
-      "0.3.0.")]] static everybeam::Options
-  ConvertToEBOptions(const casacore::MeasurementSet& ms,
-                     const ATermSettings& settings,
-                     bool frequency_interpolation, bool use_differential_beam,
-                     bool use_channel_frequency,
-                     const std::string& element_response_model,
-                     const std::string& beam_mode = "full");
 
  private:
   const size_t n_antennas_;

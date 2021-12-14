@@ -16,7 +16,7 @@ using everybeam::telescope::Dish;
 Dish::Dish(const casacore::MeasurementSet &ms,
            std::unique_ptr<circularsymmetric::Coefficients> coefficients,
            const Options &options)
-    : Telescope(ms, options), coefficients_(std::move(coefficients)) {
+    : Telescope(ms, options), dish_coefficients_(std::move(coefficients)) {
   casacore::MSField field_table = ms.field();
   casacore::ArrayColumn<double> pointing_dir_col(
       field_table, casacore::MSField::columnName(casacore::MSField::DELAY_DIR));
@@ -25,7 +25,7 @@ Dish::Dish(const casacore::MeasurementSet &ms,
     casacore::Array<double> pdir = pointing_dir_col(field_id);
     double pdir_ra = *pdir.cbegin();
     double pdir_dec = *(pdir.cbegin() + 1);
-    ms_properties_.field_pointing.emplace_back(pdir_ra, pdir_dec);
+    field_pointing_.emplace_back(pdir_ra, pdir_dec);
   }
   SetIsTimeRelevant(false);
 }
