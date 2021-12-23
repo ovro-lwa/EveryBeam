@@ -9,16 +9,51 @@ workflow:
     - when: always
 
 stages:
+  - versioning
   - prepare
   - build
   - package
   - oskar-comparison
   - deploy
 
-build-base:
-  stage: prepare
+# The 'IMAGE' variables allow reusing docker images between different pipelines.
+# See https://confluence.skatelescope.org/display/SE/Caching+Docker+images+using+GitLab+CI+registry
+versioning:
+  stage: versioning
+  image: bitnami/git
   script:
-    - docker build --tag everybeam_base:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-base .
+    # Unshallowing ensures that 'git log' works
+    - git fetch --unshallow
+    - echo BASE_IMAGE=${CI_REGISTRY_IMAGE}/base:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base) > versions.env
+    # Tag the Everybeam image with the commit id, since it uses the Everybeam source code.
+    - echo EVERYBEAM_IMAGE=${CI_REGISTRY_IMAGE}/everybeam:${CI_COMMIT_SHORT_SHA} >> versions.env
+    - echo FORMAT_IMAGE=${CI_REGISTRY_IMAGE}/format:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-format) >> versions.env
+    - cat versions.env
+  artifacts:
+    reports:
+      dotenv: versions.env
+
+.prepare:
+  stage: prepare
+  needs: ["versioning"]
+  image: docker:20.10
+  services:
+    - docker:20.10-dind
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - |
+      if ! docker manifest inspect $DOCKER_IMAGE > /dev/null; then
+        docker build $DOCKER_BUILD_ARG --tag $DOCKER_IMAGE -f $DOCKER_FILE .
+        docker push $DOCKER_IMAGE
+      fi
+
+# Create and push the base image to the gitlab registry, if it does not exist.
+prepare-base:
+  extends: .prepare
+  variables:
+    DOCKER_IMAGE: $BASE_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-base
 
 .format-common:
   rules:
@@ -27,17 +62,18 @@ build-base:
       when: never
     - when: on_success
 
-build-format:
-  extends: .format-common
-  stage: prepare
-  script:
-    - docker build --tag everybeam_format:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-format .
+# Create and push the base image to the gitlab registry, if it does not exist.
+prepare-format:
+  extends: [".prepare", ".format-common"]
+  variables:
+    DOCKER_IMAGE: $FORMAT_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-format
 
 format:
   extends: .format-common
   stage: build
-  needs: ["build-format"]
-  image: everybeam_format:${CI_COMMIT_SHORT_SHA}
+  needs: ["versioning","prepare-format"]
+  image: $FORMAT_IMAGE
   script:
     #Update external/aocommon, which contains format.sh.
     - git submodule update --init external/aocommon && \
@@ -46,8 +82,8 @@ format:
 # Build a debug version of EveryBeam from the base image
 test-and-coverage:
   stage: build
-  needs: ["build-base"]
-  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
+  needs: ["versioning","prepare-base"]
+  image: $BASE_IMAGE
   script:
     - WORKDIR=$PWD
     # Download casacore wsrt measures
@@ -72,15 +108,18 @@ test-and-coverage:
       junit: build/cpp/test/unittests.xml
 
 build-everybeam:
+  extends: .prepare
   stage: build
-  needs: ["build-base"]
-  script:
-    - docker build --build-arg BASE_TAG=${CI_COMMIT_SHORT_SHA} --tag everybeam:${CI_COMMIT_SHORT_SHA} -f ./docker/Dockerfile-everybeam .
+  needs: ["versioning","prepare-base"]
+  variables:
+    DOCKER_IMAGE: $EVERYBEAM_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-everybeam
+    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE}
 
 build-doc:
   stage: build
-  needs: ["build-base"]
-  image: everybeam_base:${CI_COMMIT_SHORT_SHA}
+  needs: ["versioning","prepare-base"]
+  image: $BASE_IMAGE
   before_script:
     - pip3 install sphinx sphinx_rtd_theme breathe myst-parser
   script:
@@ -99,8 +138,8 @@ build-doc:
 
 build-package:
   stage: package
-  needs: ["build-everybeam"]
-  image: everybeam:${CI_COMMIT_SHORT_SHA}
+  needs: ["versioning","build-everybeam"]
+  image: $EVERYBEAM_IMAGE
   script:
     - mkdir everybeam_package
     - export SRC=$(pwd)
@@ -120,8 +159,8 @@ build-package:
 
 build-compare-oskar:
   stage: oskar-comparison
-  image: everybeam:${CI_COMMIT_SHORT_SHA}
-  needs: ["build-everybeam"]
+  needs: ["versioning","build-everybeam"]
+  image: $EVERYBEAM_IMAGE
   before_script:
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
@@ -173,20 +212,20 @@ deploy-doc:
 deploy-image:
   variables:
     GIT_STRATEGY: none
-  needs: ["build-everybeam"]
+  needs: ["versioning","build-everybeam"]
   stage: deploy
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker tag everybeam:${CI_COMMIT_SHORT_SHA} $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker tag $EVERYBEAM_IMAGE $CI_REGISTRY_IMAGE/everybeam:latest
+    - docker push $CI_REGISTRY_IMAGE/everybeam:latest
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
 
 deploy-package:
   stage: deploy
-  needs: ["build-package"]
-  image: everybeam:${CI_COMMIT_SHORT_SHA}
+  needs: ["versioning","build-package"]
+  image: $EVERYBEAM_IMAGE
   script:
     - pip3 install aptly-api-client
     - chmod -R 700 external/schaap-packaging
