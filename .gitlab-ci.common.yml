@@ -1,0 +1,216 @@
+# Copyright (C) 2021 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+workflow:
+  rules:
+    # don't create a pipeline if its a commit pipeline, on a branch and that branch has open merge requests (bc we will get a MR build instead)
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - when: always
+
+stages:
+  - versioning
+  - prepare
+  - build
+  - package
+  - oskar-comparison
+  - deploy
+
+# The 'IMAGE' variables allow reusing docker images between different pipelines.
+# See https://confluence.skatelescope.org/display/SE/Caching+Docker+images+using+GitLab+CI+registry
+versioning:
+  stage: versioning
+  image: bitnami/git
+  script:
+    # Unshallowing ensures that 'git log' works
+    - git fetch --unshallow
+    - echo BASE_IMAGE=${CI_REGISTRY_IMAGE}/base:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base) > versions.env
+    # Tag the Everybeam image with the commit id, since it uses the Everybeam source code.
+    - echo EVERYBEAM_IMAGE=${CI_REGISTRY_IMAGE}/everybeam:${CI_COMMIT_SHORT_SHA} >> versions.env
+    - echo FORMAT_IMAGE=${CI_REGISTRY_IMAGE}/format:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-format) >> versions.env
+    - cat versions.env
+  artifacts:
+    reports:
+      dotenv: versions.env
+
+.prepare:
+  stage: prepare
+  needs: ["versioning"]
+  image: docker:20.10
+  services:
+    - docker:20.10-dind
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - |
+      if ! docker manifest inspect $DOCKER_IMAGE > /dev/null; then
+        docker build $DOCKER_BUILD_ARG --tag $DOCKER_IMAGE -f $DOCKER_FILE .
+        docker push $DOCKER_IMAGE
+      fi
+
+# Create and push the base image to the gitlab registry, if it does not exist.
+prepare-base:
+  extends: .prepare
+  variables:
+    DOCKER_IMAGE: $BASE_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-base
+
+.format-common:
+  rules:
+    # Do not add for schedules
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - when: on_success
+
+# Create and push the base image to the gitlab registry, if it does not exist.
+prepare-format:
+  extends: [".prepare", ".format-common"]
+  variables:
+    DOCKER_IMAGE: $FORMAT_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-format
+
+format:
+  extends: .format-common
+  stage: build
+  needs: ["versioning","prepare-format"]
+  image: $FORMAT_IMAGE
+  script:
+    #Update external/aocommon, which contains format.sh.
+    - git submodule update --init external/aocommon && \
+    - ./scripts/run-format.sh
+
+# Build a debug version of EveryBeam from the base image
+test-and-coverage:
+  stage: build
+  needs: ["versioning","prepare-base"]
+  image: $BASE_IMAGE
+  script:
+    - WORKDIR=$PWD
+    # Download casacore wsrt measures
+    - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
+    # Build in Debug mode
+    - mkdir build && cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DDOWNLOAD_LOBES=On -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
+    - make install -j8
+    - ctest -j4 --output-on-failure -T test
+    # Capture coverage
+    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json run-unit.json --xml coverage.xml
+    - gcovr --add-tracefile run-unit.json
+    # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
+    - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
+    - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
+    - cd && python3 -c "import everybeam"
+  after_script:
+    # Copy xml files to build/reports for the SKA .post step that generates badges.
+    - mkdir -p build/reports
+    - cp build/cpp/test/unittests.xml build/reports/unit-tests.xml
+    # Copy tpybindings result even though SKA has no badges for integration tests yet.
+    - cp build/python/test/tpybindings.xml build/reports/integration-tests.xml
+    - cp build/coverage.xml build/reports/code-coverage.xml
+  artifacts:
+    paths:
+      - build/reports
+      - build/run-unit.json
+    reports:
+      # NOTE: artifacts only work with relative paths...
+      cobertura: build/coverage.xml
+      junit: build/cpp/test/unittests.xml
+
+build-everybeam:
+  extends: .prepare
+  stage: build
+  needs: ["versioning","prepare-base"]
+  variables:
+    DOCKER_IMAGE: $EVERYBEAM_IMAGE
+    DOCKER_FILE: ./docker/Dockerfile-everybeam
+    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE}
+
+build-doc:
+  stage: build
+  needs: ["versioning","prepare-base"]
+  image: $BASE_IMAGE
+  before_script:
+    - pip3 install sphinx sphinx_rtd_theme breathe myst-parser
+  script:
+    - EVERYBEAM_PATH=$PWD
+    - mkdir build && cd build
+    - cmake -DBUILD_WITH_PYTHON=ON $EVERYBEAM_PATH
+    - make -j20
+    - make doc
+  artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
+    paths:
+    - build/doc/html
+  rules:
+    # Only add job for commits to master or on merge_request_events
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+build-package:
+  stage: package
+  needs: ["versioning","build-everybeam"]
+  image: $EVERYBEAM_IMAGE
+  script:
+    - mkdir everybeam_package
+    - export SRC=$(pwd)
+    - cd /opt/everybeam/build
+    - make package
+    - mv $(ls -1 *.deb) $SRC/everybeam_package/
+  artifacts:
+    paths:
+    - everybeam_package/
+  rules:
+    # The package is built only during a merge_request_event, a merge to master,
+    # or when the pipeline is triggered by a tag event.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$UPLOAD_PACKAGE'
+
+build-compare-oskar:
+  stage: oskar-comparison
+  needs: ["versioning","build-everybeam"]
+  image: $EVERYBEAM_IMAGE
+  before_script:
+    - mkdir -p /opt/oskar/build
+    - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
+    # Check-out at specific version, before HDF5 got broken
+    - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee
+    - cd /opt/oskar/build
+    - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
+    - export PYTHONPATH=/opt/everybeam/lib/python${PYVERSION}/dist-packages
+  script:
+    # OSKAR cpp install
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
+    - make -j8
+    - make install
+    # Python install
+    - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
+    - cd ./../OSKAR/python && python3 setup.py install
+    - export PATH=/opt/oskar/bin:$PATH
+    # Run OSKAR comparison, set some env variables for this session
+    - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
+    - cd /opt/everybeam/build
+    # Run cmake again, to update the cache with the updated $PATH
+    - cmake .
+    - make VERBOSE=1 comparison-oskar-basefunctions
+    # Run OSKAR stationresponse comparison
+    - export NPIXELS=32 TOLERANCE=1e-5
+    - make VERBOSE=1 comparison-oskar-station-response
+  rules:
+    # Only add job for schedules, on merge_request_event, and on master
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+deploy-image:
+  variables:
+    GIT_STRATEGY: none
+  needs: ["versioning","build-everybeam"]
+  stage: deploy
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker tag $EVERYBEAM_IMAGE $CI_REGISTRY_IMAGE/everybeam:latest
+    - docker push $CI_REGISTRY_IMAGE/everybeam:latest
+  rules:
+    # Only add job when ran on master and not a scheduled job, i.e. when merging
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
