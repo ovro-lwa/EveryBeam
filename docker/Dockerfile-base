@@ -9,7 +9,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get upgrade
         aoflagger-dev libcfitsio-dev wcslib-dev python3-pip
 # install misc packages
 RUN apt-get update && \
-    apt-get -y install wget git make cmake g++ doxygen graphviz \
+    apt-get -y install wget git make cmake g++ doxygen graphviz ninja-build \
 # install dependencies
         libboost-all-dev libhdf5-dev libfftw3-dev \
         libblas-dev liblapack-dev libgsl-dev libxml2-dev \
@@ -17,4 +17,8 @@ RUN apt-get update && \
 # Install python dependencies
     pip3 install gcovr pytest pytest-lazy-fixture \
     # Install python requirements for the OSKAR "integration" test
-        numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos
+        numpy==1.19.0 scipy h5py astropy tqdm matplotlib pandas lofarantpos \
+    # Install python requirements for building documentation
+        sphinx sphinx_rtd_theme breathe myst-parser \
+    # Install python requirements for packaging
+        aptly-api-client

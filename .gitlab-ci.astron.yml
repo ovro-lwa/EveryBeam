@@ -27,8 +27,6 @@ deploy-package:
   needs: ["versioning","build-package"]
   image: $EVERYBEAM_IMAGE
   script:
-    - pip3 install aptly-api-client
-    - chmod -R 700 external/schaap-packaging
     - cd everybeam_package
     - export FILES=$(ls -1 $PWD/*.deb)
     - echo UPLOADING files $FILES

@@ -90,12 +90,12 @@ test-and-coverage:
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
     # Build in Debug mode
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DDOWNLOAD_LOBES=On -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" ..
-    - make install -j8
-    - ctest -j4 --output-on-failure -T test
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DDOWNLOAD_LOBES=On -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" -G Ninja ..
+    - ninja install
+    - ctest -j`nproc` --output-on-failure -T test
     # Capture coverage
-    - gcovr -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json run-unit.json --xml coverage.xml
-    - gcovr --add-tracefile run-unit.json
+    - gcovr -j`nproc` -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json run-unit.json --xml coverage.xml
+    - gcovr -j`nproc` --add-tracefile run-unit.json
     # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d\.\d(?=\.\d)"`
     - export PYTHONPATH=${WORKDIR}/lib/python${PYVERSION}/dist-packages
@@ -129,21 +129,15 @@ build-doc:
   stage: build
   needs: ["versioning","prepare-base"]
   image: $BASE_IMAGE
-  before_script:
-    - pip3 install sphinx sphinx_rtd_theme breathe myst-parser
   script:
     - EVERYBEAM_PATH=$PWD
     - mkdir build && cd build
-    - cmake -DBUILD_WITH_PYTHON=ON $EVERYBEAM_PATH
-    - make -j20
-    - make doc
+    - cmake -DBUILD_WITH_PYTHON=ON $EVERYBEAM_PATH -G Ninja
+    - ninja
+    - ninja doc
   artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
     paths:
     - build/doc/html
-  rules:
-    # Only add job for commits to master or on merge_request_events
-    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 build-package:
   stage: package
@@ -181,7 +175,7 @@ build-compare-oskar:
   script:
     # OSKAR cpp install
     - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
-    - make -j8
+    - make -j`nproc`
     - make install
     # Python install
     - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
@@ -207,6 +201,9 @@ deploy-image:
     GIT_STRATEGY: none
   needs: ["versioning","build-everybeam"]
   stage: deploy
+  image: docker:20.10
+  services:
+    - docker:20.10-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker tag $EVERYBEAM_IMAGE $CI_REGISTRY_IMAGE/everybeam:latest

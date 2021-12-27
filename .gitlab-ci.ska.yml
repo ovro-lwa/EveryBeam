@@ -18,13 +18,16 @@ cache:
 
 pages:
   stage: deploy
-  needs: ["versioning","test-and-coverage"]
+  needs: ["versioning","test-and-coverage","build-doc"]
   image: $BASE_IMAGE
+  variables:
+    OUTPUT: public/$CI_COMMIT_REF_SLUG
   script:
     - echo Deploying GitLab pages to $CI_PAGES_URL/$CI_COMMIT_REF_SLUG
-    - mkdir -p public/$CI_COMMIT_REF_SLUG
-    - cd public/$CI_COMMIT_REF_SLUG
-    - gcovr -j$(($(nproc)/2 > 0 ? $(nproc)/2:1)) -r ../../ -a ../../build/run-unit.json --html-details index.html
+    - cp -a build/doc/html $OUTPUT/doc
+    - mkdir -p $OUTPUT/coverage
+    - gcovr -j`nproc` -a build/run-unit.json --html-details $OUTPUT/coverage/index.html
+    - cp -a doc/pages-index.html $OUTPUT/index.html
   artifacts:
     name: $CI_COMMIT_REF_SLUG
     paths:
