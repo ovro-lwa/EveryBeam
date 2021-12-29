@@ -206,6 +206,7 @@ deploy-image:
     - docker:20.10-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $EVERYBEAM_IMAGE
     - docker tag $EVERYBEAM_IMAGE $CI_REGISTRY_IMAGE/everybeam:latest
     - docker push $CI_REGISTRY_IMAGE/everybeam:latest
   rules:
