@@ -8,7 +8,8 @@ file(GLOB PYTESTFILES "test_*.py")
 
 # Add tests to "pybindings", can be invoked with
 # "ctest -L pybindings"
-add_test(NAME ${TEST} COMMAND pytest -v -s --exitfirst ${PYTESTFILES})
+add_test(NAME ${TEST} COMMAND python3 -m pytest -v -s --exitfirst
+                              --junit-xml=${TEST}.xml ${PYTESTFILES})
 set_tests_properties(
   ${TEST}
   PROPERTIES
@@ -19,5 +20,5 @@ set_tests_properties(
     DEPENDS
     download_mocks
     ENVIRONMENT
-    "PYTHONPATH=${CMAKE_BINARY_DIR}/python;DATA_DIR=${CMAKE_SOURCE_DIR}/test_data;SCRIPTS_DIR=${CMAKE_SOURCE_DIR}/scripts"
+    "PYTHONPATH=${CMAKE_BINARY_DIR}/python:$ENV{PYTHONPATH};DATA_DIR=${CMAKE_SOURCE_DIR}/test_data;SCRIPTS_DIR=${CMAKE_SOURCE_DIR}/scripts"
 )
