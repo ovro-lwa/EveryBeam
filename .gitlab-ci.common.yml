@@ -47,6 +47,12 @@ versioning:
         docker build $DOCKER_BUILD_ARG --tag $DOCKER_IMAGE -f $DOCKER_FILE .
         docker push $DOCKER_IMAGE
       fi
+  # Skip the job if there are no changes to the Docker file. This shortcut only
+  # works for push and merge request jobs.
+  # A manual pipeline run will thus create missing docker images.
+  rules:
+    - changes:
+      - $DOCKER_FILE
 
 # Create and push the base image to the gitlab registry, if it does not exist.
 prepare-base:
@@ -55,24 +61,26 @@ prepare-base:
     DOCKER_IMAGE: $BASE_IMAGE
     DOCKER_FILE: ./docker/Dockerfile-base
 
-.format-common:
-  rules:
-    # Do not add for schedules
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
-    - when: on_success
+# Template for jobs that depend on the optional prepare-base job.
+.needs-base:
+  needs:
+    - job: versioning
+    - job: prepare-base
+      optional: true
 
-# Create and push the base image to the gitlab registry, if it does not exist.
+# Create and push the format image to the gitlab registry, if it does not exist.
 prepare-format:
-  extends: [".prepare", ".format-common"]
+  extends: .prepare
   variables:
     DOCKER_IMAGE: $FORMAT_IMAGE
     DOCKER_FILE: ./docker/Dockerfile-format
 
 format:
-  extends: .format-common
   stage: build
-  needs: ["versioning","prepare-format"]
+  needs:
+    - job: versioning
+    - job: prepare-format
+      optional: true
   image: $FORMAT_IMAGE
   script:
     #Update external/aocommon, which contains format.sh.
@@ -81,8 +89,8 @@ format:
 
 # Build a debug version of EveryBeam from the base image
 test-and-coverage:
+  extends: .needs-base
   stage: build
-  needs: ["versioning","prepare-base"]
   image: $BASE_IMAGE
   script:
     - WORKDIR=$PWD
@@ -117,17 +125,18 @@ test-and-coverage:
       junit: build/cpp/test/unittests.xml
 
 build-everybeam:
-  extends: .prepare
+  extends: [.prepare,.needs-base]
   stage: build
-  needs: ["versioning","prepare-base"]
   variables:
     DOCKER_IMAGE: $EVERYBEAM_IMAGE
     DOCKER_FILE: ./docker/Dockerfile-everybeam
     DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE}
+  rules: # Override 'changes' rule from .prepare
+    - when: always
 
 build-doc:
+  extends: .needs-base
   stage: build
-  needs: ["versioning","prepare-base"]
   image: $BASE_IMAGE
   script:
     - EVERYBEAM_PATH=$PWD
