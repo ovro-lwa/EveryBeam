@@ -32,9 +32,6 @@ class Dataset {
   // Methods
   size_t GetIndex(const unsigned int element) const;
 
-  // Constants
-  // const unsigned int dataset_rank_ = 3;
-
   // Members
   std::vector<std::complex<double>> data_;
   size_t nr_elements_;

@@ -182,10 +182,12 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
 
   // Read element offsets and flags.
   Matrix<Quantity> aips_offset = c_offset(id);
-  assert(aips_offset.shape().isEqual(IPosition(2, 3, aips_offset.ncolumn())));
+  assert(aips_offset.shape().isEqual(
+      casacore::IPosition(2, 3, aips_offset.ncolumn())));
 
   Matrix<Bool> aips_flag = c_flag(id);
-  assert(aips_flag.shape().isEqual(IPosition(2, 2, aips_offset.ncolumn())));
+  assert(aips_flag.shape().isEqual(
+      casacore::IPosition(2, 2, aips_offset.ncolumn())));
 
   TileConfig tile_config;
   if (name != "LBA") tile_config = ReadTileConfig(table, id);
@@ -312,10 +314,12 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
   // Read element offsets and flags.
   Matrix<Quantity> aips_offset = c_offset(station_id);
 
-  assert(aips_offset.shape().isEqual(IPosition(2, aips_offset.nrow(), 3)));
+  assert(aips_offset.shape().isEqual(
+      casacore::IPosition(2, aips_offset.nrow(), 3)));
 
   Matrix<Bool> aips_flag = c_flag(station_id);
-  assert(aips_flag.shape().isEqual(IPosition(2, aips_offset.nrow(), 2)));
+  assert(
+      aips_flag.shape().isEqual(casacore::IPosition(2, aips_offset.nrow(), 2)));
 
   for (size_t i = 0; i < aips_offset.nrow(); ++i) {
     vector3r_t antenna_position = {aips_offset(i, 0).getValue(),

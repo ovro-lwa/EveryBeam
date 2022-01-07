@@ -81,7 +81,7 @@ inline Antenna::CoordinateSystem ReadAartfaacCoordinateSystem(
   casacore::TableRecord keywordset = table.keywordSet();
   casacore::Matrix<double> aips_axes;
   keywordset.get("AARTFAAC_COORDINATE_AXES", aips_axes);
-  assert(aips_axes.shape().isEqual(IPosition(2, 3, 3)));
+  assert(aips_axes.shape().isEqual(casacore::IPosition(2, 3, 3)));
 
   const vector3r_t p = {aips_axes(0, 0), aips_axes(1, 0), aips_axes(2, 0)};
   const vector3r_t q = {aips_axes(0, 1), aips_axes(1, 1), aips_axes(2, 1)};

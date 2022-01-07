@@ -9,6 +9,8 @@
 #include <limits>
 #include "oskardataset.h"
 
+static constexpr unsigned kDatatsetRank = 3;
+
 namespace everybeam {
 
 Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
@@ -46,7 +48,7 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
   // Read dataset dimensions
   H5::DataSpace dataspace = dataset.getSpace();
   const size_t rank = dataspace.getSimpleExtentNdims();
-  assert(rank == dataset_rank_);
+  assert(rank == kDatatsetRank);
 
   // Get dimensions
   std::vector<hsize_t> dims(rank);
