@@ -13,10 +13,10 @@ namespace griddedresponse {
 
 /**
  * @brief Class for computing the gridded response of dish telescopes,
- * e.g. VLA, ATCA.
+ * e.g. VLA, ATCA, GMRT, SKA-MID
  *
  */
-class DishGrid final : public GriddedResponse {
+class DishGrid : public GriddedResponse {
  public:
   DishGrid(const telescope::Telescope* telescope_ptr,
            const coords::CoordinateSystem coordinate_system)
@@ -27,25 +27,25 @@ class DishGrid final : public GriddedResponse {
 
   void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
                            double time, double frequency,
-                           size_t field_id) override;
+                           size_t field_id) final override;
 
-  void IntegratedResponse(BeamMode beam_mode, float* buffer, double time,
-                          double frequency, size_t field_id,
-                          size_t undersampling_factor,
-                          const std::vector<double>& baseline_weights) override;
+  void IntegratedResponse(
+      BeamMode beam_mode, float* buffer, double time, double frequency,
+      size_t field_id, size_t undersampling_factor,
+      const std::vector<double>& baseline_weights) final override;
 
   void IntegratedResponse(
       BeamMode beam_mode, float* buffer,
       const std::vector<double>& /* time_array */, double frequency,
       size_t field_id, size_t undersampling_factor,
-      const std::vector<double>& /* baseline_weights */) override {
+      const std::vector<double>& /* baseline_weights */) final override {
     // Time does not play a role in the integrated response of a dish telescope,
     // so call IntegratedResponse as if it were one time step
     IntegratedResponse(beam_mode, buffer, 0.0, frequency, field_id,
                        undersampling_factor, {0.0});
   }
 
-  bool PerformUndersampling() const override { return false; }
+  bool PerformUndersampling() const final override { return false; }
 
  private:
   /**

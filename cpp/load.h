@@ -23,6 +23,7 @@ enum TelescopeType {
   kLofarTelescope,
   kOSKARTelescope,
   kMWATelescope,
+  kSkaMidTelescope,
   kVLATelescope,
 };
 

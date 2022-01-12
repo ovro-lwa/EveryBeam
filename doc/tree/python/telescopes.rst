@@ -20,3 +20,6 @@ Classes
 
 .. autoclass:: everybeam.OSKAR
    :members:
+
+.. autoclass:: everybeam.SkaMid
+   :members:

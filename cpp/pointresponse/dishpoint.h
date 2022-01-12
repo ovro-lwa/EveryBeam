@@ -17,7 +17,7 @@ namespace pointresponse {
  * e.g. VLA, ATCA.
  *
  */
-class DishPoint final : public PointResponse {
+class DishPoint : public PointResponse {
  public:
   DishPoint(const telescope::Telescope* telescope_ptr, double time)
       : PointResponse(telescope_ptr, time){};
@@ -28,7 +28,7 @@ class DishPoint final : public PointResponse {
 
   void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
                            double ra, double dec, double freq,
-                           size_t field_id) override;
+                           size_t field_id) final override;
 };
 }  // namespace pointresponse
 }  // namespace everybeam

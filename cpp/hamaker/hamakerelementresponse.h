@@ -14,7 +14,9 @@ namespace everybeam {
 //! Implementation of the Hamaker response model
 class HamakerElementResponse : public ElementResponse {
  public:
-  ElementResponseModel GetModel() const final override { return kHamaker; }
+  ElementResponseModel GetModel() const final override {
+    return ElementResponseModel::kHamaker;
+  }
   aocommon::MC2x2 Response(double freq, double theta,
                            double phi) const final override;
 

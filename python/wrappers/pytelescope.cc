@@ -18,6 +18,7 @@
 #include "telescope/phasedarray.h"
 #include "telescope/lofar.h"
 #include "telescope/oskar.h"
+#include "telescope/skamid.h"
 
 #include <aocommon/matrix2x2.h>
 
@@ -38,6 +39,7 @@ using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::OSKAR;
 using everybeam::telescope::PhasedArray;
+using everybeam::telescope::SkaMid;
 using everybeam::telescope::Telescope;
 
 namespace {
@@ -164,6 +166,9 @@ std::unique_ptr<Telescope> create_telescope(const std::string &name,
     case everybeam::TelescopeType::kOSKARTelescope:
       telescope.reset(new OSKAR(ms, options));
       break;
+    case everybeam::TelescopeType::kSkaMidTelescope:
+      telescope.reset(new SkaMid(ms, options));
+      break;
     default:
       throw std::runtime_error(
           "Currently, pybindings are only available for LOFAR and OSKAR "
@@ -182,6 +187,12 @@ std::unique_ptr<OSKAR> create_oskar(const std::string &name,
                                     const everybeam::Options &options) {
   return std::unique_ptr<OSKAR>{
       static_cast<OSKAR *>(create_telescope(name, options).release())};
+}
+
+std::unique_ptr<SkaMid> CreateSkaMid(const std::string &name,
+                                     const everybeam::Options &options) {
+  return std::unique_ptr<SkaMid>{
+      static_cast<SkaMid *>(create_telescope(name, options).release())};
 }
 
 void init_telescope(py::module &m) {
@@ -980,7 +991,7 @@ void init_telescope(py::module &m) {
 
   py::class_<OSKAR, PhasedArray>(m, "OSKAR",
                                  R"pbdoc(
-        Class to get beam responses for (simulated) SKA observations.
+        Class to get beam responses for (simulated) SKA-LOW observations.
         Inherits from :func:`~everybeam.PhasedArray`.
         )pbdoc")
       .def(py::init(&create_oskar),
@@ -1003,4 +1014,78 @@ void init_telescope(py::module &m) {
   // py::class_<Dish, Telescope>(m, "Dish");
 
   // py::class_<VLA, Dish>(m, "MWA");
+
+  py::class_<SkaMid, Telescope>(m, "SkaMid", R"pbdoc(
+        Class to get beam responses for (simulated) SKA-MID observations.
+        Inherits from :func:`~everybeam.Telescope`.
+        )pbdoc")
+      .def(py::init(&CreateSkaMid),
+           R"pbdoc(
+        Initializes a SKA-MID telescope.
+
+        Parameters
+        ----------
+        ms: str
+            Path to (LOFAR) Measurement Set
+        options: everybeam.Options
+            Struct specifying (beam) options for the provided
+            Measurment Set
+        )pbdoc",
+           py::arg("ms"), py::arg("options"))
+      .def_property_readonly("diameter", &SkaMid::GetDiameter,
+                             R"pbdoc(
+        Returns
+        -------
+        float
+            Diameter of SKA-MID dish (m)
+       )pbdoc")
+      .def_property_readonly("blockage", &SkaMid::GetDiameter,
+                             R"pbdoc(
+        Returns
+        -------
+        float
+            Blockage of SKA-MID dish due to receiver (m)
+       )pbdoc")
+      .def(
+          // NOTE: duplicate of one of the overloads of
+          // PhasedArray::station_response. Migrate to
+          // Telescope base class?
+          "station_response",
+          [](SkaMid &self, double time, size_t idx, double freq, double ra,
+             double dec, size_t field_id) -> py::array_t<std::complex<float>> {
+            std::unique_ptr<PointResponse> point_response =
+                self.GetPointResponse(time);
+
+            py::array_t<std::complex<float>> response({size_t(2), size_t(2)});
+            point_response->Response(BeamMode::kFull, response.mutable_data(),
+                                     ra, dec, freq, idx, field_id);
+            return response;
+          },
+          R"pbdoc(
+        Get station response in user-specified (ra, dec) direction. Delay direction is
+        directly inferred from the provided MSet.
+
+        Parameters
+        ----------
+        time: double
+            Evaluation response at time.
+            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
+        station_idx: int
+            station index
+        freq: float
+            Frequency of the plane wave. (Hz)
+        ra: float
+            Right ascension coordinate of point of interest. (rad)
+        dec: float
+            Declination coordinate of point of interest. (rad)
+        field_id: bool, optional
+            Field index. (defaults to 0)
+
+        Returns
+        -------
+        np.2darray
+            Response (Jones) matrix
+       )pbdoc",
+          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
+          py::arg("ra"), py::arg("dec"), py::arg("field_id") = 0);
 }

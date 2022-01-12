@@ -9,4 +9,5 @@ install(
         oskarpoint.h
         dishpoint.h
         mwapoint.h
+        skamidpoint.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}/pointresponse")

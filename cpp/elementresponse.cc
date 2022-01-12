@@ -40,20 +40,23 @@ ElementResponseModel ElementResponseModelFromString(
 
 std::ostream &operator<<(std::ostream &os, ElementResponseModel model) {
   switch (model) {
-    case kDefault:
+    case ElementResponseModel::kDefault:
       os << "Default";
       break;
-    case kHamaker:
+    case ElementResponseModel::kHamaker:
       os << "Hamaker";
       break;
-    case kLOBES:
+    case ElementResponseModel::kLOBES:
       os << "LOBES";
       break;
-    case kOSKARDipole:
+    case ElementResponseModel::kOSKARDipole:
       os << "OSKARDipole";
       break;
-    case kOSKARSphericalWave:
+    case ElementResponseModel::kOSKARSphericalWave:
       os << "OSKARSphericalWave";
+      break;
+    case ElementResponseModel::kSkaMidAnalytical:
+      os << "SKA MID Analytical Beam";
       break;
     default:
       os.setstate(std::ios_base::failbit);
@@ -65,15 +68,15 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
     ElementResponseModel model, const std::string &name,
     const Options &options) {
   switch (model) {
-    case kHamaker:
+    case ElementResponseModel::kHamaker:
       return HamakerElementResponse::GetInstance(name);
-    case kHamakerLba:
+    case ElementResponseModel::kHamakerLba:
       return HamakerElementResponse::GetLbaInstance();
-    case kOSKARDipole:
+    case ElementResponseModel::kOSKARDipole:
       return OSKARElementResponseDipole::GetInstance();
-    case kOSKARSphericalWave:
+    case ElementResponseModel::kOSKARSphericalWave:
       return OSKARElementResponseSphericalWave::GetInstance();
-    case kLOBES:
+    case ElementResponseModel::kLOBES:
       try {
         return LOBESElementResponse::GetInstance(name, options);
       } catch (const std::runtime_error &e) {
@@ -81,7 +84,7 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
                   << " failed because: " << std::endl;
         std::cout << e.what() << std::endl;
         std::cout << "Switching to HamakerElementResponse instead" << std::endl;
-        return GetInstance(kHamaker, name, options);
+        return GetInstance(ElementResponseModel::kHamaker, name, options);
       }
     default:
       std::stringstream message;

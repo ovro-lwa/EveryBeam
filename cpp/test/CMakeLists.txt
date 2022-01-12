@@ -12,8 +12,14 @@ if(DOWNLOAD_LOBES)
 endif()
 
 # Set cache values if not specified
-set(MOCK_MS LOFAR_HBA_MOCK LOFAR_LBA_MOCK AARTFAAC_LBA_MOCK OSKAR_MOCK VLA_MOCK
-            MWA_MOCK)
+set(MOCK_MS
+    LOFAR_HBA_MOCK
+    LOFAR_LBA_MOCK
+    AARTFAAC_LBA_MOCK
+    OSKAR_MOCK
+    SKA_MID_MOCK
+    VLA_MOCK
+    MWA_MOCK)
 foreach(mock ${MOCK_MS})
   set(${mock}_MS
       ${CMAKE_SOURCE_DIR}/test_data/${mock}.ms
@@ -38,6 +44,7 @@ set(TEST_FILENAMES
     tlofar_aartfaac.cc
     toskar.cc
     tmwa.cc
+    tskamid.cc
     tstation.cc
     tvla.cc
     tcache.cc
@@ -56,6 +63,7 @@ add_custom_target(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_aartfaac_lba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_oskar_ms.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ska_mid_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh

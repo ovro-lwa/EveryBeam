@@ -115,7 +115,7 @@ void VoltagePattern::Render(std::complex<float>* aterm, size_t width,
       double l, m, ra, dec;
       ImageCoordinates::XYToLM(ix, iy, pixel_scale_x, pixel_scale_y, width,
                                height, l, m);
-      l += phase_centre_dl;
+      l += l0;
       m += m0;
       ImageCoordinates::LMToRaDec(l, m, phase_centre_ra, phase_centre_dec, ra,
                                   dec);
@@ -156,7 +156,7 @@ void VoltagePattern::Render(std::complex<float>* aterm, double phase_centre_ra,
   double l0, m0;
   ImageCoordinates::RaDecToLM(pointing_ra, pointing_dec, phase_centre_ra,
                               phase_centre_dec, l0, m0);
-  double l = 0;
+  double l = l0;
   double m = m0;
   double ra, dec;
   ImageCoordinates::LMToRaDec(l, m, phase_centre_ra, phase_centre_dec, ra, dec);

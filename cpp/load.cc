@@ -7,6 +7,7 @@
 #include "telescope/dish.h"
 #include "telescope/mwa.h"
 #include "telescope/oskar.h"
+#include "telescope/skamid.h"
 
 #include "circularsymmetric/atcacoefficients.h"
 #include "circularsymmetric/gmrtcoefficients.h"
@@ -37,6 +38,8 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
     return kGMRTTelescope;
   } else if (telescope_name == "LOFAR") {
     return kLofarTelescope;
+  } else if (telescope_name == "MID") {
+    return kSkaMidTelescope;
   } else if (telescope_name == "MWA") {
     return kMWATelescope;
     // check if telescope_name starts with "OSKAR"
@@ -52,7 +55,7 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
   std::unique_ptr<telescope::Telescope> telescope;
   const TelescopeType telescope_name = GetTelescopeType(ms);
   switch (telescope_name) {
-    case kAARTFAAC:  // fall through
+    case kAARTFAAC:
     case kLofarTelescope:
       telescope.reset(new telescope::LOFAR(ms, options));
       break;
@@ -79,6 +82,9 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
       telescope.reset(new telescope::OSKAR(ms, options));
       break;
     }
+    case kSkaMidTelescope:
+      telescope.reset(new telescope::SkaMid(ms, options));
+      break;
     default:
       casacore::ScalarColumn<casacore::String> telescope_name_col(
           ms.observation(), "TELESCOPE_NAME");

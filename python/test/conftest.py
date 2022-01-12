@@ -16,6 +16,7 @@ def download_msets():
         "download_lofar_lba_ms.sh",
         "download_lofar_hba_ms.sh",
         "download_oskar_ms.sh",
+        "download_ska_mid_ms.sh",
     ]
     for script in download_scripts:
         call(f"sh {os.path.join(os.environ['SCRIPTS_DIR'], script)}", shell=True)

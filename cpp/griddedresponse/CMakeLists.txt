@@ -9,4 +9,5 @@ install(
         dishgrid.h
         mwagrid.h
         phasedarraygrid.h
+        skamidgrid.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}/griddedresponse")

@@ -19,7 +19,7 @@ class MutablePtr;
 
 struct Options;
 
-enum ElementResponseModel {
+enum class ElementResponseModel {
   /// The default will select the default element response model
   /// based on the telescope: e.g. LOFAR will use kHamaker,
   /// OSKAR will select kOSKARSphericalWave.
@@ -31,7 +31,8 @@ enum ElementResponseModel {
   kHamakerLba,
   kLOBES,
   kOSKARDipole,
-  kOSKARSphericalWave
+  kOSKARSphericalWave,
+  kSkaMidAnalytical
 };
 
 std::ostream &operator<<(std::ostream &os, ElementResponseModel model);

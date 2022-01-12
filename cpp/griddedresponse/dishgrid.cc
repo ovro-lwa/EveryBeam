@@ -18,8 +18,9 @@ using aocommon::UVector;
 namespace everybeam {
 namespace griddedresponse {
 
-void DishGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
-                        double, double frequency,
+void DishGrid::Response([[maybe_unused]] BeamMode beam_mode,
+                        std::complex<float>* buffer,
+                        [[maybe_unused]] double time, double frequency,
                         [[maybe_unused]] size_t station_idx, size_t field_id) {
   const telescope::Dish& dish_telescope =
       static_cast<const telescope::Dish&>(*telescope_);

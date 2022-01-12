@@ -34,12 +34,12 @@ std::unique_ptr<Telescope> pyload_telescope(
     case everybeam::TelescopeType::kAARTFAAC:
     case everybeam::TelescopeType::kLofarTelescope:
     case everybeam::TelescopeType::kOSKARTelescope:
+    case everybeam::TelescopeType::kSkaMidTelescope:
       break;
     default:
       throw std::runtime_error(
-          "Currently the python bindings only support AARTFAAC (LBA), LOFAR "
-          "and OSKAR "
-          "observations");
+          "Currently the python bindings only support AARTFAAC (LBA), LOFAR, "
+          "OSKAR (SKALA40) and SKA-MID observations");
   }
 
   // Fill everybeam options
@@ -48,20 +48,23 @@ std::unique_ptr<Telescope> pyload_telescope(
   std::string element_response_tmp = element_response_model;
   std::for_each(element_response_tmp.begin(), element_response_tmp.end(),
                 [](char& c) { c = ::toupper(c); });
-  if (element_response_tmp == "HAMAKER")
+  if (element_response_tmp == "HAMAKER") {
     options.element_response_model = everybeam::ElementResponseModel::kHamaker;
-  else if (element_response_tmp == "HAMAKER_LBA")
+  } else if (element_response_tmp == "HAMAKER_LBA") {
     options.element_response_model =
         everybeam::ElementResponseModel::kHamakerLba;
-  else if (element_response_tmp == "LOBES")
+  } else if (element_response_tmp == "LOBES") {
     options.element_response_model = everybeam::ElementResponseModel::kLOBES;
-  else if (element_response_tmp == "OSKAR_DIPOLE")
+  } else if (element_response_tmp == "OSKAR_DIPOLE") {
     options.element_response_model =
         everybeam::ElementResponseModel::kOSKARDipole;
-  else if (element_response_tmp == "SKALA40_WAVE")
+  } else if (element_response_tmp == "SKALA40_WAVE") {
     options.element_response_model =
         everybeam::ElementResponseModel::kOSKARSphericalWave;
-  else {
+  } else if (element_response_tmp == "SKAMID_ANALYTICAL") {
+    options.element_response_model =
+        everybeam::ElementResponseModel::kSkaMidAnalytical;
+  } else {
     std::stringstream message;
     message << "The specified element response model " << element_response_model
             << " is not implemented.";

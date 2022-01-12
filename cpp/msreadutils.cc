@@ -229,7 +229,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
     if (name == "LBA") {
       antenna = std::make_shared<Element>(antenna_coordinate_system,
                                           element_response, i);
-      if (element_response->GetModel() == kHamaker) {
+      if (element_response->GetModel() == ElementResponseModel::kHamaker) {
         // Cast to LOFAR LBA
         std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
             std::static_pointer_cast<BeamFormerLofarLBA>(beam_former);
@@ -253,7 +253,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
       }
     } else {
       // name is HBA, HBA0 or HBA1
-      if (element_response->GetModel() == kHamaker) {
+      if (element_response->GetModel() == ElementResponseModel::kHamaker) {
         std::shared_ptr<BeamFormerLofarHBA> beam_former_hba =
             std::static_pointer_cast<BeamFormerLofarHBA>(beam_former);
 

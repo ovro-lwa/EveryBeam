@@ -20,7 +20,9 @@ class OSKARElementResponseDipole : public ElementResponse {
     return common::Singleton<OSKARElementResponseDipole>::GetInstance();
   }
 
-  ElementResponseModel GetModel() const final override { return kOSKARDipole; }
+  ElementResponseModel GetModel() const final override {
+    return ElementResponseModel::kOSKARDipole;
+  }
 
   aocommon::MC2x2 Response(double freq, double theta,
                            double phi) const final override;
@@ -49,7 +51,7 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
   OSKARElementResponseSphericalWave(const std::string &path);
 
   ElementResponseModel GetModel() const final override {
-    return kOSKARSphericalWave;
+    return ElementResponseModel::kOSKARSphericalWave;
   }
 
   aocommon::MC2x2 Response(double freq, double theta,

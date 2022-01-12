@@ -22,8 +22,8 @@ using everybeam::telescope::OSKAR;
 
 OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
     : PhasedArray(ms, options) {
-  if (options_.element_response_model == kDefault) {
-    options_.element_response_model = kOSKARSphericalWave;
+  if (options_.element_response_model == ElementResponseModel::kDefault) {
+    options_.element_response_model = ElementResponseModel::kOSKARSphericalWave;
   }
   ReadAllStations(ms, stations_.begin(), options_);
 

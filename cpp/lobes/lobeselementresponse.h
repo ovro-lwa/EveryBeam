@@ -28,7 +28,9 @@ class LOBESElementResponse : public FieldResponse {
    */
   LOBESElementResponse(const std::string &name, const Options &options);
 
-  ElementResponseModel GetModel() const final override { return kLOBES; }
+  ElementResponseModel GetModel() const final override {
+    return ElementResponseModel::kLOBES;
+  }
 
   /**
    * @brief Stub override of the Response method, an element id

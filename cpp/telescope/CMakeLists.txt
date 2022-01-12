@@ -9,5 +9,6 @@ install(
         lofar.h
         oskar.h
         phasedarray.h
+        skamid.h
         telescope.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}/telescope")

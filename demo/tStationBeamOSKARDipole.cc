@@ -8,7 +8,7 @@
 using namespace everybeam;
 
 int main() {
-  ElementResponseModel model(kOSKARDipole);
+  ElementResponseModel model(ElementResponseModel::kOSKARDipole);
   double frequency = 140e6;  // Mhz
   std::string input_filename(TEST_MEASUREMENTSET);
   std::string output_filename("station-beams-oskar-dipole.fits");

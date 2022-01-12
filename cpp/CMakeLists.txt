@@ -5,15 +5,16 @@ project(everybeam_cpp)
 
 #------------------------------------------------------------------------------
 add_subdirectory(aterms)
+add_subdirectory(circularsymmetric)
 add_subdirectory(common)
 add_subdirectory(coords)
-add_subdirectory(pointresponse)
 add_subdirectory(griddedresponse)
 add_subdirectory(hamaker)
-add_subdirectory(oskar)
-add_subdirectory(telescope)
-add_subdirectory(circularsymmetric)
 add_subdirectory(lobes)
+add_subdirectory(oskar)
+add_subdirectory(pointresponse)
+add_subdirectory(skamidbeam)
+add_subdirectory(telescope)
 
 #------------------------------------------------------------------------------
 add_library(
@@ -52,13 +53,16 @@ add_library(
   telescope/mwa.cc
   telescope/phasedarray.cc
   telescope/oskar.cc
+  telescope/skamid.cc
   griddedresponse/griddedresponse.cc
   griddedresponse/dishgrid.cc
   griddedresponse/mwagrid.cc
   griddedresponse/aartfaacgrid.cc
+  griddedresponse/skamidgrid.cc
   pointresponse/phasedarraypoint.cc
   pointresponse/dishpoint.cc
   pointresponse/mwapoint.cc
+  pointresponse/skamidpoint.cc
   circularsymmetric/atcacoefficients.cc
   circularsymmetric/gmrtcoefficients.cc
   circularsymmetric/vlacoefficients.cc
@@ -77,7 +81,7 @@ target_include_directories(
 target_include_directories(everybeam PRIVATE "${CMAKE_BINARY_DIR}")
 
 target_include_directories(everybeam PUBLIC ${CASACORE_INCLUDE_DIR})
-target_link_libraries(everybeam PUBLIC hamaker oskar lobes)
+target_link_libraries(everybeam PUBLIC hamaker oskar lobes skamidbeam)
 target_link_libraries(
   everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_CXX_LIBRARIES}
                    ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})

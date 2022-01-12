@@ -44,19 +44,19 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
     }
 
     switch (options_.element_response_model) {
-      case kDefault:
-      case kHamaker:
-        options_.element_response_model = kHamakerLba;
+      case ElementResponseModel::kDefault:
+      case ElementResponseModel::kHamaker:
+        options_.element_response_model = ElementResponseModel::kHamakerLba;
         break;
-      case kHamakerLba:
+      case ElementResponseModel::kHamakerLba:
         break;
       default:
         throw std::runtime_error(
             "Selected element response model not supported for AARTFAAC");
     }
   } else {
-    if (options_.element_response_model == kDefault) {
-      options_.element_response_model = kHamaker;
+    if (options_.element_response_model == ElementResponseModel::kDefault) {
+      options_.element_response_model = ElementResponseModel::kHamaker;
     }
   }
 
