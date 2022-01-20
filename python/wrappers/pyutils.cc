@@ -18,6 +18,7 @@ using everybeam::BeamNormalisationMode;
 using everybeam::cart2thetaphi;
 using everybeam::ElementResponseModel;
 using everybeam::Options;
+using everybeam::ParseBeamNormalisationMode;
 using everybeam::thetaphi2cart;
 using everybeam::vector2r_t;
 using everybeam::vector3r_t;
@@ -157,6 +158,23 @@ void init_utils(py::module &m) {
         OSKAR spherical wave internally (ElementResponseModel::kOSKARSphericalWave). This will be refactored in the future.
        )pbdoc")
       .export_values();
+
+  m.def("parse_beam_normalisation_mode", &ParseBeamNormalisationMode,
+        R"pbdoc(
+        Parses a string containing a valid name of a beam normalisation mode 
+        and returns the matching value of the BeamNormalisationMode enum.
+
+        Raises a RuntimeError when no matching BeamNormalisationMode value is found.
+
+        Parameters
+        ----------
+        beam_normalisation_mode, string
+
+        Returns
+        -------
+        BeamNormalisationMode matching the input string
+        )pbdoc",
+        py::arg("beam_normalisation_mode"));
 
   // Bindings for BeamMode enum
   py::enum_<BeamMode>(m, "BeamMode", py::arithmetic(), "Beam Mode enumeration")

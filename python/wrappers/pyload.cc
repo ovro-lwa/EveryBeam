@@ -20,10 +20,9 @@ namespace py = pybind11;
 
 // Wrapper around the everybeam::Load method
 std::unique_ptr<Telescope> pyload_telescope(
-    const std::string& name, const std::string& data_column = "DATA",
-    bool differential_beam = false, bool channel_frequency = true,
-    const std::string& element_response_model = "hamaker",
-    const std::string& coeff_path = "") {
+    const std::string& name, const std::string& data_column,
+    BeamNormalisationMode beam_normalisation_mode, bool use_channel_frequency,
+    const std::string& element_response_model, const std::string& coeff_path) {
   // Load measurement set
   MeasurementSet ms(name);
 
@@ -71,18 +70,32 @@ std::unique_ptr<Telescope> pyload_telescope(
     throw std::runtime_error(message.str());
   }
   options.data_column_name = data_column;
-  options.beam_normalisation_mode = differential_beam
-                                        ? BeamNormalisationMode::kPreApplied
-                                        : BeamNormalisationMode::kNone;
-  options.use_channel_frequency = channel_frequency;
+  options.beam_normalisation_mode = beam_normalisation_mode;
+  options.use_channel_frequency = use_channel_frequency;
   options.coeff_path = coeff_path;
 
   return Load(ms, options);
 }
 
 void init_load(py::module& m) {
-  m.def("load_telescope", &pyload_telescope, R"pbdoc(
+  m.def(
+      "load_telescope",
+      [](const std::string& name, const std::string& data_column,
+         bool use_differential_beam, bool use_channel_frequency,
+         const std::string& element_response_model,
+         const std::string& coeff_path = "") -> std::unique_ptr<Telescope> {
+        BeamNormalisationMode beam_normalisation_mode =
+            use_differential_beam ? BeamNormalisationMode::kPreApplied
+                                  : BeamNormalisationMode::kNone;
+        return pyload_telescope(name, data_column, beam_normalisation_mode,
+                                use_channel_frequency, element_response_model,
+                                coeff_path);
+      },
+      R"pbdoc(
         Load telescope from measurement set (MS)
+
+        This version has a simple on/off toggle for beam normalisation through
+        the use_differential_beam parameter
 
         Parameters
         ----------
@@ -105,8 +118,43 @@ void init_load(py::module& m) {
         -------
         Telescope object
        )pbdoc",
+      py::arg("name"), py::arg("data_column") = "DATA",
+      py::arg("use_differential_beam") = false,
+      py::arg("use_channel_frequency") = true,
+      py::arg("element_response_model") = "hamaker",
+      py::arg("coeff_path") = "");
+
+  m.def("load_telescope", &pyload_telescope, R"pbdoc(
+        Load telescope from measurement set (MS)
+
+        This version allows more fine grained control over the normalisation
+        of the beam through the beam_normalisation_mode parameter.
+        (needed by the DP3 python step implemented in idgcaldpstep.py in the IDG library)
+
+        Parameters
+        ----------
+        name: str
+            Path to MS
+        data_column: str, optional
+            Data column that should
+        beam_normalisation_mode : BeamNormalisationMode, optional
+            Defaults to BeamNormalisationMode.none (no normalisation)
+            see BeamNormalisationMode enum
+        use_channel_frequency: bool, optional
+            Use channel frequency? Defaults to True.
+        element_response_model: str
+            Specify the element response model, should be any of
+            ["hamaker", "lobes", "oskar_dipole", "skala40_wave"]
+            Please note that the SKALA40 Wave model is
+            currently named OSKAR Spherical Wave in the EveryBeam internals.
+            This will be refactored to SKALA40_WAVE in the future.
+
+        Returns
+        -------
+        Telescope object
+       )pbdoc",
         py::arg("name"), py::arg("data_column") = "DATA",
-        py::arg("use_differential_beam") = false,
+        py::arg("beam_normalisation_mode") = BeamNormalisationMode::kNone,
         py::arg("use_channel_frequency") = true,
         py::arg("element_response_model") = "hamaker",
         py::arg("coeff_path") = "");

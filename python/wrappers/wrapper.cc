@@ -14,8 +14,10 @@ PYBIND11_MODULE(everybeam, m) {
   m.doc() = R"pbdoc(
    pyeverybeam provides python-wrappers for the everybeam beam response library
   )pbdoc";
+  init_utils(m);  // utils needs to be intialized first, because init_load
+                  // depends on the BeamNormalisationMode enum already being
+                  // registered.
   init_load(m);
-  init_utils(m);
   init_telescope(m);
   init_lobes(m);
 }

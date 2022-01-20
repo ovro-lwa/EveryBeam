@@ -28,6 +28,7 @@ bool PhasedArrayResponse::CalculateBeamNormalisation(
     aocommon::MC2x2F& inverse_gain) const {
   const telescope::PhasedArray& phased_array =
       static_cast<const telescope::PhasedArray&>(*phased_array_);
+
   if (beam_normalisation_mode_ == BeamNormalisationMode::kNone) {
     return false;
   }
