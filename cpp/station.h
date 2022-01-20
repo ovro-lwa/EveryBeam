@@ -61,21 +61,6 @@ class Station {
   //! Station::setPhaseReference()
   const vector3r_t &GetPhaseReference() const;
 
-  /*!
-   *  \brief Add an antenna field to the station.
-   *
-   *  Physical (%LOFAR) stations consist of an LBA field, and either one (remote
-   *  and international stations) or two (core stations) HBA fields. Virtual
-   *  (%LOFAR) stations can consist of a combination of the antenna fields of
-   *  several physical stations.
-   *
-   *  Use this method to add the appropriate antenna fields to the station.
-   */
-  //     void addField(const AntennaField::ConstPtr &field);
-
-  //! Return the number of available antenna fields.
-  size_t GetNrFields() const;
-
   /**
    *  \brief Compute the full response of the station for a plane wave of
    * frequency \p freq, arriving from direction \p direction, with the %station
