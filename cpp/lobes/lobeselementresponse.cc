@@ -134,19 +134,16 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
     return aocommon::MC2x2::Zero();
   }
 
-  bool clear_basefunctions = false;
-  if (basefunctions_.rows() == 0) {
-    // Fill basefunctions if not cached at this stage (via SetFieldQuantities).
-    // Also, set clear_basefunctions to true, to clear the basefunctions_ at the
-    // end of this response calculation.
-    basefunctions_ = ComputeBaseFunctions(theta, phi);
-    clear_basefunctions = true;
-  }
+  // When the objects basefunctions_ aren't initialized create our own copy.
+  // Note it's not possible to set the object's version since the function is
+  // called from multiple threads.
+  const BaseFunctions &basefunctions =
+      basefunctions_ ? *basefunctions_ : ComputeBaseFunctions(theta, phi);
 
   const int freq_idx = FindFrequencyIdx(freq);
   std::complex<double> xx = {0}, xy = {0}, yx = {0}, yy = {0};
 
-  const int nr_rows = basefunctions_.rows();
+  const int nr_rows = basefunctions.rows();
   if (nr_rows == 0) {
     throw std::runtime_error(
         "Number of rows in basefunctions_ member is 0. Did you run "
@@ -154,18 +151,14 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
   }
 
   for (int i = 0; i < nr_rows; ++i) {
-    const std::complex<double> q2 = basefunctions_(i, 0);
-    const std::complex<double> q3 = basefunctions_(i, 1);
+    const std::complex<double> q2 = basefunctions(i, 0);
+    const std::complex<double> q3 = basefunctions(i, 1);
     xx += q2 * coefficients_(0, freq_idx, element_id, i);
     xy += q3 * coefficients_(0, freq_idx, element_id, i);
     yx += q2 * coefficients_(1, freq_idx, element_id, i);
     yy += q3 * coefficients_(1, freq_idx, element_id, i);
   }
 
-  if (clear_basefunctions) {
-    // Do a destructive resize
-    basefunctions_.resize(0, 2);
-  }
   return aocommon::MC2x2(xx, xy, yx, yy);
 }
 

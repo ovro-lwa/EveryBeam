@@ -10,6 +10,8 @@
 #include "../options.h"
 #include "../fieldresponse.h"
 
+#include <boost/optional.hpp>
+
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -79,6 +81,9 @@ class LOBESElementResponse : public FieldResponse {
    *
    * @param theta Angle wrt. z-axis (rad)
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
+   *
+   * @warning When calling this function or @ref ClearFieldQuantities from
+   * multiple threads the callers need to ensure the synchronisation.
    */
   virtual void SetFieldQuantities(double theta, double phi) final override {
     basefunctions_ = ComputeBaseFunctions(theta, phi);
@@ -87,16 +92,19 @@ class LOBESElementResponse : public FieldResponse {
   /**
    * @brief Clear the cached basefunctions
    *
+   * @warning When calling this function or @ref SetFieldQuantities from
+   * multiple threads the callers need to ensure the synchronisation.
    */
   virtual void ClearFieldQuantities() final override {
-    // Destructively resize the basefunctions_ to 0 rows
-    basefunctions_.resize(0, 2);
+    basefunctions_.reset();
   };
 
  private:
   // Typdef of BaseFunctions as Eigen::Array type
   typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
-  mutable BaseFunctions basefunctions_;
+
+  /** The cached version of the base functions. */
+  mutable boost::optional<BaseFunctions> basefunctions_;
 
   // Find the closest frequency
   size_t FindFrequencyIdx(double f) const {
