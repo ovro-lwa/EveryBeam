@@ -14,14 +14,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 # Download SKA-MID mset
 SKA_MID_MOCK_ARCHIVE=SKA_MID_MOCK.tar.bz2
 SKA_MID_MOCK_MS=SKA_MID_MOCK.ms

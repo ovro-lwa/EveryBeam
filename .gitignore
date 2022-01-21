@@ -5,9 +5,7 @@
 coeffs/lobes
 build/
 builds/
-test_data/
 __pycache__/
 cpp/test/thamaker_tmp.cc
 cpp/test/tlobes_tmp.cc
 download_lofar_lobes_ms.sh
-

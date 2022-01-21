@@ -9,14 +9,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 # TODO: complete name of tarfile to be downloaded
 OSKAR_MOCK_ARCHIVE=OSKAR_MOCK.tar.bz2
 OSKAR_MOCK_MS=OSKAR_MOCK.ms

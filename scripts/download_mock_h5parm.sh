@@ -10,14 +10,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 MOCK_H5PARM=MOCK_H5PARM.h5
 if [ ! -f ${MOCK_H5PARM} ] ; then
     wget -q www.astron.nl/citt/EveryBeam/${MOCK_H5PARM}

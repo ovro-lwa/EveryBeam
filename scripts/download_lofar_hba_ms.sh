@@ -9,14 +9,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 LOFAR_MOCK_ARCHIVE=LOFAR_HBA_ARCHIVE.tar.bz2
 LOFAR_HBA_MOCK_MS=LOFAR_HBA_MOCK.ms
 

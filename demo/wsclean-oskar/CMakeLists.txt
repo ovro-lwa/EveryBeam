@@ -10,7 +10,7 @@ add_custom_command(
   COMMAND
     ${CMAKE_COMMAND} -E env PATH="${CMAKE_SOURCE_DIR}/scripts/misc:$ENV{PATH}"
     PYTHONPATH="${CMAKE_CURRENT_SOURCE_DIR}/../utils:$ENV{PYTHONPATH}"
-    DATA_DIR="${CMAKE_SOURCE_DIR}/test_data" python3 -B
+    DATA_DIR="${DATA_DIR}" python3 -B
     "${CMAKE_CURRENT_SOURCE_DIR}/run_oskar_simulation.py")
 
 # Generate a template image using the pointing in the test MeasurementSet
@@ -36,6 +36,6 @@ add_custom_target(
   COMMAND
     ${CMAKE_COMMAND} -E env
     EXTRA_PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts"
-    DATA_DIR="${CMAKE_SOURCE_DIR}/test_data" MS=${MS}
+    DATA_DIR="${DATA_DIR}" MS=${MS}
     "${CMAKE_CURRENT_SOURCE_DIR}/run_wsclean_oskar.sh"
   DEPENDS ${MODEL_IMAGES} testdata.ms run_wsclean_oskar.sh)

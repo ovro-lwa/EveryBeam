@@ -34,5 +34,5 @@ add_custom_target(
     ${CMAKE_COMMAND} -E env
     PATH="${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_SOURCE_DIR}/scripts/coeff_scripts:${CMAKE_SOURCE_DIR}/scripts/misc:$ENV{PATH}"
     PYTHONPATH="${CMAKE_CURRENT_SOURCE_DIR}/../utils:$ENV{PYTHONPATH}"
-    DATA_DIR=${CMAKE_SOURCE_DIR}/test_data python3 -B
+    DATA_DIR=${DATA_DIR} python3 -B
     "${CMAKE_CURRENT_SOURCE_DIR}/compare_stationresponse.py")

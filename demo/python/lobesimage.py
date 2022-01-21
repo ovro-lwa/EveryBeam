@@ -16,7 +16,7 @@ A minimal LOFAR MSet can be downloaded here:
 https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
 """
 
-ms_path = "../../test_data/LOFAR_LBA_MOCK.ms"
+ms_path = os.path.join(os.environ["DATA_DIR"], "LOFAR_LBA_MOCK.ms")
 
 # Response settings
 mode = "station"  # Change to "element" to obtain the element response

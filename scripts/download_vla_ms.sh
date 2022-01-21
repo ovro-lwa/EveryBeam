@@ -9,14 +9,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 VLA_MOCK_ARCHIVE=VLA_ARCHIVE.tar.bz2
 VLA_MOCK_MS=VLA_MOCK.ms
 

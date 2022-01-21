@@ -6,14 +6,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 AARTFAAC_MOCK_ARCHIVE=LOFAR_LBA_ARCHIVE.tar.bz2
 AARTFAAC_LBA_MOCK_MS=AARTFAAC_LBA_MOCK.ms
 

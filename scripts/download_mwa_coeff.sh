@@ -9,14 +9,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 MWA_COEFF_ARCHIVE=MWA_COEFF.tar.bz2
 MWA_COEFF_H5=mwa_full_embedded_element_pattern.h5
 

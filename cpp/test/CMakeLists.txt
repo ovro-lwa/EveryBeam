@@ -22,15 +22,15 @@ set(MOCK_MS
     MWA_MOCK)
 foreach(mock ${MOCK_MS})
   set(${mock}_MS
-      ${CMAKE_SOURCE_DIR}/test_data/${mock}.ms
+      ${DATA_DIR}/${mock}.ms
       CACHE PATH "")
 endforeach()
 
 set(MWA_COEFF_PATH
-    ${CMAKE_SOURCE_DIR}/test_data/mwa_full_embedded_element_pattern.h5
+    ${DATA_DIR}/mwa_full_embedded_element_pattern.h5
     CACHE PATH "")
 set(MOCK_H5PARM_PATH
-    ${CMAKE_SOURCE_DIR}/test_data/MOCK_H5PARM.h5
+    ${DATA_DIR}/MOCK_H5PARM.h5
     CACHE PATH "")
 set(LOBES_COEFF_PATH
     ${CMAKE_BINARY_DIR}/coeffs/lobes
@@ -56,9 +56,9 @@ set(TEST_FILENAMES
 # calls after running all tests, in the cleanup phase.
 set_source_files_properties(${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS
                                                          "BOOST_TEST_DYN_LINK")
-
 add_custom_target(
   download_mocks
+  WORKING_DIRECTORY ${DATA_DIR}
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_aartfaac_lba_ms.sh

@@ -9,14 +9,6 @@
 
 set -e
 
-SCRIPT_PATH=$(dirname "$0")
-cd $SCRIPT_PATH
-
-# Move up to parent folder which contains the source
-cd ..
-mkdir -p test_data
-cd test_data/
-
 MWA_MOCK_ARCHIVE=MWA_ARCHIVE.tar.bz2
 MWA_MOCK_MS=MWA_MOCK.ms
 

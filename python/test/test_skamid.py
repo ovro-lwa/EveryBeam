@@ -6,6 +6,7 @@ import pytest
 import os
 from subprocess import check_call
 import numpy as np
+import warnings
 
 
 EVERYBEAM_BASE_URL = "http://www.astron.nl/citt/EveryBeam/"

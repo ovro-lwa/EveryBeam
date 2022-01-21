@@ -141,6 +141,23 @@ if("${isSystemDir}" STREQUAL "-1")
 endif("${isSystemDir}" STREQUAL "-1")
 
 #------------------------------------------------------------------------------
+# Set up a test_data directory in the build directory.
+# Create symbolic links to the files/directories in the source directory.
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.14) # Required for file(CREATE_LINK)
+  set(DATA_DIR ${CMAKE_BINARY_DIR}/test_data)
+  file(MAKE_DIRECTORY ${DATA_DIR})
+  file(GLOB SOURCE_DATA_FILES "${CMAKE_SOURCE_DIR}/test_data/*")
+  foreach(SOURCE_DATA_FILE ${SOURCE_DATA_FILES})
+    string(REPLACE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} BINARY_DATA_FILE
+                   ${SOURCE_DATA_FILE})
+    file(CREATE_LINK ${SOURCE_DATA_FILE} ${BINARY_DATA_FILE} SYMBOLIC)
+  endforeach()
+else()
+  # For older versions, fall back to using the source directory.
+  set(DATA_DIR ${CMAKE_SOURCE_DIR}/test_data)
+endif()
+
+#------------------------------------------------------------------------------
 # Add source
 add_subdirectory(cpp)
 

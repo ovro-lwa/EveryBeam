@@ -14,7 +14,7 @@ https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2
 """
 
 # Set path to (OSKAR) MS
-ms_path = "../../test_data/OSKAR_MOCK.ms"
+ms_path = os.path.join(os.environ["DATA_DIR"], "OSKAR_MOCK.ms")
 
 # Use differential beam?
 use_differential_beam = False

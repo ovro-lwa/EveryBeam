@@ -15,7 +15,7 @@ https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
 """
 
 # Set path to LOFAR LBA MS and load telescope
-ms_path = "../../test_data/LOFAR_LBA_MOCK.ms"
+ms_path = os.path.join(os.environ["DATA_DIR"], "LOFAR_LBA_MOCK.ms")
 
 telescope = eb.load_telescope(ms_path)
 assert type(telescope) == eb.LOFAR
