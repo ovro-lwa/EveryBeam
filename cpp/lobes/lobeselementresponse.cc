@@ -134,18 +134,19 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
     return aocommon::MC2x2::Zero();
   }
 
-  // Fill basefunctions if not yet set. Set clear_basefunctions to false
-  // to disable the caching of the basefunctions
   bool clear_basefunctions = false;
   if (basefunctions_.rows() == 0) {
-    clear_basefunctions = true;
+    // Fill basefunctions if not cached at this stage (via SetFieldQuantities).
+    // Also, set clear_basefunctions to true, to clear the basefunctions_ at the
+    // end of this response calculation.
     basefunctions_ = ComputeBaseFunctions(theta, phi);
+    clear_basefunctions = true;
   }
 
-  int freq_idx = FindFrequencyIdx(freq);
+  const int freq_idx = FindFrequencyIdx(freq);
   std::complex<double> xx = {0}, xy = {0}, yx = {0}, yy = {0};
 
-  int nr_rows = basefunctions_.rows();
+  const int nr_rows = basefunctions_.rows();
   if (nr_rows == 0) {
     throw std::runtime_error(
         "Number of rows in basefunctions_ member is 0. Did you run "
@@ -153,8 +154,8 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
   }
 
   for (int i = 0; i < nr_rows; ++i) {
-    std::complex<double> q2 = basefunctions_(i, 0);
-    std::complex<double> q3 = basefunctions_(i, 1);
+    const std::complex<double> q2 = basefunctions_(i, 0);
+    const std::complex<double> q3 = basefunctions_(i, 1);
     xx += q2 * coefficients_(0, freq_idx, element_id, i);
     xy += q3 * coefficients_(0, freq_idx, element_id, i);
     yx += q2 * coefficients_(1, freq_idx, element_id, i);

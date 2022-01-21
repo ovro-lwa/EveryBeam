@@ -106,9 +106,11 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
   // Copy options into local_options. Needed to propagate
   // the potential change in the rotate boolean downstream
   Options local_options = options;
-  // If field_response_ not nullptr, set/precompute quantities
-  // related to the field
-  if (nullptr != field_response_) {
+  // If field_response_ is valid, compute and cache quantities
+  // related to the field. This is done for LOBEs beamformers
+  // in which all elements inside the beamformer have the same basisfunction for
+  // a given direction.
+  if (field_response_ != nullptr) {
     // Lock the associated mutex, thus avoiding that the LOBESElementResponse
     // basefunctions_ are overwritten before response is computed
     lock.lock();
@@ -134,8 +136,8 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
                dot(e_phi, options.north), dot(e_phi, options.east)};
   }
 
-  // Wipe out basefunctions cache
-  if (nullptr != field_response_) {
+  // Clear the basefunctions cache
+  if (field_response_ != nullptr) {
     field_response_->ClearFieldQuantities();
   }
   return result;

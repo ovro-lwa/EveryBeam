@@ -135,16 +135,29 @@ class BeamFormer : public Antenna {
   std::shared_ptr<FieldResponse> field_response_;
 
  private:
-  // Transform position vector into a local position vector
+  /**
+   * @brief Transform position vector into a local position vector.
+   */
   vector3r_t TransformToLocalPosition(const vector3r_t &position);
 
-  // Compute the weights based on the difference vector between the pointing
-  // direction and the direction of interest. Analogous to
-  // ComputeGeometricResponse, this difference vector should be computed as:
-  // direction = pointing_freq * pointing_dir - interest_freq * interest_dir
+  /**
+   * @brief Compute the beamformer weights based on the difference vector
+   * between the pointing direction and the direction of interest. Analogous to
+   * \c ComputeGeometricResponse , this difference vector should be computed as:
+   * direction = pointing_freq * pointing_dir - interest_freq * interest_dir
+   *
+   * @param direction Direction of interest (ITRF)
+   * @return std::vector<aocommon::MC2x2Diag> Weight matrix per antenna inside
+   * the beamformer
+   */
   std::vector<aocommon::MC2x2Diag> ComputeWeightedResponses(
       const vector3r_t &direction) const;
 
+  /**
+   * @brief Mutex providing a locking mechanism in case field quantities can be
+   * precomputed (e.g. the basefunctions in a specific direction for the LOBEs
+   * model)
+   */
   mutable std::mutex mtx_;
 };
 }  // namespace everybeam
