@@ -66,6 +66,9 @@ include_directories(${pybind11_INCLUDE_DIRS})
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/schaapcommon")
 include_directories("${CMAKE_SOURCE_DIR}/external/schaapcommon/include")
 
+# Include oskar beam utils
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/oskar/oskar/beam_utils")
+
 # Find and include HDF5
 find_package(
   HDF5

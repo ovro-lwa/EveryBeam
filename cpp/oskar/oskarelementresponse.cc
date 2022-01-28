@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "oskarelementresponse.h"
-#include "oskar.h"
 #include "config.h"
 #include <iostream>
+
+#include <oskar_beam_utils.h>
+
+using oskar::beam_utils::oskar_evaluate_dipole_pattern_double;
+using oskar::beam_utils::oskar_evaluate_spherical_wave_sum_double;
 
 namespace everybeam {
 

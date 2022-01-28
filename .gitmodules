@@ -13,3 +13,6 @@
 [submodule "external/schaap-packaging"]
 	path = external/schaap-packaging
 	url = https://git.astron.nl/RD/schaap-packaging.git
+[submodule "external/oskar"]
+	path = external/oskar
+	url = https://gitlab.com/ska-telescope/sim/oskar.git
