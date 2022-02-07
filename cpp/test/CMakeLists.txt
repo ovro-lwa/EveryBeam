@@ -44,6 +44,7 @@ set(TEST_FILENAMES
     tlofar_aartfaac.cc
     toskar.cc
     tmwa.cc
+    tphasedarraypoint.cc
     tskamid.cc
     tstation.cc
     tvla.cc

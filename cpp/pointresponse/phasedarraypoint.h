@@ -98,7 +98,7 @@ class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
    * @brief Use local east-north-up system (true) or global coordinate
    * system (false).
    */
-  void SetUseLocalCoordinateSystem(bool is_local){};
+  void SetUseLocalCoordinateSystem(bool is_local) { is_local_ = is_local; };
   bool GetUseLocalCoordinateSystem() const { return is_local_; };
 
   /**
