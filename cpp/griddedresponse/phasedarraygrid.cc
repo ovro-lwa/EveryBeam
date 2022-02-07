@@ -134,7 +134,12 @@ void PhasedArrayGrid::CalcThread(BeamMode beam_mode, bool apply_normalisation,
                                          m);
       l += phase_centre_dl_;
       m += phase_centre_dm_;
-      n = sqrt(1.0 - l * l - m * m);
+      const double sqrt_term = 1.0 - l * l - m * m;
+      if (sqrt_term >= 0.0) {
+        n = std::sqrt(sqrt_term);
+      } else {
+        n = -std::sqrt(-sqrt_term);
+      }
 
       const vector3r_t itrf_direction =
           l * l_vector_itrf_ + m * m_vector_itrf_ + n * n_vector_itrf_;

@@ -21,6 +21,7 @@ using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::AartfaacGrid;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::pointresponse::AartfaacPoint;
+using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 using everybeam::telescope::Telescope;
 
@@ -59,19 +60,19 @@ BOOST_AUTO_TEST_CASE(load) {
   }
   {
     options.element_response_model = ElementResponseModel::kHamakerLba;
-    auto telescope = LoadAartfaacTelescope(options);
+    std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
     BOOST_CHECK(dynamic_cast<LOFAR*>(telescope.get()));
   }
   {
     options.element_response_model = ElementResponseModel::kHamakerLba;
-    auto telescope = LoadAartfaacTelescope(options);
+    std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
     BOOST_CHECK(dynamic_cast<LOFAR*>(telescope.get()));
   }
 }
 
 BOOST_AUTO_TEST_CASE(gridded_response, *boost::unit_test::tolerance(1e-8)) {
   const Options options;
-  auto telescope = LoadAartfaacTelescope(options);
+  std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
 
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(kCoordSystem);
@@ -136,18 +137,20 @@ BOOST_AUTO_TEST_CASE(gridded_response, *boost::unit_test::tolerance(1e-8)) {
 
 BOOST_AUTO_TEST_CASE(point_response, *boost::unit_test::tolerance(1e-8)) {
   const Options options;
-  auto telescope = LoadAartfaacTelescope(options);
+  std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
 
   const size_t station_index = 7;
   // Compute station response for station 7
-  auto grid_response = telescope->GetGriddedResponse(kCoordSystem);
+  std::unique_ptr<GriddedResponse> grid_response =
+      telescope->GetGriddedResponse(kCoordSystem);
   const size_t buffer_size = grid_response->GetStationBufferSize(1);
   std::vector<std::complex<float>> full_response(buffer_size);
   grid_response->Response(BeamMode::kFull, full_response.data(), kTime,
                           kFrequency, station_index, 0);
 
   // Compute point response
-  auto point_response = telescope->GetPointResponse(kTime);
+  std::unique_ptr<PointResponse> point_response =
+      telescope->GetPointResponse(kTime);
   BOOST_CHECK(dynamic_cast<AartfaacPoint*>(point_response.get()));
 
   std::vector<std::complex<float>> point_buffer_all_stations(
@@ -165,6 +168,50 @@ BOOST_AUTO_TEST_CASE(point_response, *boost::unit_test::tolerance(1e-8)) {
       point_buffer_all_stations.data() + offset_point,
       point_buffer_all_stations.data() + offset_point + 4,
       full_response.data() + offset_22, full_response.data() + offset_22 + 4);
+}
+
+BOOST_AUTO_TEST_CASE(under_horizon_point) {
+  const Options options;
+  std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
+
+  const size_t station_index = 0;
+
+  // Compute point response
+  std::unique_ptr<PointResponse> point_response =
+      telescope->GetPointResponse(kTime);
+  aocommon::MC2x2F value = aocommon::MC2x2F::Unity();
+  point_response->Response(BeamMode::kFull, value.Data(), kCoordSystem.ra,
+                           -M_PI /* always under the horizon for Aartfaac */,
+                           kFrequency, station_index, 0);
+
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK_EQUAL(value[i].real(), 0.0);
+    BOOST_CHECK_EQUAL(value[i].imag(), 0.0);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(under_horizon_grid) {
+  const Options options;
+  std::unique_ptr<Telescope> telescope = LoadAartfaacTelescope(options);
+  const size_t width = 16;
+  const size_t height = 16;
+  const CoordinateSystem under_horizon = {width, height, kRa,     kDec,
+                                          0.4,   0.4,    kShiftL, kShiftM};
+  std::unique_ptr<GriddedResponse> grid_response =
+      telescope->GetGriddedResponse(under_horizon);
+  std::vector<std::complex<float>> response(4 * width * height);
+  grid_response->Response(everybeam::BeamMode::kElement, response.data(), kTime,
+                          kFrequency, 0, 0);
+
+  for (size_t i = 0; i != 4 * width * height; ++i) {
+    BOOST_CHECK(std::isfinite(response[i].real()));
+    BOOST_CHECK(std::isfinite(response[i].imag()));
+  }
+  // Check that the top left corner is zero
+  for (size_t i = 0; i != 4; ++i) {
+    BOOST_CHECK_EQUAL(response[i].real(), 0.0);
+    BOOST_CHECK_EQUAL(response[i].imag(), 0.0);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
