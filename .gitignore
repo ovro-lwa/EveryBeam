@@ -2,7 +2,6 @@
 #
 # Directories
 .vscode/
-coeffs/lobes
 build/
 builds/
 __pycache__/
