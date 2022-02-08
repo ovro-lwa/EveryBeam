@@ -77,13 +77,12 @@ find_package(
 add_definitions(${HDF5_DEFINITIONS} -DH5_USE_110_API)
 include_directories(${HDF5_INCLUDE_DIRS})
 
+find_package(Threads REQUIRED)
+
 # Find and include Casacore
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
 find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
 include_directories(${CASACORE_INCLUDE_DIRS})
-
-# Find and include OpenMP
-find_package(OpenMP REQUIRED)
 
 # Find and include Boost headers (boost::math required for MWA beam)
 # Filesystem component required to search for LOBES coefficient files

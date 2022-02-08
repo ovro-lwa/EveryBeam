@@ -75,8 +75,7 @@ add_test(NAME download_mocks
 set_tests_properties(download_mocks PROPERTIES FIXTURES_SETUP mocks)
 
 add_executable(unittests ${TEST_FILENAMES})
-target_link_libraries(unittests everybeam ${Boost_LIBRARIES}
-                      ${CMAKE_THREAD_LIBS_INIT} schaapcommon)
+target_link_libraries(unittests everybeam ${Boost_LIBRARIES} schaapcommon)
 # Required to get the config.h header
 target_include_directories(unittests PRIVATE "${CMAKE_BINARY_DIR}")
 

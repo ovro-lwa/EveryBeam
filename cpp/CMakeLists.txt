@@ -85,7 +85,7 @@ target_link_libraries(everybeam PUBLIC hamaker oskar lobes skamidbeam)
 target_link_libraries(
   everybeam PUBLIC ${CASACORE_LIBRARIES} ${HDF5_CXX_LIBRARIES}
                    ${FFTW3F_LIBRARY} ${CFITSIO_LIBRARY})
-target_link_libraries(everybeam PRIVATE schaapcommon)
+target_link_libraries(everybeam PRIVATE schaapcommon Threads::Threads)
 
 install(
   TARGETS everybeam

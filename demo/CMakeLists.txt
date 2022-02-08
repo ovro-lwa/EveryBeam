@@ -69,14 +69,12 @@ if(CFITSIO_FOUND)
   target_include_directories(tElementBeamOSKARSphericalWave
                              PUBLIC ${CMAKE_BINARY_DIR})
 
-  target_link_libraries(tStationBeamHamaker PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(tStationBeamOSKARDipole PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(tStationBeamOSKARSphericalWave
-                        PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(tElementBeamHamaker PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(tElementBeamOSKARDipole PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(tElementBeamOSKARSphericalWave
-                        PUBLIC OpenMP::OpenMP_CXX)
+  target_link_libraries(tStationBeamHamaker)
+  target_link_libraries(tStationBeamOSKARDipole)
+  target_link_libraries(tStationBeamOSKARSphericalWave)
+  target_link_libraries(tElementBeamHamaker)
+  target_link_libraries(tElementBeamOSKARDipole)
+  target_link_libraries(tElementBeamOSKARSphericalWave)
 
   # These are not "tests" in the strict sense of the word, so don't add them to test stack
   # NOTE: tests should go to cpp/test

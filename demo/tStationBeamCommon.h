@@ -1,10 +1,16 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#ifndef DEMO_STATION_BEAM_COMMON_H_
+#define DEMO_STATION_BEAM_COMMON_H_
+
 #include <iostream>
 #include <complex>
 #include <vector>
+
 #include <aocommon/matrix2x2.h>
+#include <aocommon/parallelfor.h>
+#include <aocommon/system.h>
 
 #include "beam-helper.h"
 
@@ -13,12 +19,11 @@ void calculateStationBeams(
     std::vector<vector3r_t>& itrfDirections, vector3r_t stationDirection,
     vector3r_t tileDirection, unsigned int subgrid_size,
     std::vector<std::complex<float>>& buffer, double time, double frequency) {
-  typedef std::complex<float> Data[stations.size()][subgrid_size][subgrid_size]
-                                  [4];
-  Data* data_ptr = (Data*)buffer.data();
-
-#pragma omp parallel for
-  for (size_t s = 0; s < stations.size(); s++) {
+  const size_t n_stations = stations.size();
+  aocommon::ParallelFor<size_t> loop(aocommon::system::ProcessorCount());
+  loop.Run(0, stations.size(), [&, subgrid_size, n_stations](size_t s) {
+    using Data = std::complex<float>[n_stations][subgrid_size][subgrid_size][4];
+    Data* data_ptr = (Data*)buffer.data();
     for (unsigned y = 0; y < subgrid_size; y++) {
       for (unsigned x = 0; x < subgrid_size; x++) {
         auto direction = itrfDirections[y * subgrid_size + x];
@@ -31,7 +36,7 @@ void calculateStationBeams(
         gainMatrix.AssignTo(antBufferPtr);
       }
     }
-  }
+  });
 }
 
 void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
@@ -105,3 +110,5 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   StoreBeam(output_filename, beams.data(), nr_stations, subgrid_size,
             subgrid_size);
 }
+
+#endif
