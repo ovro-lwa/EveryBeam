@@ -38,10 +38,10 @@ install(
   DESTINATION lib)
 
 # install coefficients
-message("install lobes coefficients in: " ${CMAKE_INSTALL_DATA_DIR}/lobes)
+message("install lobes coefficients in: " ${EVERYBEAM_FULL_DATADIR}/lobes)
 install(
   DIRECTORY "${CMAKE_BINARY_DIR}/coeffs/lobes"
-  DESTINATION ${CMAKE_INSTALL_DATA_DIR}
+  DESTINATION ${EVERYBEAM_DATADIR}
   FILES_MATCHING
   PATTERN "LOBES_*")
 

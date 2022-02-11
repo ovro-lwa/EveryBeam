@@ -33,8 +33,9 @@ include(ExternalProject)
 # Configure directory for data files
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
-set(CMAKE_INSTALL_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${projectname}")
-message("Storing data in: " ${CMAKE_INSTALL_DATA_DIR})
+set(EVERYBEAM_DATADIR "share/${projectname}")
+set(EVERYBEAM_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${EVERYBEAM_DATADIR}")
+message("Storing data in: " ${EVERYBEAM_FULL_DATADIR})
 
 # Find and include git submodules
 find_package(Git QUIET)

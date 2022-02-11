@@ -18,8 +18,8 @@ install(
   DESTINATION lib)
 
 # install coefficients
-message("install hamaker in: " ${CMAKE_INSTALL_DATA_DIR})
+message("install hamaker in: " ${EVERYBEAM_FULL_DATADIR})
 install(FILES "${CMAKE_SOURCE_DIR}/coeffs/HamakerHBACoeff.h5"
-        DESTINATION ${CMAKE_INSTALL_DATA_DIR})
+        DESTINATION ${EVERYBEAM_DATADIR})
 install(FILES "${CMAKE_SOURCE_DIR}/coeffs/HamakerLBACoeff.h5"
-        DESTINATION ${CMAKE_INSTALL_DATA_DIR})
+        DESTINATION ${EVERYBEAM_DATADIR})
