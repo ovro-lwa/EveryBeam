@@ -23,16 +23,20 @@ enum class ElementResponseModel {
   /// The default will select the default element response model
   /// based on the telescope: e.g. LOFAR will use kHamaker,
   /// OSKAR will select kOSKARSphericalWave.
+  ///
+  /// @note The values are part of the public ABI.
   //
   // kHamakerLba is specifically introduced for AARTFAAC observations, in which
   // case the type HBA/LBA cannot be inferred from the station name
-  kDefault,
-  kHamaker,
-  kHamakerLba,
-  kLOBES,
-  kOSKARDipole,
-  kOSKARSphericalWave,
-  kSkaMidAnalytical
+  kDefault = 0,
+  kHamaker = 1,
+  kHamakerLba = 2,
+  kLOBES = 3,
+  kOSKARDipole = 4,
+  kOSKARSphericalWave = 5,
+  kSkaMidAnalytical = 6,
+  kAartfaacInner = 7,
+  kAartfaacOuter = 8
 };
 
 std::ostream &operator<<(std::ostream &os, ElementResponseModel model);

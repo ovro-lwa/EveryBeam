@@ -11,11 +11,20 @@ namespace griddedresponse {
 void AartfaacGrid::ResponseAllStations(BeamMode beam_mode,
                                        std::complex<float>* buffer, double time,
                                        double frequency, size_t field_id) {
-  Response(beam_mode, buffer, time, frequency, 0, field_id);
-  const size_t station_buffer = width_ * height_ * 4;
-  // Repeated copy for n_stations
-  for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
-    std::copy_n(buffer, station_buffer, buffer + i * station_buffer);
+  const size_t kResponseSize = width_ * height_ * 4;
+  if (telescope_->GetOptions().element_response_model ==
+      ElementResponseModel::kLOBES) {
+    // For LOBEs every station has its own response.
+    for (size_t i = 0; i != telescope_->GetNrStations(); ++i) {
+      Response(beam_mode, buffer, time, frequency, i, field_id);
+      buffer += kResponseSize;
+    }
+  } else {
+    // For Hamaker every station has the same response.
+    Response(beam_mode, buffer, time, frequency, 0, field_id);
+    for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
+      std::copy_n(buffer, kResponseSize, buffer + i * kResponseSize);
+    }
   }
 }
 

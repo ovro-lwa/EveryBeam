@@ -31,10 +31,18 @@ class AartfaacPoint final : public PhasedArrayPoint {
   void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
                            double ra, double dec, double freq,
                            size_t field_id) override {
-    Response(beam_mode, buffer, ra, dec, freq, 0u, field_id);
-    // Just repeat nstations times
-    for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
-      std::copy_n(buffer, 4, buffer + i * 4);
+    if (telescope_->GetOptions().element_response_model ==
+        ElementResponseModel::kLOBES) {
+      // For LOBEs every station has its own response.
+      for (size_t i = 0; i != telescope_->GetNrStations(); ++i) {
+        Response(beam_mode, buffer + i * 4, ra, dec, freq, i, field_id);
+      }
+    } else {
+      // For Hamaker every station has the same response.
+      Response(beam_mode, buffer, ra, dec, freq, 0u, field_id);
+      for (size_t i = 1; i != telescope_->GetNrStations(); ++i) {
+        std::copy_n(buffer, 4, buffer + i * 4);
+      }
     }
   }
 };

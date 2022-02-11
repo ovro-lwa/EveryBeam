@@ -119,7 +119,6 @@ class LOBESElementResponse : public FieldResponse {
 
   // Store h5 coefficients in coefficients_
   Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor> coefficients_;
-  std::vector<unsigned int> coefficients_shape_;
 
   // Store h5 frequencies in frequencies_
   std::vector<double> frequencies_;

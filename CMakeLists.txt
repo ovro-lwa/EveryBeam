@@ -28,6 +28,7 @@ string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 
 # Set the path to CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+include(ExternalProject)
 
 # Configure directory for data files
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")

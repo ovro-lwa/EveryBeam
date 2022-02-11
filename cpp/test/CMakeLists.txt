@@ -16,6 +16,7 @@ set(MOCK_MS
     LOFAR_HBA_MOCK
     LOFAR_LBA_MOCK
     AARTFAAC_LBA_MOCK
+    AARTFAAC_6_LBA_MOCK
     OSKAR_MOCK
     SKA_MID_MOCK
     VLA_MOCK
@@ -57,6 +58,18 @@ set(TEST_FILENAMES
 # calls after running all tests, in the cleanup phase.
 set_source_files_properties(${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS
                                                          "BOOST_TEST_DYN_LINK")
+
+ExternalProject_Add(
+  download_mock_aartfaac_6_lba
+  EXCLUDE_FROM_ALL TRUE
+  URL https://www.astron.nl/citt/ci_data/EveryBeam/AARTFAAC_6_LBA_MOCK.ms.tar.gz
+  URL_HASH
+    SHA256=8d7f93ce089b3a29c4d0ee8b367d27a821175d0626793b16be1643ee9bcdc6a5
+  SOURCE_DIR ${DATA_DIR}/AARTFAAC_6_LBA_MOCK.ms
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND "")
+
 add_custom_target(
   download_mocks
   WORKING_DIRECTORY ${DATA_DIR}
@@ -68,7 +81,8 @@ add_custom_target(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh)
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
+  DEPENDS download_mock_aartfaac_6_lba)
 add_test(NAME download_mocks
          COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target
                  download_mocks)

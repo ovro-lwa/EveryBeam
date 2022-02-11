@@ -49,6 +49,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
         options_.element_response_model = ElementResponseModel::kHamakerLba;
         break;
       case ElementResponseModel::kHamakerLba:
+      case ElementResponseModel::kLOBES:
         break;
       default:
         throw std::runtime_error(
