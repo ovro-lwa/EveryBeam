@@ -34,9 +34,9 @@ deploy-package:
     # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap
     - ../external/schaap-packaging/update_repo.py --cleanup -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap ${FILES}
   rules:
-    # Only run on master because GPG_KEY and GPG_PASS are protected and therefore only available on protected branches.
-    - if: '$CI_COMMIT_BRANCH != "master"'
-      when: never
+    # Only deploy packages when building the default branch or a tag, or when UPLOAD_PACKAGE is set manually.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
     - if: '$UPLOAD_PACKAGE'
 
 check-stack:
