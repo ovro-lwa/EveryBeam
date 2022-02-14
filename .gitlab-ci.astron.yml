@@ -26,6 +26,8 @@ deploy-package:
   stage: deploy
   needs: ["versioning","build-package"]
   image: $EVERYBEAM_IMAGE
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
   script:
     - cd everybeam_package
     - export FILES=$(ls -1 $PWD/*.deb)
