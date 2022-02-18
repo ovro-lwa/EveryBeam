@@ -21,7 +21,7 @@ PhasedArrayGrid::PhasedArrayGrid(
     : GriddedResponse(telescope_ptr, coordinate_system),
       PhasedArrayResponse(static_cast<const PhasedArray*>(telescope_ptr)) {
   // Compute and set number of threads
-  const size_t ncpus = aocommon::ThreadPool::NCPUs();
+  const size_t ncpus = aocommon::system::ProcessorCount();
   const size_t nthreads = std::min(ncpus, telescope_->GetNrStations());
   threads_.resize(nthreads);
 }
