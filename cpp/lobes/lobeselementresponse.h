@@ -28,7 +28,7 @@ class LOBESElementResponse : public FieldResponse {
    * @param options if options.coeff_path is non-empty it is used to find
    * coefficient files
    */
-  LOBESElementResponse(const std::string &name, const Options &options);
+  LOBESElementResponse(const std::string& name, const Options& options);
 
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kLOBES;
@@ -71,7 +71,7 @@ class LOBESElementResponse : public FieldResponse {
    * @return std::shared_ptr<LOBESElementResponse>
    */
   static std::shared_ptr<LOBESElementResponse> GetInstance(
-      const std::string &name, const Options &options);
+      const std::string& name, const Options& options);
 
   /**
    * @brief Set field quantities (i.e. the basefunctions) for the LOBES element

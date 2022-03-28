@@ -14,7 +14,7 @@ using everybeam::common::F4far_new;
 using everybeam::common::P;
 using everybeam::common::Pacc;
 
-void init_lobes(py::module &m) {
+void init_lobes(py::module& m) {
   py::module m_sub = m.def_submodule("lobes");
 
   m_sub.doc() = "Helper methods for LOBEs response model";
@@ -43,11 +43,10 @@ void init_lobes(py::module &m) {
       static_cast<std::pair<std::complex<double>, std::complex<double>> (*)(
           int, int, int, double, double)>(&F4far_new),
       "Evaluate spherical harmonics at given (theta, phi) angle");
-  m_sub.def(
-      "F4far_new",
-      static_cast<std::pair<Eigen::VectorXcd, Eigen::VectorXcd> (*)(
-          int, int, int, const Eigen::VectorXd &, const Eigen::VectorXd &)>(
-          &everybeam::common::F4far_new),
-      "Evaluate spherical harmonics at given theta/phi angles "
-      "(vector/flattened array input)");
+  m_sub.def("F4far_new",
+            static_cast<std::pair<Eigen::VectorXcd, Eigen::VectorXcd> (*)(
+                int, int, int, const Eigen::VectorXd&, const Eigen::VectorXd&)>(
+                &everybeam::common::F4far_new),
+            "Evaluate spherical harmonics at given theta/phi angles "
+            "(vector/flattened array input)");
 }

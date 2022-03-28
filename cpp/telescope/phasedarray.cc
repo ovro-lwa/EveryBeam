@@ -9,9 +9,9 @@
 namespace everybeam {
 namespace telescope {
 void PhasedArray::CalculatePreappliedBeamOptions(
-    const casacore::MeasurementSet &ms, const std::string &data_column_name,
-    casacore::MDirection &preapplied_beam_dir,
-    CorrectionMode &correction_mode) {
+    const casacore::MeasurementSet& ms, const std::string& data_column_name,
+    casacore::MDirection& preapplied_beam_dir,
+    CorrectionMode& correction_mode) {
   casacore::ScalarMeasColumn<casacore::MDirection> referenceDirColumn(
       ms.field(),
       casacore::MSField::columnName(casacore::MSFieldEnums::REFERENCE_DIR));

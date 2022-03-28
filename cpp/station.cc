@@ -10,8 +10,8 @@
 using namespace everybeam;
 using everybeam::coords::ITRFDirection;
 
-Station::Station(const std::string &name, const vector3r_t &position,
-                 const Options &options)
+Station::Station(const std::string& name, const vector3r_t& position,
+                 const Options& options)
     : name_(name),
       position_(position),
       options_(options),
@@ -32,15 +32,15 @@ void Station::SetResponse(std::shared_ptr<ElementResponse> element_response) {
   element_response_.set(element_response);
 }
 
-const std::string &Station::GetName() const { return name_; }
+const std::string& Station::GetName() const { return name_; }
 
-const vector3r_t &Station::GetPosition() const { return position_; }
+const vector3r_t& Station::GetPosition() const { return position_; }
 
-void Station::SetPhaseReference(const vector3r_t &reference) {
+void Station::SetPhaseReference(const vector3r_t& reference) {
   phase_reference_ = reference;
 }
 
-const vector3r_t &Station::GetPhaseReference() const {
+const vector3r_t& Station::GetPhaseReference() const {
   return phase_reference_;
 }
 
@@ -73,7 +73,7 @@ void Station::SetAntenna(std::shared_ptr<Antenna> antenna) {
 
 // ========================================================
 aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
-                                                const vector3r_t &direction,
+                                                const vector3r_t& direction,
                                                 size_t id, bool is_local,
                                                 bool rotate) const {
   Antenna::Options options;
@@ -92,7 +92,7 @@ aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
 }
 
 aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
-                                                const vector3r_t &direction,
+                                                const vector3r_t& direction,
                                                 bool is_local,
                                                 bool rotate) const {
   return ComputeElementResponse(time, freq, direction, element_->GetElementID(),
@@ -100,9 +100,9 @@ aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
 }
 
 aocommon::MC2x2 Station::Response(real_t time, real_t freq,
-                                  const vector3r_t &direction, real_t freq0,
-                                  const vector3r_t &station0,
-                                  const vector3r_t &tile0,
+                                  const vector3r_t& direction, real_t freq0,
+                                  const vector3r_t& station0,
+                                  const vector3r_t& tile0,
                                   const bool rotate) const {
   Antenna::Options options;
   options.freq0 = freq0;
@@ -122,10 +122,10 @@ aocommon::MC2x2 Station::Response(real_t time, real_t freq,
 }
 
 aocommon::MC2x2Diag Station::ArrayFactor(real_t time, real_t freq,
-                                         const vector3r_t &direction,
+                                         const vector3r_t& direction,
                                          real_t freq0,
-                                         const vector3r_t &station0,
-                                         const vector3r_t &tile0) const {
+                                         const vector3r_t& station0,
+                                         const vector3r_t& tile0) const {
   Antenna::Options options;
   options.freq0 = freq0;
   options.station0 = station0;

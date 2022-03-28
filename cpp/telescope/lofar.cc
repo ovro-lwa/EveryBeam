@@ -28,7 +28,7 @@ using everybeam::pointresponse::LOFARPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::LOFAR;
 
-LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
+LOFAR::LOFAR(const casacore::MeasurementSet& ms, const Options& options)
     : PhasedArray(ms, options) {
   const TelescopeType telescope_type = GetTelescopeType(ms);
   if (telescope_type == TelescopeType::kAARTFAAC) {
@@ -124,7 +124,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) const {
+    const coords::CoordinateSystem& coordinate_system) const {
   std::unique_ptr<GriddedResponse> grid_response =
       is_aartfaac_ ? std::unique_ptr<GriddedResponse>(
                          new AartfaacGrid(this, coordinate_system))

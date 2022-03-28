@@ -25,7 +25,7 @@ class BeamFormerLofarLBA : public BeamFormerLofar {
    *
    * @param coordinate_system
    */
-  BeamFormerLofarLBA(const CoordinateSystem &coordinate_system)
+  BeamFormerLofarLBA(const CoordinateSystem& coordinate_system)
       : BeamFormerLofar(coordinate_system) {}
 
   /**
@@ -64,8 +64,8 @@ class BeamFormerLofarLBA : public BeamFormerLofar {
  private:
   // Local Array factor override
   aocommon::MC2x2Diag LocalArrayFactor(
-      real_t time, real_t freq, const vector3r_t &direction,
-      const Options &options) const final override;
+      real_t time, real_t freq, const vector3r_t& direction,
+      const Options& options) const final override;
 
   // Is element enabled?
   std::vector<std::array<bool, 2>> element_enabled_;

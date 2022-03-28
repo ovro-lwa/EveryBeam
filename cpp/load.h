@@ -33,7 +33,7 @@ enum TelescopeType {
  * @param ms
  * @return TelescopeType
  */
-TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms);
+TelescopeType GetTelescopeType(const casacore::MeasurementSet& ms);
 
 /**
  * @brief Load telescope given a measurement set. Telescope is determined
@@ -43,8 +43,8 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms);
  * @param options Options
  * @return std::unique_ptr<Telescope> Unique pointer to Telescope object
  */
-std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
-                                           const Options &options);
+std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
+                                           const Options& options);
 
 /**
  * @brief Load telescope given a path to a measurment set. Telescope is
@@ -54,15 +54,15 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
  * @param options Options
  * @return td::unique_ptr<Telescope> Unique pointer to Telescope object
  */
-std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,
-                                           const Options &options);
+std::unique_ptr<telescope::Telescope> Load(const std::string& ms_name,
+                                           const Options& options);
 
 /**
  * @brief Convert a string to an ElementResponseModel enum
  *
  */
 everybeam::ElementResponseModel GetElementResponseEnum(
-    const std::string &element_response);
+    const std::string& element_response);
 
 }  // namespace everybeam
 

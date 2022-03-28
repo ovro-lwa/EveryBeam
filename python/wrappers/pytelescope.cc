@@ -44,7 +44,7 @@ using everybeam::telescope::Telescope;
 
 namespace {
 // Convert pyarray of size 3 to vector3r_t
-vector3r_t np2vector3r_t(const py::array_t<double> &pyarray) {
+vector3r_t np2vector3r_t(const py::array_t<double>& pyarray) {
   auto r = pyarray.unchecked<1>();
   if (r.size() != 3) {
     throw std::runtime_error("Pyarray is of incorrect size, must be 3.");
@@ -54,14 +54,14 @@ vector3r_t np2vector3r_t(const py::array_t<double> &pyarray) {
 
 // Cast complex buffer to numpy array
 template <typename T>
-py::array_t<std::complex<T>> cast_tensor(const std::complex<T> *buffer,
-                                         const std::vector<size_t> &layout) {
+py::array_t<std::complex<T>> cast_tensor(const std::complex<T>* buffer,
+                                         const std::vector<size_t>& layout) {
   std::vector<ptrdiff_t> np_layout(layout.begin(), layout.end());
   return py::array_t<std::complex<T>>(np_layout, buffer);
 }
 
 // Cast aocommon::MC2x2 to py::array
-py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 &matrix) {
+py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2& matrix) {
   // Solution from: https://github.com/pybind/pybind11/issues/1299
   return cast_tensor<double>(matrix.Data(), {2, 2});
 }
@@ -70,7 +70,7 @@ py::array_t<std::complex<double>> cast_matrix(const aocommon::MC2x2 &matrix) {
 // with some additional size checks
 template <size_t nelem, typename T>
 py::array_t<std::complex<double>> cast_tensor_mc(
-    const std::vector<T> &matrix, const std::vector<size_t> &layout) {
+    const std::vector<T>& matrix, const std::vector<size_t>& layout) {
   size_t total_size = 1;
   for (size_t rank_size : layout) {
     total_size *= rank_size;
@@ -81,14 +81,14 @@ py::array_t<std::complex<double>> cast_tensor_mc(
   }
 
   // Reinterpret_cast needed to flatten the nested std::array
-  auto buffer = reinterpret_cast<const std::complex<double> *>(matrix.data());
+  auto buffer = reinterpret_cast<const std::complex<double>*>(matrix.data());
   return cast_tensor<double>(buffer, layout);
 }
 
 // Convenience method throwing an error if provided station
 // index exceeds number of stations
 void check_station_index(size_t idx, size_t idx_max,
-                         const std::string &prefix) {
+                         const std::string& prefix) {
   if (idx >= idx_max) {
     throw std::runtime_error(
         prefix + ": Requested station index exceeds number of stations.");
@@ -98,7 +98,7 @@ void check_station_index(size_t idx, size_t idx_max,
 // Convenience method to convert a buffer of [npixels * 16]
 // (where 16 the number of entries of an aocmmon::HMC4x4 matrix
 // to a vector of MC4x4 matrices
-std::vector<aocommon::MC4x4> hmc_to_mc(float *buffer, size_t npixels) {
+std::vector<aocommon::MC4x4> hmc_to_mc(float* buffer, size_t npixels) {
   std::vector<aocommon::MC4x4> vec_mc4x4(npixels);
   for (size_t pixel = 0; pixel != npixels; ++pixel) {
     std::array<double, 16> tmp;
@@ -112,7 +112,7 @@ std::vector<aocommon::MC4x4> hmc_to_mc(float *buffer, size_t npixels) {
 
 // Convenience function for applying the differential beam response (lhs) to the
 // response (rhs)
-void apply_differential_beam(aocommon::MC2x2 &lhs, const aocommon::MC2x2 &rhs) {
+void apply_differential_beam(aocommon::MC2x2& lhs, const aocommon::MC2x2& rhs) {
   // Computes lhs = lhs^{-1} * rhs by
   // 1) computing the inverse of response (in preapplied beam direction), if it
   // exists...
@@ -135,9 +135,9 @@ class PyTelescope : public Telescope {
   /* Inherit the constructors */
   using Telescope::Telescope;
 
-  GriddedResponse *GetGriddedResponseWrapper(
-      const CoordinateSystem &coordinate_system) {
-    PYBIND11_OVERLOAD_PURE(GriddedResponse *, Telescope, GetGriddedResponse,
+  GriddedResponse* GetGriddedResponseWrapper(
+      const CoordinateSystem& coordinate_system) {
+    PYBIND11_OVERLOAD_PURE(GriddedResponse*, Telescope, GetGriddedResponse,
                            coordinate_system);
   }
 };
@@ -152,8 +152,8 @@ class PyTelescope : public Telescope {
  * @param options Options
  * @return std::unique_ptr<Telescope>
  */
-std::unique_ptr<Telescope> create_telescope(const std::string &name,
-                                            const everybeam::Options &options) {
+std::unique_ptr<Telescope> create_telescope(const std::string& name,
+                                            const everybeam::Options& options) {
   MeasurementSet ms(name);
   std::unique_ptr<Telescope> telescope;
   const everybeam::TelescopeType telescope_name =
@@ -177,25 +177,25 @@ std::unique_ptr<Telescope> create_telescope(const std::string &name,
   return telescope;
 }
 
-std::unique_ptr<LOFAR> create_lofar(const std::string &name,
-                                    const everybeam::Options &options) {
+std::unique_ptr<LOFAR> create_lofar(const std::string& name,
+                                    const everybeam::Options& options) {
   return std::unique_ptr<LOFAR>{
-      static_cast<LOFAR *>(create_telescope(name, options).release())};
+      static_cast<LOFAR*>(create_telescope(name, options).release())};
 }
 
-std::unique_ptr<OSKAR> create_oskar(const std::string &name,
-                                    const everybeam::Options &options) {
+std::unique_ptr<OSKAR> create_oskar(const std::string& name,
+                                    const everybeam::Options& options) {
   return std::unique_ptr<OSKAR>{
-      static_cast<OSKAR *>(create_telescope(name, options).release())};
+      static_cast<OSKAR*>(create_telescope(name, options).release())};
 }
 
-std::unique_ptr<SkaMid> CreateSkaMid(const std::string &name,
-                                     const everybeam::Options &options) {
+std::unique_ptr<SkaMid> CreateSkaMid(const std::string& name,
+                                     const everybeam::Options& options) {
   return std::unique_ptr<SkaMid>{
-      static_cast<SkaMid *>(create_telescope(name, options).release())};
+      static_cast<SkaMid*>(create_telescope(name, options).release())};
 }
 
-void init_telescope(py::module &m) {
+void init_telescope(py::module& m) {
   py::class_<Telescope, PyTelescope>(m, "Telescope")
       .def_property_readonly("is_time_relevant", &Telescope::GetIsTimeRelevant,
                              R"pbdoc(
@@ -226,7 +226,7 @@ void init_telescope(py::module &m) {
       // elegant way, see https://github.com/pybind/pybind11/issues/2619
       .def(
           "gridded_response",
-          [](Telescope &self, const CoordinateSystem &coordinate_system,
+          [](Telescope& self, const CoordinateSystem& coordinate_system,
              double time, double freq, size_t station_idx,
              size_t field_idx) -> py::array_t<std::complex<float>> {
             check_station_index(station_idx, self.GetNrStations(),
@@ -268,7 +268,7 @@ void init_telescope(py::module &m) {
           py::arg("station_index"), py::kw_only(), py::arg("field_index") = 0)
       .def(
           "gridded_response",
-          [](Telescope &self, const CoordinateSystem &coordinate_system,
+          [](Telescope& self, const CoordinateSystem& coordinate_system,
              double time, double freq,
              size_t field_idx) -> py::array_t<std::complex<float>> {
             const size_t nr_stations = self.GetNrStations();
@@ -307,10 +307,10 @@ void init_telescope(py::module &m) {
           py::kw_only(), py::arg("field_index") = 0)
       .def(
           "undersampled_response",
-          [](Telescope &self, const CoordinateSystem &coordinate_system,
-             const py::array_t<double> &time, double freq,
+          [](Telescope& self, const CoordinateSystem& coordinate_system,
+             const py::array_t<double>& time, double freq,
              size_t undersampling_factor,
-             const py::array_t<double> &baseline_weights, size_t field_id) {
+             const py::array_t<double>& baseline_weights, size_t field_id) {
             std::unique_ptr<GriddedResponse> grid_response =
                 self.GetGriddedResponse(coordinate_system);
             std::vector<float> buffer(grid_response->GetIntegratedBufferSize());
@@ -389,13 +389,13 @@ void init_telescope(py::module &m) {
        )pbdoc")
       .def(
           "station_name",
-          [](PhasedArray &self, size_t idx) {
+          [](PhasedArray& self, size_t idx) {
             if (idx >= self.GetNrStations()) {
               throw std::runtime_error(
                   "Requested station index exceeds number of stations.");
             }
-            const everybeam::Station &station =
-                static_cast<const everybeam::Station &>(
+            const everybeam::Station& station =
+                static_cast<const everybeam::Station&>(
                     *(self.GetStation(idx).get()));
             return station.GetName();
           },
@@ -429,7 +429,7 @@ void init_telescope(py::module &m) {
       // Corresponds to evaluate3 in lofarbeam
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx, double freq,
+          [](PhasedArray& self, double time, size_t idx, double freq,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "station_response");
             vector3r_t direction;
@@ -440,8 +440,8 @@ void init_telescope(py::module &m) {
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
             phased_array_point.SetParalacticRotation(rotate);
 
             std::mutex mutex;
@@ -478,7 +478,7 @@ void init_telescope(py::module &m) {
       // Corresponds to evaluate2 in lofarbeam
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx, size_t channel,
+          [](PhasedArray& self, double time, size_t idx, size_t channel,
              bool rotate) -> py::array_t<std::complex<double>> {
             if (channel >= self.GetNrChannels()) {
               throw std::runtime_error(
@@ -514,7 +514,7 @@ void init_telescope(py::module &m) {
       // Corresponds to evaluate1 in lofarbeam
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx,
+          [](PhasedArray& self, double time, size_t idx,
              bool rotate) -> py::array_t<std::complex<double>> {
             // NOTE: reusing another station_response can be expected
             // to be slightly less efficient than making a dedicated
@@ -554,7 +554,7 @@ void init_telescope(py::module &m) {
       // Corresponds to evaluate0 in lofarbeam
       .def(
           "station_response",
-          [](PhasedArray &self, double time,
+          [](PhasedArray& self, double time,
              bool rotate) -> py::array_t<std::complex<double>> {
             const size_t nr_stations = self.GetNrStations();
             const size_t nr_channels = self.GetNrChannels();
@@ -592,10 +592,10 @@ void init_telescope(py::module &m) {
       // Corresponds to evaluate4 from lofarbeam
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx, double freq,
-             const py::array_t<double> &pydirection,
-             const py::array_t<double> &pystation0,
-             const py::array_t<double> &pytile0,
+          [](PhasedArray& self, double time, size_t idx, double freq,
+             const py::array_t<double>& pydirection,
+             const py::array_t<double>& pystation0,
+             const py::array_t<double>& pytile0,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "station_response");
 
@@ -605,8 +605,8 @@ void init_telescope(py::module &m) {
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
             phased_array_point.SetParalacticRotation(rotate);
             aocommon::MC2x2 response = phased_array_point.UnnormalisedResponse(
                 BeamMode::kFull, idx, freq, direction, station0, tile0);
@@ -666,7 +666,7 @@ void init_telescope(py::module &m) {
       // tile0 direction coincide.
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx, double freq,
+          [](PhasedArray& self, double time, size_t idx, double freq,
              const py::array_t<double> pydirection,
              const py::array_t<double> pystation0,
              bool rotate) -> py::array_t<std::complex<double>> {
@@ -704,12 +704,12 @@ void init_telescope(py::module &m) {
           py::arg("rotate") = true)
       .def(
           "station_response",
-          [](PhasedArray &self, double time, size_t idx, double freq, double ra,
+          [](PhasedArray& self, double time, size_t idx, double freq, double ra,
              double dec, size_t field_id) -> py::array_t<std::complex<float>> {
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
 
             py::array_t<std::complex<float>> response({size_t(2), size_t(2)});
             phased_array_point.Response(BeamMode::kFull,
@@ -746,7 +746,7 @@ void init_telescope(py::module &m) {
           py::arg("ra"), py::arg("dec"), py::arg("field_id") = 0)
       .def(
           "element_response",
-          [](PhasedArray &self, double time, size_t idx, size_t element_idx,
+          [](PhasedArray& self, double time, size_t idx, size_t element_idx,
              double freq, const py::array_t<double> pydirection, bool is_local,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "element_response");
@@ -755,8 +755,8 @@ void init_telescope(py::module &m) {
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
             phased_array_point.SetUseLocalCoordinateSystem(is_local);
             phased_array_point.SetParalacticRotation(rotate);
 
@@ -811,7 +811,7 @@ void init_telescope(py::module &m) {
           py::arg("rotate") = true)
       .def(
           "element_response",
-          [](PhasedArray &self, double time, size_t idx, double freq,
+          [](PhasedArray& self, double time, size_t idx, double freq,
              const py::array_t<double> pydirection, bool is_local,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "element_response");
@@ -820,8 +820,8 @@ void init_telescope(py::module &m) {
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
             phased_array_point.SetUseLocalCoordinateSystem(is_local);
             phased_array_point.SetParalacticRotation(rotate);
 
@@ -885,7 +885,7 @@ void init_telescope(py::module &m) {
           py::arg("rotate") = true)
       .def(
           "array_factor",
-          [](PhasedArray &self, double time, size_t idx, double freq,
+          [](PhasedArray& self, double time, size_t idx, double freq,
              const py::array_t<double> pydirection,
              const py::array_t<double> pystation0,
              const py::array_t<double> pytile0)
@@ -897,8 +897,8 @@ void init_telescope(py::module &m) {
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
-            PhasedArrayPoint &phased_array_point =
-                static_cast<PhasedArrayPoint &>(*point_response);
+            PhasedArrayPoint& phased_array_point =
+                static_cast<PhasedArrayPoint&>(*point_response);
 
             // Diagonal to 2x2 matrix
             const aocommon::MC2x2 response(
@@ -937,7 +937,7 @@ void init_telescope(py::module &m) {
           py::arg("tile0_direction"))
       .def(
           "array_factor",
-          [](PhasedArray &self, double time, size_t idx, double freq,
+          [](PhasedArray& self, double time, size_t idx, double freq,
              const py::array_t<double> pydirection,
              const py::array_t<double> pystation0)
               -> py::array_t<std::complex<double>> {
@@ -1051,7 +1051,7 @@ void init_telescope(py::module &m) {
           // PhasedArray::station_response. Migrate to
           // Telescope base class?
           "station_response",
-          [](SkaMid &self, double time, size_t idx, double freq, double ra,
+          [](SkaMid& self, double time, size_t idx, double freq, double ra,
              double dec, size_t field_id) -> py::array_t<std::complex<float>> {
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);

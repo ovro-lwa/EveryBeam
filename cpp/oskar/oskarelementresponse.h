@@ -48,7 +48,7 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
    *
    * @param path Path to the coefficients file to load
    */
-  OSKARElementResponseSphericalWave(const std::string &path);
+  OSKARElementResponseSphericalWave(const std::string& path);
 
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kOSKARSphericalWave;
@@ -61,7 +61,7 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
                            double phi) const final override;
 
  protected:
-  std::string GetPath(const char *) const;
+  std::string GetPath(const char*) const;
 
   std::unique_ptr<Datafile> datafile_;
 };

@@ -21,8 +21,8 @@ std::shared_ptr<Antenna> BeamFormerLofarHBA::Clone() const {
 }
 
 aocommon::MC2x2Diag BeamFormerLofarHBA::LocalArrayFactor(
-    real_t time, real_t freq, const vector3r_t &direction,
-    const Options &options) const {
+    real_t time, real_t freq, const vector3r_t& direction,
+    const Options& options) const {
   // Compute the array factor of the field
   aocommon::MC2x2Diag array_factor_field = FieldArrayFactor(
       time, freq, direction, options, tile_positions_, tile_enabled_);
@@ -35,8 +35,8 @@ aocommon::MC2x2Diag BeamFormerLofarHBA::LocalArrayFactor(
 }
 
 std::complex<double> BeamFormerLofarHBA::TileArrayFactor(
-    [[maybe_unused]] real_t time, real_t freq, const vector3r_t &direction,
-    const Options &options) const {
+    [[maybe_unused]] real_t time, real_t freq, const vector3r_t& direction,
+    const Options& options) const {
   // Weighted subtraction of the directions, with weights given by corresponding
   // freqs. Purpose is to correctly handle the case in which options.freq0 !=
   // freq
@@ -48,7 +48,7 @@ std::complex<double> BeamFormerLofarHBA::TileArrayFactor(
 
   // Initialize and fill result
   std::complex<double> result = 0;
-  for (const auto &gr : geometric_response) {
+  for (const auto& gr : geometric_response) {
     result += gr;
   }
 

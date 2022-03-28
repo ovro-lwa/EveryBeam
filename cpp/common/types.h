@@ -15,7 +15,7 @@ namespace everybeam {
 
 /** Print the contents of a static array. */
 template <typename T, size_t N>
-std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj);
+std::ostream& operator<<(std::ostream& out, const std::array<T, N>& obj);
 
 /** Type used for real scalars. */
 typedef double real_t;
@@ -38,7 +38,7 @@ typedef std::array<std::array<real_t, 2>, 2> matrix22r_t;
 typedef std::array<vector3r_t, 16> TileConfig;
 
 template <typename T, size_t N>
-std::ostream &operator<<(std::ostream &out, const std::array<T, N> &obj) {
+std::ostream& operator<<(std::ostream& out, const std::array<T, N>& obj) {
   // print(out, obj.begin(), obj.end());
   out << "[";
   for (auto it : obj) {

@@ -25,14 +25,14 @@ class ITRFDirection {
   typedef std::shared_ptr<ITRFDirection> Ptr;
   typedef std::shared_ptr<const ITRFDirection> ConstPtr;
 
-  ITRFDirection(const vector3r_t &position, const vector2r_t &direction);
-  ITRFDirection(const vector3r_t &position, const vector3r_t &direction);
-  ITRFDirection(const vector2r_t &direction);
-  ITRFDirection(const vector3r_t &direction);
+  ITRFDirection(const vector3r_t& position, const vector2r_t& direction);
+  ITRFDirection(const vector3r_t& position, const vector3r_t& direction);
+  ITRFDirection(const vector2r_t& direction);
+  ITRFDirection(const vector3r_t& direction);
 
   vector3r_t at(real_t time) const;
 
-  const static vector3r_t &LOFARPosition() { return lofar_position_; }
+  const static vector3r_t& LOFARPosition() { return lofar_position_; }
 
  private:
   // ITRF position of CS002LBA, just to use a fixed reference

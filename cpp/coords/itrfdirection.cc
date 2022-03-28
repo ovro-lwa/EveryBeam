@@ -20,8 +20,8 @@ const vector3r_t ITRFDirection::lofar_position_ = {
 // specific directions. Needed for wslean as well as for the makeeverybeam
 // executable.
 
-ITRFDirection::ITRFDirection(const vector3r_t &position,
-                             const vector2r_t &direction) {
+ITRFDirection::ITRFDirection(const vector3r_t& position,
+                             const vector2r_t& direction) {
   casacore::MVPosition mv_position(position[0], position[1], position[2]);
   casacore::MPosition m_position(mv_position, casacore::MPosition::ITRF);
   frame_ = casacore::MeasFrame(casacore::MEpoch(), m_position);
@@ -35,13 +35,13 @@ ITRFDirection::ITRFDirection(const vector3r_t &position,
       casacore::MDirection::Ref(casacore::MDirection::ITRF, frame_));
 }
 
-ITRFDirection::ITRFDirection(const vector2r_t &direction)
+ITRFDirection::ITRFDirection(const vector2r_t& direction)
     : ITRFDirection(lofar_position_, direction) {
   // create ITRF Direction from fixed stationposition
 }
 
-ITRFDirection::ITRFDirection(const vector3r_t &position,
-                             const vector3r_t &direction) {
+ITRFDirection::ITRFDirection(const vector3r_t& position,
+                             const vector3r_t& direction) {
   casacore::MVPosition mv_position(position[0], position[1], position[2]);
   casacore::MPosition m_position(mv_position, casacore::MPosition::ITRF);
   frame_ = casacore::MeasFrame(casacore::MEpoch(), m_position);
@@ -53,7 +53,7 @@ ITRFDirection::ITRFDirection(const vector3r_t &position,
       casacore::MDirection::Ref(casacore::MDirection::ITRF, frame_));
 }
 
-ITRFDirection::ITRFDirection(const vector3r_t &direction)
+ITRFDirection::ITRFDirection(const vector3r_t& direction)
     : ITRFDirection(lofar_position_, direction)
 
 {
@@ -67,8 +67,8 @@ vector3r_t ITRFDirection::at(real_t time) const {
   // argument is UTC in (fractional) days (MJD).
   frame_.resetEpoch(casacore::Quantity(time, "s"));
 
-  const casacore::MDirection &m_ITRF = converter_();
-  const casacore::MVDirection &mv_ITRF = m_ITRF.getValue();
+  const casacore::MDirection& m_ITRF = converter_();
+  const casacore::MVDirection& mv_ITRF = m_ITRF.getValue();
 
   return vector3r_t{mv_ITRF(0), mv_ITRF(1), mv_ITRF(2)};
 }

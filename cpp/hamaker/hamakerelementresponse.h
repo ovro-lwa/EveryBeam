@@ -32,10 +32,10 @@ class HamakerElementResponse : public ElementResponse {
    * @param name Station Name
    */
   static std::shared_ptr<HamakerElementResponse> GetInstance(
-      const std::string &name);
+      const std::string& name);
 
  protected:
-  std::string GetPath(const char *) const;
+  std::string GetPath(const char*) const;
 
   std::unique_ptr<HamakerCoefficients> coeffs_;
 };

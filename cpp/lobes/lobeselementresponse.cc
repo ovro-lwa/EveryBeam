@@ -53,7 +53,7 @@ static T ExtractIntegral(boost::string_view string) {
 #else
 /** Modelled after std::from_chars_result. */
 struct from_chars_result {
-  const char *ptr;
+  const char* ptr;
   std::errc ec;
 };
 
@@ -64,8 +64,8 @@ struct from_chars_result {
  * @note No support for bases other than 10.
  */
 template <class T>
-static from_chars_result from_chars(const char *first, const char *last,
-                                    T &value) {
+static from_chars_result from_chars(const char* first, const char* last,
+                                    T& value) {
   if (first == last || *first < '0' || *first > '9') {
     return {first, std::errc::invalid_argument};
   }
@@ -123,7 +123,7 @@ namespace {
  * @param station_name Station name, as read from MS
  * @return std::string Path to file or empty string if file cannot be found
  */
-boost::filesystem::path FindCoeffFile(const std::string &search_path,
+boost::filesystem::path FindCoeffFile(const std::string& search_path,
                                       boost::string_view station_name) {
   const std::string station_file = "LOBES_" + std::string{station_name} + ".h5";
   return search_path.empty()
@@ -145,15 +145,15 @@ static const H5::CompType kH5Dcomplex = [] {
 }();
 
 static void ReadAllElements(
-    Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor> &coefficients,
-    const H5::DataSet &dataset, const std::vector<unsigned int> &shape) {
+    Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor>& coefficients,
+    const H5::DataSet& dataset, const std::vector<unsigned int>& shape) {
   coefficients.resize(shape[0], shape[1], shape[2], shape[3]);
   dataset.read(coefficients.data(), kH5Dcomplex);
 }
 
 void ReadOneElement(
-    Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor> &coefficients,
-    const H5::DataSet &dataset, const std::vector<unsigned> &shape,
+    Eigen::Tensor<std::complex<double>, 4, Eigen::RowMajor>& coefficients,
+    const H5::DataSet& dataset, const std::vector<unsigned>& shape,
     unsigned index) {
   static constexpr size_t kRank = 4;
 
@@ -200,8 +200,8 @@ void ReadOneElement(
 #endif
 }
 
-LOBESElementResponse::LOBESElementResponse(const std::string &name,
-                                           const Options &options) {
+LOBESElementResponse::LOBESElementResponse(const std::string& name,
+                                           const Options& options) {
   const boost::optional<AartfaacStation> aartfaac_station =
       GetAartfaacStation(name, AartfaacElements::kInner);
 
@@ -216,7 +216,7 @@ LOBESElementResponse::LOBESElementResponse(const std::string &name,
 
   try {
     h5file.openFile(coeff_file_path.c_str(), H5F_ACC_RDONLY);
-  } catch (const H5::FileIException &e) {
+  } catch (const H5::FileIException& e) {
     throw std::runtime_error("Could not open LOBES coeffcients file: " +
                              coeff_file_path.string());
   }
@@ -292,7 +292,7 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
   // When the objects basefunctions_ aren't initialized create our own copy.
   // Note it's not possible to set the object's version since the function is
   // called from multiple threads.
-  const BaseFunctions &basefunctions =
+  const BaseFunctions& basefunctions =
       basefunctions_ ? *basefunctions_ : ComputeBaseFunctions(theta, phi);
 
   const int freq_idx = FindFrequencyIdx(freq);
@@ -318,7 +318,7 @@ aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
 }
 
 std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(
-    const std::string &name, const Options &options) {
+    const std::string& name, const Options& options) {
   static std::map<std::string, std::shared_ptr<LOBESElementResponse>>
       name_response_map;
 

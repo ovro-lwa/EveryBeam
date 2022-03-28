@@ -39,10 +39,10 @@ enum class ElementResponseModel {
   kAartfaacOuter = 8
 };
 
-std::ostream &operator<<(std::ostream &os, ElementResponseModel model);
+std::ostream& operator<<(std::ostream& os, ElementResponseModel model);
 
 ElementResponseModel ElementResponseModelFromString(
-    const std::string &element_response);
+    const std::string& element_response);
 
 /**
  * @brief Abstract class for the element response model. All the
@@ -84,8 +84,8 @@ class ElementResponse {
   }
 
   static std::shared_ptr<ElementResponse> GetInstance(
-      ElementResponseModel model, const std::string &name,
-      const Options &options);
+      ElementResponseModel model, const std::string& name,
+      const Options& options);
 };
 }  // namespace everybeam
 #endif

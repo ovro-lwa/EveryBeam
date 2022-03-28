@@ -18,8 +18,8 @@ std::shared_ptr<Antenna> BeamFormerIdenticalAntennas::Clone() const {
 }
 
 aocommon::MC2x2 BeamFormerIdenticalAntennas::LocalResponse(
-    real_t time, real_t freq, const vector3r_t &direction,
-    const Options &options) const {
+    real_t time, real_t freq, const vector3r_t& direction,
+    const Options& options) const {
   std::shared_ptr<Antenna> antenna = antennas_[0];
 
   aocommon::MC2x2 antenna_response =

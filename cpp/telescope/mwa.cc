@@ -14,7 +14,7 @@ using everybeam::pointresponse::MWAPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::MWA;
 
-MWA::MWA(const casacore::MeasurementSet &ms, const Options &options)
+MWA::MWA(const casacore::MeasurementSet& ms, const Options& options)
     : Telescope(ms, options) {
   if (GetNrStations() == 0) {
     throw std::runtime_error("No antennae in set");
@@ -30,14 +30,14 @@ MWA::MWA(const casacore::MeasurementSet &ms, const Options &options)
   casacore::ArrayColumn<int> delays_col(mwa_tile_pointing, "DELAYS");
   casacore::Array<int> delays_arr = delays_col(0);
   casacore::Array<int>::contiter delays_arr_ptr = delays_arr.cbegin();
-  for (auto &delay : delays_) {
+  for (auto& delay : delays_) {
     delay = *delays_arr_ptr;
     ++delays_arr_ptr;
   }
 }
 
 std::unique_ptr<GriddedResponse> MWA::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) const {
+    const coords::CoordinateSystem& coordinate_system) const {
   std::unique_ptr<GriddedResponse> grid(new MWAGrid(this, coordinate_system));
   return grid;
 }

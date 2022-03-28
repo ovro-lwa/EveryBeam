@@ -20,13 +20,13 @@
 #include <stdexcept>
 
 namespace everybeam {
-TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
+TelescopeType GetTelescopeType(const casacore::MeasurementSet& ms) {
   // Read Telescope name and convert to enum
   casacore::ScalarColumn<casacore::String> telescope_name_col(ms.observation(),
                                                               "TELESCOPE_NAME");
   std::string telescope_name = telescope_name_col(0);
   std::for_each(telescope_name.begin(), telescope_name.end(),
-                [](char &c) { c = ::toupper(c); });
+                [](char& c) { c = ::toupper(c); });
 
   if (telescope_name == "AARTFAAC") {
     return kAARTFAAC;
@@ -50,8 +50,8 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet &ms) {
   }
 }
 
-std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
-                                           const Options &options) {
+std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
+                                           const Options& options) {
   std::unique_ptr<telescope::Telescope> telescope;
   const TelescopeType telescope_name = GetTelescopeType(ms);
   switch (telescope_name) {
@@ -96,14 +96,14 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet &ms,
   return telescope;
 }
 
-std::unique_ptr<telescope::Telescope> Load(const std::string &ms_name,
-                                           const Options &options) {
+std::unique_ptr<telescope::Telescope> Load(const std::string& ms_name,
+                                           const Options& options) {
   casacore::MeasurementSet ms(ms_name);
   return Load(ms, options);
 }
 
 ElementResponseModel GetElementResponseEnum(
-    const std::string &element_response) {
+    const std::string& element_response) {
   return ElementResponseModelFromString(element_response);
 }
 }  // namespace everybeam

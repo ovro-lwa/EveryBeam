@@ -32,16 +32,16 @@ class MWA final : public Telescope {
    * @param model Element Response model
    * @param options telescope options
    */
-  MWA(const casacore::MeasurementSet &ms, const Options &options);
+  MWA(const casacore::MeasurementSet& ms, const Options& options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) const override;
+      const coords::CoordinateSystem& coordinate_system) const override;
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
 
   casacore::MPosition GetArrayPosition() const { return array_position_; }
-  const std::array<double, 16> &GetDelays() const { return delays_; }
+  const std::array<double, 16>& GetDelays() const { return delays_; }
 
  private:
   casacore::MPosition array_position_;

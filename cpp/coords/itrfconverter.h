@@ -30,12 +30,12 @@ class ITRFConverter {
   ITRFConverter(real_t time);
 
   void SetTime(real_t time);
-  vector3r_t j2000ToITRF(const vector2r_t &j2000Direction) const;
-  vector3r_t j2000ToITRF(const vector3r_t &j2000Direction) const;
-  vector3r_t ToITRF(const casacore::MDirection &direction) const;
-  casacore::MDirection ToDirection(const vector2r_t &j2000Direction) const;
-  casacore::MDirection ToDirection(const vector3r_t &j2000Direction) const;
-  casacore::MDirection ToDirection(const casacore::MDirection &direction) const;
+  vector3r_t j2000ToITRF(const vector2r_t& j2000Direction) const;
+  vector3r_t j2000ToITRF(const vector3r_t& j2000Direction) const;
+  vector3r_t ToITRF(const casacore::MDirection& direction) const;
+  casacore::MDirection ToDirection(const vector2r_t& j2000Direction) const;
+  casacore::MDirection ToDirection(const vector3r_t& j2000Direction) const;
+  casacore::MDirection ToDirection(const casacore::MDirection& direction) const;
 
  private:
   casacore::MeasFrame frame_;

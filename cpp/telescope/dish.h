@@ -31,12 +31,12 @@ namespace telescope {
  */
 class Dish final : public Telescope {
  public:
-  Dish(const casacore::MeasurementSet &ms,
+  Dish(const casacore::MeasurementSet& ms,
        std::unique_ptr<circularsymmetric::Coefficients> coefficients,
-       const Options &options);
+       const Options& options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) const override;
+      const coords::CoordinateSystem& coordinate_system) const override;
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
@@ -47,11 +47,11 @@ class Dish final : public Telescope {
    * @return std::vector<std::pair<double, double>> Vector of size number of
    * fields, and (ra, dec) pointings as entries.
    */
-  const std::vector<std::pair<double, double>> &GetFieldPointing() const {
+  const std::vector<std::pair<double, double>>& GetFieldPointing() const {
     return field_pointing_;
   }
 
-  const circularsymmetric::Coefficients *GetDishCoefficients() const {
+  const circularsymmetric::Coefficients* GetDishCoefficients() const {
     return dish_coefficients_.get();
   }
 

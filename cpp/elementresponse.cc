@@ -11,7 +11,7 @@
 namespace everybeam {
 
 ElementResponseModel ElementResponseModelFromString(
-    const std::string &element_response) {
+    const std::string& element_response) {
   // LOFAR & SKA(/OSKAR) related
   std::string element_response_upper = element_response;
   std::transform(element_response_upper.begin(), element_response_upper.end(),
@@ -38,7 +38,7 @@ ElementResponseModel ElementResponseModelFromString(
   return element_response_enum;
 }
 
-std::ostream &operator<<(std::ostream &os, ElementResponseModel model) {
+std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   switch (model) {
     case ElementResponseModel::kDefault:
       os << "Default";
@@ -65,8 +65,8 @@ std::ostream &operator<<(std::ostream &os, ElementResponseModel model) {
 }
 
 std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
-    ElementResponseModel model, const std::string &name,
-    const Options &options) {
+    ElementResponseModel model, const std::string& name,
+    const Options& options) {
   switch (model) {
     case ElementResponseModel::kHamaker:
       return HamakerElementResponse::GetInstance(name);
@@ -79,7 +79,7 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
     case ElementResponseModel::kLOBES:
       try {
         return LOBESElementResponse::GetInstance(name, options);
-      } catch (const std::runtime_error &e) {
+      } catch (const std::runtime_error& e) {
         std::cout << "Creating LOBESElementResponse for station " << name
                   << " failed because: " << std::endl;
         std::cout << e.what() << std::endl;

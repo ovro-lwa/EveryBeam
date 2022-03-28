@@ -16,17 +16,17 @@ using telescope::PhasedArray;
 
 namespace pointresponse {
 
-PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope *telescope_ptr,
+PhasedArrayPoint::PhasedArrayPoint(const telescope::Telescope* telescope_ptr,
                                    double time)
     : PointResponse(telescope_ptr, time),
-      PhasedArrayResponse(static_cast<const PhasedArray *>(telescope_ptr)),
+      PhasedArrayResponse(static_cast<const PhasedArray*>(telescope_ptr)),
       ra_(std::numeric_limits<double>::min()),
       dec_(std::numeric_limits<double>::min()),
       has_partial_itrf_update_(false),
       is_local_(false),
       rotate_(true) {}
 
-void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float> *buffer,
+void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float>* buffer,
                                 double ra, double dec, double freq,
                                 size_t station_idx,
                                 [[maybe_unused]] size_t field_id) {
@@ -38,8 +38,8 @@ void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float> *buffer,
     has_partial_itrf_update_ = false;
   }
 
-  const PhasedArray &phased_array =
-      static_cast<const PhasedArray &>(*telescope_);
+  const PhasedArray& phased_array =
+      static_cast<const PhasedArray&>(*telescope_);
 
   aocommon::MC2x2F inverse_central_gain;
   const bool apply_normalisation = CalculateBeamNormalisation(
@@ -61,8 +61,8 @@ void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float> *buffer,
 
 aocommon::MC2x2 PhasedArrayPoint::Response(BeamMode beam_mode,
                                            size_t station_idx, double freq,
-                                           const vector3r_t &direction,
-                                           std::mutex *mutex) {
+                                           const vector3r_t& direction,
+                                           std::mutex* mutex) {
   if (has_time_update_) {
     if (mutex != nullptr) {
       // Caller takes over responsibility to be thread-safe
@@ -90,10 +90,10 @@ aocommon::MC2x2 PhasedArrayPoint::Response(BeamMode beam_mode,
 
 aocommon::MC2x2 PhasedArrayPoint::UnnormalisedResponse(
     BeamMode beam_mode, size_t station_idx, double freq,
-    const vector3r_t &direction, const vector3r_t &station0,
-    const vector3r_t &tile0) const {
-  const PhasedArray &phased_array =
-      static_cast<const PhasedArray &>(*telescope_);
+    const vector3r_t& direction, const vector3r_t& station0,
+    const vector3r_t& tile0) const {
+  const PhasedArray& phased_array =
+      static_cast<const PhasedArray&>(*telescope_);
   const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
   return phased_array.GetStation(station_idx)
@@ -103,10 +103,10 @@ aocommon::MC2x2 PhasedArrayPoint::UnnormalisedResponse(
 
 aocommon::MC2x2 PhasedArrayPoint::ElementResponse(size_t station_idx,
                                                   double freq,
-                                                  const vector3r_t &direction,
+                                                  const vector3r_t& direction,
                                                   size_t element_idx) const {
-  const PhasedArray &phased_array =
-      static_cast<const PhasedArray &>(*telescope_);
+  const PhasedArray& phased_array =
+      static_cast<const PhasedArray&>(*telescope_);
   return phased_array.GetStation(station_idx)
       ->ComputeElementResponse(time_, freq, direction, element_idx, is_local_,
                                rotate_);
@@ -136,7 +136,7 @@ void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {
                         diff_beam_centre_);
 }
 
-void PhasedArrayPoint::UpdateITRFVectors(std::mutex &mutex) {
+void PhasedArrayPoint::UpdateITRFVectors(std::mutex& mutex) {
   std::unique_lock<std::mutex> lock(mutex);
   coords::ITRFConverter itrf_converter(time_);
   coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);

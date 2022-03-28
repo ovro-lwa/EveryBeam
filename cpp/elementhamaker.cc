@@ -18,9 +18,9 @@ std::shared_ptr<Antenna> ElementHamaker::Clone() const {
 
 aocommon::MC2x2 ElementHamaker::LocalResponse([[maybe_unused]] real_t time,
                                               real_t freq,
-                                              const vector3r_t &direction,
+                                              const vector3r_t& direction,
                                               size_t id,
-                                              const Options &options) const {
+                                              const Options& options) const {
   vector2r_t thetaphi = cart2thetaphi(direction);
   thetaphi[1] -= 5.0 * common::pi_4;
 

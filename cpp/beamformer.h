@@ -35,7 +35,7 @@ class BeamFormer : public Antenna {
    *
    * @param coordinate_system
    */
-  BeamFormer(const CoordinateSystem &coordinate_system,
+  BeamFormer(const CoordinateSystem& coordinate_system,
              std::shared_ptr<FieldResponse> field_response = nullptr)
       : Antenna(coordinate_system),
         local_phase_reference_position_(
@@ -50,14 +50,14 @@ class BeamFormer : public Antenna {
    * @param phase_reference_position
    */
   BeamFormer(CoordinateSystem coordinate_system,
-             const vector3r_t &phase_reference_position,
+             const vector3r_t& phase_reference_position,
              std::shared_ptr<FieldResponse> field_response = nullptr)
       : Antenna(coordinate_system, phase_reference_position),
         local_phase_reference_position_(
             TransformToLocalPosition(phase_reference_position_)),
         field_response_(field_response) {}
 
-  BeamFormer(const vector3r_t &phase_reference_position,
+  BeamFormer(const vector3r_t& phase_reference_position,
              std::shared_ptr<FieldResponse> field_response = nullptr)
       : Antenna(phase_reference_position),
         local_phase_reference_position_(
@@ -108,21 +108,21 @@ class BeamFormer : public Antenna {
    * @return The geometry response for each position.
    */
   static aocommon::UVector<std::complex<double>> ComputeGeometricResponse(
-      const std::vector<vector3r_t> &phase_reference_positions,
-      const vector3r_t &direction);
+      const std::vector<vector3r_t>& phase_reference_positions,
+      const vector3r_t& direction);
 
  protected:
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                const vector3r_t &direction,
-                                const Options &options) const override;
+                                const vector3r_t& direction,
+                                const Options& options) const override;
 
   // Compute the local ArrayFactor, with ArrayFactor a vectorial
   // "representation" of a diagonal Jones matrix
   aocommon::MC2x2Diag LocalArrayFactor(real_t time, real_t freq,
-                                       const vector3r_t &direction,
-                                       const Options &options) const override;
+                                       const vector3r_t& direction,
+                                       const Options& options) const override;
 
   const vector3r_t
       local_phase_reference_position_;  // in coordinate system of Antenna
@@ -138,7 +138,7 @@ class BeamFormer : public Antenna {
   /**
    * @brief Transform position vector into a local position vector.
    */
-  vector3r_t TransformToLocalPosition(const vector3r_t &position);
+  vector3r_t TransformToLocalPosition(const vector3r_t& position);
 
   /**
    * @brief Compute the beamformer weights based on the difference vector
@@ -151,7 +151,7 @@ class BeamFormer : public Antenna {
    * the beamformer
    */
   std::vector<aocommon::MC2x2Diag> ComputeWeightedResponses(
-      const vector3r_t &direction) const;
+      const vector3r_t& direction) const;
 
   /**
    * @brief Mutex providing a locking mechanism in case field quantities can be

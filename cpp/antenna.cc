@@ -7,13 +7,13 @@
 
 namespace everybeam {
 
-Antenna::Antenna(const CoordinateSystem &coordinate_system,
-                 const vector3r_t &phase_reference_position)
+Antenna::Antenna(const CoordinateSystem& coordinate_system,
+                 const vector3r_t& phase_reference_position)
     : coordinate_system_(coordinate_system),
       phase_reference_position_(phase_reference_position),
       enabled_{true, true} {}
 
-Antenna::Antenna(const vector3r_t &phase_reference_position)
+Antenna::Antenna(const vector3r_t& phase_reference_position)
     : coordinate_system_(
           {phase_reference_position, CoordinateSystem::identity_axes}),
       phase_reference_position_(phase_reference_position),
@@ -27,7 +27,7 @@ constexpr vector3r_t Antenna::CoordinateSystem::zero_origin;
 constexpr Antenna::CoordinateSystem Antenna::IdentityCoordinateSystem;
 
 vector3r_t Antenna::TransformToLocalDirection(
-    const vector3r_t &direction) const {
+    const vector3r_t& direction) const {
   return {
       dot(coordinate_system_.axes.p, direction),
       dot(coordinate_system_.axes.q, direction),
@@ -35,7 +35,7 @@ vector3r_t Antenna::TransformToLocalDirection(
   };
 }
 
-void Antenna::Transform(const CoordinateSystem &coordinate_system) {
+void Antenna::Transform(const CoordinateSystem& coordinate_system) {
   coordinate_system_.axes.p =
       coordinate_system_.axes.p[0] * coordinate_system.axes.p +
       coordinate_system_.axes.p[1] * coordinate_system.axes.q +

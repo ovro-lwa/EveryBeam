@@ -20,10 +20,10 @@ namespace telescope {
 //! SKA-MID telescope class
 class SkaMid final : public Telescope {
  public:
-  SkaMid(const casacore::MeasurementSet &ms, const Options &options);
+  SkaMid(const casacore::MeasurementSet& ms, const Options& options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) const override;
+      const coords::CoordinateSystem& coordinate_system) const override;
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;
@@ -34,7 +34,7 @@ class SkaMid final : public Telescope {
    * @return std::vector<std::pair<double, double>> Vector of size number of
    * fields, and (ra, dec) pointings as entries.
    */
-  const std::vector<std::pair<double, double>> &GetFieldPointing() const {
+  const std::vector<std::pair<double, double>>& GetFieldPointing() const {
     return field_pointing_;
   }
 

@@ -20,8 +20,8 @@ namespace mwabeam {
 
 class TileBeam2016 : public Beam2016Implementation {
  public:
-  TileBeam2016(const double *delays, bool frequency_interpolation,
-               const std::string &coeff_path);
+  TileBeam2016(const double* delays, bool frequency_interpolation,
+               const std::string& coeff_path);
 
   /**
    * @brief API method for computing MWA array response
@@ -36,11 +36,11 @@ class TileBeam2016 : public Beam2016Implementation {
    * @param gain Gain matrix
    */
   void ArrayResponse(double ra, double dec,
-                     const casacore::MDirection::Ref &j2000_ref,
-                     casacore::MDirection::Convert &j2000_to_hadecref,
-                     casacore::MDirection::Convert &j2000_to_azelgeoref,
+                     const casacore::MDirection::Ref& j2000_ref,
+                     casacore::MDirection::Convert& j2000_to_hadecref,
+                     casacore::MDirection::Convert& j2000_to_azelgeoref,
                      double arr_lattitude, double frequency,
-                     std::complex<double> *gain);
+                     std::complex<double>* gain);
 
   /**
    * @brief Compute MWA array response in given zenith/azimuth direction
@@ -51,7 +51,7 @@ class TileBeam2016 : public Beam2016Implementation {
    * @param gain Gain matrix
    */
   void ArrayResponse(double zenith_angle, double azimuth, double frequency,
-                     std::complex<double> *gain) {
+                     std::complex<double>* gain) {
     // As yet, this conditional is effectively redundant
     if (frequency_interpolation_)
       GetInterpolatedResponse(azimuth, zenith_angle, frequency, gain);
@@ -68,13 +68,13 @@ class TileBeam2016 : public Beam2016Implementation {
    * from the impedance matrix. freq in Hz.
    */
   void GetTabulatedResponse(double az, double za, double freq,
-                            std::complex<double> *result);
+                            std::complex<double>* result);
 
   /**
    * Create a few tabulated responses and interpolated over these.
    */
   void GetInterpolatedResponse(double az, double za, double freq,
-                               std::complex<double> *result) {
+                               std::complex<double>* result) {
     // Not implemented yet: just call normal function
     GetTabulatedResponse(az, za, freq, result);
   }

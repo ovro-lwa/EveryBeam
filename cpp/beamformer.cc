@@ -31,7 +31,7 @@ std::shared_ptr<Antenna> BeamFormer::ExtractAntenna(
   return antenna;
 }
 
-vector3r_t BeamFormer::TransformToLocalPosition(const vector3r_t &position) {
+vector3r_t BeamFormer::TransformToLocalPosition(const vector3r_t& position) {
   // Get antenna position relative to coordinate system origin
   const vector3r_t dposition{position[0] - coordinate_system_.origin[0],
                              position[1] - coordinate_system_.origin[1],
@@ -45,8 +45,8 @@ vector3r_t BeamFormer::TransformToLocalPosition(const vector3r_t &position) {
 }
 
 aocommon::UVector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
-    const std::vector<vector3r_t> &phase_reference_positions,
-    const vector3r_t &direction) {
+    const std::vector<vector3r_t>& phase_reference_positions,
+    const vector3r_t& direction) {
   constexpr double two_pi_over_c = -2.0 * M_PI / common::c;
 
   // Allocate and fill result vector by looping over antennas
@@ -62,7 +62,7 @@ aocommon::UVector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
 }
 
 std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
-    const vector3r_t &pointing) const {
+    const vector3r_t& pointing) const {
   // Get geometric response for pointing direction
   aocommon::UVector<std::complex<double>> geometric_response =
       ComputeGeometricResponse(delta_phase_reference_positions_, pointing);
@@ -81,7 +81,7 @@ std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
   }
 
   // Normalize the weight by the number of antennas
-  for (auto &entry : result) {
+  for (auto& entry : result) {
     entry[0] /= weight_sum[0];
     entry[1] /= weight_sum[1];
   }
@@ -89,8 +89,8 @@ std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
 }
 
 aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
-                                          const vector3r_t &direction,
-                                          const Options &options) const {
+                                          const vector3r_t& direction,
+                                          const Options& options) const {
   std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
 
   // Weighted subtraction of the pointing direction (0-direction), and the
@@ -144,8 +144,8 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
 }
 
 aocommon::MC2x2Diag BeamFormer::LocalArrayFactor(real_t time, real_t freq,
-                                                 const vector3r_t &direction,
-                                                 const Options &options) const {
+                                                 const vector3r_t& direction,
+                                                 const Options& options) const {
   // Weighted subtraction of the pointing direction (0-direction), and the
   // direction of interest (direction). Weights are given by corresponding
   // freqs.

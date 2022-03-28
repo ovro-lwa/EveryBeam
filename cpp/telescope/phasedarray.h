@@ -38,7 +38,7 @@ class PhasedArray : public Telescope {
    * @param ms MeasurementSet
    * @param options telescope options
    */
-  PhasedArray(const casacore::MeasurementSet &ms, const Options &options)
+  PhasedArray(const casacore::MeasurementSet& ms, const Options& options)
       : Telescope(ms, options) {
     stations_.resize(nstations_);
   };
@@ -87,9 +87,9 @@ class PhasedArray : public Telescope {
 
  protected:
   static void CalculatePreappliedBeamOptions(
-      const casacore::MeasurementSet &ms, const std::string &data_column_name,
-      casacore::MDirection &preapplied_beam_dir,
-      CorrectionMode &correction_mode);
+      const casacore::MeasurementSet& ms, const std::string& data_column_name,
+      casacore::MDirection& preapplied_beam_dir,
+      CorrectionMode& correction_mode);
 
   std::vector<std::shared_ptr<Station>> stations_;
 

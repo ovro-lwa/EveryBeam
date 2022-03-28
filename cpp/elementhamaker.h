@@ -28,27 +28,27 @@ class ElementHamaker final : public Element {
    * @param element_response ElementResponseModel
    * @param id
    */
-  ElementHamaker(const CoordinateSystem &coordinate_system,
+  ElementHamaker(const CoordinateSystem& coordinate_system,
                  ElementResponse::Ptr element_response, int id)
       : Element(coordinate_system, element_response, id) {}
 
   std::shared_ptr<Antenna> Clone() const override;
 
   aocommon::MC2x2 Response(real_t time, real_t freq,
-                           const vector3r_t &direction,
-                           const Options &options) const override {
+                           const vector3r_t& direction,
+                           const Options& options) const override {
     // The only transform that is needed is hard-coded in LocalResponse
     return LocalResponse(time, freq, direction, options);
   }
 
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                const vector3r_t &direction, size_t id,
-                                const Options &options) const override;
+                                const vector3r_t& direction, size_t id,
+                                const Options& options) const override;
 
  private:
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                const vector3r_t &direction,
-                                const Options &options) const override {
+                                const vector3r_t& direction,
+                                const Options& options) const override {
     return LocalResponse(time, freq, direction, id_, options);
   };
 };

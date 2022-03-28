@@ -95,7 +95,7 @@ class Antenna {
    *
    * @param coordinate_system
    */
-  Antenna(const CoordinateSystem &coordinate_system)
+  Antenna(const CoordinateSystem& coordinate_system)
       :  // default phase reference system is the origin of the coordinate
          // system
         Antenna(coordinate_system, coordinate_system.origin) {}
@@ -109,15 +109,15 @@ class Antenna {
    * @param coordinate_system Coordinate system
    * @param phase_reference_position Phase reference position (ITRF, m)
    */
-  Antenna(const CoordinateSystem &coordinate_system,
-          const vector3r_t &phase_reference_position);
+  Antenna(const CoordinateSystem& coordinate_system,
+          const vector3r_t& phase_reference_position);
 
   /**
    * @brief Construct a new Antenna object
    *
    * @param phase_reference_position Phase reference position (ITRF, m)
    */
-  Antenna(const vector3r_t &phase_reference_position);
+  Antenna(const vector3r_t& phase_reference_position);
 
   /**
    * @brief Makes a copy of this Antenna object
@@ -148,7 +148,7 @@ class Antenna {
    * the coordinate system of the beamformer needs to be
    * applied to the coordinate system of the antenna
    */
-  void Transform(const CoordinateSystem &coordinate_system);
+  void Transform(const CoordinateSystem& coordinate_system);
 
   /**
    * @brief Compute the %Antenna Response
@@ -159,8 +159,8 @@ class Antenna {
    * @param options
    */
   virtual aocommon::MC2x2 Response(real_t time, real_t freq,
-                                   const vector3r_t &direction,
-                                   const Options &options = {}) const {
+                                   const vector3r_t& direction,
+                                   const Options& options = {}) const {
     // Transform direction and directions in options to local coordinatesystem
     vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
@@ -182,8 +182,8 @@ class Antenna {
    * @param options
    */
   virtual aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
-                                          const vector3r_t &direction,
-                                          const Options &options) const {
+                                          const vector3r_t& direction,
+                                          const Options& options) const {
     // Transform direction and directions in options to local coordinatesystem
     const vector3r_t local_direction = TransformToLocalDirection(direction);
     Options local_options;
@@ -198,17 +198,17 @@ class Antenna {
   bool enabled_[2];
 
  protected:
-  vector3r_t TransformToLocalDirection(const vector3r_t &direction) const;
+  vector3r_t TransformToLocalDirection(const vector3r_t& direction) const;
 
  private:
   virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                        const vector3r_t &direction,
-                                        const Options &options) const = 0;
+                                        const vector3r_t& direction,
+                                        const Options& options) const = 0;
 
   virtual aocommon::MC2x2Diag LocalArrayFactor(
       [[maybe_unused]] real_t time, [[maybe_unused]] real_t freq,
-      [[maybe_unused]] const vector3r_t &direction,
-      [[maybe_unused]] const Options &options) const {
+      [[maybe_unused]] const vector3r_t& direction,
+      [[maybe_unused]] const Options& options) const {
     return aocommon::MC2x2Diag::Unity();
   }
 };

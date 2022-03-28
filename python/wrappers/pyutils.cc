@@ -35,7 +35,7 @@ vector3r_t np2vector3r_t(const py::array_t<double> pyarray) {
 }
 }  // namespace
 
-void init_utils(py::module &m) {
+void init_utils(py::module& m) {
   m.def(
       "cart2thetaphi",
       [](py::array_t<double> pydirection) {

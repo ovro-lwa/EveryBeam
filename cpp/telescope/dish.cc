@@ -13,9 +13,9 @@ using everybeam::pointresponse::DishPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::Dish;
 
-Dish::Dish(const casacore::MeasurementSet &ms,
+Dish::Dish(const casacore::MeasurementSet& ms,
            std::unique_ptr<circularsymmetric::Coefficients> coefficients,
-           const Options &options)
+           const Options& options)
     : Telescope(ms, options), dish_coefficients_(std::move(coefficients)) {
   casacore::MSField field_table = ms.field();
   casacore::ArrayColumn<double> pointing_dir_col(
@@ -31,7 +31,7 @@ Dish::Dish(const casacore::MeasurementSet &ms,
 }
 
 std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) const {
+    const coords::CoordinateSystem& coordinate_system) const {
   std::unique_ptr<GriddedResponse> grid(new DishGrid(this, coordinate_system));
   return grid;
 }

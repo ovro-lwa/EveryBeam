@@ -31,7 +31,7 @@ namespace common {
  * @param id Id of the antenna field in the station (int)
  * @return vector3r_t
  */
-inline vector3r_t ReadOrigin(const casacore::Table &table, size_t id) {
+inline vector3r_t ReadOrigin(const casacore::Table& table, size_t id) {
   casacore::ArrayQuantColumn<double> position_column(table, "POSITION", "m");
   // Read antenna field center (ITRF).
   casacore::Vector<casacore::Quantity> position = position_column(id);
@@ -49,7 +49,7 @@ inline vector3r_t ReadOrigin(const casacore::Table &table, size_t id) {
  * @return Antenna::CoordinateSystem
  */
 inline Antenna::CoordinateSystem ReadCoordinateSystem(
-    const casacore::Table &table, size_t id) {
+    const casacore::Table& table, size_t id) {
   const vector3r_t origin = ReadOrigin(table, id);
   casacore::ArrayQuantColumn<casacore::Double> c_axes(table, "COORDINATE_AXES",
                                                       "m");
@@ -75,7 +75,7 @@ inline Antenna::CoordinateSystem ReadCoordinateSystem(
  * @return Antenna::CoordinateSystem
  */
 inline Antenna::CoordinateSystem ReadAartfaacCoordinateSystem(
-    const casacore::Table &table, size_t station_index) {
+    const casacore::Table& table, size_t station_index) {
   const vector3r_t origin = ReadOrigin(table, station_index);
 
   casacore::TableRecord keywordset = table.keywordSet();
@@ -98,7 +98,7 @@ inline Antenna::CoordinateSystem ReadAartfaacCoordinateSystem(
  * @return true If column present
  * @return false If column not present
  */
-inline bool HasColumn(const casacore::Table &table, const string &column) {
+inline bool HasColumn(const casacore::Table& table, const string& column) {
   return table.tableDesc().isColumn(column);
 }
 
@@ -109,8 +109,8 @@ inline bool HasColumn(const casacore::Table &table, const string &column) {
  * @param name Name of sub table (str)
  * @return Table (casacore::Table)
  */
-inline casacore::Table GetSubTable(const casacore::Table &table,
-                                   const string &name) {
+inline casacore::Table GetSubTable(const casacore::Table& table,
+                                   const string& name) {
   return table.keywordSet().asTable(name);
 }
 }  // namespace common

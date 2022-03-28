@@ -12,9 +12,9 @@
 
 namespace everybeam {
 aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
-    [[maybe_unused]] real_t time, real_t freq, const vector3r_t &direction,
-    const Options &options, const std::vector<vector3r_t> &antenna_positions,
-    const std::vector<std::array<bool, 2>> &antenna_enabled) const {
+    [[maybe_unused]] real_t time, real_t freq, const vector3r_t& direction,
+    const Options& options, const std::vector<vector3r_t>& antenna_positions,
+    const std::vector<std::array<bool, 2>>& antenna_enabled) const {
   assert(antenna_positions.size() == antenna_enabled.size());
 
   // Weighted subtraction of the directions, with weights given by corresponding
@@ -45,8 +45,8 @@ aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
 }
 
 aocommon::MC2x2 BeamFormerLofar::LocalResponse(real_t time, real_t freq,
-                                               const vector3r_t &direction,
-                                               const Options &options) const {
+                                               const vector3r_t& direction,
+                                               const Options& options) const {
   // Compute the combined array factor
   const aocommon::MC2x2Diag array_factor =
       LocalArrayFactor(time, freq, direction, options);

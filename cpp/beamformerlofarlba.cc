@@ -20,8 +20,8 @@ std::shared_ptr<Antenna> BeamFormerLofarLBA::Clone() const {
 }
 
 aocommon::MC2x2Diag BeamFormerLofarLBA::LocalArrayFactor(
-    real_t time, real_t freq, const vector3r_t &direction,
-    const Options &options) const {
+    real_t time, real_t freq, const vector3r_t& direction,
+    const Options& options) const {
   // Compute the array factor of the field
   return FieldArrayFactor(time, freq, direction, options, element_positions_,
                           element_enabled_);

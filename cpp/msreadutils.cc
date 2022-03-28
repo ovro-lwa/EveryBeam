@@ -89,7 +89,7 @@ constexpr Antenna::CoordinateSystem::Axes lofar_antenna_orientation = {
     {0.0, 0.0, 1.0},
 };
 
-TileConfig ReadTileConfig(const Table &table, unsigned int row) {
+TileConfig ReadTileConfig(const Table& table, unsigned int row) {
   ArrayQuantColumn<Double> c_tile_offset(table, "TILE_ELEMENT_OFFSET", "m");
 
   // Read tile configuration for HBA antenna fields, assert validity of aips
@@ -107,9 +107,9 @@ TileConfig ReadTileConfig(const Table &table, unsigned int row) {
   return config;
 }
 
-void TransformToFieldCoordinates(TileConfig &config,
-                                 const Antenna::CoordinateSystem::Axes &axes) {
-  for (auto &val : config) {
+void TransformToFieldCoordinates(TileConfig& config,
+                                 const Antenna::CoordinateSystem::Axes& axes) {
+  for (auto& val : config) {
     const vector3r_t position = val;
     val[0] = dot(position, axes.p);
     val[1] = dot(position, axes.q);
@@ -118,14 +118,14 @@ void TransformToFieldCoordinates(TileConfig &config,
 }
 
 vector3r_t TransformToFieldCoordinates(
-    const vector3r_t &position, const Antenna::CoordinateSystem::Axes &axes) {
+    const vector3r_t& position, const Antenna::CoordinateSystem::Axes& axes) {
   const vector3r_t result{dot(position, axes.p), dot(position, axes.q),
                           dot(position, axes.r)};
   return result;
 }
 
-std::shared_ptr<BeamFormer> MakeTile(const vector3r_t &position,
-                                     const TileConfig &tile_config,
+std::shared_ptr<BeamFormer> MakeTile(const vector3r_t& position,
+                                     const TileConfig& tile_config,
                                      ElementResponse::Ptr element_response) {
   std::shared_ptr<BeamFormer> tile =
       std::make_shared<BeamFormerIdenticalAntennas>(position);
@@ -147,7 +147,7 @@ std::shared_ptr<BeamFormer> MakeTile(const vector3r_t &position,
 // Make a dedicated HBA "Hamaker" tile, saving only one element, and 16
 // element positions
 void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
-              const TileConfig &tile_config,
+              const TileConfig& tile_config,
               ElementResponse::Ptr element_response) {
   for (unsigned int id = 0; id < tile_config.size(); id++) {
     vector3r_t antenna_position = tile_config[id];
@@ -169,7 +169,7 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
 }
 
 std::shared_ptr<Antenna> ReadAntennaFieldLofar(
-    const Table &table, unsigned int id,
+    const Table& table, unsigned int id,
     ElementResponse::Ptr element_response) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, id);
@@ -178,7 +178,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
   ArrayQuantColumn<Double> c_offset(table, "ELEMENT_OFFSET", "m");
   ArrayColumn<Bool> c_flag(table, "ELEMENT_FLAG");
 
-  const string &name = c_name(id);
+  const string& name = c_name(id);
 
   // Read element offsets and flags.
   Matrix<Quantity> aips_offset = c_offset(id);
@@ -281,7 +281,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
 }
 
 std::shared_ptr<Element> AartfaacElement(
-    const MeasurementSet &ms, size_t station_id,
+    const MeasurementSet& ms, size_t station_id,
     ElementResponse::Ptr element_response) {
   Table table = common::GetSubTable(ms, "ANTENNA");
 
@@ -301,7 +301,7 @@ std::shared_ptr<Element> AartfaacElement(
 }
 
 std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
-    const Table &table, size_t station_id,
+    const Table& table, size_t station_id,
     ElementResponse::Ptr element_response) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, station_id);
@@ -341,8 +341,8 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
 }
 
 std::shared_ptr<BeamFormer> LofarStationBeamFormer(
-    const MeasurementSet &ms, size_t station_id,
-    const vector3r_t &phase_reference, ElementResponse::Ptr element_response) {
+    const MeasurementSet& ms, size_t station_id,
+    const vector3r_t& phase_reference, ElementResponse::Ptr element_response) {
   std::shared_ptr<BeamFormer> beam_former;
 
   Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
@@ -367,7 +367,7 @@ std::shared_ptr<BeamFormer> LofarStationBeamFormer(
   return beam_former;
 }
 
-vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
+vector3r_t ReadStationPhaseReference(const Table& table, unsigned int id) {
   vector3r_t phase_reference = {0.0, 0.0, 0.0};
   const string columnName("LOFAR_PHASE_REFERENCE");
   if (common::HasColumn(table, columnName)) {
@@ -381,7 +381,7 @@ vector3r_t ReadStationPhaseReference(const Table &table, unsigned int id) {
 }
 
 std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
-    const MeasurementSet &ms, size_t station_id,
+    const MeasurementSet& ms, size_t station_id,
     ElementResponse::Ptr element_response) {
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
@@ -393,9 +393,9 @@ std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
 }
 }  // namespace
 
-std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
+std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
                                            unsigned int id,
-                                           const Options &options) {
+                                           const Options& options) {
   TelescopeType telescope_type = GetTelescopeType(ms);
   if (telescope_type != TelescopeType::kLofarTelescope &&
       telescope_type != TelescopeType::kAARTFAAC &&
@@ -443,7 +443,7 @@ std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
   return station;
 }
 
-MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms) {
+MDirection ReadTileBeamDirection(const casacore::MeasurementSet& ms) {
   TelescopeType telescope_type = GetTelescopeType(ms);
   if (telescope_type != TelescopeType::kLofarTelescope &&
       telescope_type != TelescopeType::kAARTFAAC) {

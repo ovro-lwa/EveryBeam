@@ -45,7 +45,7 @@ class Telescope {
    * @return GriddedResponse::Ptr
    */
   virtual std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem &coordinate_system) const = 0;
+      const coords::CoordinateSystem& coordinate_system) const = 0;
 
   /**
    * @brief Get the Point Response object
@@ -67,7 +67,7 @@ class Telescope {
    * @param ms MeasurementSet
    * @param options telescope options
    */
-  Telescope(const casacore::MeasurementSet &ms, const Options &options)
+  Telescope(const casacore::MeasurementSet& ms, const Options& options)
       : nstations_(ms.antenna().nrow()), options_(options){};
 
   void SetIsTimeRelevant(bool is_time_relevant) {

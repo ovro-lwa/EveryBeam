@@ -31,9 +31,9 @@ const std::string kAartfaacAntennaTypeName = "AARTFAAC_ANTENNA_TYPE";
  * @return Shared pointer to \param Station object
 
  */
-std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
+std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
                                            unsigned int id,
-                                           const Options &options = Options());
+                                           const Options& options = Options());
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
@@ -45,8 +45,8 @@ std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet &ms,
  * @param model ElementResponseModel to use
  */
 template <typename T>
-inline void ReadAllStations(const casacore::MeasurementSet &ms, T out_it,
-                            const Options &options = Options()) {
+inline void ReadAllStations(const casacore::MeasurementSet& ms, T out_it,
+                            const Options& options = Options()) {
   casacore::ROMSAntennaColumns antenna(ms.antenna());
   for (unsigned int i = 0; i < antenna.nrow(); ++i) {
     *out_it++ = ReadSingleStation(ms, i, options);
@@ -55,6 +55,6 @@ inline void ReadAllStations(const casacore::MeasurementSet &ms, T out_it,
 
 // Read the tile beam direction from a LOFAR MS. If it is not defined,
 // this function returns the delay center.
-casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet &ms);
+casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet& ms);
 }  // namespace everybeam
 #endif  // EVERYBEAM_MSREADUTILS_H_

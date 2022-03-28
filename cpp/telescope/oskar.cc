@@ -20,7 +20,7 @@ using everybeam::pointresponse::OSKARPoint;
 using everybeam::pointresponse::PointResponse;
 using everybeam::telescope::OSKAR;
 
-OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
+OSKAR::OSKAR(const MeasurementSet& ms, const Options& options)
     : PhasedArray(ms, options) {
   if (options_.element_response_model == ElementResponseModel::kDefault) {
     options_.element_response_model = ElementResponseModel::kOSKARSphericalWave;
@@ -57,7 +57,7 @@ OSKAR::OSKAR(const MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) const {
+    const coords::CoordinateSystem& coordinate_system) const {
   // Get and return GriddedResponse ptr
   std::unique_ptr<GriddedResponse> grid(new OSKARGrid(this, coordinate_system));
   return grid;

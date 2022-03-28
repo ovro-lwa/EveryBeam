@@ -13,7 +13,7 @@ static constexpr double kBlockage = 0.0;
 namespace everybeam {
 namespace telescope {
 
-SkaMid::SkaMid(const casacore::MeasurementSet &ms, const Options &options)
+SkaMid::SkaMid(const casacore::MeasurementSet& ms, const Options& options)
     : Telescope(ms, options),
       element_response_model_(options.element_response_model) {
   casacore::MSField field_table = ms.field();
@@ -35,7 +35,7 @@ SkaMid::SkaMid(const casacore::MeasurementSet &ms, const Options &options)
 }
 
 std::unique_ptr<griddedresponse::GriddedResponse> SkaMid::GetGriddedResponse(
-    const coords::CoordinateSystem &coordinate_system) const {
+    const coords::CoordinateSystem& coordinate_system) const {
   std::unique_ptr<griddedresponse::GriddedResponse> grid_response(
       new griddedresponse::SkaMidGrid(this, coordinate_system,
                                       element_response_model_));

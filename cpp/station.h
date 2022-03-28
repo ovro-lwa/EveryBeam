@@ -34,16 +34,16 @@ class Station {
    *  \param name Name of the station.
    *  \param position Position of the station (ITRF, m).
    */
-  Station(const std::string &name, const vector3r_t &position,
-          const Options &options = Options());
+  Station(const std::string& name, const vector3r_t& position,
+          const Options& options = Options());
 
   void SetResponse(std::shared_ptr<ElementResponse> element_response);
 
   //! Return the name of the station.
-  const std::string &GetName() const;
+  const std::string& GetName() const;
 
   //! Return the position of the station (ITRF, m).
-  const vector3r_t &GetPosition() const;
+  const vector3r_t& GetPosition() const;
 
   /*!
    *  \brief Set the phase reference position. This is the position where the
@@ -55,11 +55,11 @@ class Station {
    *  reference position. Use this method to set the phase reference position
    *  explicitly when this assumption is false.
    */
-  void SetPhaseReference(const vector3r_t &reference);
+  void SetPhaseReference(const vector3r_t& reference);
 
   //! Return the phase reference position (ITRF, m). \see
   //! Station::setPhaseReference()
-  const vector3r_t &GetPhaseReference() const;
+  const vector3r_t& GetPhaseReference() const;
 
   /**
    *  \brief Compute the full response of the station for a plane wave of
@@ -91,8 +91,8 @@ class Station {
    *  wave arrives.
    */
   aocommon::MC2x2 Response(real_t time, real_t freq,
-                           const vector3r_t &direction, real_t freq0,
-                           const vector3r_t &station0, const vector3r_t &tile0,
+                           const vector3r_t& direction, real_t freq0,
+                           const vector3r_t& station0, const vector3r_t& tile0,
                            const bool rotate = true) const;
 
   /**
@@ -101,8 +101,8 @@ class Station {
    * \see CorrectionMode.
    */
   aocommon::MC2x2 Response(CorrectionMode mode, real_t time, real_t freq,
-                           const vector3r_t &direction, real_t freq0,
-                           const vector3r_t &station0, const vector3r_t &tile0,
+                           const vector3r_t& direction, real_t freq0,
+                           const vector3r_t& station0, const vector3r_t& tile0,
                            const bool rotate = true) const {
     switch (mode) {
       case CorrectionMode::kNone:
@@ -147,9 +147,9 @@ class Station {
    *  wave arrives.
    */
   aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
-                                  const vector3r_t &direction, real_t freq0,
-                                  const vector3r_t &station0,
-                                  const vector3r_t &tile0) const;
+                                  const vector3r_t& direction, real_t freq0,
+                                  const vector3r_t& station0,
+                                  const vector3r_t& tile0) const;
 
   /*!
    *  \name Convenience member functions
@@ -180,8 +180,8 @@ class Station {
    */
   template <typename T, typename U>
   void Response(unsigned int count, real_t time, T freq,
-                const vector3r_t &direction, real_t freq0,
-                const vector3r_t &station0, const vector3r_t &tile0, U buffer,
+                const vector3r_t& direction, real_t freq0,
+                const vector3r_t& station0, const vector3r_t& tile0, U buffer,
                 const bool rotate = true) const;
 
   /*!
@@ -205,8 +205,8 @@ class Station {
    */
   template <typename T, typename U>
   void ArrayFactor(unsigned int count, real_t time, T freq,
-                   const vector3r_t &direction, real_t freq0,
-                   const vector3r_t &station0, const vector3r_t &tile0,
+                   const vector3r_t& direction, real_t freq0,
+                   const vector3r_t& station0, const vector3r_t& tile0,
                    U buffer) const;
 
   /*!
@@ -231,8 +231,8 @@ class Station {
    */
   template <typename T, typename U>
   void Response(unsigned int count, real_t time, T freq,
-                const vector3r_t &direction, T freq0,
-                const vector3r_t &station0, const vector3r_t &tile0, U buffer,
+                const vector3r_t& direction, T freq0,
+                const vector3r_t& station0, const vector3r_t& tile0, U buffer,
                 const bool rotate = true) const;
 
   /*!
@@ -256,8 +256,8 @@ class Station {
    */
   template <typename T, typename U>
   void ArrayFactor(unsigned int count, real_t time, T freq,
-                   const vector3r_t &direction, T freq0,
-                   const vector3r_t &station0, const vector3r_t &tile0,
+                   const vector3r_t& direction, T freq0,
+                   const vector3r_t& station0, const vector3r_t& tile0,
                    U buffer) const;
 
   // @}
@@ -279,7 +279,7 @@ class Station {
    * @return aocommon::MC2x2 Jones matrix of element response
    */
   aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
-                                         const vector3r_t &direction, size_t id,
+                                         const vector3r_t& direction, size_t id,
                                          bool is_local, bool rotate) const;
 
   /**
@@ -295,12 +295,12 @@ class Station {
    * @return aocommon::MC2x2 Jones matrix of element response
    */
   aocommon::MC2x2 ComputeElementResponse(real_t time, real_t freq,
-                                         const vector3r_t &direction,
+                                         const vector3r_t& direction,
                                          bool is_local, bool rotate) const;
 
   //! Specialized implementation of response function.
   aocommon::MC2x2 Response(real_t time, real_t freq,
-                           const vector3r_t &direction) const {
+                           const vector3r_t& direction) const {
     return antenna_->Response(time, freq, direction);
   }
 
@@ -344,8 +344,8 @@ class Station {
 
 template <typename T, typename U>
 void Station::Response(unsigned int count, real_t time, T freq,
-                       const vector3r_t &direction, real_t freq0,
-                       const vector3r_t &station0, const vector3r_t &tile0,
+                       const vector3r_t& direction, real_t freq0,
+                       const vector3r_t& station0, const vector3r_t& tile0,
                        U buffer, const bool rotate) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =
@@ -355,8 +355,8 @@ void Station::Response(unsigned int count, real_t time, T freq,
 
 template <typename T, typename U>
 void Station::ArrayFactor(unsigned int count, real_t time, T freq,
-                          const vector3r_t &direction, real_t freq0,
-                          const vector3r_t &station0, const vector3r_t &tile0,
+                          const vector3r_t& direction, real_t freq0,
+                          const vector3r_t& station0, const vector3r_t& tile0,
                           U buffer) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ = ArrayFactor(time, *freq++, direction, freq0, station0, tile0);
@@ -365,8 +365,8 @@ void Station::ArrayFactor(unsigned int count, real_t time, T freq,
 
 template <typename T, typename U>
 void Station::Response(unsigned int count, real_t time, T freq,
-                       const vector3r_t &direction, T freq0,
-                       const vector3r_t &station0, const vector3r_t &tile0,
+                       const vector3r_t& direction, T freq0,
+                       const vector3r_t& station0, const vector3r_t& tile0,
                        U buffer, const bool rotate) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =
@@ -376,8 +376,8 @@ void Station::Response(unsigned int count, real_t time, T freq,
 
 template <typename T, typename U>
 void Station::ArrayFactor(unsigned int count, real_t time, T freq,
-                          const vector3r_t &direction, T freq0,
-                          const vector3r_t &station0, const vector3r_t &tile0,
+                          const vector3r_t& direction, T freq0,
+                          const vector3r_t& station0, const vector3r_t& tile0,
                           U buffer) const {
   for (unsigned int i = 0; i < count; ++i) {
     *buffer++ =

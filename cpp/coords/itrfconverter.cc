@@ -38,7 +38,7 @@ void ITRFConverter::SetTime(real_t time) {
   frame_.resetEpoch(casacore::Quantity(time, "s"));
 }
 
-vector3r_t ITRFConverter::j2000ToITRF(const vector2r_t &j2000Direction) const {
+vector3r_t ITRFConverter::j2000ToITRF(const vector2r_t& j2000Direction) const {
   casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1]);
   casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
   const casacore::MVDirection mvITRF = converter_(m_direction).getValue();
@@ -46,7 +46,7 @@ vector3r_t ITRFConverter::j2000ToITRF(const vector2r_t &j2000Direction) const {
   return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
 }
 
-vector3r_t ITRFConverter::j2000ToITRF(const vector3r_t &j2000Direction) const {
+vector3r_t ITRFConverter::j2000ToITRF(const vector3r_t& j2000Direction) const {
   casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1],
                                      j2000Direction[2]);
   casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
@@ -56,20 +56,20 @@ vector3r_t ITRFConverter::j2000ToITRF(const vector3r_t &j2000Direction) const {
   return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
 }
 
-vector3r_t ITRFConverter::ToITRF(const casacore::MDirection &direction) const {
+vector3r_t ITRFConverter::ToITRF(const casacore::MDirection& direction) const {
   const casacore::MVDirection mvITRF = converter_(direction).getValue();
   return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
 }
 
 casacore::MDirection ITRFConverter::ToDirection(
-    const vector2r_t &j2000Direction) const {
+    const vector2r_t& j2000Direction) const {
   casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1]);
   casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
   return converter_(m_direction);
 }
 
 casacore::MDirection ITRFConverter::ToDirection(
-    const vector3r_t &j2000Direction) const {
+    const vector3r_t& j2000Direction) const {
   casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1],
                                      j2000Direction[2]);
   casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
@@ -78,7 +78,7 @@ casacore::MDirection ITRFConverter::ToDirection(
 }
 
 casacore::MDirection ITRFConverter::ToDirection(
-    const casacore::MDirection &direction) const {
+    const casacore::MDirection& direction) const {
   return converter_(direction);
 }
 }  // namespace coords

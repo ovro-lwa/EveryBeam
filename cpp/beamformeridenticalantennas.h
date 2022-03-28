@@ -21,7 +21,7 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
    *
    * @param coordinate_system
    */
-  BeamFormerIdenticalAntennas(const CoordinateSystem &coordinate_system)
+  BeamFormerIdenticalAntennas(const CoordinateSystem& coordinate_system)
       : BeamFormer(coordinate_system) {}
 
   /**
@@ -32,10 +32,10 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
    * @param phase_reference_position
    */
   BeamFormerIdenticalAntennas(CoordinateSystem coordinate_system,
-                              const vector3r_t &phase_reference_position)
+                              const vector3r_t& phase_reference_position)
       : BeamFormer(coordinate_system, phase_reference_position) {}
 
-  BeamFormerIdenticalAntennas(const vector3r_t &phase_reference_position)
+  BeamFormerIdenticalAntennas(const vector3r_t& phase_reference_position)
       : BeamFormer(phase_reference_position) {}
 
   std::shared_ptr<Antenna> Clone() const override;
@@ -44,8 +44,8 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
   aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
-                                const vector3r_t &direction,
-                                const Options &options) const override;
+                                const vector3r_t& direction,
+                                const Options& options) const override;
 };
 }  // namespace everybeam
 #endif
