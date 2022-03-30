@@ -11,6 +11,8 @@
 
 #include <casacore/measures/Measures/MPosition.h>
 
+#include <array>
+
 namespace everybeam {
 
 namespace griddedresponse {
