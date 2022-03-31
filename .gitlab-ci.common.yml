@@ -25,8 +25,10 @@ versioning:
     # Unshallowing ensures that 'git log' works
     - git fetch --unshallow
     - echo BASE_IMAGE=${CI_REGISTRY_IMAGE}/base:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base) > versions.env
+    - echo BASE_IMAGE_2204=${CI_REGISTRY_IMAGE}/base_2204:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base-2204) >> versions.env
     # Tag the Everybeam image with the commit id, since it uses the Everybeam source code.
     - echo EVERYBEAM_IMAGE=${CI_REGISTRY_IMAGE}/everybeam:${CI_COMMIT_SHORT_SHA} >> versions.env
+    - echo EVERYBEAM_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
     - echo FORMAT_IMAGE=${CI_REGISTRY_IMAGE}/format:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-format) >> versions.env
     - cat versions.env
   artifacts:
@@ -61,11 +63,23 @@ prepare-base:
     DOCKER_IMAGE: $BASE_IMAGE
     DOCKER_FILE: ./docker/Dockerfile-base
 
+prepare-base-2204:
+  extends: .prepare
+  variables:
+    DOCKER_IMAGE: $BASE_IMAGE_2204
+    DOCKER_FILE: ./docker/Dockerfile-base-2204
+
 # Template for jobs that depend on the optional prepare-base job.
 .needs-base:
   needs:
     - job: versioning
     - job: prepare-base
+      optional: true
+
+.needs-base-2204:
+  needs:
+    - job: versioning
+    - job: prepare-base-2204
       optional: true
 
 # Create and push the format image to the gitlab registry, if it does not exist.
@@ -133,6 +147,17 @@ build-everybeam:
     DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE}
   rules: # Override 'changes' rule from .prepare
     - when: always
+
+build-everybeam-2204:
+  extends: [.prepare,.needs-base-2204]
+  stage: build
+  variables:
+    DOCKER_IMAGE: $EVERYBEAM_IMAGE_2204
+    DOCKER_FILE: ./docker/Dockerfile-everybeam
+    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2204}
+  rules: # Override 'changes' rule from .prepare
+    - when: always
+
 
 build-doc:
   extends: .needs-base
