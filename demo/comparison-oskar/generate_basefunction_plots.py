@@ -1,6 +1,10 @@
 # Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Work-around issue https://github.com/astropy/astropy/issues/13007
+from astropy.utils import iers
+iers.conf.auto_download = False
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
