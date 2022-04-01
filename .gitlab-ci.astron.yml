@@ -26,6 +26,7 @@ deploy-package:
   stage: deploy
   needs: ["versioning","build-package"]
   image: $EVERYBEAM_IMAGE
+  allow_failure: true
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
