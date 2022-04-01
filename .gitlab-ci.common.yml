@@ -61,13 +61,13 @@ prepare-base:
   extends: .prepare
   variables:
     DOCKER_IMAGE: $BASE_IMAGE
-    DOCKER_FILE: ./docker/Dockerfile-base
+    DOCKER_FILE: docker/Dockerfile-base
 
 prepare-base-2204:
   extends: .prepare
   variables:
     DOCKER_IMAGE: $BASE_IMAGE_2204
-    DOCKER_FILE: ./docker/Dockerfile-base-2204
+    DOCKER_FILE: docker/Dockerfile-base-2204
 
 # Template for jobs that depend on the optional prepare-base job.
 .needs-base:
@@ -87,7 +87,7 @@ prepare-format:
   extends: .prepare
   variables:
     DOCKER_IMAGE: $FORMAT_IMAGE
-    DOCKER_FILE: ./docker/Dockerfile-format
+    DOCKER_FILE: docker/Dockerfile-format
 
 format:
   stage: build
@@ -143,9 +143,9 @@ build-everybeam:
   stage: build
   variables:
     DOCKER_IMAGE: $EVERYBEAM_IMAGE
-    DOCKER_FILE: ./docker/Dockerfile-everybeam
+    DOCKER_FILE: docker/Dockerfile-everybeam
     DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE}
-  rules: # Override 'changes' rule from .prepare
+  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
     - when: always
 
 build-everybeam-2204:
@@ -153,9 +153,9 @@ build-everybeam-2204:
   stage: build
   variables:
     DOCKER_IMAGE: $EVERYBEAM_IMAGE_2204
-    DOCKER_FILE: ./docker/Dockerfile-everybeam
+    DOCKER_FILE: docker/Dockerfile-everybeam
     DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2204}
-  rules: # Override 'changes' rule from .prepare
+  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
     - when: always
 
 
