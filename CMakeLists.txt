@@ -3,7 +3,7 @@
 
 #------------------------------------------------------------------------------
 # Top level CMakeLists.txt file for EveryBeam
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.8)
 
 #------------------------------------------------------------------------------
 # Set version name and project number
@@ -118,7 +118,10 @@ if(POLICY CMP0074)
 endif()
 
 # Set compile options
-add_compile_options(-std=c++11 "${OpenMP_CXX_FLAGS}" -Wall)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
+add_compile_options("${OpenMP_CXX_FLAGS}" -Wall)
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
 
 if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
