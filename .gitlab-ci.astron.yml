@@ -8,7 +8,7 @@ include: .gitlab-ci.common.yml
 
 deploy-doc:
   stage: deploy
-  needs: ["build-doc"]
+  needs: ["build-doc-2204"]
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
@@ -22,9 +22,9 @@ deploy-doc:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
 
-deploy-package:
+deploy-package-2204:
   stage: deploy
-  needs: ["versioning","build-package"]
+  needs: ["versioning","build-package-2204"]
   image: $EVERYBEAM_IMAGE
   allow_failure: true
   variables:

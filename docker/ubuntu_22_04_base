@@ -5,17 +5,20 @@
 FROM ubuntu:22.04
 RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get upgrade -y && \
 # install astronomy packages
-    apt-get -y install casacore-dev \
-        libcfitsio-dev wcslib-dev python3-pip
+    apt-get -y install casacore-dev python3-casacore \
+        libcfitsio-dev wcslib-dev
 # install misc packages
-RUN apt-get update && \
-    apt-get -y install wget git make cmake g++ doxygen graphviz ninja-build \
+RUN apt-get -y install wget make cmake g++ doxygen graphviz ninja-build \
 # install dependencies
         libboost-all-dev libhdf5-dev libfftw3-dev \
         libblas-dev liblapack-dev libgsl-dev libxml2-dev \
-        libpng-dev libgtkmm-3.0-dev libpython3.9-dev && \
+        libpng-dev libgtkmm-3.0-dev libpython3-dev gcovr
+# Install formatting tools
+RUN apt-get -y install git python3-pip clang-format-12 && \
+	ln -sf clang-format-12 /usr/bin/clang-format && \
+	pip3 install cmake-format
 # Install python dependencies
-    pip3 install gcovr pytest pytest-lazy-fixture \
+RUN pip3 install pytest pytest-lazy-fixture \
     # Install python requirements for the OSKAR "integration" test
         numpy scipy h5py astropy tqdm matplotlib pandas lofarantpos \
     # Install python requirements for building documentation

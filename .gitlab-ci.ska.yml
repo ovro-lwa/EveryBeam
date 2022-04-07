@@ -18,8 +18,8 @@ cache:
 
 pages:
   stage: deploy
-  needs: ["versioning","test-and-coverage","build-doc"]
-  image: $BASE_IMAGE
+  needs: ["versioning","test-and-coverage-2204","build-doc-2204"]
+  image: $BASE_IMAGE_2204
   variables:
     OUTPUT: public/$CI_COMMIT_REF_SLUG
   script:

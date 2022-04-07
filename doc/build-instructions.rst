@@ -5,7 +5,7 @@ Build instructions
 
 Dependencies:
 ~~~~~~~~~~~~~
-EveryBeam needs a number of dependencies in order to successfully compile. On a clean (ubuntu 18.04) system,
+EveryBeam needs a number of dependencies in order to successfully compile. On a clean (ubuntu 20.04) system,
 the dependencies can be installed with (see also the ``docker`` directory):
 
 General packages:
