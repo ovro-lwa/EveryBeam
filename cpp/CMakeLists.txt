@@ -39,6 +39,7 @@ add_library(
   aterms/dldmaterm.cc
   aterms/pafbeamterm.cc
   aterms/h5parmaterm.cc
+  aterms/klfittingaterm.cc
   aterms/cache.cc
   # common
   common/sphericalharmonics.cc

@@ -33,6 +33,9 @@ set(MWA_COEFF_PATH
 set(MOCK_H5PARM_PATH
     ${DATA_DIR}/MOCK_H5PARM.h5
     CACHE PATH "")
+set(KL_SCREEN_PATH
+    ${DATA_DIR}/kl_0.fits
+    CACHE PATH "")
 set(LOBES_COEFF_PATH
     ${CMAKE_BINARY_DIR}/coeffs/lobes
     CACHE PATH "")
@@ -50,6 +53,7 @@ set(TEST_FILENAMES
     tstation.cc
     tvla.cc
     tcache.cc
+    tklfittingaterm.cc
     th5parmaterm.cc)
 
 # Add boost dynamic link flag for all test files.
@@ -82,6 +86,7 @@ add_custom_target(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_kl_fits_screen.sh
   DEPENDS download_mock_aartfaac_6_lba)
 add_test(NAME download_mocks
          COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target

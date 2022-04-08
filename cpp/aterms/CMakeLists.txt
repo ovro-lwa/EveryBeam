@@ -16,4 +16,5 @@ install(
         dldmaterm.h
         pafbeamterm.h
         h5parmaterm.h
+        klfittingaterm.h
   DESTINATION "include/${CMAKE_PROJECT_NAME}/aterms")
