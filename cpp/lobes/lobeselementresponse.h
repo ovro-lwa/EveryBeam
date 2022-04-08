@@ -10,11 +10,10 @@
 #include "../options.h"
 #include "../fieldresponse.h"
 
-#include <boost/optional.hpp>
-
-#include <vector>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <optional>
+#include <vector>
 
 namespace everybeam {
 
@@ -104,7 +103,7 @@ class LOBESElementResponse : public FieldResponse {
   typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
 
   /** The cached version of the base functions. */
-  mutable boost::optional<BaseFunctions> basefunctions_;
+  mutable std::optional<BaseFunctions> basefunctions_;
 
   // Find the closest frequency
   size_t FindFrequencyIdx(double f) const {

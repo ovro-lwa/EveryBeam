@@ -13,34 +13,31 @@
 #include <H5Cpp.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/utility/string_view.hpp>
-#include <boost/optional.hpp>
 
-#if __cplusplus > 201402L
 #include <charconv>
-#endif
 #include <complex>
+#include <filesystem>
 #include <map>
+#include <optional>
+#include <string_view>
 
 // There are two main modi for the AARTFAAC telescope, AARTFAAC-6 and
 // AARTFAAC-12. To properly use AARTFAAC in LOBEs mode the coefficients of all
 // stations need to be available. At the moment of writing only a partial set
 // is available. This means only AARTFAAC-6 is tested.
-static const std::array<boost::string_view, 12> kAartfaacStationNames{
+static const std::array<std::string_view, 12> kAartfaacStationNames{
     // Available
     "CS002LBA", "CS003LBA", "CS004LBA", "CS005LBA", "CS006LBA", "CS007LBA",
     // Currently unavailable
     "CS001LBA", "CS011LBA", "CS013LBA", "CS017LBA", "CS021LBA", "CS032LBA"};
 
 struct AartfaacStation {
-  boost::string_view station;
+  std::string_view station;
   int element;
 };
 
-#if __cplusplus > 201402L
 template <class T>
-static T ExtractIntegral(boost::string_view string) {
+static T ExtractIntegral(std::string_view string) {
   int value;
   std::from_chars_result result =
       std::from_chars(string.begin(), string.end(), value);
@@ -50,50 +47,11 @@ static T ExtractIntegral(boost::string_view string) {
   }
   return value;
 }
-#else
-/** Modelled after std::from_chars_result. */
-struct from_chars_result {
-  const char* ptr;
-  std::errc ec;
-};
 
-/**
- * A minimal implementation of std::from_chars.
- *
- * @note No support for floating point values.
- * @note No support for bases other than 10.
- */
-template <class T>
-static from_chars_result from_chars(const char* first, const char* last,
-                                    T& value) {
-  if (first == last || *first < '0' || *first > '9') {
-    return {first, std::errc::invalid_argument};
-  }
-  value = 0;
-  do {
-    value *= 10;
-    value += *first - '0';
-    ++first;
-  } while (first != last && *first >= '0' && *first <= '9');
-
-  return {last, std::errc{}};
-}
-
-template <class T>
-static int ExtractIntegral(boost::string_view string) {
-  T value;
-  from_chars_result result = from_chars(string.begin(), string.end(), value);
-  if (result.ec != std::errc{} || result.ptr != string.end()) {
-    aocommon::ThrowRuntimeError("The value '", string,
-                                "' can't be converted to a number");
-  }
-  return value;
-}
-#endif
 enum class AartfaacElements { kInner, kOuter };
 
-static boost::optional<AartfaacStation> GetAartfaacStation(
-    boost::string_view station_name, AartfaacElements elements) {
+static std::optional<AartfaacStation> GetAartfaacStation(
+    std::string_view station_name, AartfaacElements elements) {
   if (!boost::starts_with(station_name, "A12_")) {
     return {};
   }
@@ -123,14 +81,14 @@ namespace {
  * @param station_name Station name, as read from MS
  * @return std::string Path to file or empty string if file cannot be found
  */
-boost::filesystem::path FindCoeffFile(const std::string& search_path,
-                                      boost::string_view station_name) {
+std::filesystem::path FindCoeffFile(const std::string& search_path,
+                                    std::string_view station_name) {
   const std::string station_file = "LOBES_" + std::string{station_name} + ".h5";
   return search_path.empty()
-             ? boost::filesystem::path(std::string{EVERYBEAM_DATA_DIR} +
-                                       std::string{"/lobes"}) /
+             ? std::filesystem::path(std::string{EVERYBEAM_DATA_DIR} +
+                                     std::string{"/lobes"}) /
                    station_file
-             : boost::filesystem::path(search_path) / station_file;
+             : std::filesystem::path(search_path) / station_file;
 }
 }  // namespace
 
@@ -202,14 +160,14 @@ void ReadOneElement(
 
 LOBESElementResponse::LOBESElementResponse(const std::string& name,
                                            const Options& options) {
-  const boost::optional<AartfaacStation> aartfaac_station =
+  const std::optional<AartfaacStation> aartfaac_station =
       GetAartfaacStation(name, AartfaacElements::kInner);
 
-  boost::filesystem::path coeff_file_path = FindCoeffFile(
+  std::filesystem::path coeff_file_path = FindCoeffFile(
       options.coeff_path, aartfaac_station ? aartfaac_station->station : name);
   H5::H5File h5file;
 
-  if (!boost::filesystem::exists(coeff_file_path)) {
+  if (!std::filesystem::exists(coeff_file_path)) {
     throw std::runtime_error("LOBES coeffcients file: " +
                              coeff_file_path.string() + " does not exists");
   }

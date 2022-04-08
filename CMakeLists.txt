@@ -87,11 +87,7 @@ find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
 include_directories(${CASACORE_INCLUDE_DIRS})
 
 # Find and include Boost headers (boost::math required for MWA beam)
-# Filesystem component required to search for LOBES coefficient files
-find_package(
-  Boost
-  COMPONENTS filesystem system
-  REQUIRED)
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Find and include FFTW3 float libraries
@@ -123,6 +119,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 add_compile_options("${OpenMP_CXX_FLAGS}" -Wall)
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # GCC 8.x requires linking with stdc++fs for the filesystem library
+  # https://gcc.gnu.org/onlinedocs/gcc-9.1.0/libstdc++/manual/manual/status.html#status.iso.2017
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+    link_libraries(stdc++fs)
+  endif()
+endif()
 
 if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
   add_compile_options(-DNDEBUG)
