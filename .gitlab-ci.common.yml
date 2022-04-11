@@ -26,9 +26,11 @@ versioning:
     - git fetch --unshallow
     - echo BASE_IMAGE_2004=${CI_REGISTRY_IMAGE}/base_2004:$(git log -n 1 --pretty=format:%H -- docker/ubuntu_20_04_base) > versions.env
     - echo BASE_IMAGE_2204=${CI_REGISTRY_IMAGE}/base_2204:$(git log -n 1 --pretty=format:%H -- docker/ubuntu_22_04_base) >> versions.env
+    - echo BASE_IMAGE_GCC12=${CI_REGISTRY_IMAGE}/base_gcc12:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base-gcc12) >> versions.env
     # Tag the Everybeam image with the commit id, since it uses the Everybeam source code.
     - echo EVERYBEAM_IMAGE_2004=${CI_REGISTRY_IMAGE}/everybeam_2004:${CI_COMMIT_SHORT_SHA} >> versions.env
     - echo EVERYBEAM_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
+    - echo EVERYBEAM_IMAGE_GCC12=${CI_REGISTRY_IMAGE}/everybeam_gcc12:${CI_COMMIT_SHORT_SHA} >> versions.env
     - cat versions.env
   artifacts:
     reports:
@@ -72,6 +74,12 @@ prepare-base-2204:
     DOCKER_IMAGE: $BASE_IMAGE_2204
     DOCKER_FILE: docker/ubuntu_22_04_base
 
+prepare-base-gcc12:
+  extends: .prepare
+  variables:
+    DOCKER_IMAGE: $BASE_IMAGE_GCC12
+    DOCKER_FILE: ./docker/Dockerfile-base-gcc12
+
 # Template for jobs that depend on the optional prepare-base job.
 .needs-base-2004:
   needs:
@@ -83,6 +91,12 @@ prepare-base-2204:
   needs:
     - job: versioning
     - job: prepare-base-2204
+      optional: true
+
+.needs-base-gcc12:
+  needs:
+    - job: versioning
+    - job: prepare-base-gcc12
       optional: true
 
 format-2204:
@@ -151,6 +165,15 @@ build-everybeam-2204:
   rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
     - when: always
 
+build-everybeam-gcc12:
+  extends: [.prepare,.needs-base-gcc12]
+  stage: build
+  variables:
+    DOCKER_IMAGE: $EVERYBEAM_IMAGE_GCC12
+    DOCKER_FILE: ./docker/everybeam
+    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_GCC12}
+  rules: # Override 'changes' rule from .prepare
+    - when: always
 
 build-doc-2204:
   extends: .needs-base-2204

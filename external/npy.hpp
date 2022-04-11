@@ -35,7 +35,7 @@
 #include <algorithm>
 #include <regex>
 #include <unordered_map>
-
+#include <iterator>
 
 namespace npy {
 

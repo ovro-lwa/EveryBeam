@@ -10,7 +10,6 @@
 #include "../pointresponse/dishpoint.h"
 #include "../elementresponse.h"
 #include "../telescope/dish.h"
-#include "../../external/npy.hpp"
 
 #include "config.h"
 #include <complex>
@@ -124,11 +123,6 @@ BOOST_AUTO_TEST_CASE(load_vla) {
         point_response_buffer + i * 4, point_response_buffer + 4 * (i + 1),
         point_response_buffer, point_response_buffer + 4);
   }
-
-  // Print to np array, note: this spits out the transposed grid
-  const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
-  npy::SaveArrayAsNumpy("vla_station_responses.npy", false, 4, leshape,
-                        antenna_buffer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

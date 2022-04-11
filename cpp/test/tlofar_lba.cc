@@ -12,7 +12,6 @@
 #include "../elementresponse.h"
 #include "../station.h"
 #include "../common/types.h"
-#include "../../external/npy.hpp"
 #include "../telescope/lofar.h"
 
 #include <complex>
@@ -172,9 +171,6 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
     BOOST_CHECK_CLOSE(antenna_buffer_single[offset_13 + i],
                       everybeam_ref_p13[i], 2e-1);
   }
-  // const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
-  // npy::SaveArrayAsNumpy("lobes_station_response.npy", false, 4, leshape,
-  //                       antenna_buffer_single);
 }
 #endif  // DOWNLOAD_LOBES
 

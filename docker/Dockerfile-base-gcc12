@@ -1,0 +1,46 @@
+# Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# base
+FROM ubuntu:22.04
+RUN export DEBIAN_FRONTEND="noninteractive" && \
+	apt-get update && \
+	apt-get upgrade -y && \
+    apt-get -y install \
+      casacore-dev \
+      cmake \
+      g++-12  \
+      git \
+      libblas-dev \
+      libboost-all-dev \
+      libcfitsio-dev \
+      libfftw3-dev \
+      libgsl-dev \
+      libgtkmm-3.0-dev \
+      libhdf5-dev \
+      liblapack-dev \
+      libpng-dev \
+      libpython3-dev \
+      libxml2-dev \
+      make \
+      ninja-build \
+  		python3-casacore \
+      python3-pip \
+      wcslib-dev \
+      wget \
+    && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN ln -sf clang-format-12 /usr/bin/clang-format
+RUN pip3 install \
+		numpy \
+		scipy \
+		h5py \
+		astropy \
+		tqdm \
+		matplotlib \
+		pandas \
+		lofarantpos \
+		aptly-api-client
+
+ENV CC /usr/bin/gcc-12
+ENV CXX /usr/bin/g++-12

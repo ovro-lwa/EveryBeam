@@ -11,7 +11,6 @@
 #include "../pointresponse/lofarpoint.h"
 #include "../elementresponse.h"
 #include "../coords/coordutils.h"
-#include "../../external/npy.hpp"
 #include "../station.h"
 #include "../common/types.h"
 #include "../telescope/lofar.h"

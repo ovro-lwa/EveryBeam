@@ -8,7 +8,6 @@
 #include "../options.h"
 #include "../griddedresponse/mwagrid.h"
 #include "../pointresponse/mwapoint.h"
-#include "../../external/npy.hpp"
 #include "../telescope/mwa.h"
 
 #include "config.h"
@@ -133,11 +132,6 @@ BOOST_AUTO_TEST_CASE(load_mwa) {
         point_response_buffer + i * 4, point_response_buffer + 4 * (i + 1),
         point_response_buffer, point_response_buffer + 4);
   }
-
-  // Print to np array
-  const long unsigned leshape[] = {(long unsigned int)width, height, 2, 2};
-  npy::SaveArrayAsNumpy("mwa_station_responses.npy", false, 4, leshape,
-                        antenna_buffer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
