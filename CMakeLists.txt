@@ -125,6 +125,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # https://gcc.gnu.org/onlinedocs/gcc-9.1.0/libstdc++/manual/manual/status.html#status.iso.2017
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
     link_libraries(stdc++fs)
+  elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+    message(
+      FATAL_ERROR "The GCC version is too old, upgrade to GCC 8.0 or newer")
   endif()
 endif()
 
