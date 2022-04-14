@@ -96,6 +96,10 @@ find_package(
   COMPONENTS single
   REQUIRED)
 
+# Find BLAS and LAPACK, needed for everybeam::aterms only
+find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
+
 # Find CFITSIO, needed for everybeam::aterms only
 find_package(CFITSIO REQUIRED)
 include_directories(${CFITSIO_INCLUDE_DIRS})

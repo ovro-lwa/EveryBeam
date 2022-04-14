@@ -186,7 +186,7 @@ class H5ParmATerm final : public ATermBase {
    * @return false No need to update the result, cached result can be used
    */
   bool Calculate(std::complex<float>* buffer, double time, double frequency,
-                 size_t field_id, const double* uvw_in_m) override final;
+                 size_t field_id, const double* uvw_in_m) override;
 
   /**
    * @brief Set the update interval
