@@ -3,8 +3,8 @@
 
 project(everybeam_pybind11)
 
+find_package(PythonInterp 3 REQUIRED)
 find_package(PythonLibs 3 REQUIRED)
-find_package(PythonInterp REQUIRED)
 message(STATUS "Using python version ${PYTHON_VERSION_STRING}")
 
 # Create the binding library

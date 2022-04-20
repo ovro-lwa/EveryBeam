@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from idg.h5parmwriter import H5ParmWriter
 import numpy as np
 from datetime import datetime

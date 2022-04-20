@@ -61,6 +61,10 @@ endif()
 # Include aocommon/eigen3/pybind11 headers
 include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
 include_directories("${CMAKE_SOURCE_DIR}/external/eigen/")
+# Find python with cmake to convince pybind11 to use right python path
+# This can go when we're using CMake >= 3.12:
+# https://pybind11.readthedocs.io/en/stable/compiling.html#findpython-mode
+find_package(PythonInterp 3)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/pybind11")
 include_directories(${pybind11_INCLUDE_DIRS})
 
