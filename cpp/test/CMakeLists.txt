@@ -18,6 +18,7 @@ set(MOCK_MS
     AARTFAAC_LBA_MOCK
     AARTFAAC_6_LBA_MOCK
     OSKAR_MOCK
+    SCREEN_FITTING
     SKA_MID_MOCK
     VLA_MOCK
     MWA_MOCK)
@@ -34,7 +35,7 @@ set(MOCK_H5PARM_PATH
     ${DATA_DIR}/MOCK_H5PARM.h5
     CACHE PATH "")
 set(KL_SCREEN_PATH
-    ${DATA_DIR}/kl_0.fits
+    ${DATA_DIR}/kl_screen_0.fits
     CACHE PATH "")
 set(LOBES_COEFF_PATH
     ${CMAKE_BINARY_DIR}/coeffs/lobes
@@ -43,6 +44,7 @@ set(LOBES_COEFF_PATH
 #------------------------------------------------------------------------------
 set(TEST_FILENAMES
     runtests.cc
+    tatermconfig.cc
     tlofar_hba.cc
     tlofar_lba.cc
     tlofar_aartfaac.cc
@@ -89,6 +91,7 @@ add_custom_target(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_kl_fits_screen.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_screen_fitting_ms.sh
   DEPENDS download_mock_aartfaac_6_lba)
 add_test(NAME download_mocks
          COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target

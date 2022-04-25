@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(calculate) {
   std::vector<std::string> station_names = {"CS001HBA0", "CS001HBA1",
                                             "RS509HBA"};
 
-  double frequency = 122215271.;
+  // double frequency = 122215271.;
   // double ra(-1.44194878), dec(0.85078091);
   double ra(2.2031291147), dec(1.125737367);
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(calculate) {
   const int support = 3;
   FourierFittingATerm fourierfittingaterm(station_names, coord_system, support);
 
-  double time = 4987958432.341753;
+  // double time = 4987958432.341753;
 
   aocommon::UVector<std::complex<float>> aterm_buffer(width * height *
                                                       station_names.size() * 4);
