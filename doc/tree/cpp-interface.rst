@@ -1,3 +1,5 @@
+.. _cppinterface:
+
 C++ interface
 =============
 

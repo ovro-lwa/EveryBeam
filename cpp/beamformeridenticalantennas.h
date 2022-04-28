@@ -7,6 +7,11 @@
 #include "beamformer.h"
 
 namespace everybeam {
+/**
+ * @brief Sub-class of \c BeamFormer assuming that all the antennas
+ * have an identical \c LocalResponse.
+ *
+ */
 class BeamFormerIdenticalAntennas : public BeamFormer {
  public:
   /**

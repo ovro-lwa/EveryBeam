@@ -34,6 +34,10 @@ class ElementHamaker final : public Element {
 
   std::shared_ptr<Antenna> Clone() const override;
 
+  /**
+   * @brief This override avoids a number of redundant coordinate
+   * transformations compared to the parent implementation.
+   */
   aocommon::MC2x2 Response(real_t time, real_t freq,
                            const vector3r_t& direction,
                            const Options& options) const override {

@@ -16,6 +16,12 @@
 #include "fieldresponse.h"
 
 namespace everybeam {
+/**
+ * @brief A BeamFormer contains a number of antennas - be it lower level
+ * beamformers or elements - and can return its combined response or array
+ * factor.
+ *
+ */
 class BeamFormer : public Antenna {
  public:
   typedef std::shared_ptr<BeamFormer> Ptr;

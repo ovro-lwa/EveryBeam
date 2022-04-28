@@ -100,7 +100,7 @@ class BeamFormerLofar : public Antenna {
                                 const Options& options) const final override;
 
   // Each BeamFormerLofar stores one unique element, and a vector of unique
-  // positions Usually, the Element will be of type ElementHamaker.
+  // positions. Usually, the Element will be of type ElementHamaker.
   std::shared_ptr<Element> element_;
   std::vector<vector3r_t> element_positions_;
 };

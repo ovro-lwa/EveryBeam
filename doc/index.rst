@@ -33,6 +33,7 @@
     :caption: Technicalities
 
     tree/lobes
+    tree/station-hierarchy
 
 .. toctree::
    :maxdepth: 2

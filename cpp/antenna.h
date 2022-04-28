@@ -16,9 +16,9 @@
 namespace everybeam {
 
 /**
- * @brief (Virtual) class describing an antenna, and computing the corresponding
- * Response() and ArrayFactor().
- *
+ * @brief Abstract class describing an antenna, and computing the
+ * corresponding Response() and ArrayFactor(). \c Element and \c BeamFormer
+ * classes - and childs thereof - inherit from this class.
  */
 class Antenna {
  public:

@@ -91,6 +91,7 @@ std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
 aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
                                           const vector3r_t& direction,
                                           const Options& options) const {
+  // TODO (AST-783): Revisit the locking strategy.
   std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
 
   // Weighted subtraction of the pointing direction (0-direction), and the

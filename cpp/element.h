@@ -82,6 +82,9 @@ class Element : public Antenna {
                                         const vector3r_t& direction, size_t id,
                                         const Options& options) const;
 
+  /**
+   * @brief The array factor for a single element is unity.
+   */
   aocommon::MC2x2Diag ArrayFactor(
       [[maybe_unused]] real_t time, [[maybe_unused]] real_t freq,
       [[maybe_unused]] const vector3r_t& direction,
