@@ -12,6 +12,8 @@
 #include <casacore/measures/Measures/MDirection.h>
 #include <casacore/tables/Tables/TableRecord.h>
 
+#include <schaapcommon/h5parm/h5parm.h>
+
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/test/unit_test.hpp>
@@ -35,8 +37,12 @@ namespace {
 
 class MockParsetProvider : public everybeam::aterms::ParsetProvider {
  public:
-  MockParsetProvider(bool provide_beam, bool provide_diagonal)
-      : provide_beam_(provide_beam), provide_diagonal_(provide_diagonal) {}
+  MockParsetProvider(bool provide_beam, bool provide_diagonal,
+                     bool provide_fourier_fit, bool provide_kl_fit)
+      : provide_beam_(provide_beam),
+        provide_diagonal_(provide_diagonal),
+        provide_fourier_fit_(provide_fourier_fit),
+        provide_kl_fit_(provide_kl_fit) {}
 
   std::string GetString(const std::string& key) const final override {
     BOOST_FAIL("GetString: Unexpected key: " + key);
@@ -45,6 +51,11 @@ class MockParsetProvider : public everybeam::aterms::ParsetProvider {
 
   std::string GetStringOr([[maybe_unused]] const std::string& key,
                           const std::string& orValue) const final override {
+    if (provide_fourier_fit_ || provide_kl_fit_) {
+      if ((key == "fourierfit.solutions") || (key == "klfit.solutions")) {
+        return H5_SOLUTIONS_PATH;
+      }
+    }
     return orValue;
   };
 
@@ -58,6 +69,12 @@ class MockParsetProvider : public everybeam::aterms::ParsetProvider {
       }
       if (provide_diagonal_) {
         list.push_back("diagonal");
+      }
+      if (provide_fourier_fit_) {
+        list.push_back("fourierfit");
+      }
+      if (provide_kl_fit_) {
+        list.push_back("klfit");
       }
       return list;
     }
@@ -106,6 +123,8 @@ class MockParsetProvider : public everybeam::aterms::ParsetProvider {
  private:
   const bool provide_beam_;
   const bool provide_diagonal_;
+  const bool provide_fourier_fit_;
+  const bool provide_kl_fit_;
 };
 
 }  // namespace
@@ -113,7 +132,7 @@ class MockParsetProvider : public everybeam::aterms::ParsetProvider {
 void GenerateAterms(const casacore::MeasurementSet& ms,
                     const MockParsetProvider& parset_provider,
                     std::vector<std::complex<float>>& aterm_buffer,
-                    float start_time, double time_step, float start_frequency,
+                    double start_time, double time_step, double start_frequency,
                     double frequency_step, size_t n_antennas, size_t n_channels,
                     size_t n_times,
                     everybeam::coords::CoordinateSystem system) {
@@ -186,9 +205,9 @@ BOOST_AUTO_TEST_CASE(combine_aterms) {
       screen_width, screen_height, ra, dec, dl, dm, -0.5 * dl, -0.5 * dm};
 
   // Create parset providers
-  const MockParsetProvider provider_combined(true, true);
-  const MockParsetProvider provider_beam(true, false);
-  const MockParsetProvider provider_diagonal(false, true);
+  const MockParsetProvider provider_combined(true, true, false, false);
+  const MockParsetProvider provider_beam(true, false, false, false);
+  const MockParsetProvider provider_diagonal(false, true, false, false);
 
   // Initialize aterm buffers
   const size_t aterm_buffer_size = coord_system.width * coord_system.height *
@@ -222,6 +241,56 @@ BOOST_AUTO_TEST_CASE(combine_aterms) {
   BOOST_CHECK_EQUAL_COLLECTIONS(aterms_product.begin(), aterms_product.end(),
                                 aterm_buffer_combined.begin(),
                                 aterm_buffer_combined.end());
+}
+
+BOOST_AUTO_TEST_CASE(fourierfit) {
+  casacore::MeasurementSet ms(SCREEN_FITTING_MS);
+
+  // Get data from ms
+  Table antenna_table(ms.keywordSet().asTable("ANTENNA"));
+  const size_t n_antennas_ms = antenna_table.nrow();
+  Table field_table(ms.keywordSet().asTable("FIELD"));
+  ArrayMeasColumn<MDirection> field_column_1(field_table, "PHASE_DIR");
+  const MDirection phase_center_ms = *(field_column_1(0).data());
+  const double ra = phase_center_ms.getAngle("rad").getValue()[0];
+  const double dec = phase_center_ms.getAngle("rad").getValue()[1];
+
+  // Get data from h5parm file
+  schaapcommon::h5parm::H5Parm h5parmfile(H5_SOLUTIONS_PATH);
+  schaapcommon::h5parm::SolTab phase_soltab = h5parmfile.GetSolTab("phase000");
+  std::vector<double> frequencies = phase_soltab.GetRealAxis("freq");
+  std::vector<double> times = phase_soltab.GetRealAxis("time");
+  double frequency_step = phase_soltab.GetFreqInterval();
+  double time_step = phase_soltab.GetTimeInterval();
+  const size_t n_channels = frequencies.size();
+  const size_t n_times = times.size();
+  unsigned int n_antennas = phase_soltab.GetAxis("ant").size;
+
+  // Verify that the MS and the h5 file contain the same information
+  BOOST_TEST(n_antennas_ms == n_antennas);
+
+  // Properties of grid
+  const size_t width = 32;
+  const size_t height = 32;
+  const double dl = 3.5 * M_PI / 180. / width;
+  const double dm = 3.5 * M_PI / 180. / height;
+
+  // Initialize coordinate system
+  const everybeam::coords::CoordinateSystem coord_system = {
+      width, height, ra, dec, dl, dm, 0., 0.};
+
+  // Create parset providers
+  const MockParsetProvider provider_fourierfit(false, false, true, false);
+
+  // Initialize aterm buffers
+  const size_t aterm_buffer_size = coord_system.width * coord_system.height *
+                                   n_antennas * kAtermMatrixSize * n_channels *
+                                   n_times;
+  std::vector<std::complex<float>> aterm_buffer_fourierfit(aterm_buffer_size);
+
+  GenerateAterms(ms, provider_fourierfit, aterm_buffer_fourierfit, times[0],
+                 time_step, frequencies[0], frequency_step, n_antennas,
+                 n_channels, n_times, coord_system);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

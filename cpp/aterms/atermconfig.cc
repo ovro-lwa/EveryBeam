@@ -7,6 +7,8 @@
 #include "dldmaterm.h"
 #include "everybeamaterm.h"
 #include "fitsaterm.h"
+#include "fourierfittingaterm.h"
+#include "klfittingaterm.h"
 #include "pafbeamterm.h"
 #include "h5parmaterm.h"
 
@@ -80,6 +82,39 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
         f->SetWindow(window);
       }
       f->SetDownSample(reader.GetBoolOr(aterm_name + ".downsample", true));
+      aterms_.emplace_back(std::move(f));
+    } else if (aterm_type == "fourierfit") {
+      // Extract antenna names from MS
+      std::vector<std::string> station_names(n_antennas_);
+      casacore::ScalarColumn<casacore::String> stations(
+          ms.antenna(),
+          ms.antenna().columnName(casacore::MSAntennaEnums::NAME));
+
+      if (stations.nrow() != n_antennas_) {
+        throw std::runtime_error(
+            "Number of stations read from measurement set (" +
+            std::to_string(stations.nrow()) +
+            ") should match the number of stations set in the constructor "
+            "command line (" +
+            std::to_string(n_antennas_) + ")");
+      }
+
+      for (size_t i = 0; i < n_antennas_; ++i) {
+        station_names[i] = stations(i);
+      }
+
+      std::unique_ptr<FourierFittingATerm> f(new FourierFittingATerm(
+          station_names, coordinate_system_, settings_.max_support));
+
+      std::string solutions_file =
+          reader.GetStringOr(aterm_name + ".solutions", "");
+      f->Open({solutions_file});
+      aterms_.emplace_back(std::move(f));
+    } else if (aterm_type == "klfit") {
+      std::unique_ptr<KlFittingATerm> f(new KlFittingATerm(coordinate_system_));
+      std::string solutions_file =
+          reader.GetStringOr(aterm_name + ".solutions", "");
+      // f->Open(solutions_file);
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "dldm") {
       std::vector<std::string> dldm_files =

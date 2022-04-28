@@ -34,6 +34,9 @@ set(MWA_COEFF_PATH
 set(MOCK_H5PARM_PATH
     ${DATA_DIR}/MOCK_H5PARM.h5
     CACHE PATH "")
+set(H5_SOLUTIONS_PATH
+    ${DATA_DIR}/solutions.h5
+    CACHE PATH "")
 set(KL_SCREEN_PATH
     ${DATA_DIR}/kl_screen_0.fits
     CACHE PATH "")
@@ -84,6 +87,7 @@ add_custom_target(
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_aartfaac_lba_ms.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_h5_solutions.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_oskar_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ska_mid_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
