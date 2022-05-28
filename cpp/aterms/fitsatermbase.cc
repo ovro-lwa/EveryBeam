@@ -32,7 +32,7 @@ void FitsATermBase::InitializeFromFiles(
       [](const aocommon::FitsReader& a, const aocommon::FitsReader& b) -> bool {
         return a.TimeDimensionStart() < b.TimeDimensionStart();
       });
-  n_frequencies_ = readers.front().NFrequencies();
+  n_frequencies_ = readers.empty() ? 0 : readers.front().NFrequencies();
   for (size_t reader_index = 0; reader_index != readers.size();
        ++reader_index) {
     const aocommon::FitsReader& reader = readers[reader_index];
@@ -48,7 +48,7 @@ void FitsATermBase::InitializeFromFiles(
           << reader.NAntennas() << " antennas.";
       throw std::runtime_error(str.str());
     }
-    double time0 = reader.TimeDimensionStart();
+    const double time0 = reader.TimeDimensionStart();
     if (!timesteps_.empty() && time0 < timesteps_.back().time) {
       throw std::runtime_error(
           "Time axis of FITS files seem to overlap (start of fitsfile " +

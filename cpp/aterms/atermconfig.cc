@@ -35,12 +35,8 @@ namespace aterms {
 void ATermConfig::Read(const casacore::MeasurementSet& ms,
                        const ParsetProvider& reader,
                        const std::string& ms_filename) {
-  std::vector<std::string> aterms = reader.GetStringList("aterms");
-
-  if (aterms.empty()) {
-    throw std::runtime_error(
-        "No a-term correction given in parset (aterms key is an empty list)");
-  }
+  const std::vector<std::string> aterms =
+      reader.GetNonEmptyStringList("aterms");
 
   for (const std::string& aterm_name : aterms) {
     // Allows to "alias" the aterm type.
@@ -49,7 +45,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
 
     if (aterm_type == "tec") {
       std::vector<std::string> tec_files =
-          reader.GetStringList(aterm_name + ".images");
+          reader.GetNonEmptyStringList(aterm_name + ".images");
       std::unique_ptr<FitsATerm> f(new FitsATerm(
           n_antennas_, coordinate_system_, settings_.max_support));
       f->OpenTECFiles(tec_files);
@@ -67,7 +63,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "diagonal") {
       std::vector<std::string> diag_files =
-          reader.GetStringList(aterm_name + ".images");
+          reader.GetNonEmptyStringList(aterm_name + ".images");
       std::unique_ptr<FitsATerm> f(new FitsATerm(
           n_antennas_, coordinate_system_, settings_.max_support));
       f->OpenDiagGainFiles(diag_files);
@@ -118,7 +114,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "dldm") {
       std::vector<std::string> dldm_files =
-          reader.GetStringList(aterm_name + ".images");
+          reader.GetNonEmptyStringList(aterm_name + ".images");
       std::unique_ptr<DLDMATerm> f(new DLDMATerm(
           n_antennas_, coordinate_system_, settings_.max_support));
       f->Open(dldm_files);
@@ -226,7 +222,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "h5parm") {
       std::vector<std::string> h5parm_files =
-          reader.GetStringList(aterm_name + ".files");
+          reader.GetNonEmptyStringList(aterm_name + ".files");
 
       // Extract antenna names from MS
       std::vector<std::string> station_names(n_antennas_);
