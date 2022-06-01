@@ -142,7 +142,9 @@ test-and-coverage-2204:
       - build/run-unit.json
     reports:
       # NOTE: artifacts only work with relative paths...
-      cobertura: build/coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: build/coverage.xml
       junit: build/cpp/test/unittests.xml
 
 build-everybeam-2004:
