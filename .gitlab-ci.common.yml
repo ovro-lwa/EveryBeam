@@ -187,7 +187,7 @@ build-doc-2204:
     - cmake -DBUILD_WITH_PYTHON=ON $EVERYBEAM_PATH -G Ninja
     - ninja
     - ninja doc
-  artifacts: # Only for master the docs are published; for branches it may be useful to browse the artifacts
+  artifacts:
     paths:
     - build/doc/html
 
