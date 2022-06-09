@@ -3,8 +3,8 @@
 Build instructions
 ==================
 
-Dependencies:
-~~~~~~~~~~~~~
+Dependencies
+~~~~~~~~~~~~
 EveryBeam needs a number of dependencies in order to successfully compile. On a clean (ubuntu 20.04) system,
 the dependencies can be installed with (see also the ``docker`` directory):
 
@@ -32,8 +32,8 @@ In order to be able to build the documentation with ``make doc``, ``sphinx`` and
 
 
 
-Quick installation guide:
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Quick installation guide
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -44,8 +44,8 @@ Quick installation guide:
     make install
 
 
-Installation options:
-~~~~~~~~~~~~~~~~~~~~~
+Installation options
+~~~~~~~~~~~~~~~~~~~~
 
 (Use :code:`ccmake` or :code:`cmake -i` to configure all options.)
 
