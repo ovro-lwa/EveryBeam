@@ -14,12 +14,15 @@ import os
 import sys
 
 # Make sure that it refers to the shared object file from current build
-sys.path.insert(0, os.environ["EVERYBEAM_SO_PATH"])
+if 'READTHEDOCS' in os.environ:
+    sys.path.insert(0, os.path.abspath("../build/python"))
+else:
+    sys.path.insert(0, os.environ["EVERYBEAM_SO_PATH"])
 
 # -- Project information -----------------------------------------------------
 
 project = "EveryBeam"
-copyright = "2021, ASTRON (Netherlands Institute for Radio Astronomy)"
+copyright = "2022, ASTRON (Netherlands Institute for Radio Astronomy)"
 author = "Jakob Maljaars"
 
 
@@ -57,4 +60,8 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 # Breathe Configuration
+# When using CMake, the 'doc' target already sets breathe_projects.
+if 'READTHEDOCS' in os.environ:
+    breathe_projects = { "EveryBeam": "../build/doc/doxygen/xml" }
+
 breathe_default_project = "EveryBeam"

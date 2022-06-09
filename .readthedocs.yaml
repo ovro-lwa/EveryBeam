@@ -1,0 +1,47 @@
+# Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html
+
+version: 2
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.9"
+  # Use development packages from docker/ubuntu_22_04_base
+  apt_packages:
+    - casacore-dev
+    - cmake
+    - doxygen
+    - g++
+    - graphviz
+    - libblas-dev
+    - libboost-all-dev
+    - libcfitsio-dev
+    - libfftw3-dev
+    - libgsl-dev
+    - libgtkmm-3.0-dev
+    - libhdf5-dev
+    - liblapack-dev
+    - libpng-dev
+    - libpython3-dev
+    - libxml2-dev
+    - ninja-build
+    - python3-casacore
+    - python3-pip
+    - wcslib-dev
+  jobs:
+    # Build the .so with the everybeam python bindings, including docstrings.
+    pre_build:
+      - mkdir build
+      - cmake -DBUILD_WITH_PYTHON=ON -G Ninja -S . -B build
+      - cd build && ninja && ninja doxygen
+
+sphinx:
+   configuration: doc/conf.py
+
+python:
+   install:
+     - requirements: doc/requirements.txt
