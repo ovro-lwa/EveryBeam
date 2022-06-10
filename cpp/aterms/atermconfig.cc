@@ -107,10 +107,31 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       f->Open({solutions_file});
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "klfit") {
-      std::unique_ptr<KlFittingATerm> f(new KlFittingATerm(coordinate_system_));
+      // Extract antenna names from MS
+      std::vector<std::string> station_names(n_antennas_);
+      casacore::ScalarColumn<casacore::String> stations(
+          ms.antenna(),
+          ms.antenna().columnName(casacore::MSAntennaEnums::NAME));
+
+      if (stations.nrow() != n_antennas_) {
+        throw std::runtime_error(
+            "Number of stations read from measurement set (" +
+            std::to_string(stations.nrow()) +
+            ") should match the number of stations set in the constructor "
+            "command line (" +
+            std::to_string(n_antennas_) + ")");
+      }
+
+      for (size_t i = 0; i < n_antennas_; ++i) {
+        station_names[i] = stations(i);
+      }
+
+      int order = reader.GetDoubleOr(aterm_name + ".order", 3);
+      std::unique_ptr<KlFittingATerm> f(
+          new KlFittingATerm(station_names, coordinate_system_, order));
       std::string solutions_file =
           reader.GetStringOr(aterm_name + ".solutions", "");
-      // f->Open(solutions_file);
+      f->Open(solutions_file);
       aterms_.emplace_back(std::move(f));
     } else if (aterm_type == "dldm") {
       std::vector<std::string> dldm_files =

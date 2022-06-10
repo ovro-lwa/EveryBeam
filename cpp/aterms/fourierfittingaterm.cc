@@ -100,7 +100,7 @@ bool FourierFittingATerm::Calculate(std::complex<float>* buffer, double time,
     std::vector<std::complex<float>> screen(subgrid_size * subgrid_size);
     fourier_fitter_->Evaluate(solutions, screen.data());
 
-    for (size_t i = 0; i < coordinate_system_.height; ++i) {
+    for (size_t i = 0; i < (subgrid_size * subgrid_size); ++i) {
       // Store output on "diagonal" of Jones matrix
       buffer[0] = screen[i];
       buffer[1] = 0.0;

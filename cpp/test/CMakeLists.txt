@@ -61,6 +61,7 @@ set(TEST_FILENAMES
     tklfittingaterm.cc
     tfourierfittingaterm.cc
     tfourierfitter.cc
+    tklfitter.cc
     th5parmaterm.cc)
 
 # Add boost dynamic link flag for all test files.

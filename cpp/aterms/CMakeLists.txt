@@ -12,6 +12,7 @@ add_library(
   dldmaterm.cc
   pafbeamterm.cc
   h5parmaterm.cc
+  klfitter.cc
   klfittingaterm.cc
   fourierfitter.cc
   fourierfittingaterm.cc
