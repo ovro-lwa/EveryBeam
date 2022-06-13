@@ -16,7 +16,7 @@ OSKAR_MOCK_MS=OSKAR_MOCK.ms
 if [ ! -f ${OSKAR_MOCK_MS}/table.f0 ] ; then
 
     if [ ! -f "$OSKAR_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2 -O $OSKAR_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/OSKAR-single-timeslot.tar.bz2 -O $OSKAR_MOCK_ARCHIVE
     fi
 
     mkdir -p $OSKAR_MOCK_MS

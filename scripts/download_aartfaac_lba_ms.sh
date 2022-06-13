@@ -12,7 +12,7 @@ AARTFAAC_LBA_MOCK_MS=AARTFAAC_LBA_MOCK.ms
 if [ ! -f ${AARTFAAC_LBA_MOCK_MS}/table.f0 ] ; then
 
     if [ ! -f "$LOFAR_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/aartfaac.MS.tgz -O $AARTFAAC_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/aartfaac.MS.tgz -O $AARTFAAC_MOCK_ARCHIVE
     fi
 
     mkdir -p $AARTFAAC_LBA_MOCK_MS

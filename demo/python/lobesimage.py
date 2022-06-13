@@ -14,7 +14,7 @@ for the beam response for a LOFAR observation.
 
 Script requires a LOFAR Measurement Set in order to run.
 A minimal LOFAR MSet can be downloaded here:
-https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
+https://support.astron.nl/software/ci_data/EveryBeam/lba.MS.tar.bz2
 """
 
 ms_path = os.path.join(os.environ["DATA_DIR"], "LOFAR_LBA_MOCK.ms")

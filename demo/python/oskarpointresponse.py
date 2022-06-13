@@ -11,7 +11,7 @@ bindings can be used to compute beam responses.
 
 Script requires an OSKAR Measurement Set in order to run.
 A minimal OSKAR MSet can be downloaded here:
-https://www.astron.nl/citt/EveryBeam/OSKAR-single-timeslot.tar.bz2
+https://support.astron.nl/software/ci_data/EveryBeam/OSKAR-single-timeslot.tar.bz2
 """
 
 # Set path to (OSKAR) MS

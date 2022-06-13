@@ -12,5 +12,5 @@ set -e
 
 MOCK_H5PARM=MOCK_H5PARM.h5
 if [ ! -f ${MOCK_H5PARM} ] ; then
-    wget -q www.astron.nl/citt/EveryBeam/${MOCK_H5PARM}
+    wget -q https://support.astron.nl/software/ci_data/EveryBeam/${MOCK_H5PARM}
 fi

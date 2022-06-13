@@ -14,7 +14,7 @@ SCREEN_FITTING_MS=SCREEN_FITTING.ms
 if [ ! -f ${SCREEN_FITTING_MS}/table.f0 ] ; then
 
     if [ ! -f "$SCREEN_FITTING_MS_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/ci_data/EveryBeam/screentest_ms.tar.gz -O $SCREEN_FITTING_MS_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/screentest_ms.tar.gz -O $SCREEN_FITTING_MS_ARCHIVE
     fi
 
     rm -rf $SCREEN_FITTING_MS

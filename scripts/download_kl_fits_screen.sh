@@ -6,7 +6,7 @@
 # This file is generated from the "screen_test.ms" dataset, using the following commands:
 
 # 1. Get solutions file with DP3
-# DP3 msin.datacolumn=DATA msout= msin=screen_test.ms steps=[ddecal] ddecal.type=ddecal ddecal.mode=scalarphase ddecal.h5parm=test_solutions.h5parm ddecal.maxiter=150 ddecal.nchan=10 ddecal.solint=1 ddecal.sourcedb=skymodel.txt ddecal.usebeammodel=True ddecal.beammode=array_factor ddecal.solveralgorithm=hybrid ddecal.stepsize=0.02 
+# DP3 msin.datacolumn=DATA msout= msin=screen_test.ms steps=[ddecal] ddecal.type=ddecal ddecal.mode=scalarphase ddecal.h5parm=test_solutions.h5parm ddecal.maxiter=150 ddecal.nchan=10 ddecal.solint=1 ddecal.sourcedb=skymodel.txt ddecal.usebeammodel=True ddecal.beammode=array_factor ddecal.solveralgorithm=hybrid ddecal.stepsize=0.02
 # Where the skymodel is the following:
 # FORMAT = Name, Type, Patch, Ra, Dec, I, SpectralIndex='[]', LogarithmicSI, ReferenceFrequency='150616963.704427', MajorAxis, MinorAxis, Orientation
 # # LSMTool history:
@@ -39,5 +39,5 @@ set -e
 KL_SCREEN_FILE="kl_screen_0.fits"
 # Download Karhunen Loève screens in fits format
 if [ ! -f "$KL_SCREEN_FILE" ]; then
-    wget https://www.astron.nl/citt/ci_data/EveryBeam/${KL_SCREEN_FILE}
+    wget https://support.astron.nl/software/ci_data/EveryBeam/${KL_SCREEN_FILE}
 fi

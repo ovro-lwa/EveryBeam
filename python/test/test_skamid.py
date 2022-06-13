@@ -9,7 +9,7 @@ import numpy as np
 import warnings
 
 
-EVERYBEAM_BASE_URL = "http://www.astron.nl/citt/EveryBeam/"
+EVERYBEAM_BASE_URL = "https://support.astron.nl/software/ci_data/EveryBeam/"
 DATADIR = os.environ["DATA_DIR"]
 RASCIL_FITS = "test_primary_beam_RADEC_MID_512.fits"
 

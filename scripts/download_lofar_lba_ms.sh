@@ -15,7 +15,7 @@ LOFAR_LBA_MOCK_MS=LOFAR_LBA_MOCK.ms
 if [ ! -f ${LOFAR_LBA_MOCK_MS}/table.f0 ] ; then
 
     if [ ! -f "$LOFAR_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/lba.MS.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
     fi
 
     mkdir -p $LOFAR_LBA_MOCK_MS

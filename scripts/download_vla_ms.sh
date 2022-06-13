@@ -15,7 +15,7 @@ VLA_MOCK_MS=VLA_MOCK.ms
 if [ ! -f ${VLA_MOCK_MS}/table.f1 ] ; then
 
     if [ ! -f "$VLA_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/small-vla-set.tar.bz2 -O $VLA_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/small-vla-set.tar.bz2 -O $VLA_MOCK_ARCHIVE
     fi
 
     mkdir -p $VLA_MOCK_MS

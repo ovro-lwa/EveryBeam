@@ -74,7 +74,7 @@ set_source_files_properties(${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS
 ExternalProject_Add(
   download_mock_aartfaac_6_lba
   EXCLUDE_FROM_ALL TRUE
-  URL https://www.astron.nl/citt/ci_data/EveryBeam/AARTFAAC_6_LBA_MOCK.ms.tar.gz
+  URL https://support.astron.nl/software/ci_data/EveryBeam/AARTFAAC_6_LBA_MOCK.ms.tar.gz
   URL_HASH
     SHA256=8d7f93ce089b3a29c4d0ee8b367d27a821175d0626793b16be1643ee9bcdc6a5
   SOURCE_DIR ${DATA_DIR}/AARTFAAC_6_LBA_MOCK.ms

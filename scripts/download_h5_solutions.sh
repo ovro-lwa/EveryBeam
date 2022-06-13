@@ -5,7 +5,7 @@
 # Script for downloading a reference h5 solutions file.
 # This file is generated from the "screen_test.ms" dataset, using the following DP3 command:
 
-# DP3 msin.datacolumn=DATA msout= msin=screen_test.ms steps=[ddecal] ddecal.type=ddecal ddecal.mode=scalarphase ddecal.h5parm=test_solutions.h5parm ddecal.maxiter=150 ddecal.nchan=10 ddecal.solint=1 ddecal.sourcedb=skymodel.txt ddecal.usebeammodel=True ddecal.beammode=array_factor ddecal.solveralgorithm=hybrid ddecal.stepsize=0.02 
+# DP3 msin.datacolumn=DATA msout= msin=screen_test.ms steps=[ddecal] ddecal.type=ddecal ddecal.mode=scalarphase ddecal.h5parm=test_solutions.h5parm ddecal.maxiter=150 ddecal.nchan=10 ddecal.solint=1 ddecal.sourcedb=skymodel.txt ddecal.usebeammodel=True ddecal.beammode=array_factor ddecal.solveralgorithm=hybrid ddecal.stepsize=0.02
 # Where the skymodel is the following:
 # FORMAT = Name, Type, Patch, Ra, Dec, I, SpectralIndex='[]', LogarithmicSI, ReferenceFrequency='150616963.704427', MajorAxis, MinorAxis, Orientation
 # # LSMTool history:
@@ -35,5 +35,5 @@ set -e
 H5_SOLUTIONS_FILE="solutions.h5"
 # Download Karhunen Loève screens in fits format
 if [ ! -f "$H5_SOLUTIONS_FILE" ]; then
-    wget https://www.astron.nl/citt/ci_data/EveryBeam/${H5_SOLUTIONS_FILE}
+    wget https://support.astron.nl/software/ci_data/EveryBeam/${H5_SOLUTIONS_FILE}
 fi

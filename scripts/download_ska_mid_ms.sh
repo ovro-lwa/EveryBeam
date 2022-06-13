@@ -21,7 +21,7 @@ SKA_MID_MOCK_MS=SKA_MID_MOCK.ms
 if [ ! -f ${SKA_MID_MOCK_MS}/table.f0 ] ; then
 
     if [ ! -f "$SKA_MID_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/SKA_MID_SIM-1channel-1timestep.tar.bz2 -O $SKA_MID_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/SKA_MID_SIM-1channel-1timestep.tar.bz2 -O $SKA_MID_MOCK_ARCHIVE
     fi
 
     mkdir -p $SKA_MID_MOCK_MS

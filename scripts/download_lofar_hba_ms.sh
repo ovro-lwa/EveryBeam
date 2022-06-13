@@ -15,7 +15,7 @@ LOFAR_HBA_MOCK_MS=LOFAR_HBA_MOCK.ms
 if [ ! -f ${LOFAR_HBA_MOCK_MS}/table.f0 ] ; then
 
     if [ ! -f "$LOFAR_MOCK_ARCHIVE" ]; then
-	wget -q https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
+	    wget -q https://support.astron.nl/software/ci_data/EveryBeam/L258627-one-timestep.tar.bz2 -O $LOFAR_MOCK_ARCHIVE
     fi
 
     mkdir -p $LOFAR_HBA_MOCK_MS

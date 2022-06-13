@@ -12,7 +12,7 @@ a grid for LOFAR observations.
 
 Script requires an LOFAR Measurement Set in order to run.
 A minimal LOFAR MSet can be downloaded here:
-https://www.astron.nl/citt/EveryBeam/lba.MS.tar.bz2
+https://support.astron.nl/software/ci_data/EveryBeam/lba.MS.tar.bz2
 """
 
 # Set path to LOFAR LBA MS and load telescope

@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
   // wsclean -size 40 40  -scale 900asec -apply-primary-beam  LOFAR_MOCK.ms
   //
   // where LOFAR_MOCK.ms the MS available from
-  // https://www.astron.nl/citt/EveryBeam/L258627-one-timestep.tar.bz2
+  // https://support.astron.nl/software/ci_data/EveryBeam/L258627-one-timestep.tar.bz2
   //
   // PLEASE NOTE: for the sake of testing, the baseline weights were set to 1
   // in wsclean::lbeamimagemaker, i.e.

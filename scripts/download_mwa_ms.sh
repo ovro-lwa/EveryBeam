@@ -15,7 +15,7 @@ MWA_MOCK_MS=MWA_MOCK.ms
 if [ ! -f ${MWA_MOCK_MS}/table.f1 ]; then
 
     if [ ! -f "$MWA_MOCK_ARCHIVE" ]; then
-	wget -q www.astron.nl/citt/EveryBeam/MWA-single-timeslot.tar.bz2 -O $MWA_MOCK_ARCHIVE
+        wget -q https://support.astron.nl/software/ci_data/EveryBeam/MWA-single-timeslot.tar.bz2 -O $MWA_MOCK_ARCHIVE
     fi
 
     mkdir -p $MWA_MOCK_MS
