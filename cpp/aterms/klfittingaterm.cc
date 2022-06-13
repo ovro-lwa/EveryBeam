@@ -18,12 +18,14 @@ KlFittingATerm::KlFittingATerm(
     const std::vector<std::string>& station_names_ms,
     const coords::CoordinateSystem& coordinate_system, int order,
     bool use_phasor_fit)
-    : kl_fitter_(),
-      station_names_ms_(station_names_ms),
+    : station_names_ms_(station_names_ms),
       coordinate_system_(coordinate_system),
       order_(order),
+      phase_soltab_(),
       update_interval_(0),
+      kl_fitter_(),
       last_aterm_update_(-1),
+      nr_directions_(0),
       use_phasor_fit_(use_phasor_fit) {
   if (coordinate_system.height != coordinate_system.width) {
     throw std::runtime_error(
@@ -88,8 +90,9 @@ void KlFittingATerm::Open(const std::string& filename) {
 }
 
 bool KlFittingATerm::Calculate(std::complex<float>* buffer, double time,
-                               double frequency, size_t field_id,
-                               const double* uvw_in_m) {
+                               double frequency,
+                               [[maybe_unused]] size_t field_id,
+                               [[maybe_unused]] const double* uvw_in_m) {
   const bool outdated = std::fabs(time - last_aterm_update_) > update_interval_;
   if (!outdated) return false;
   last_aterm_update_ = time;

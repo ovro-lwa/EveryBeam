@@ -75,7 +75,7 @@ class KlFittingATerm final : public ATermBase {
   double update_interval_;
   std::unique_ptr<KlFitter> kl_fitter_;
   double last_aterm_update_;
-  int nr_directions_;
+  std::size_t nr_directions_;
   bool use_phasor_fit_;
 };
 }  // namespace aterms
