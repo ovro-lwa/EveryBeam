@@ -28,8 +28,9 @@
 static const std::array<std::string_view, 12> kAartfaacStationNames{
     // Available
     "CS002LBA", "CS003LBA", "CS004LBA", "CS005LBA", "CS006LBA", "CS007LBA",
+    "CS001LBA", "CS011LBA", "CS013LBA",
     // Currently unavailable
-    "CS001LBA", "CS011LBA", "CS013LBA", "CS017LBA", "CS021LBA", "CS032LBA"};
+    "CS017LBA", "CS021LBA", "CS032LBA"};
 
 struct AartfaacStation {
   std::string_view station;
