@@ -11,4 +11,4 @@
 set -e
 
 # Download the h5 coefficient files in case they're not present (-nc option) in the coeffs/lobes directory
-wget -q -r -nc -nH --no-parent --cut-dirs=4 --accept-regex=LOBES_.*\.h5 -e robots=off https://support.astron.nl/software/ci_data/EveryBeam/lobes/
+wget -q -r -nc -nH --no-parent --cut-dirs=4 --accept-regex=LOBES_.*\.h5 -e robots=off https://support.astron.nl/software/lobes/
