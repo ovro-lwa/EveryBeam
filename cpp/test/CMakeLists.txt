@@ -7,10 +7,6 @@ find_package(
   COMPONENTS unit_test_framework
   REQUIRED)
 
-if(DOWNLOAD_LOBES)
-  add_definitions(-DDOWNLOAD_LOBES)
-endif()
-
 # Set cache values if not specified
 set(MOCK_MS
     LOFAR_HBA_MOCK

@@ -31,6 +31,7 @@ versioning:
     - echo EVERYBEAM_IMAGE_2004=${CI_REGISTRY_IMAGE}/everybeam_2004:${CI_COMMIT_SHORT_SHA} >> versions.env
     - echo EVERYBEAM_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
     - echo EVERYBEAM_IMAGE_GCC12=${CI_REGISTRY_IMAGE}/everybeam_gcc12:${CI_COMMIT_SHORT_SHA} >> versions.env
+    - echo EVERYBEAM_PACKAGE_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_package_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
     - cat versions.env
   artifacts:
     reports:
@@ -119,7 +120,7 @@ test-and-coverage-2204:
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
     # Build in Debug mode
     - mkdir build && cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DDOWNLOAD_LOBES=On -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" -G Ninja ..
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DCMAKE_CXX_FLAGS="-coverage" -DCMAKE_EXE_LINKER_FLAGS="-coverage" -G Ninja ..
     - ninja install
     - ctest -j`nproc` --output-on-failure -T test
     # Capture coverage
@@ -167,6 +168,16 @@ build-everybeam-2204:
   rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
     - when: always
 
+build-everybeam-package-2204:
+  extends: [.prepare,.needs-base-2204]
+  stage: build
+  variables:
+    DOCKER_IMAGE: $EVERYBEAM_PACKAGE_IMAGE_2204
+    DOCKER_FILE: docker/everybeam-package
+    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2204}
+  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
+    - when: always
+
 build-everybeam-gcc12:
   extends: [.prepare,.needs-base-gcc12]
   stage: build
@@ -194,7 +205,7 @@ build-doc-2204:
 build-package-2204:
   stage: package
   needs: ["versioning","build-everybeam-2204"]
-  image: $EVERYBEAM_IMAGE_2204
+  image: $EVERYBEAM_PACKAGE_IMAGE_2204
   script:
     - mkdir everybeam_package
     - export SRC=$(pwd)

@@ -126,9 +126,6 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   }
 }
 
-// DOWNLOAD_LOBES required since we need to make sure
-// coefficient file for CS302LBA is present in build dir.
-#ifdef DOWNLOAD_LOBES
 BOOST_AUTO_TEST_CASE(test_lobes) {
   Options options;
   // Effectively, all the computations will be done as if the Hamaker model was
@@ -172,6 +169,5 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
                       everybeam_ref_p13[i], 2e-1);
   }
 }
-#endif  // DOWNLOAD_LOBES
 
 BOOST_AUTO_TEST_SUITE_END()

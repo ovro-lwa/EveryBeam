@@ -65,9 +65,7 @@ static std::unique_ptr<Telescope> LoadAartfaac6Telescope(
 BOOST_AUTO_TEST_CASE(load) {
   Options options;
   // TODO AST-807 harden this test
-  // - When DOWNLOAD_LOBES is undefined it throws.
   // - When an Aartfaac-12 MS is used it throws.
-  // - Builds where DOWNLOAD_LOBES is undefined aren't tested in CI.
   {
     options.element_response_model = ElementResponseModel::kLOBES;
     std::unique_ptr<Telescope> telescope = LoadAartfaac6Telescope(options);
@@ -226,7 +224,6 @@ BOOST_AUTO_TEST_CASE(under_horizon_grid) {
   }
 }
 
-#ifdef DOWNLOAD_LOBES
 static std::unique_ptr<everybeam::telescope::Telescope> GetTelescopeLofar() {
   Options options;
   options.element_response_model = ElementResponseModel::kLOBES;
@@ -395,7 +392,5 @@ BOOST_AUTO_TEST_CASE(gridded_response_lobes,
                                     array_factor_ref.data() + 4);
   }
 }
-
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()
