@@ -16,15 +16,15 @@ namespace aterms {
 
 class FourierFitter {
  public:
-  FourierFitter(int subgrid_size, int support,
+  FourierFitter(std::size_t subgrid_size, std::size_t support,
                 const std::vector<std::pair<float, float>>& directions);
 
   void Evaluate(const std::vector<std::complex<float>>& solutions,
                 std::complex<float>* buffer) const;
 
  private:
-  int subgrid_size_;
-  int support_;
+  std::size_t subgrid_size_;
+  std::size_t support_;
   xt::xtensor<std::complex<float>, 2> a_inv_;
 };
 

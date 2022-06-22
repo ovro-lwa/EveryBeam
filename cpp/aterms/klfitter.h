@@ -16,13 +16,13 @@ namespace aterms {
 
 class KlFitter {
  public:
-  KlFitter(int subgrid_size, int order,
+  KlFitter(std::size_t subgrid_size, int order,
            const std::vector<std::pair<float, float>>& directions);
 
   void Evaluate(const std::vector<float>& solutions, float* buffer) const;
 
  private:
-  int subgrid_size_;
+  std::size_t subgrid_size_;
   xt::xtensor<float, 3> fitting_matrix_;
 };
 

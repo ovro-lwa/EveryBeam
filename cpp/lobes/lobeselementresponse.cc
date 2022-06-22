@@ -137,7 +137,7 @@ void ReadOneElement(
   for (size_t i = 0; i < shape[0]; ++i) {
     for (size_t j = 0; j < shape[1]; ++j) {
       for (size_t k = 0; k < shape[3]; ++k) {
-        coefficients(i, j, 0, k) = *iterator++;
+        coefficients(i, j, 0, static_cast<long>(k)) = *iterator++;
       }
     }
   }

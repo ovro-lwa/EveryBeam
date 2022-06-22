@@ -13,10 +13,7 @@ namespace mwabeam {
 TileBeam2016::TileBeam2016(const double* delays, bool frequency_interpolation,
                            const std::string& coeff_path)
     : Beam2016Implementation(delays, nullptr, coeff_path),
-      frequency_interpolation_(frequency_interpolation),
-      mwa_lattitude_(-26.703319),
-      mwa_longitude_(116.67081),
-      mwa_height_(377.0) {}
+      frequency_interpolation_(frequency_interpolation) {}
 
 void TileBeam2016::ArrayResponse(
     double ra, double dec, const casacore::MDirection::Ref& j2000_ref,

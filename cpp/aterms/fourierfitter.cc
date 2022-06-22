@@ -9,7 +9,7 @@ namespace everybeam {
 namespace aterms {
 
 FourierFitter::FourierFitter(
-    int subgrid_size, int support,
+    std::size_t subgrid_size, std::size_t support,
     const std::vector<std::pair<float, float>>& directions)
     : subgrid_size_(subgrid_size), support_(support) {
   // The solution to the least squares fitting problem solved in Evaluate() is
@@ -72,7 +72,7 @@ void FourierFitter::Evaluate(const std::vector<std::complex<float>>& solutions,
   xt::xarray<std::complex<float>> screen = xt::fftw::fft2(screen_ift);
 
   // Write the result into the buffer
-  const int size = subgrid_size_ * subgrid_size_;
+  const std::size_t size = subgrid_size_ * subgrid_size_;
   std::vector<std::size_t> shape = {subgrid_size_, subgrid_size_};
   xt::adapt(buffer, size, xt::no_ownership(), shape) = screen;
 }

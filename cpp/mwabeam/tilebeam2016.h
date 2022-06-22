@@ -78,11 +78,6 @@ class TileBeam2016 : public Beam2016Implementation {
     // Not implemented yet: just call normal function
     GetTabulatedResponse(az, za, freq, result);
   }
-
-  // TODO: variables seem to be unused. Remove?
-  const double mwa_lattitude_;  // Array latitude. degrees North
-  const double mwa_longitude_;  // Array longitude. degrees East
-  const double mwa_height_;     // Array altitude. meters above sea level
 };
 }  // namespace mwabeam
 }  // namespace everybeam

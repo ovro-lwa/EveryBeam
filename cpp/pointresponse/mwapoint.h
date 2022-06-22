@@ -40,7 +40,8 @@ class MWAPoint final : public PointResponse {
                 size_t field_id) override;
 
   void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double ra, double dec, double freq, size_t field_id);
+                           double ra, double dec, double freq,
+                           size_t field_id) override;
 
  private:
   void SetJ200Vectors();

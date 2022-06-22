@@ -9,7 +9,7 @@
 namespace everybeam {
 namespace aterms {
 
-KlFitter::KlFitter(int subgrid_size, int order,
+KlFitter::KlFitter(std::size_t subgrid_size, int order,
                    const std::vector<std::pair<float, float>>& directions)
     : subgrid_size_(subgrid_size) {
   std::vector<size_t> shape = {directions.size(), 2};
@@ -74,8 +74,8 @@ void KlFitter::Evaluate(const std::vector<float>& solutions,
   xt::xtensor<float, 2> screen = xt::linalg::tensordot(fitting_matrix_, y, 1);
 
   // Write the result into the buffer
-  int size = subgrid_size_ * subgrid_size_;
-  std::vector<std::size_t> shape = {subgrid_size_, subgrid_size_};
+  const std::size_t size = subgrid_size_ * subgrid_size_;
+  const std::vector<std::size_t> shape = {subgrid_size_, subgrid_size_};
   xt::adapt(buffer, size, xt::no_ownership(), shape) = screen;
 }
 
