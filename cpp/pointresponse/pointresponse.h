@@ -111,9 +111,11 @@ class PointResponse {
    * caller is assumed to be thread-safe.
    * @return aocommon::MC2x2
    */
-  virtual aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx,
-                                   double freq, const vector3r_t& direction,
-                                   std::mutex* mutex = nullptr) {
+  virtual aocommon::MC2x2 Response(
+      [[maybe_unused]] BeamMode beam_mode, [[maybe_unused]] size_t station_idx,
+      [[maybe_unused]] double freq,
+      [[maybe_unused]] const vector3r_t& direction,
+      [[maybe_unused]] std::mutex* mutex = nullptr) {
     throw std::runtime_error("Not yet implemented");
   }
 

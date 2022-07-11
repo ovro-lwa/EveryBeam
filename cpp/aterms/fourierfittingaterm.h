@@ -91,7 +91,7 @@ class FourierFittingATerm final : public ATermBase {
 
   schaapcommon::h5parm::SolTab phase_soltab_;
   int support_;
-  int nr_directions_;
+  std::size_t nr_directions_;
   double update_interval_;
   double last_aterm_update_;
 };

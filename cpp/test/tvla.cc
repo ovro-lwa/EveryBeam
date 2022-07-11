@@ -47,14 +47,15 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   double ra(2.62880729), dec(0.02831797), dl(0.125 * M_PI / 180.),
       dm(0.125 * M_PI / 180.), shift_l(0.), shift_m(0.);
 
-  CoordinateSystem coord_system = {.width = width,
-                                   .height = height,
-                                   .ra = ra,
-                                   .dec = dec,
-                                   .dl = dl,
-                                   .dm = dm,
-                                   .phase_centre_dl = shift_l,
-                                   .phase_centre_dm = shift_m};
+  CoordinateSystem coord_system;
+  coord_system.width = width;
+  coord_system.height = height;
+  coord_system.ra = ra;
+  coord_system.dec = dec;
+  coord_system.dl = dl;
+  coord_system.dm = dm;
+  coord_system.phase_centre_dl = shift_l;
+  coord_system.phase_centre_dm = shift_m;
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr != dynamic_cast<DishGrid*>(grid_response.get()));
