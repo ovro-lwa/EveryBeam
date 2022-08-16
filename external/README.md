@@ -7,3 +7,8 @@ result of silently updating the submodules. Dependencies are checked out on the 
 - `eigen`: `3.3.7` (https://gitlab.com/libeigen/eigen/-/tags/3.3.7)
 - `pybind11`: `v2.5.0` (https://github.com/pybind/pybind11/releases/tag/v2.5.0)
 
+The file npy.hpp comes from the libnpy library that can be found here:
+
+- https://github.com/llohse/libnpy
+
+See that file for its license.
