@@ -99,6 +99,7 @@ find_package(
   FFTW3
   COMPONENTS single
   REQUIRED)
+include_directories(${FFTW3_INCLUDE_DIR})
 
 # Find BLAS and LAPACK, needed for everybeam::aterms only
 find_package(BLAS REQUIRED)
@@ -226,5 +227,3 @@ if(BUILD_APT_PACKAGES)
   add_subdirectory(package)
 endif()
 #------------------------------------------------------------------------------
-
-option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
