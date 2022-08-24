@@ -320,8 +320,9 @@ class Station {
   Options options_;
   vector3r_t phase_reference_;
   ElementResponse::Ptr element_response_;
+  // element_ either refers to antenna_ or an Element inside antenna_.
+  // Besides Station, no one has (shared) ownership of antenna_.
   std::shared_ptr<Element> element_;
-
   std::shared_ptr<Antenna> antenna_;
 
   coords::ITRFDirection::Ptr ncp_;

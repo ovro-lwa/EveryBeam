@@ -63,12 +63,12 @@ void Station::SetAntenna(std::shared_ptr<Antenna> antenna) {
   // note that the Element was upcasted from an ElementHamaker into an Element
   // in BeamFormerLofarHBA/LBA::Clone()!- and Transform the Element with the
   // coordinate system of the HBA/LBA beam former.
-  if (auto beamformer_lofar =
-          std::dynamic_pointer_cast<BeamFormerLofar>(antenna)) {
-    antenna = beamformer_lofar->GetElement();
-    antenna->Transform(beamformer_lofar->coordinate_system_);
+  if (auto beamformer_lofar = dynamic_cast<BeamFormerLofar*>(antenna.get())) {
+    element_ = beamformer_lofar->GetElement();
+    element_->Transform(beamformer_lofar->coordinate_system_);
+  } else {
+    element_ = std::dynamic_pointer_cast<Element>(antenna);
   }
-  element_ = std::dynamic_pointer_cast<Element>(antenna);
 }
 
 // ========================================================
