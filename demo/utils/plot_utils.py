@@ -33,7 +33,9 @@ def plot_fits_panel(ax, image, title, cmap):
 
     im = ax.imshow(np.squeeze(image), cmap=cmap)
     plt.colorbar(im, format="%.2e")
-    plt.tick_params(labelcolor="none", top="off", bottom="off", left="off", right="off")
+    plt.tick_params(
+        labelcolor="none", top="off", bottom="off", left="off", right="off"
+    )
     ax.set_xticks([])
     ax.set_yticks([])
     ax.invert_yaxis()

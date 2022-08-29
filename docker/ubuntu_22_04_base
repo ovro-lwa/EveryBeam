@@ -51,5 +51,6 @@ RUN pip3 install \
 		breathe \
 		myst-parser \
 		aptly-api-client \
+		black \
 		cmake-format \
 	;

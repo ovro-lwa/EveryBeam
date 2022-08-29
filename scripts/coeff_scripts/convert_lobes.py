@@ -393,7 +393,15 @@ def make_plot(E, theta, phi, vmin=None, vmax=None):
 
 
 def fit_and_write_lobes_coeffs(
-    theta, phi, freq, positions, v_pol1, v_pol2, nmax, outfile, apply_weighting=False,
+    theta,
+    phi,
+    freq,
+    positions,
+    v_pol1,
+    v_pol2,
+    nmax,
+    outfile,
+    apply_weighting=False,
 ):
     """
     Fit and write coefficients for simulated lobes data
@@ -444,7 +452,9 @@ def fit_and_write_lobes_coeffs(
     E1, E1w = extract_electromagnetic_field(v_pol1, weights=weights)
     E2, E2w = extract_electromagnetic_field(v_pol2, weights=weights)
 
-    F, F_w, nms = compute_polyomial_expansion(theta, phi, nmax, weights=weights)
+    F, F_w, nms = compute_polyomial_expansion(
+        theta, phi, nmax, weights=weights
+    )
     print("Inverting matrix")
     Finv = np.linalg.pinv(F_w) if F_w is not None else np.linalg.pinv(F)
 
@@ -488,7 +498,10 @@ def main():
         element_select = None
 
         h5data = read_h5_file(
-            simpath, simfile, freq_select=freq_select, element_select=element_select
+            simpath,
+            simfile,
+            freq_select=freq_select,
+            element_select=element_select,
         )
         # Please note that freqs have to be converted from MHz to Hz!
         F, pT, = fit_and_write_lobes_coeffs(
@@ -537,7 +550,9 @@ def main():
         return simdata["theta"], simdata["phi"], F, pT
 
     theta, phi, F, pT = (
-        single_hdf5_file() if approach == "single_hdf5_file" else separate_hdf5_files()
+        single_hdf5_file()
+        if approach == "single_hdf5_file"
+        else separate_hdf5_files()
     )
 
     # Plot modulus of fitted response for XX, freq 0, and element 0

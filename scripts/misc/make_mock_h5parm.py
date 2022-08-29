@@ -42,7 +42,10 @@ def init_h5parm_solution_table(
     basisfunction_type="lagrange",
     history="",
 ):
-    soltab_info = {"amplitude": "amplitude_coefficients", "phase": "phase_coefficients"}
+    soltab_info = {
+        "amplitude": "amplitude_coefficients",
+        "phase": "phase_coefficients",
+    }
 
     assert soltab_type in soltab_info.keys()
     soltab_name = soltab_info[soltab_type]
@@ -56,7 +59,9 @@ def init_h5parm_solution_table(
     )
 
     # Set info for the "ant" axis
-    h5parm_object.create_axis_meta_data(soltab_name, "ant", meta_data=antenna_names)
+    h5parm_object.create_axis_meta_data(
+        soltab_name, "ant", meta_data=antenna_names
+    )
 
     # Set info for the "dir" axis
     h5parm_object.create_axis_meta_data(
@@ -70,17 +75,29 @@ def init_h5parm_solution_table(
     )
 
     # Set info for the "time" axis
-    h5parm_object.create_axis_meta_data(soltab_name, "time", meta_data=time_array)
+    h5parm_object.create_axis_meta_data(
+        soltab_name, "time", meta_data=time_array
+    )
     return h5parm_object
 
 
 axes_labels = ["ant", "time", "dir"]
 axes_data_amplitude = dict(
-    zip(axes_labels, (nr_stations, time_array_ampl.size, nr_parameters_ampl),)
+    zip(
+        axes_labels,
+        (nr_stations, time_array_ampl.size, nr_parameters_ampl),
+    )
 )
 
 axes_data_phase = dict(
-    zip(axes_labels, (nr_stations, time_array_phase.size, nr_parameters_phase,),)
+    zip(
+        axes_labels,
+        (
+            nr_stations,
+            time_array_phase.size,
+            nr_parameters_phase,
+        ),
+    )
 )
 
 h5writer = H5ParmWriter(fname, solution_set_name=solsetname, overwrite=True)
@@ -123,6 +140,10 @@ for i, tampl in enumerate(time_array_ampl):
 phase_coeffs = np.array([[1, 2, 3], [4, 5, 6]])
 for i, tphase in enumerate(time_array_phase):
     phase_coeffs_tmp = phase_coeffs * (i + 1)
-    phase_coeffs_tmp = phase_coeffs_tmp.reshape(nr_stations, 1, nr_parameters_phase)
+    phase_coeffs_tmp = phase_coeffs_tmp.reshape(
+        nr_stations, 1, nr_parameters_phase
+    )
     offset_phase = (0, i, 0)
-    h5writer.fill_solution_table("phase_coefficients", phase_coeffs_tmp, offset_phase)
+    h5writer.fill_solution_table(
+        "phase_coefficients", phase_coeffs_tmp, offset_phase
+    )

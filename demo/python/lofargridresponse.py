@@ -38,16 +38,28 @@ gs.l_shift = gs.m_shift = 0.0
 grid_response_all = telescope.gridded_response(gs, time, freq)
 
 # Check whether the returned numpy array has the expected shape
-assert grid_response_all.shape == (telescope.nr_stations, gs.width, gs.height, 2, 2)
+assert grid_response_all.shape == (
+    telescope.nr_stations,
+    gs.width,
+    gs.height,
+    2,
+    2,
+)
 
 # Get the response for a specific station (station_id)
 grid_response = telescope.gridded_response(gs, time, freq, station_id)
 
 # Returned response should of course match corresponding entry
 # in "grid_response_all"
-np.testing.assert_allclose(grid_response, grid_response_all[station_id, ...], rtol=1e-6)
+np.testing.assert_allclose(
+    grid_response, grid_response_all[station_id, ...], rtol=1e-6
+)
 
 # Also, at the center pixel (2,2) the retrieved response should be reproduced
 # by a call to station_response at the phase centre ra and dec
-station_response = telescope.station_response(time, station_id, freq, gs.ra, gs.dec)
-np.testing.assert_allclose(grid_response[2, 2, ...], station_response, rtol=1e-6)
+station_response = telescope.station_response(
+    time, station_id, freq, gs.ra, gs.dec
+)
+np.testing.assert_allclose(
+    grid_response[2, 2, ...], station_response, rtol=1e-6
+)

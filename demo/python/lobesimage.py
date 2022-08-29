@@ -49,7 +49,7 @@ response = np.empty((y_v.size, x_v.size, 2, 2), dtype=np.cdouble)
 response.fill(np.nan)
 for i, x in enumerate(x_v):
     for j, y in enumerate(y_v):
-        if (x ** 2 + y ** 2) <= 1.0:
+        if (x**2 + y**2) <= 1.0:
             # Compute theta/phi and resulting direction vector
             theta = np.arcsin(np.sqrt(x * x + y * y))
             phi = np.arctan2(y, x)
@@ -66,7 +66,12 @@ for i, x in enumerate(x_v):
                 )
             elif mode == "station":
                 response[j, i, :, :] = telescope.station_response(
-                    time, station_id, frequency, direction, station0, rotate=rotate
+                    time,
+                    station_id,
+                    frequency,
+                    direction,
+                    station0,
+                    rotate=rotate,
                 )
             else:
                 raise Exception(
@@ -85,7 +90,9 @@ for i, row in enumerate(range(2)):
         axs[row, col].set_title(f"abs({label[j]}{label[i]})")
         fig.colorbar(im1, ax=axs[row, col])
 
-        im2 = axs[row, col + 2].pcolor(X, Y, np.angle(response[:, :, row, col]))
+        im2 = axs[row, col + 2].pcolor(
+            X, Y, np.angle(response[:, :, row, col])
+        )
         axs[row, col + 2].set_aspect("equal", "box")
         axs[row, col + 2].set_title(f"angle({label[j]}{label[i]})")
         fig.colorbar(im2, ax=axs[row, col + 2])

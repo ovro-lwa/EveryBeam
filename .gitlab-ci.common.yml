@@ -106,7 +106,7 @@ format-2204:
   image: $BASE_IMAGE_2204
   script:
     #Update external/aocommon, which contains format.sh.
-    - git submodule update --init external/aocommon && \
+    - git submodule update --init external/aocommon
     - ./scripts/run-format.sh
 
 # Build a debug version of EveryBeam from the base image

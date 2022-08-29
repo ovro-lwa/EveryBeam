@@ -13,6 +13,7 @@ import sys
 import time
 import re
 
+
 def flat_index(shape, index):
     """
     Compute the flat index of the element with the provided (N-dimensional)
@@ -36,7 +37,8 @@ def flat_index(shape, index):
 
     return flat
 
-def regex(name, type, signed = True):
+
+def regex(name, type, signed=True):
     """
     Return a regular expression to match a (possibly signed) int or float, using
     the named group syntax. The matching group will by assigned the provided
@@ -56,6 +58,7 @@ def regex(name, type, signed = True):
 
     return "(?P<%s>%s)" % (name, expr)
 
+
 def main(args):
     """
     Main function for the conversion of of a coefficient file to a *.cc file. Typical usage is
@@ -66,7 +69,9 @@ def main(args):
     ./convert_coeff.py element_beam_LBA.coeff defaultcoefflba.cc default_lba
     ./convert_coeff.py element_beam_HBA.coeff defaultcoeffhba.cc default_hba
     """
-    print "converting %s -> %s (variable name: %s)" % (args[0], args[1], args[2])
+    print(
+        "converting %s -> %s (variable name: %s)" % (args[0], args[1], args[2])
+    )
 
     HEADER, COEFF = range(2)
     state = HEADER
@@ -91,19 +96,31 @@ def main(args):
 
         # Parse header information.
         if state == HEADER:
-            match = re.match("^d\s+%s\s+k\s+%s\s+pwrT\s+%s\s+pwrF\s+%s\s+"
-                "freqAvg\s+%s\s+freqRange\s+%s$" % (regex("d", "int", False),
-                regex("k", "int", False), regex("pwrT", "int", False),
-                regex("pwrF", "int", False), regex("freqAvg", "float", False),
-                regex("freqRange", "float", False)), line)
-            assert match, "unable to parse header: \"%s\"" % line
+            match = re.match(
+                "^d\s+%s\s+k\s+%s\s+pwrT\s+%s\s+pwrF\s+%s\s+"
+                "freqAvg\s+%s\s+freqRange\s+%s$"
+                % (
+                    regex("d", "int", False),
+                    regex("k", "int", False),
+                    regex("pwrT", "int", False),
+                    regex("pwrF", "int", False),
+                    regex("freqAvg", "float", False),
+                    regex("freqRange", "float", False),
+                ),
+                line,
+            )
+            assert match, 'unable to parse header: "%s"' % line
 
-            shape = (int(match.group("k")), int(match.group("pwrT")),
-                int(match.group("pwrF")), int(match.group("d")))
+            shape = (
+                int(match.group("k")),
+                int(match.group("pwrT")),
+                int(match.group("pwrF")),
+                int(match.group("d")),
+            )
             assert shape[3] == 2, "unsupported array shape, expected d == 2"
 
             size = reduce(lambda x, y: x * y, shape)
-            print "coefficient array shape:", shape, "(%d total)" % size
+            print("coefficient array shape:", shape, "(%d total)" % size)
 
             freqAvg = match.group("freqAvg")
             freqRange = match.group("freqRange")
@@ -113,10 +130,18 @@ def main(args):
 
         # Parse coefficients.
         elif state == COEFF:
-            match = re.match("^%s\s+%s\s+%s\s+%s\s+%s\s+%s$"
-                % (regex("d", "int", False), regex("k", "int", False),
-                regex("pwrT", "int", False), regex("pwrF", "int", False),
-                regex("re", "float"), regex("im", "float")), line)
+            match = re.match(
+                "^%s\s+%s\s+%s\s+%s\s+%s\s+%s$"
+                % (
+                    regex("d", "int", False),
+                    regex("k", "int", False),
+                    regex("pwrT", "int", False),
+                    regex("pwrF", "int", False),
+                    regex("re", "float"),
+                    regex("im", "float"),
+                ),
+                line,
+            )
             assert match, "unable to parse line #%d" % line_no
 
             d = int(match.group("d"))
@@ -125,7 +150,10 @@ def main(args):
             pwrF = int(match.group("pwrF"))
 
             index = flat_index(shape, (k, pwrT, pwrF, d))
-            coeff[index] = "std::complex<double>(%s, %s)" % (match.group("re"), match.group("im"))
+            coeff[index] = "std::complex<double>(%s, %s)" % (
+                match.group("re"),
+                match.group("im"),
+            )
 
             count += 1
 
@@ -138,8 +166,14 @@ def main(args):
     fout = file(args[1], "w")
 
     print >> fout, "// Beam model coefficients converted by convert_coeff.py."
-    print >> fout, "// Conversion performed on %s UTC using: " % time.strftime("%Y/%m/%d/%H:%M:%S", time.gmtime())
-    print >> fout, "//     convert_coeff.py %s %s %s" % (args[0], args[1], args[2])
+    print >> fout, "// Conversion performed on %s UTC using: " % time.strftime(
+        "%Y/%m/%d/%H:%M:%S", time.gmtime()
+    )
+    print >> fout, "//     convert_coeff.py %s %s %s" % (
+        args[0],
+        args[1],
+        args[2],
+    )
     print >> fout
     print >> fout, "#include <complex>"
     print >> fout
@@ -152,14 +186,26 @@ def main(args):
     print >> fout, "const double %s_freq_center = %s;" % (args[2], freqAvg)
     print >> fout, "const double %s_freq_range = %s;" % (args[2], freqRange)
     print >> fout
-    print >> fout, "// Shape of the coefficient array: %dx%dx%dx2 (the size of the last dimension is" % (shape[0], shape[1], shape[2])
+    print >> fout, "// Shape of the coefficient array: %dx%dx%dx2 (the size of the last dimension is" % (
+        shape[0],
+        shape[1],
+        shape[2],
+    )
     print >> fout, "// implied, and always equal to 2)."
     print >> fout, "//"
-    print >> fout, "const unsigned int %s_coeff_shape[3] = {%d, %d, %d};" % (args[2], shape[0], shape[1], shape[2])
+    print >> fout, "const unsigned int %s_coeff_shape[3] = {%d, %d, %d};" % (
+        args[2],
+        shape[0],
+        shape[1],
+        shape[2],
+    )
     print >> fout
-    print >> fout, "// The array of coefficients in row-major order (\"C\"-order)."
+    print >> fout, '// The array of coefficients in row-major order ("C"-order).'
     print >> fout, "//"
-    print >> fout, "const std::complex<double> %s_coeff[%d] = {" % (args[2], len(coeff))
+    print >> fout, "const std::complex<double> %s_coeff[%d] = {" % (
+        args[2],
+        len(coeff),
+    )
 
     i = 0
     while i < len(coeff):
@@ -177,10 +223,15 @@ def main(args):
 
     fout.close()
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print "convert a beam model coefficient (.coeff) file to a C++ (.cc) file."
-        print "usage: convert_coeff.py <input-file> <output-file> <variable-name>"
+        print(
+            "convert a beam model coefficient (.coeff) file to a C++ (.cc) file."
+        )
+        print(
+            "usage: convert_coeff.py <input-file> <output-file> <variable-name>"
+        )
         sys.exit(1)
 
     main(sys.argv[1:])

@@ -4,6 +4,7 @@
 
 # Work-around issue https://github.com/astropy/astropy/issues/13007
 from astropy.utils import iers
+
 iers.conf.auto_download = False
 
 import os
@@ -18,7 +19,9 @@ Compare the station response obtained with OSKAR to the station
 response obtained via EveryBeam.
 """
 
-tolerance = float(os.environ["TOLERANCE"]) if "TOLERANCE" in os.environ else 0.0
+tolerance = (
+    float(os.environ["TOLERANCE"]) if "TOLERANCE" in os.environ else 0.0
+)
 npixels = int(os.environ["NPIXELS"]) if "NPIXELS" in os.environ else 256
 data_dir = os.environ["DATA_DIR"]
 freq = 50e6
@@ -34,7 +37,11 @@ subprocess.check_call(
     ]
 )
 subprocess.check_call(
-    ["oskar_csv_to_hdf5.py", os.path.join(data_dir, "skalowmini-coef.tm"), "oskar.h5"]
+    [
+        "oskar_csv_to_hdf5.py",
+        os.path.join(data_dir, "skalowmini-coef.tm"),
+        "oskar.h5",
+    ]
 )
 # subprocess.check_call(["make_station_response_image", str(npixels)])
 
@@ -66,8 +73,8 @@ B.fill(complex(np.nan, np.nan))
 
 for i, x in enumerate(x_v):
     for j, y in enumerate(y_v):
-        if (x ** 2 + y ** 2) <= 1.0:
-            z = np.sqrt(1.0 - x ** 2 - y ** 2)
+        if (x**2 + y**2) <= 1.0:
+            z = np.sqrt(1.0 - x**2 - y**2)
             direction = x * p + y * q + z * r
             B[i, j, :, :] = telescope.station_response(
                 time, station_index, freq, direction, station0, rotate=False

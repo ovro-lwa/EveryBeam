@@ -119,7 +119,9 @@ def get_telescope_settings(
             "normalise_beams_at_phase_centre": False,
             "aperture_array/element_pattern/normalise": False,
         },
-        "telescope/input_directory": os.path.join(data_dir, "skalowmini-coef.tm"),
+        "telescope/input_directory": os.path.join(
+            data_dir, "skalowmini-coef.tm"
+        ),
         "telescope/aperture_array/element_pattern/enable_numerical": True,
         "telescope/aperture_array/element_pattern/swap_xy": swap_xy,
         "telescope/aperture_array/array_pattern/enable": True,
@@ -127,7 +129,9 @@ def get_telescope_settings(
     }
 
 
-def generate_oskar_csv(basefunction_idx, freqs, output_dir, element_id, em_idx=0):
+def generate_oskar_csv(
+    basefunction_idx, freqs, output_dir, element_id, em_idx=0
+):
     """
     Write OSKAR results to csv file.
     """
@@ -153,7 +157,9 @@ def generate_oskar_csv(basefunction_idx, freqs, output_dir, element_id, em_idx=0
                     alpha = np.real(A[:, :, i, j] / s)
 
                     np.savetxt(
-                        os.path.join(output_dir, filename), alpha, delimiter=", "
+                        os.path.join(output_dir, filename),
+                        alpha,
+                        delimiter=", ",
                     )
 
 
@@ -174,14 +180,11 @@ def read_oskar_beams(root_name):
     A = None
     for i, pol1 in enumerate(["X", "Y"]):
         for j, pol2 in enumerate(["X", "Y"]):
-            filename_amp = (
-                f"{root_name}_MHz_S0000_TIME_SEP_CHAN_SEP_AMP_{pol1}{pol2}.fits"
-            )
-            filename_phase = (
-                f"{root_name}_MHz_S0000_TIME_SEP_CHAN_SEP_PHASE_{pol1}{pol2}.fits"
-            )
+            filename_amp = f"{root_name}_MHz_S0000_TIME_SEP_CHAN_SEP_AMP_{pol1}{pol2}.fits"
+            filename_phase = f"{root_name}_MHz_S0000_TIME_SEP_CHAN_SEP_PHASE_{pol1}{pol2}.fits"
             d = (
-                fits.getdata(filename_amp) * np.exp(1j * fits.getdata(filename_phase))
+                fits.getdata(filename_amp)
+                * np.exp(1j * fits.getdata(filename_phase))
             )[0, 0, ...].T
             if A is None:
                 N = d.shape[-1]

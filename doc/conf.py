@@ -14,7 +14,7 @@ import os
 import sys
 
 # Make sure that it refers to the shared object file from current build
-if 'READTHEDOCS' in os.environ:
+if "READTHEDOCS" in os.environ:
     sys.path.insert(0, os.path.abspath("../build/python"))
 else:
     sys.path.insert(0, os.environ["EVERYBEAM_SO_PATH"])
@@ -61,7 +61,7 @@ html_static_path = ["_static"]
 
 # Breathe Configuration
 # When using CMake, the 'doc' target already sets breathe_projects.
-if 'READTHEDOCS' in os.environ:
-    breathe_projects = { "EveryBeam": "../build/doc/doxygen/xml" }
+if "READTHEDOCS" in os.environ:
+    breathe_projects = {"EveryBeam": "../build/doc/doxygen/xml"}
 
 breathe_default_project = "EveryBeam"

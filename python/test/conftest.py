@@ -19,4 +19,6 @@ def download_msets():
         "download_ska_mid_ms.sh",
     ]
     for script in download_scripts:
-        call(f"sh {os.path.join(os.environ['SCRIPTS_DIR'], script)}", shell=True)
+        call(
+            f"sh {os.path.join(os.environ['SCRIPTS_DIR'], script)}", shell=True
+        )

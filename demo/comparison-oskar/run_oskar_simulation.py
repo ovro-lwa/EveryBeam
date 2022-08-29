@@ -30,7 +30,12 @@ def main(npixels):
     freqs = [50]
 
     telescope_settings = get_telescope_settings(
-        data_dir, ra0_deg, dec0_deg, length_sec, num_time_steps=60, swap_xy=False
+        data_dir,
+        ra0_deg,
+        dec0_deg,
+        length_sec,
+        num_time_steps=60,
+        swap_xy=False,
     )
 
     # Copy the base settings dictionary.
@@ -59,7 +64,9 @@ def main(npixels):
         settings["beam_pattern/beam_image/size"] = npixels
         settings["beam_pattern/station_outputs/fits_image/amp"] = True
         settings["beam_pattern/station_outputs/fits_image/phase"] = True
-        settings["beam_pattern/station_outputs/fits_image/auto_power_real"] = False
+        settings[
+            "beam_pattern/station_outputs/fits_image/auto_power_real"
+        ] = False
 
         # Run the app with the settings file.
         subprocess.call([app2, settings_path])

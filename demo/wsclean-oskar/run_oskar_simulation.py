@@ -36,7 +36,12 @@ def main():
 
     # Define telescope settings dictionary
     telescope_settings = get_telescope_settings(
-        data_dir, ra0_deg, dec0_deg, length_sec, num_time_steps=600, swap_xy=True
+        data_dir,
+        ra0_deg,
+        dec0_deg,
+        length_sec,
+        num_time_steps=600,
+        swap_xy=True,
     )
 
     # Copy the base settings dictionary
