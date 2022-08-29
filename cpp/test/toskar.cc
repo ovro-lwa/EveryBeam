@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
 
   // Assert if GetStation(stationd_id) behaves properly
   const OSKAR& oskartelescope = static_cast<const OSKAR&>(*telescope.get());
-  BOOST_CHECK_EQUAL(oskartelescope.GetStation(0)->GetName(), "s0000");
+  BOOST_CHECK_EQUAL(oskartelescope.GetStation(0).GetName(), "s0000");
 
   // Properties extracted from MS
   double time = 4.45353e+09;

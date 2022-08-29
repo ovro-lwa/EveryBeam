@@ -48,8 +48,8 @@ void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float>* buffer,
 
   const aocommon::MC2x2F gain_matrix =
       aocommon::MC2x2F(phased_array.GetStation(station_idx)
-                           ->Response(beam_mode, time_, freq, itrf_direction_,
-                                      sb_freq, station0_, tile0_)
+                           .Response(beam_mode, time_, freq, itrf_direction_,
+                                     sb_freq, station0_, tile0_)
                            .Data());
 
   if (apply_normalisation) {
@@ -97,8 +97,8 @@ aocommon::MC2x2 PhasedArrayPoint::UnnormalisedResponse(
   const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
   return phased_array.GetStation(station_idx)
-      ->Response(beam_mode, time_, freq, direction, sb_freq, station0, tile0,
-                 rotate_);
+      .Response(beam_mode, time_, freq, direction, sb_freq, station0, tile0,
+                rotate_);
 }
 
 aocommon::MC2x2 PhasedArrayPoint::ElementResponse(size_t station_idx,
@@ -108,8 +108,8 @@ aocommon::MC2x2 PhasedArrayPoint::ElementResponse(size_t station_idx,
   const PhasedArray& phased_array =
       static_cast<const PhasedArray&>(*telescope_);
   return phased_array.GetStation(station_idx)
-      ->ComputeElementResponse(time_, freq, direction, element_idx, is_local_,
-                               rotate_);
+      .ComputeElementResponse(time_, freq, direction, element_idx, is_local_,
+                              rotate_);
 }
 
 void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {

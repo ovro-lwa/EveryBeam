@@ -51,16 +51,16 @@ bool PhasedArrayResponse::CalculateBeamNormalisation(
        preapplied_correction_mode_ != BeamMode::kNone)) {
     inverse_gain = aocommon::MC2x2F(
         phased_array.GetStation(station_index)
-            ->Response(preapplied_correction_mode_, time, frequency,
-                       diff_beam_centre_, subband_frequency, station0_, tile0_)
+            .Response(preapplied_correction_mode_, time, frequency,
+                      diff_beam_centre_, subband_frequency, station0_, tile0_)
             .Data());
   } else {
     // in all other cases the response for the reference direction with
     // beam_mode is needed
     inverse_gain = aocommon::MC2x2F(
         phased_array.GetStation(station_index)
-            ->Response(beam_mode, time, frequency, diff_beam_centre_,
-                       subband_frequency, station0_, tile0_)
+            .Response(beam_mode, time, frequency, diff_beam_centre_,
+                      subband_frequency, station0_, tile0_)
             .Data());
   }
 

@@ -393,7 +393,7 @@ std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
 }
 }  // namespace
 
-std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
+std::unique_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
                                            unsigned int id,
                                            const Options& options) {
   TelescopeType telescope_type = GetTelescopeType(ms);
@@ -419,8 +419,7 @@ std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
   const vector3r_t position = {mvPosition(0), mvPosition(1), mvPosition(2)};
 
   // Create station
-  std::shared_ptr<Station> station =
-      std::make_shared<Station>(name, position, options);
+  auto station = std::make_unique<Station>(name, position, options);
 
   // Set the top level beamformer (that might contain nested beam formers)
   if (telescope_type == TelescopeType::kOSKARTelescope) {

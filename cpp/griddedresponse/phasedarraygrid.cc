@@ -151,8 +151,8 @@ void PhasedArrayGrid::CalcThread(BeamMode beam_mode, bool apply_normalisation,
 
       const aocommon::MC2x2F gain_matrix = aocommon::MC2x2F(
           phased_array.GetStation(job.antenna_idx)
-              ->Response(beam_mode, time, frequency, itrf_direction, sb_freq,
-                         station0_, tile0_)
+              .Response(beam_mode, time, frequency, itrf_direction, sb_freq,
+                        station0_, tile0_)
               .Data());
 
       if (apply_normalisation) {

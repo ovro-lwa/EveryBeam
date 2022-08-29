@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   BOOST_CHECK_EQUAL(telescope->GetNrStations(), size_t{37});
 
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
-  BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001LBA");
+  BOOST_CHECK_EQUAL(lofartelescope.GetStation(0).GetName(), "CS001LBA");
 
   // Reference solution obtained with commit sha
   // 70a286e7dace4616417b0e973a624477f15c9ce3
@@ -69,8 +69,7 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
       {-0.802669, 0.00378276}, {-0.577012, 0.000892636},
       {-0.586008, 0.00549141}, {0.805793, -0.00504886});
 
-  const Station& station =
-      static_cast<const Station&>(*(lofartelescope.GetStation(19).get()));
+  const Station& station = lofartelescope.GetStation(19);
   aocommon::MC2x2 element_response =
       station.ComputeElementResponse(time, frequency, direction, false, true);
 
@@ -80,8 +79,7 @@ BOOST_AUTO_TEST_CASE(test_hamaker) {
   }
 
   // Compute station response for station 31 (see also python/test)
-  const Station& station31 =
-      static_cast<const Station&>(*(lofartelescope.GetStation(31).get()));
+  const Station& station31 = lofartelescope.GetStation(31);
 
   // Channel frequency of channel 4 (3 given zero-based indexing)
   double freq4 = lofartelescope.GetChannelFrequency(3);
@@ -140,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_lobes) {
 
   // Extract Station 20, should be station CS302LBA
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
-  BOOST_CHECK_EQUAL(lofartelescope.GetStation(20)->GetName(), "CS302LBA");
+  BOOST_CHECK_EQUAL(lofartelescope.GetStation(20).GetName(), "CS302LBA");
 
   // Gridded response
   std::unique_ptr<GriddedResponse> grid_response =

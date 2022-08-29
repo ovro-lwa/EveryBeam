@@ -28,10 +28,10 @@ const std::string kAartfaacAntennaTypeName = "AARTFAAC_ANTENNA_TYPE";
  * @param options [optional] can contain for example the coefficient path, used
  to specify
  * locations of LOBES or other coefficient file(s)
- * @return Shared pointer to \param Station object
+ * @return A Station object representing the station that was read.
 
  */
-std::shared_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
+std::unique_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
                                            unsigned int id,
                                            const Options& options = Options());
 

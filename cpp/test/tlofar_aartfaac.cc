@@ -237,12 +237,12 @@ static std::unique_ptr<everybeam::telescope::Telescope> GetTelescopeLofar() {
   // sure the needed stations are at the expected offset. When this fails this
   // fix also needs to be applied to the point_response_lobes test.
   const LOFAR& lofar = static_cast<const LOFAR&>(*telescope.get());
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(1)->GetName(), "CS002LBA");
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(2)->GetName(), "CS003LBA");
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(3)->GetName(), "CS004LBA");
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(4)->GetName(), "CS005LBA");
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(5)->GetName(), "CS006LBA");
-  BOOST_REQUIRE_EQUAL(lofar.GetStation(6)->GetName(), "CS007LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(1).GetName(), "CS002LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(2).GetName(), "CS003LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(3).GetName(), "CS004LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(4).GetName(), "CS005LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(5).GetName(), "CS006LBA");
+  BOOST_REQUIRE_EQUAL(lofar.GetStation(6).GetName(), "CS007LBA");
 
   return telescope;
 }

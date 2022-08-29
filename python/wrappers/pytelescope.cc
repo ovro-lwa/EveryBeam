@@ -394,10 +394,7 @@ void init_telescope(py::module& m) {
               throw std::runtime_error(
                   "Requested station index exceeds number of stations.");
             }
-            const everybeam::Station& station =
-                static_cast<const everybeam::Station&>(
-                    *(self.GetStation(idx).get()));
-            return station.GetName();
+            return self.GetStation(idx).GetName();
           },
           R"pbdoc(
         Get the station name given a station index.

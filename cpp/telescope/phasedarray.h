@@ -45,13 +45,12 @@ class PhasedArray : public Telescope {
 
   /**
    * @brief Get station by index
-   *
-   * @param station_id Station index to retrieve
-   * @return std::shared_ptr<Station>
+   * @param station_id Station index to retrieve.
+   * @return The station with the given index.
    */
-  std::shared_ptr<Station> GetStation(std::size_t station_idx) const {
+  const Station& GetStation(std::size_t station_idx) const {
     assert(station_idx < nstations_);
-    return stations_[station_idx];
+    return *stations_[station_idx];
   }
 
   // Convenience getters (used in pybindings only)
@@ -91,7 +90,7 @@ class PhasedArray : public Telescope {
       casacore::MDirection& preapplied_beam_dir,
       CorrectionMode& correction_mode);
 
-  std::vector<std::shared_ptr<Station>> stations_;
+  std::vector<std::unique_ptr<Station>> stations_;
 
   MSProperties ms_properties_;
 };

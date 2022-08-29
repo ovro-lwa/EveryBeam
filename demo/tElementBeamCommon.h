@@ -14,13 +14,11 @@
 
 #include "beam-helper.h"
 
-void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
+void calculateElementBeams(const everybeam::ElementResponse& elementResponse,
                            std::vector<vector2r_t>& thetaPhiDirections,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double frequency,
                            std::vector<std::complex<float>>& buffer) {
-  auto elementResponse = station->GetElementResponse();
-
   aocommon::ParallelFor<size_t> loop(aocommon::system::ProcessorCount());
   loop.Run(0, nr_antennas, [&, nr_antennas, subgrid_size](size_t a) {
     using Data =
@@ -38,7 +36,7 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
         // std::complex<double> gainMatrix[2][2] = {0.0};
         aocommon::MC2x2 gainMatrix;
         if (std::isfinite(theta) && std::isfinite(phi)) {
-          gainMatrix = elementResponse->Response(a, frequency, theta, phi);
+          gainMatrix = elementResponse.Response(a, frequency, theta, phi);
         }
 
         // Store gain
@@ -49,7 +47,7 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
   });
 }
 
-void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
+void calculateElementBeams(const everybeam::Station& station,
                            std::vector<vector3r_t>& itrfDirections,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double time, double frequency,
@@ -67,7 +65,7 @@ void calculateElementBeams(std::shared_ptr<everybeam::Station>& station,
         // Compute gain
         aocommon::MC2x2 gainMatrix(0., 0., 0., 0.);
         if (std::isfinite(direction[0])) {
-          gainMatrix = station->ComputeElementResponse(
+          gainMatrix = station.ComputeElementResponse(
               time, frequency, direction, a, true, false);
         }
 
@@ -126,8 +124,8 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   GetThetaPhiDirectionsZenith(thetaPhiDirections.data(), subgrid_size);
   std::vector<std::complex<float>> beam_thetaphi(subgrid_size * subgrid_size *
                                                  4 * nr_antennas);
-  calculateElementBeams(station, thetaPhiDirections, nr_antennas, subgrid_size,
-                        frequency, beam_thetaphi);
+  calculateElementBeams(*station->GetElementResponse(), thetaPhiDirections,
+                        nr_antennas, subgrid_size, frequency, beam_thetaphi);
 
 // Compute element beams from itrf coordinates
 // TODO: the Station::ComputeElementResponse method does not work properly

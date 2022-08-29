@@ -26,8 +26,6 @@ namespace everybeam {
 
 class Station {
  public:
-  typedef std::shared_ptr<const Station> ConstPtr;
-
   /*!
    *  \brief Construct a new Station instance.
    *

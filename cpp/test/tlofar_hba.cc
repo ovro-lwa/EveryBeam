@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(load_lofar_hba) {
 
   // Assert if GetStation(stationd_id) behaves properly
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
-  BOOST_CHECK_EQUAL(lofartelescope.GetStation(0)->GetName(), "CS001HBA0");
+  BOOST_CHECK_EQUAL(lofartelescope.GetStation(0).GetName(), "CS001HBA0");
 }
 
 BOOST_AUTO_TEST_CASE(tile_beam_direction) {
@@ -154,8 +154,7 @@ BOOST_AUTO_TEST_CASE(element_response) {
       {-0.164112, -0.000467162}, {-0.843709, -0.00123631},
       {-0.892528, -0.00126278}, {0.0968527, -6.7158e-05});
 
-  const Station& station =
-      static_cast<const Station&>(*(lofartelescope.GetStation(11).get()));
+  const Station& station = lofartelescope.GetStation(11);
   aocommon::MC2x2 element_response =
       station.ComputeElementResponse(time, frequency, direction, false, true);
 
@@ -166,8 +165,7 @@ BOOST_AUTO_TEST_CASE(element_response) {
   }
 
   // Compute station response for station 63 (see also python/test)
-  const Station& station63 =
-      static_cast<const Station&>(*(lofartelescope.GetStation(63).get()));
+  const Station& station63 = lofartelescope.GetStation(63);
 
   vector3r_t direction_s63 = {0.424588, 0.4629957, 0.7780411};
   vector3r_t station0_dir = {0.4083262, 0.5273447, 0.7451022};
@@ -340,8 +338,7 @@ BOOST_AUTO_TEST_CASE(point_response_caching) {
 BOOST_AUTO_TEST_CASE(gridded_response_array_factor) {
   // This tests whether "element beam" x "array factor" == "full beam"
   const LOFAR& lofartelescope = static_cast<const LOFAR&>(*telescope.get());
-  const Station& station =
-      static_cast<const Station&>(*(lofartelescope.GetStation(23).get()));
+  const Station& station = lofartelescope.GetStation(23);
 
   // tile0 equals station0
   vector3r_t station0 = {0.408326, 0.527345, 0.745102};
