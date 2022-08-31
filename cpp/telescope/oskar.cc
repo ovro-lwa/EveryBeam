@@ -58,13 +58,9 @@ OSKAR::OSKAR(const MeasurementSet& ms, const Options& options)
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
     const coords::CoordinateSystem& coordinate_system) const {
-  // Get and return GriddedResponse ptr
-  std::unique_ptr<GriddedResponse> grid(new OSKARGrid(this, coordinate_system));
-  return grid;
+  return std::make_unique<OSKARGrid>(this, coordinate_system);
 }
 
 std::unique_ptr<PointResponse> OSKAR::GetPointResponse(double time) const {
-  // Get and return PointResponse ptr
-  std::unique_ptr<PointResponse> point_response(new OSKARPoint(this, time));
-  return point_response;
+  return std::make_unique<OSKARPoint>(this, time);
 }

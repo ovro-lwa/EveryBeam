@@ -46,8 +46,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
     if (aterm_type == "tec") {
       std::vector<std::string> tec_files =
           reader.GetNonEmptyStringList(aterm_name + ".images");
-      std::unique_ptr<FitsATerm> f(new FitsATerm(
-          n_antennas_, coordinate_system_, settings_.max_support));
+      auto f = std::make_unique<FitsATerm>(n_antennas_, coordinate_system_,
+                                           settings_.max_support);
       f->OpenTECFiles(tec_files);
       std::string window_str =
           reader.GetStringOr(aterm_name + ".window", "raised-hann");
@@ -64,8 +64,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
     } else if (aterm_type == "diagonal") {
       std::vector<std::string> diag_files =
           reader.GetNonEmptyStringList(aterm_name + ".images");
-      std::unique_ptr<FitsATerm> f(new FitsATerm(
-          n_antennas_, coordinate_system_, settings_.max_support));
+      auto f = std::make_unique<FitsATerm>(n_antennas_, coordinate_system_,
+                                           settings_.max_support);
       f->OpenDiagGainFiles(diag_files);
       std::string window_str =
           reader.GetStringOr(aterm_name + ".window", "raised-hann");
@@ -99,8 +99,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
         station_names[i] = stations(i);
       }
 
-      std::unique_ptr<FourierFittingATerm> f(new FourierFittingATerm(
-          station_names, coordinate_system_, settings_.max_support));
+      auto f = std::make_unique<FourierFittingATerm>(
+          station_names, coordinate_system_, settings_.max_support);
 
       std::string solutions_file =
           reader.GetStringOr(aterm_name + ".solutions", "");
@@ -127,8 +127,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
       }
 
       int order = reader.GetDoubleOr(aterm_name + ".order", 3);
-      std::unique_ptr<KlFittingATerm> f(
-          new KlFittingATerm(station_names, coordinate_system_, order));
+      auto f = std::make_unique<KlFittingATerm>(station_names,
+                                                coordinate_system_, order);
       std::string solutions_file =
           reader.GetStringOr(aterm_name + ".solutions", "");
       f->Open(solutions_file);
@@ -136,8 +136,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
     } else if (aterm_type == "dldm") {
       std::vector<std::string> dldm_files =
           reader.GetNonEmptyStringList(aterm_name + ".images");
-      std::unique_ptr<DLDMATerm> f(new DLDMATerm(
-          n_antennas_, coordinate_system_, settings_.max_support));
+      auto f = std::make_unique<DLDMATerm>(n_antennas_, coordinate_system_,
+                                           settings_.max_support);
       f->Open(dldm_files);
       f->SetUpdateInterval(
           reader.GetDoubleOr(aterm_name + ".update_interval", 5.0 * 60.0));
@@ -223,8 +223,8 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
           beam_pointings[filename_index * 2 + 1]);
       std::string fileTemplate =
           reader.GetString(aterm_name + ".file_template");
-      std::unique_ptr<PAFBeamTerm> f(
-          new PAFBeamTerm(coordinate_system_, settings_.max_support));
+      auto f = std::make_unique<PAFBeamTerm>(coordinate_system_,
+                                             settings_.max_support);
       f->Open(fileTemplate, antenna_map, beam_map[filename_index], beam_ra,
               beam_dec);
       std::string window_str =
@@ -264,8 +264,7 @@ void ATermConfig::Read(const casacore::MeasurementSet& ms,
         station_names[i] = stations(i);
       }
 
-      std::unique_ptr<H5ParmATerm> f(
-          new H5ParmATerm(station_names, coordinate_system_));
+      auto f = std::make_unique<H5ParmATerm>(station_names, coordinate_system_);
       f->Open(h5parm_files);
       f->SetUpdateInterval(reader.GetDoubleOr(aterm_name + ".update_interval",
                                               settings_.aterm_update_interval));
@@ -337,8 +336,7 @@ std::unique_ptr<ATermBeam> ATermConfig::GetATermBeam(
   everybeam::Options options = ConvertToEBOptions(
       ms, settings, frequency_interpolation, beam_normalisation_mode,
       use_channel_frequency, element_response_model, beam_mode);
-  return std::unique_ptr<ATermBeam>(
-      new EveryBeamATerm(ms, coordinate_system, options));
+  return std::make_unique<EveryBeamATerm>(ms, coordinate_system, options);
 }
 
 everybeam::Options ATermConfig::ConvertToEBOptions(

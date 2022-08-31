@@ -36,10 +36,10 @@ void H5ParmATerm::Open(const std::vector<std::string>& filenames) {
     amplitude_soltab_.push_back(h5parmfile.GetSolTab("amplitude_coefficients"));
     phase_soltab_.push_back(h5parmfile.GetSolTab("phase_coefficients"));
 
-    ampl_polynomial_ = std::unique_ptr<LagrangePolynomial>(
-        new LagrangePolynomial(amplitude_soltab_.back().GetAxis("dir").size));
-    phase_polynomial_ = std::unique_ptr<LagrangePolynomial>(
-        new LagrangePolynomial(phase_soltab_.back().GetAxis("dir").size));
+    ampl_polynomial_ = std::make_unique<LagrangePolynomial>(
+        amplitude_soltab_.back().GetAxis("dir").size);
+    phase_polynomial_ = std::make_unique<LagrangePolynomial>(
+        phase_soltab_.back().GetAxis("dir").size);
 
     // Check that antenna names in MS and h5parm match exactly
     std::vector<std::string> station_names_ampl =

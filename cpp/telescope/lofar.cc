@@ -125,18 +125,17 @@ LOFAR::LOFAR(const casacore::MeasurementSet& ms, const Options& options)
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(
     const coords::CoordinateSystem& coordinate_system) const {
-  std::unique_ptr<GriddedResponse> grid_response =
-      is_aartfaac_ ? std::unique_ptr<GriddedResponse>(
-                         new AartfaacGrid(this, coordinate_system))
-                   : std::unique_ptr<GriddedResponse>(
-                         new LOFARGrid(this, coordinate_system));
-  return grid_response;
+  if (is_aartfaac_) {
+    return std::make_unique<AartfaacGrid>(this, coordinate_system);
+  } else {
+    return std::make_unique<LOFARGrid>(this, coordinate_system);
+  }
 }
 
 std::unique_ptr<PointResponse> LOFAR::GetPointResponse(double time) const {
-  std::unique_ptr<PointResponse> point_response =
-      is_aartfaac_
-          ? std::unique_ptr<PointResponse>(new AartfaacPoint(this, time))
-          : std::unique_ptr<PointResponse>(new LOFARPoint(this, time));
-  return point_response;
+  if (is_aartfaac_) {
+    return std::make_unique<AartfaacPoint>(this, time);
+  } else {
+    return std::make_unique<LOFARPoint>(this, time);
+  }
 }

@@ -4,6 +4,7 @@
 #include "skamid.h"
 #include "../pointresponse/skamidpoint.h"
 #include "../griddedresponse/skamidgrid.h"
+#include "../skamidbeam/skamidresponse.h"
 
 namespace {
 static constexpr double kDiameter = 15.0;
@@ -36,17 +37,14 @@ SkaMid::SkaMid(const casacore::MeasurementSet& ms, const Options& options)
 
 std::unique_ptr<griddedresponse::GriddedResponse> SkaMid::GetGriddedResponse(
     const coords::CoordinateSystem& coordinate_system) const {
-  std::unique_ptr<griddedresponse::GriddedResponse> grid_response(
-      new griddedresponse::SkaMidGrid(this, coordinate_system,
-                                      element_response_model_));
-  return grid_response;
+  return std::make_unique<griddedresponse::SkaMidGrid>(this, coordinate_system,
+                                                       element_response_model_);
 }
 
 std::unique_ptr<pointresponse::PointResponse> SkaMid::GetPointResponse(
     double time) const {
-  std::unique_ptr<pointresponse::PointResponse> point_response(
-      new pointresponse::SkaMidPoint(this, time, element_response_model_));
-  return point_response;
+  return std::make_unique<pointresponse::SkaMidPoint>(this, time,
+                                                      element_response_model_);
 }
 
 double SkaMid::GetDiameter() const { return kDiameter; }

@@ -38,11 +38,9 @@ MWA::MWA(const casacore::MeasurementSet& ms, const Options& options)
 
 std::unique_ptr<GriddedResponse> MWA::GetGriddedResponse(
     const coords::CoordinateSystem& coordinate_system) const {
-  std::unique_ptr<GriddedResponse> grid(new MWAGrid(this, coordinate_system));
-  return grid;
+  return std::make_unique<MWAGrid>(this, coordinate_system);
 }
 
 std::unique_ptr<PointResponse> MWA::GetPointResponse(double time) const {
-  std::unique_ptr<PointResponse> point_response(new MWAPoint(this, time));
-  return point_response;
+  return std::make_unique<MWAPoint>(this, time);
 }

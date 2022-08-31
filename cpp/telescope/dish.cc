@@ -32,11 +32,9 @@ Dish::Dish(const casacore::MeasurementSet& ms,
 
 std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(
     const coords::CoordinateSystem& coordinate_system) const {
-  std::unique_ptr<GriddedResponse> grid(new DishGrid(this, coordinate_system));
-  return grid;
+  return std::make_unique<DishGrid>(this, coordinate_system);
 }
 
 std::unique_ptr<PointResponse> Dish::GetPointResponse(double time) const {
-  std::unique_ptr<PointResponse> point_response(new DishPoint(this, time));
-  return point_response;
+  return std::make_unique<DishPoint>(this, time);
 }

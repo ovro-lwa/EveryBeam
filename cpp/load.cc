@@ -60,18 +60,15 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
       telescope.reset(new telescope::LOFAR(ms, options));
       break;
     case kATCATelescope: {
-      std::unique_ptr<circularsymmetric::Coefficients> coefs(
-          new circularsymmetric::ATCACoefficients());
+      auto coefs = std::make_unique<circularsymmetric::ATCACoefficients>();
       telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
     } break;
     case kGMRTTelescope: {
-      std::unique_ptr<circularsymmetric::Coefficients> coefs(
-          new circularsymmetric::GMRTCoefficients());
+      auto coefs = std::make_unique<circularsymmetric::GMRTCoefficients>();
       telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
     } break;
     case kVLATelescope: {
-      std::unique_ptr<circularsymmetric::Coefficients> coefs(
-          new circularsymmetric::VLACoefficients(""));
+      auto coefs = std::make_unique<circularsymmetric::VLACoefficients>("");
       telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
     } break;
     case kMWATelescope: {
