@@ -64,19 +64,12 @@ KlFitter::KlFitter(std::size_t subgrid_size, int order,
 
 void KlFitter::Evaluate(const std::vector<float>& solutions,
                         float* buffer) const {
-  // Create a vector (N x 1 tensor) from a std::vector
-  // xt::adapt converts from std containers to xtensors
-  // The new xt::view adds a length-1 axis to create the shape needed
-  // to compute a matrix-vector product.
-  xt::xtensor<float, 2> y =
-      xt::view(xt::adapt(solutions), xt::all(), xt::newaxis());
-
-  xt::xtensor<float, 2> screen = xt::linalg::tensordot(fitting_matrix_, y, 1);
-
-  // Write the result into the buffer
+  // Convert 'buffer' and 'solutions' into xtensor objects and compute the
+  // matrix-vector product.
   const std::size_t size = subgrid_size_ * subgrid_size_;
-  const std::vector<std::size_t> shape = {subgrid_size_, subgrid_size_};
-  xt::adapt(buffer, size, xt::no_ownership(), shape) = screen;
+  const std::array<std::size_t, 2> shape = {subgrid_size_, subgrid_size_};
+  xt::adapt(buffer, size, xt::no_ownership(), shape) =
+      xt::linalg::tensordot(fitting_matrix_, xt::adapt(solutions), 1);
 }
 
 }  // namespace aterms

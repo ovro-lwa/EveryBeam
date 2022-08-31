@@ -16,7 +16,7 @@
 using everybeam::aterms::KlFittingATerm;
 using everybeam::coords::CoordinateSystem;
 
-BOOST_AUTO_TEST_SUITE(testklfitting)
+BOOST_AUTO_TEST_SUITE(klfittingaterm)
 
 BOOST_AUTO_TEST_CASE(verify, *boost::unit_test::tolerance(1e-8)) {
   // Create aterm from fits file

@@ -148,6 +148,22 @@ test-and-coverage-2204:
         path: build/coverage.xml
       junit: build/cpp/test/unittests.xml
 
+# Run unittests only using the address sanitizer.
+# Python tests do not work with the sanitizer, since the main executable
+# (python) was not built with the sanitizer.
+sanitize-2204:
+  extends: .needs-base-2204
+  stage: build
+  image: $BASE_IMAGE_2204
+  script:
+    # Download casacore wsrt measures
+    - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
+    # Build and run unit tests.
+    - mkdir build && cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_CXX_FLAGS="-fsanitize=address" -G Ninja ..
+    - ninja install
+    - ctest -j`nproc` --output-on-failure -L unit
+
 build-everybeam-2004:
   extends: [.prepare,.needs-base-2004]
   stage: build
