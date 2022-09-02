@@ -9,7 +9,6 @@ namespace everybeam {
 
 Datafile::Datafile(const std::string& filename) {
   // Open file
-  std::cout << "read oskar datafile: " << filename << std::endl;
   h5_file_.reset(new H5::H5File(filename, H5F_ACC_RDONLY));
 
   // Disable HDF5 error prints

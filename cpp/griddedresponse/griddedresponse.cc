@@ -67,23 +67,23 @@ void GriddedResponse::IntegratedResponse(
   dm_ = dm_original;
 }
 
-void GriddedResponse::IntegratedResponse(
-    BeamMode beam_mode, float* buffer, const std::vector<double>& time_array,
-    double frequency, size_t field_id, size_t undersampling_factor,
+std::vector<HMC4x4> GriddedResponse::UndersampledIntegratedResponse(
+    BeamMode beam_mode, const std::vector<double>& time_array, double frequency,
+    size_t field_id, size_t undersampling_factor,
     const std::vector<double>& baseline_weights) {
-  size_t nstations = telescope_->GetNrStations();
-  size_t nbaselines = nstations * (nstations + 1) / 2;
+  const size_t nstations = telescope_->GetNrStations();
+  const size_t nbaselines = nstations * (nstations + 1) / 2;
   if (baseline_weights.size() != time_array.size() * nbaselines) {
     throw std::runtime_error("baseline_weights vector has incorrect size.");
   }
 
   // Scaling factor
-  double baseline_total_weight =
+  const double baseline_total_weight =
       std::accumulate(baseline_weights.begin(), baseline_weights.end(), 0.0);
 
   // Copy coordinate members
   size_t width_original = width_, height_original = height_;
-  double dl_original = dl_, dm_original = dm_;
+  const double dl_original = dl_, dm_original = dm_;
 
   width_ /= undersampling_factor;
   height_ /= undersampling_factor;
@@ -91,7 +91,7 @@ void GriddedResponse::IntegratedResponse(
   dm_ *= (double(width_original) / double(width_));
 
   // Init (Hermitian) Mueller matrix for every pixel in the coarse grid
-  size_t npixels = width_ * height_;
+  const size_t npixels = width_ * height_;
   std::vector<HMC4x4> matrices(npixels, HMC4x4::Zero());
 
   for (std::size_t tstep = 0; tstep != time_array.size(); ++tstep) {
@@ -104,14 +104,47 @@ void GriddedResponse::IntegratedResponse(
     matrix /= baseline_total_weight;
   }
 
-  DoFFTResampling(buffer, width_, height_, width_original, height_original,
-                  matrices);
-
   // Reset coordinate members to original values
   width_ = width_original;
   height_ = height_original;
   dl_ = dl_original;
   dm_ = dm_original;
+
+  return matrices;
+}
+
+void GriddedResponse::IntegratedResponse(
+    BeamMode beam_mode, float* destination,
+    const std::vector<double>& time_array, double frequency, size_t field_id,
+    size_t undersampling_factor, const std::vector<double>& baseline_weights) {
+  const std::vector<HMC4x4> matrices =
+      UndersampledIntegratedResponse(beam_mode, time_array, frequency, field_id,
+                                     undersampling_factor, baseline_weights);
+
+  const size_t undersampled_width = width_ / undersampling_factor;
+  const size_t undersampled_height = height_ / undersampling_factor;
+
+  DoFFTResampling(destination, undersampled_width, undersampled_height, width_,
+                  height_, matrices);
+}
+
+void GriddedResponse::UpsampleResponse(
+    float* destination, size_t element_index,
+    const std::vector<aocommon::HMC4x4>& undersampled_beam,
+    size_t undersampling_factor) {
+  const size_t undersampled_width = width_ / undersampling_factor;
+  const size_t undersampled_height = height_ / undersampling_factor;
+
+  common::FFTResampler resampler(undersampled_width, undersampled_height,
+                                 width_, height_);
+  resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
+  UVector<float> lowres_input(undersampled_width * undersampled_height);
+
+  for (size_t i = 0; i != undersampled_width * undersampled_height; ++i) {
+    lowres_input[i] = undersampled_beam[i].Data(element_index);
+  }
+  // Resample and write to the "element_index-th image" in the output buffer
+  resampler.Resample(lowres_input.data(), destination);
 }
 
 void GriddedResponse::MakeIntegratedSnapshot(
@@ -162,8 +195,8 @@ void GriddedResponse::MakeIntegratedSnapshot(
 }
 
 void GriddedResponse::DoFFTResampling(
-    float* buffer, int width_in, int height_in, int width_out, int height_out,
-    const std::vector<aocommon::HMC4x4>& matrices) {
+    float* destination, int width_in, int height_in, int width_out,
+    int height_out, const std::vector<aocommon::HMC4x4>& matrices) {
   // (FFT) resampling, run multi-threaded?
   common::FFTResampler resampler(width_in, height_in, width_out, height_out);
   resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
@@ -175,7 +208,7 @@ void GriddedResponse::DoFFTResampling(
     }
     // Resample and write to the "p-th image" in the output buffer
     resampler.Resample(lowres_input.data(),
-                       buffer + p * width_out * height_out);
+                       destination + p * width_out * height_out);
   }
 }
 }  // namespace griddedresponse

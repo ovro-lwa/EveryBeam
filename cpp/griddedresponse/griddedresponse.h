@@ -42,14 +42,14 @@ class GriddedResponse {
    *
    * @param beam_mode Selects beam mode (BeamMode::kElement,
    * BeamMode::kArrayFactor or BeamMode::kFull)
-   * @param buffer Output buffer, compute and set size with
+   * @param destination Output buffer, compute and set size with
    * GriddedResponse::GetStationBufferSize(1)
    * @param station_idx Station index, must be smaller than number of stations
    * in the Telescope
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void Response(BeamMode beam_mode, std::complex<float>* buffer,
+  virtual void Response(BeamMode beam_mode, std::complex<float>* destination,
                         double time, double freq, size_t station_idx,
                         size_t field_id) = 0;
 
@@ -59,30 +59,15 @@ class GriddedResponse {
    * matrix (4 complex valued floats) per pixel for each station.
    *
    * @param beam_mode Selects beam mode (element, array factor or full)
-   * @param buffer Output buffer, compute and set size with
+   * @param destination Output buffer, compute and set size with
    * GriddedResponse::GetStationBufferSize()
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
   virtual void ResponseAllStations(BeamMode beam_mode,
-                                   std::complex<float>* buffer, double time,
-                                   double frequency, size_t field_id) = 0;
-
-  /**
-   * @brief Calculate integrated/undersampled beam for a single time step.
-   * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
-   * may override MakeIntegratedSnapshot() to implement a more efficient
-   * version.
-   *
-   * @param buffer Buffer for storing the result, should have size width *
-   * height * 16
-   * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
-   * @param frequency Frequency (Hz)
-   * @param field_id Field id
-   * @param undersampling_factor Undersampling factor
-   * @param baseline_weights Baseline weights, size should equal
-   * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
-   */
+                                   std::complex<float>* destination,
+                                   double time, double frequency,
+                                   size_t field_id) = 0;
 
   /**
    * @brief Calculate integrated/undersampled beam for a single time step.
@@ -91,7 +76,7 @@ class GriddedResponse {
    * version.
    *
    * @param beam_mode Selects beam mode (element, array factor or full)
-   * @param buffer Buffer for storing the result, should have size width *
+   * @param destination Buffer for storing the result, should have size width *
    * height * 16
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
@@ -100,7 +85,7 @@ class GriddedResponse {
    * @param baseline_weights Baseline weights, size should equal
    * Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2
    */
-  virtual void IntegratedResponse(BeamMode beam_mode, float* buffer,
+  virtual void IntegratedResponse(BeamMode beam_mode, float* destination,
                                   double time, double frequency,
                                   size_t field_id, size_t undersampling_factor,
                                   const std::vector<double>& baseline_weights);
@@ -109,10 +94,13 @@ class GriddedResponse {
    * @brief Calculate integrated beam over multiple time steps.
    * This function makes use of @ref MakeIntegratedSnapshot(). Subclasses
    * may override MakeIntegratedSnapshot() to implement a more efficient
-   * version.
+   * version. This function stores all Mueller matrices for the full size
+   * image in memory. If this is undesirable, the functions
+   * @ref UndersampledIntegratedResponse() and @ref UpsampleResponse() may
+   * be used.
    *
    * @param beam_mode Selects beam mode (element, array factor or full)
-   * @param buffer Buffer for storing the result, should have size width *
+   * @param destination Buffer for storing the result, should have size width *
    * height * 16
    * @param time_array Vector with probing times, modified Julian date, UTC, in
    * seconds (MJD(UTC), s).
@@ -123,11 +111,38 @@ class GriddedResponse {
    * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
    * time_array.size()
    */
-  virtual void IntegratedResponse(BeamMode beam_mode, float* buffer,
+  virtual void IntegratedResponse(BeamMode beam_mode, float* destination,
                                   const std::vector<double>& time_array,
                                   double frequency, size_t field_id,
                                   size_t undersampling_factor,
                                   const std::vector<double>& baseline_weights);
+
+  /**
+   * Same as @ref IntegratedResponse(), but without performing the upsampling.
+   * This function therefore returns the undersampled data.
+   * Function @ref UpsampleResponse() can be used to upsample the returned
+   * data. This route is useful for big images, for which it is undesirable to
+   * hold all 16 elements of the Mueller matrix in memory at the same time.
+   * @returns The undersampled data, input to @ref UpsampleResponse().
+   */
+  virtual std::vector<aocommon::HMC4x4> UndersampledIntegratedResponse(
+      BeamMode beam_mode, const std::vector<double>& time_array,
+      double frequency, size_t field_id, size_t undersampling_factor,
+      const std::vector<double>& baseline_weights);
+
+  /**
+   * Upsample a single element from an undersampled response.
+   * @param destination Result buffer for one Mueller matrix element of size
+   * Width() x Height().
+   * @param element_index Value from 0 to 15 indicating which Mueller matrix to
+   * upsample.
+   * @param undersampled_beam The previously calculated undersampled response
+   * @param undersampling_factor Undersampling factor that was used in the
+   * response calculation call.
+   */
+  void UpsampleResponse(float* destination, size_t element_index,
+                        const std::vector<aocommon::HMC4x4>& undersampled_beam,
+                        size_t undersampling_factor);
 
   std::size_t GetStationBufferSize(std::size_t nstations) const {
     return nstations * width_ * height_ * 4u;
@@ -164,7 +179,7 @@ class GriddedResponse {
         phase_centre_dl_(coordinate_system.phase_centre_dl),
         phase_centre_dm_(coordinate_system.phase_centre_dm){};
 
-  static void DoFFTResampling(float* buffer, int width_in, int height_in,
+  static void DoFFTResampling(float* destination, int width_in, int height_in,
                               int width_out, int height_out,
                               const std::vector<aocommon::HMC4x4>& matrices);
 

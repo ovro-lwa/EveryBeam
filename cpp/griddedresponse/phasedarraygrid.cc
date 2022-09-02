@@ -64,7 +64,7 @@ void PhasedArrayGrid::ResponseAllStations(BeamMode beam_mode,
 
   SetITRFVectors(time);
 
-  bool apply_normalisation;
+  bool apply_normalisation = false;
   inverse_central_gain_.resize(phased_array.GetNrStations());
   for (size_t i = 0; i != phased_array.GetNrStations(); ++i) {
     apply_normalisation = CalculateBeamNormalisation(

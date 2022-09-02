@@ -44,6 +44,7 @@ set(LOBES_COEFF_PATH
 set(TEST_FILENAMES
     runtests.cc
     tatermconfig.cc
+    tgriddedresponse.cc
     tlofar_hba.cc
     tlofar_lba.cc
     tlofar_aartfaac.cc
