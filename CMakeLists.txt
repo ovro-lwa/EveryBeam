@@ -33,8 +33,18 @@ include(ExternalProject)
 # Configure directory for data files
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
-set(EVERYBEAM_DATADIR "share/${projectname}")
-set(EVERYBEAM_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${EVERYBEAM_DATADIR}")
+# Note: Use type `STRING` here, instead of `PATH`. Because, if the user
+# specified a _relative_ path on the command-line without specifying the type
+# `PATH`, then the `set` command will treat the path as relative to the current
+# working directory and convert it to an absolute path. We do *not* want this!
+set(EVERYBEAM_DATADIR
+    "share/${projectname}"
+    CACHE STRING "EveryBeam data directory")
+if(IS_ABSOLUTE ${EVERYBEAM_DATADIR})
+  set(EVERYBEAM_FULL_DATADIR "${EVERYBEAM_DATADIR}")
+else()
+  set(EVERYBEAM_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${EVERYBEAM_DATADIR}")
+endif()
 message("Storing data in: " ${EVERYBEAM_FULL_DATADIR})
 
 # Find and include git submodules

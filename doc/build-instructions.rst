@@ -52,6 +52,7 @@ Installation options
 * :code:`BUILD_WITH_PYTHON`: build Python module 'everybeam' to use everybeam from Python
 * :code:`BUILD_TESTING`: compile tests when building EveryBeam
 * :code:`DOWNLOAD_LOBES`: download and install available LOBEs coefficients files (``OFF`` by default)
+* :code:`EVERYBEAM_DATADIR`: override the directory where EveryBeam searches for its data files; a relative path will be prefixed with the install prefix.
 
 All other build options serve development purposes only, and can/should be left at the default values by a regular user.
 
