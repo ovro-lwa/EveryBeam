@@ -1,8 +1,50 @@
 # Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Ensure that we use /usr as install prefix when packaging.
-set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+# EveryBeam uses a hard-coded, compile-time generated, path to the location
+# of the data files it uses. In order to avoid that the data files in the
+# package are installed in a different directory than where they are searched
+# for, we need to follow the advice given in the merge request
+# "Set default value of CPACK_PACKAGING_INSTALL_PREFIX properly"
+# (https://gitlab.kitware.com/cmake/cmake/-/merge_requests/827).
+# Set `CPACK_PACKAGING_INSTALL_PREFIX` (the install prefix used by `cpack`),
+# to the value of `CMAKE_INSTALL_PREFIX` (the install prefix used by `cmake`),
+# unless the user specified `CPACK_PACKAGING_INSTALL_PREFIX` explicitly.
+if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+  set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+endif()
+
+# By default, Debian packages are installed in `/usr`. Print a warning when
+# `CMAKE_INSTALL_PREFIX` is set to a different directory, because that might
+# break compatibility with other Debian packages.
+if(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+  message(
+    WARNING
+      "[CPack] - CMAKE_INSTALL_PREFIX is set to `${CMAKE_INSTALL_PREFIX}`. "
+      "For packaging, it is strongly recommended to set it to `/usr` "
+      "to avoid compatibility issues with other Debian packages.")
+endif()
+
+# Different settings for `CPACK_PACKAGING_INSTALL_PREFIX` and
+# `CMAKE_INSTALL_PREFIX` may break the package being built.
+if(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "${CPACK_PACKAGING_INSTALL_PREFIX}")
+  message(
+    WARNING
+      "[CPack] - CMAKE_INSTALL_PREFIX is set to `${CMAKE_INSTALL_PREFIX}`, and "
+      "CPACK_PACKAGING_INSTALL_PREFIX is set to `${CPACK_PACKAGING_INSTALL_PREFIX}`. "
+      "For packaging, it is strongly recommend to use the same setting for both, "
+      "preferably `/usr` to avoid compatibility issues with other Debian packages."
+  )
+endif()
+
+# Using absolute paths when packaging may break relocation. Issue a warning
+# when `EVERYBEAM_DATADIR` contains an absolute path. Also, let CPack itself
+# generate a warning if it encounters (other) absolute install paths.
+if(IS_ABSOLUTE ${EVERYBEAM_DATADIR})
+  message(WARNING "[CPack] - EVERYBEAM_DATADIR contains an absolute path. "
+                  "This may break relocation during packaging.")
+endif()
+set(CPACK_WARN_ON_ABSOLUTE_INSTALL_DESTINATION ON)
 
 # We use git to determine the version string from the latest tag.
 find_package(Git QUIET)
