@@ -27,19 +27,14 @@ versioning:
     - echo BASE_IMAGE_2004=${CI_REGISTRY_IMAGE}/base_2004:$(git log -n 1 --pretty=format:%H -- docker/ubuntu_20_04_base) > versions.env
     - echo BASE_IMAGE_2204=${CI_REGISTRY_IMAGE}/base_2204:$(git log -n 1 --pretty=format:%H -- docker/ubuntu_22_04_base) >> versions.env
     - echo BASE_IMAGE_GCC12=${CI_REGISTRY_IMAGE}/base_gcc12:$(git log -n 1 --pretty=format:%H -- docker/Dockerfile-base-gcc12) >> versions.env
-    # Tag the Everybeam image with the commit id, since it uses the Everybeam source code.
-    - echo EVERYBEAM_IMAGE_2004=${CI_REGISTRY_IMAGE}/everybeam_2004:${CI_COMMIT_SHORT_SHA} >> versions.env
-    - echo EVERYBEAM_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
-    - echo EVERYBEAM_IMAGE_GCC12=${CI_REGISTRY_IMAGE}/everybeam_gcc12:${CI_COMMIT_SHORT_SHA} >> versions.env
-    - echo EVERYBEAM_PACKAGE_IMAGE_2204=${CI_REGISTRY_IMAGE}/everybeam_package_2204:${CI_COMMIT_SHORT_SHA} >> versions.env
     - cat versions.env
   artifacts:
     reports:
       dotenv: versions.env
 
 .prepare:
-  stage: prepare
   needs: ["versioning"]
+  stage: prepare
   image: docker:20.10
   services:
     - docker:20.10-dind
@@ -87,23 +82,25 @@ prepare-base-gcc12:
     - job: versioning
     - job: prepare-base-2004
       optional: true
+  image: $BASE_IMAGE_2004
 
 .needs-base-2204:
   needs:
     - job: versioning
     - job: prepare-base-2204
       optional: true
+  image: $BASE_IMAGE_2204
 
 .needs-base-gcc12:
   needs:
     - job: versioning
     - job: prepare-base-gcc12
       optional: true
+  image: $BASE_IMAGE_GCC12
 
 format-2204:
   extends: .needs-base-2204
   stage: build
-  image: $BASE_IMAGE_2204
   script:
     #Update external/aocommon, which contains format.sh.
     - git submodule update --init external/aocommon
@@ -113,7 +110,6 @@ format-2204:
 test-and-coverage-2204:
   extends: .needs-base-2204
   stage: build
-  image: $BASE_IMAGE_2204
   script:
     - WORKDIR=$PWD
     # Download casacore wsrt measures
@@ -164,50 +160,25 @@ sanitize-2204:
     - ninja install
     - ctest -j`nproc` --output-on-failure -L unit
 
-build-everybeam-2004:
-  extends: [.prepare,.needs-base-2004]
+.build-everybeam:
   stage: build
-  variables:
-    DOCKER_IMAGE: $EVERYBEAM_IMAGE_2004
-    DOCKER_FILE: docker/everybeam
-    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2004}
-  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
-    - when: always
+  script:
+    - mkdir build && cd build
+    - cmake -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON ..
+    - make -j`nproc`
+
+build-everybeam-2004:
+  extends: [.needs-base-2004,.build-everybeam]
 
 build-everybeam-2204:
-  extends: [.prepare,.needs-base-2204]
-  stage: build
-  variables:
-    DOCKER_IMAGE: $EVERYBEAM_IMAGE_2204
-    DOCKER_FILE: docker/everybeam
-    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2204}
-  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
-    - when: always
-
-build-everybeam-package-2204:
-  extends: [.prepare,.needs-base-2204]
-  stage: build
-  variables:
-    DOCKER_IMAGE: $EVERYBEAM_PACKAGE_IMAGE_2204
-    DOCKER_FILE: docker/everybeam-package
-    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_2204}
-  rules: # Override 'changes' rule from .prepare, since it also depends on the base docker file.
-    - when: always
+  extends: [.needs-base-2204,.build-everybeam]
 
 build-everybeam-gcc12:
-  extends: [.prepare,.needs-base-gcc12]
-  stage: build
-  variables:
-    DOCKER_IMAGE: $EVERYBEAM_IMAGE_GCC12
-    DOCKER_FILE: ./docker/everybeam
-    DOCKER_BUILD_ARG: --build-arg BASE_IMAGE=${BASE_IMAGE_GCC12}
-  rules: # Override 'changes' rule from .prepare
-    - when: always
+  extends: [.needs-base-gcc12,.build-everybeam]
 
 build-doc-2204:
   extends: .needs-base-2204
   stage: build
-  image: $BASE_IMAGE_2204
   script:
     - EVERYBEAM_PATH=$PWD
     - mkdir build && cd build
@@ -219,15 +190,15 @@ build-doc-2204:
     - build/doc/html
 
 build-package-2204:
+  extends: [.needs-base-2204]
   stage: package
-  needs: ["versioning","build-everybeam-2204"]
-  image: $EVERYBEAM_PACKAGE_IMAGE_2204
   script:
+    - git fetch --unshallow # Unshallowing ensures that 'git describe' works.
     - mkdir everybeam_package
-    - export SRC=$(pwd)
-    - cd /opt/everybeam/build
-    - make package
-    - mv $(ls -1 *.deb) $SRC/everybeam_package/
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_PYTHON=ON -DBUILD_APT_PACKAGES=ON ..
+    - make -j `nproc` package
+    - mv $(ls -1 *.deb) ../everybeam_package/
   artifacts:
     paths:
     - everybeam_package/
@@ -241,30 +212,37 @@ build-package-2204:
 
 build-compare-oskar-2204:
   stage: oskar-comparison
-  needs: ["versioning","build-everybeam-2204"]
-  image: $EVERYBEAM_IMAGE_2204
+  extends: [.needs-base-2204]
+  image: $BASE_IMAGE_2204
   before_script:
+    # Build and install everybeam
+    - mkdir -p /opt/everybeam/build
+    - cmake -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=/opt/everybeam -S. -B/opt/everybeam/build
+    - cd /opt/everybeam/build
+    - make -j`nproc` install
+    # Get OSKAR sources
     - mkdir -p /opt/oskar/build
     - cd /opt/oskar && git clone https://github.com/OxfordSKA/OSKAR.git
     # Check-out at specific version, before HDF5 got broken
     - cd OSKAR && git checkout bb3f9112e20e1d5e9b91b695828f993ad6bc91ee
-    - cd /opt/oskar/build
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d+\.\d+(?=\.\d+)"`
     - export PYTHONPATH=/opt/everybeam/lib/python${PYVERSION}/dist-packages
   script:
     # OSKAR cpp install
-    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXE_LINKER_FLAGS="-coverage" ../OSKAR/
+    - cd /opt/oskar/build
+    - cmake -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug ../OSKAR/
     - make -j`nproc`
     - make install
     # Python install
-    - export OSKAR_INC_DIR=/opt/oskar/include && export OSKAR_LIB_DIR=/opt/oskar/lib
-    - cd ./../OSKAR/python && python3 setup.py install
+    - export OSKAR_INC_DIR=/opt/oskar/include
+    - export OSKAR_LIB_DIR=/opt/oskar/lib
+    - cd ../OSKAR/python && python3 setup.py install
+    # Run cmake for EveryBeam again, to update the cache with the updated $PATH
     - export PATH=/opt/oskar/bin:$PATH
-    # Run OSKAR comparison, set some env variables for this session
-    - export NPIXELS=8 && export APPLY_TRANSPOSE=OFF && MAX_ORDER=3 && TOLERANCE=1e-12
     - cd /opt/everybeam/build
-    # Run cmake again, to update the cache with the updated $PATH
     - cmake .
+    # Run OSKAR base comparison, set some env variables for this session
+    - export NPIXELS=8 APPLY_TRANSPOSE=OFF MAX_ORDER=3 TOLERANCE=1e-12
     - make VERBOSE=1 comparison-oskar-basefunctions
     # Run OSKAR stationresponse comparison
     - export NPIXELS=32 TOLERANCE=1e-5
@@ -276,18 +254,17 @@ build-compare-oskar-2204:
     - if: '$CI_COMMIT_BRANCH == "master"'
 
 deploy-image-2204:
-  variables:
-    GIT_STRATEGY: none
   needs: ["versioning","build-everybeam-2204"]
   stage: deploy
   image: docker:20.10
   services:
     - docker:20.10-dind
+  variables:
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE/everybeam_2204:latest
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $EVERYBEAM_IMAGE_2204
-    - docker tag $EVERYBEAM_IMAGE_2204 $CI_REGISTRY_IMAGE/everybeam_2204:latest
-    - docker push $CI_REGISTRY_IMAGE/everybeam_2204:latest
+    - docker build --build-arg BASE_IMAGE=${BASE_IMAGE_2204} --tag $DOCKER_IMAGE -f docker/everybeam
+    - docker push $DOCKER_IMAGE
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
