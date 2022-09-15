@@ -130,8 +130,8 @@ test-and-coverage-2204:
     # Copy xml files to build/reports for the SKA .post step that generates badges.
     - mkdir -p build/reports
     - cp build/cpp/test/unittests.xml build/reports/unit-tests.xml
-    # Copy tpybindings result even though SKA has no badges for integration tests yet.
-    - cp build/python/test/tpybindings.xml build/reports/integration-tests.xml
+    # Coping python test results into integration-tests.xml is not
+    # needed, since SKA has no badges for integration tests yet.
     - cp build/coverage.xml build/reports/code-coverage.xml
   artifacts:
     paths:
@@ -142,7 +142,9 @@ test-and-coverage-2204:
       coverage_report:
         coverage_format: cobertura
         path: build/coverage.xml
-      junit: build/cpp/test/unittests.xml
+      junit:
+        - build/cpp/test/unittests.xml
+        - build/python/test/*.xml
 
 # Run unittests only using the address sanitizer.
 # Python tests do not work with the sanitizer, since the main executable
