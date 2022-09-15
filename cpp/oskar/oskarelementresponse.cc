@@ -54,10 +54,10 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
                                                             double phi) const {
   aocommon::MC2x2 response = aocommon::MC2x2::Zero();
 
-  auto dataset = datafile_->Get(freq);
-  auto l_max = dataset->GetLMax();
+  const Dataset& dataset = datafile_->Get(freq);
+  const size_t l_max = dataset.GetLMax();
 
-  std::complex<double>* alpha_ptr = dataset->GetAlphaPtr(element_id);
+  const std::complex<double>* alpha_ptr = dataset.GetAlphaPtr(element_id);
 
   double phi_x = phi;
   double phi_y = phi;

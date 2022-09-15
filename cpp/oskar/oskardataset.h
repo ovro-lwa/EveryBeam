@@ -22,17 +22,14 @@ class Dataset {
    */
   Dataset(H5::H5File& h5_file, const unsigned int freq);
 
-  // Get
   size_t GetNrElements() const { return nr_elements_; };
   size_t GetLMax() const { return l_max_; };
 
-  std::complex<double>* GetAlphaPtr(const unsigned int element);
+  const std::complex<double>* GetAlphaPtr(const unsigned int element) const;
 
  private:
-  // Methods
   size_t GetIndex(const unsigned int element) const;
 
-  // Members
   std::vector<std::complex<double>> data_;
   size_t nr_elements_;
   size_t nr_coeffs_;

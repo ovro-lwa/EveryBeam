@@ -20,16 +20,27 @@ class Datafile {
  public:
   Datafile(const std::string& filename);
 
-  std::shared_ptr<Dataset> Get(const unsigned int freq);
+  /**
+   * Get the Dataset for a frequency.
+   *
+   * The first request for a Dataset for a frequency loads the data from
+   * from the HDF5 file. Successive requests reuse the previously read Dataset.
+   *
+   * @param freq Frequency identifier.
+   * @return A reference to the Dataset. It remains valid as long as the
+   * Datafile that returned the Dateset is valid.
+   */
+  const Dataset& Get(const unsigned int freq);
 
  private:
-  // Coeffs;
-  std::map<unsigned int, std::shared_ptr<Dataset>> map_;
+  // Maps frequency identifiers to Datasets.
+  std::map<unsigned int, std::unique_ptr<Dataset>> map_;
 
   // HDF5
   std::string filename_;
   std::unique_ptr<H5::H5File> h5_file_;
-  mutable std::mutex mutex_;
+  // Protects concurrent access to map_.
+  std::mutex mutex_;
 };
 }  // namespace everybeam
 

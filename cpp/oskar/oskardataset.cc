@@ -94,7 +94,8 @@ size_t Dataset::GetIndex(const unsigned int element) const {
   return element * nr_coeffs_ * 4;
 }
 
-std::complex<double>* Dataset::GetAlphaPtr(const unsigned int element) {
+const std::complex<double>* Dataset::GetAlphaPtr(
+    const unsigned int element) const {
   assert(element < GetNrElements());
   size_t index = GetIndex(element);
   return data_.data() + index;
