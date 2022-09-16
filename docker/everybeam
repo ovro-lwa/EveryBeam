@@ -10,5 +10,5 @@ ADD . ${EVERYBEAMDIR}/EveryBeam
 RUN cd ${EVERYBEAMDIR}/EveryBeam && git fetch --unshallow \
     && mkdir -p ${EVERYBEAMDIR}/build && cd ${EVERYBEAMDIR}/build \
     && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=.. ../EveryBeam \
-    && make -j8 && make install -j8
+    && make -j8 && make install -j8 \
     && rm -rf ${EVERYBEAMDIR}/EveryBeam ${EVERYBEAMDIR}/build

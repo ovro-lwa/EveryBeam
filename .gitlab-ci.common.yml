@@ -265,8 +265,10 @@ deploy-image-2204:
     DOCKER_IMAGE: $CI_REGISTRY_IMAGE/everybeam_2204:latest
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg BASE_IMAGE=${BASE_IMAGE_2204} --tag $DOCKER_IMAGE -f docker/everybeam
+    - docker build --build-arg BASE_IMAGE=${BASE_IMAGE_2204} --tag $DOCKER_IMAGE -f docker/everybeam .
     - docker push $DOCKER_IMAGE
   rules:
     # Only add job when ran on master and not a scheduled job, i.e. when merging
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
+    # For testing this job on a branch, set the DEPLOY_IMAGE variable to true.
+    - if: '$DEPLOY_IMAGE'
