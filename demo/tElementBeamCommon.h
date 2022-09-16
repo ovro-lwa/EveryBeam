@@ -124,7 +124,7 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   GetThetaPhiDirectionsZenith(thetaPhiDirections.data(), subgrid_size);
   std::vector<std::complex<float>> beam_thetaphi(subgrid_size * subgrid_size *
                                                  4 * nr_antennas);
-  calculateElementBeams(station->GetElementResponse(), thetaPhiDirections,
+  calculateElementBeams(*station->GetElementResponse(), thetaPhiDirections,
                         nr_antennas, subgrid_size, frequency, beam_thetaphi);
 
 // Compute element beams from itrf coordinates

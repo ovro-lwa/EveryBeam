@@ -423,7 +423,7 @@ std::unique_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
     if (telescope_type == TelescopeType::kLofarTelescope) {
       station->SetAntenna(
           LofarStationBeamFormer(ms, id, station->GetPhaseReference(),
-                                 station->GetElementResponse().GetModel()));
+                                 station->GetElementResponse()->GetModel()));
     } else if (telescope_type == TelescopeType::kAARTFAAC) {
       station->SetAntenna(AartfaacElement(ms, id));
     }

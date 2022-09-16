@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(station) {
       std::make_shared<everybeam::Station>(name, position, options);
 
   const everybeam::ElementResponse& element_response =
-      station->GetElementResponse();
+      *station->GetElementResponse();
 
   double freq = 50e6;
 

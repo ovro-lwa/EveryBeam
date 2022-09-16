@@ -10,8 +10,13 @@ message(STATUS "Using python version ${PYTHON_VERSION_STRING}")
 # Create the binding library
 # pyeverybeam is a temporary alias for everybeam target
 pybind11_add_module(
-  pyeverybeam wrappers/pyutils.cc wrappers/pyload.cc wrappers/pytelescope.cc
-  wrappers/pylobes.cc wrappers/wrapper.cc)
+  pyeverybeam
+  wrappers/pyelementresponse.cc
+  wrappers/pyload.cc
+  wrappers/pylobes.cc
+  wrappers/pytelescope.cc
+  wrappers/pyutils.cc
+  wrappers/wrapper.cc)
 
 target_include_directories(pyeverybeam
                            PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/cpp>")

@@ -261,7 +261,9 @@ class Station {
   // @}
 
   //! Returns a pointer to the ElementResponse class
-  const ElementResponse& GetElementResponse() { return *element_response_; }
+  std::shared_ptr<const ElementResponse> GetElementResponse() const {
+    return *element_response_.get();
+  }
 
   /**
    * @brief Compute the Jones matrix for the element response

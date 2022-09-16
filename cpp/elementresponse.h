@@ -86,7 +86,7 @@ class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
    * @param freq Frequency of the plane wave (Hz).
    * @param theta Angle wrt. z-axis (rad)
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
-   * @param result Pointer to 2x2 array of Jones matrix
+   * @return A 2x2 array containing the Jones matrix.
    */
   virtual aocommon::MC2x2 Response(double freq, double theta,
                                    double phi) const = 0;
@@ -99,7 +99,7 @@ class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
    * @param freq Frequency of the plane wave (Hz).
    * @param theta Angle wrt. z-axis (rad)
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
-   * @param result Pointer to 2x2 array of Jones matrix
+   * @return A 2x2 array containing the Jones matrix.
    */
   virtual aocommon::MC2x2 Response([[maybe_unused]] int element_id, double freq,
                                    double theta, double phi) const {

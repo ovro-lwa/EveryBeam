@@ -1,7 +1,7 @@
 # Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from everybeam import load_telescope, LOFAR, GridSettings
+from everybeam import load_telescope, LOFAR, GridSettings, ElementResponseModel
 import pytest
 import os
 import numpy as np
@@ -30,6 +30,7 @@ def lba_setup():
         "direction": np.array([0.667806, -0.0770635, 0.740335]),
         "preapplied_beam_dir": np.array([0.655743, -0.0670973, 0.751996]),
         "station0": np.array([0.655743, -0.0670973, 0.751996]),
+        "station0_name": "CS001LBA",
         "tile0": np.array([0.655743, -0.0670973, 0.751996]),
         "cpp_response": np.array(
             [
@@ -73,6 +74,7 @@ def hba_setup():
         "direction": np.array([0.42458804, 0.46299569, 0.77804112]),
         "preapplied_beam_dir": np.array([0.408326, 0.527345, 0.745102]),
         "station0": np.array([0.4083262, 0.52734471, 0.74510219]),
+        "station0_name": "CS001HBA0",
         "tile0": np.array([0.40832685, 0.52734421, 0.74510219]),
         "cpp_response": np.array(
             [
@@ -195,6 +197,11 @@ def test_lofar(ref, differential_beam):
         ms_path, use_differential_beam=differential_beam
     )
     assert isinstance(telescope, LOFAR)
+    assert telescope.station_name(0) == ref["station0_name"]
+    assert (
+        telescope.station_element_response(0).model
+        == ElementResponseModel.hamaker
+    )
 
     time = ref["time"]
     freq = ref["freq"]

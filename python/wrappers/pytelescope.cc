@@ -409,6 +409,28 @@ void init_telescope(py::module& m) {
         str
         )pbdoc",
           py::arg("station_index"))
+      .def(
+          "station_element_response",
+          [](PhasedArray& self, size_t idx) {
+            if (idx >= self.GetNrStations()) {
+              throw std::runtime_error(
+                  "Requested station index exceeds number of stations.");
+            }
+            return self.GetStation(idx).GetElementResponse();
+          },
+          R"pbdoc(
+        Get the element response for a station, given a station index.
+
+        Parameters
+        ----------
+        station_index: int
+            Station index
+
+        Returns
+        -------
+        An element response object for the station.
+        )pbdoc",
+          py::arg("station_index"))
       .def("channel_frequency", &PhasedArray::GetChannelFrequency,
            R"pbdoc(
         Retrieve channel frequency for a given (zero-based) channel index.
