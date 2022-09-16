@@ -12,7 +12,7 @@ deploy-package-2204:
   image: $EVERYBEAM_IMAGE
   allow_failure: true
   variables:
-    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - cd everybeam_package
     - export FILES=$(ls -1 $PWD/*.deb)

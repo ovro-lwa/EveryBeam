@@ -110,6 +110,8 @@ format-2204:
 test-and-coverage-2204:
   extends: .needs-base-2204
   stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - WORKDIR=$PWD
     # Download casacore wsrt measures
@@ -153,6 +155,8 @@ sanitize-2204:
   extends: .needs-base-2204
   stage: build
   image: $BASE_IMAGE_2204
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     # Download casacore wsrt measures
     - wget -q ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar && tar -xf WSRT_Measures.ztar -C /var/lib/casacore/data/ && rm -f WSRT_Measures.ztar
@@ -164,6 +168,8 @@ sanitize-2204:
 
 .build-everybeam:
   stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - mkdir build && cd build
     - cmake -DBUILD_TESTING=ON -DBUILD_WITH_PYTHON=ON ..
@@ -194,6 +200,8 @@ build-doc-2204:
 build-package-2204:
   extends: [.needs-base-2204]
   stage: package
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - git fetch --unshallow # Unshallowing ensures that 'git describe' works.
     - mkdir everybeam_package
@@ -216,6 +224,8 @@ build-compare-oskar-2204:
   stage: oskar-comparison
   extends: [.needs-base-2204]
   image: $BASE_IMAGE_2204
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   before_script:
     # Build and install everybeam
     - mkdir -p /opt/everybeam/build
