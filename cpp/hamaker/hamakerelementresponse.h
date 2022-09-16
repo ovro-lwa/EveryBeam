@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_HAMAKER_ELEMENTRESPONSE_H_
@@ -17,6 +17,7 @@ class HamakerElementResponse : public ElementResponse {
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kHamaker;
   }
+
   aocommon::MC2x2 Response(double freq, double theta,
                            double phi) const final override;
 

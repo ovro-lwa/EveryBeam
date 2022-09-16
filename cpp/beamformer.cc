@@ -88,12 +88,9 @@ std::vector<aocommon::MC2x2Diag> BeamFormer::ComputeWeightedResponses(
   return result;
 }
 
-aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
-                                          const vector3r_t& direction,
-                                          const Options& options) const {
-  // TODO (AST-783): Revisit the locking strategy.
-  std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
-
+aocommon::MC2x2 BeamFormer::LocalResponse(
+    const ElementResponse& element_response, real_t time, real_t freq,
+    const vector3r_t& direction, const Options& options) const {
   // Weighted subtraction of the pointing direction (0-direction), and the
   // direction of interest. Weights are given by corresponding freqs.
   const vector3r_t delta_direction =
@@ -105,25 +102,23 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
       ComputeWeightedResponses(delta_direction);
 
   // Copy options into local_options. Needed to propagate
-  // the potential change in the rotate boolean downstream
+  // the potential change in the rotate boolean downstream.
   Options local_options = options;
-  // If field_response_ is valid, compute and cache quantities
-  // related to the field. This is done for LOBEs beamformers
-  // in which all elements inside the beamformer have the same basisfunction for
-  // a given direction.
-  if (field_response_ != nullptr) {
-    // Lock the associated mutex, thus avoiding that the LOBESElementResponse
-    // basefunctions_ are overwritten before response is computed
-    lock.lock();
-    const vector2r_t thetaphi = cart2thetaphi(direction);
-    field_response_->SetFieldQuantities(thetaphi[0], thetaphi[1]);
+
+  // If fixate_direction_ is true, compute and cache quantities related to the
+  // field. This is done for LOBEs beamformers in which all elements inside the
+  // beamformer have the same basisfunction for a given direction.
+  std::shared_ptr<ElementResponse> local_element_response;
+  if (fixate_direction_) {
+    local_element_response = element_response.FixateDirection(direction);
     local_options.rotate = false;
   }
 
   aocommon::MC2x2 result(0.0, 0.0, 0.0, 0.0);
   for (size_t idx = 0; idx < antennas_.size(); ++idx) {
-    aocommon::MC2x2 antenna_response =
-        antennas_[idx]->Response(time, freq, direction, local_options);
+    aocommon::MC2x2 antenna_response = antennas_[idx]->Response(
+        local_element_response ? *local_element_response : element_response,
+        time, freq, direction, local_options);
     result += weights[idx] * antenna_response;
   }
 
@@ -137,10 +132,6 @@ aocommon::MC2x2 BeamFormer::LocalResponse(real_t time, real_t freq,
                dot(e_phi, options.north), dot(e_phi, options.east)};
   }
 
-  // Clear the basefunctions cache
-  if (field_response_ != nullptr) {
-    field_response_->ClearFieldQuantities();
-  }
   return result;
 }
 

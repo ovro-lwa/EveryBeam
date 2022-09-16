@@ -384,12 +384,13 @@ BOOST_AUTO_TEST_CASE(gridded_response_lobes,
         full_response_all.data() + (i + 1) * buffer_size, full_response.data(),
         full_response.data() + buffer_size);
 
-    for (size_t pixel = 0; pixel < kWidth * kHeight; ++pixel)
+    for (size_t pixel = 0; pixel < kWidth * kHeight; ++pixel) {
       // Array factor should be identity
       BOOST_CHECK_EQUAL_COLLECTIONS(array_factor.data() + pixel * 4u,
                                     array_factor.data() + (pixel + 1u) * 4u,
                                     array_factor_ref.data(),
                                     array_factor_ref.data() + 4);
+    }
   }
 }
 

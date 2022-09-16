@@ -7,8 +7,9 @@ include_directories(${CMAKE_BINARY_DIR})
 
 #------------------------------------------------------------------------------
 # build libeverybeam-oskar.so
-add_library(oskar SHARED oskarelementresponse.cc oskardatafile.cc
-                         oskardataset.cc)
+add_library(
+  oskar SHARED oskarelementresponse.cc oskardatafile.cc oskardataset.cc
+               ${CMAKE_SOURCE_DIR}/cpp/elementresponse.cc)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 set_target_properties(oskar PROPERTIES LIBRARY_OUTPUT_NAME

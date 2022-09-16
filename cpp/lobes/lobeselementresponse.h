@@ -1,25 +1,30 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_LOBES_ELEMENTRESPONSE_H
 #define EVERYBEAM_LOBES_ELEMENTRESPONSE_H
-
-#include <Eigen/Core>
-#include <unsupported/Eigen/CXX11/Tensor>
-
-#include "../options.h"
-#include "../fieldresponse.h"
 
 #include <iostream>
 #include <memory>
 #include <optional>
 #include <vector>
 
+#include <Eigen/Core>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "../options.h"
+
 namespace everybeam {
 
 //! Implementation of the Lobes response model
-class LOBESElementResponse : public FieldResponse {
+class LOBESElementResponse : public ElementResponse {
  public:
+  /**
+   * Vector containing n * 2 values that represent base functions.
+   * This type is shared with LobesElementResponseForDirection.
+   */
+  using BaseFunctions = std::vector<std::complex<double>>;
+
   /**
    * @brief Construct a new LOBESElementResponse object
    *
@@ -36,11 +41,6 @@ class LOBESElementResponse : public FieldResponse {
   /**
    * @brief Stub override of the Response method, an element id
    * is needed to compute the element response.
-   *
-   * @param freq
-   * @param theta
-   * @param phi
-   * @param response
    */
   aocommon::MC2x2 Response([[maybe_unused]] double freq,
                            [[maybe_unused]] double theta,
@@ -52,6 +52,7 @@ class LOBESElementResponse : public FieldResponse {
   /**
    * @brief Virtual implementation of Response method
    *
+   * @param cache Cached data from CacheDirection().
    * @param element_id ID of element
    * @param freq Frequency of the plane wave (Hz).
    * @param theta Angle wrt. z-axis (rad) (NOTE: parameter is just a stub to
@@ -73,40 +74,25 @@ class LOBESElementResponse : public FieldResponse {
       const std::string& name, const Options& options);
 
   /**
-   * @brief Set field quantities (i.e. the basefunctions) for the LOBES element
-   * response given the direction of interest, specified in (theta, phi) angles.
-   * NOTE: this method overrides the "cached" basefunction_ member every time
-   * when called.
+   * Creates a LobesElementResponseForDirection object with the field quantities
+   * (i.e. the basefunctions) for the LOBES element response given the direction
+   * of interest.
    *
-   * @param theta Angle wrt. z-axis (rad)
-   * @param phi Angle in the xy-plane wrt. x-axis  (rad)
-   *
-   * @warning When calling this function or @ref ClearFieldQuantities from
-   * multiple threads the callers need to ensure the synchronisation.
+   * @param direction Direction of interest (ITRF, m)
    */
-  virtual void SetFieldQuantities(double theta, double phi) final override {
-    basefunctions_ = ComputeBaseFunctions(theta, phi);
-  };
+  std::shared_ptr<ElementResponse> FixateDirection(
+      const vector3r_t& direction) const final override;
 
   /**
-   * @brief Clear the cached basefunctions
-   *
-   * @warning When calling this function or @ref SetFieldQuantities from
-   * multiple threads the callers need to ensure the synchronisation.
+   * Calculate the response using pre-calculated base functions.
+   * LobesElementResponseForDirection also uses this function.
    */
-  virtual void ClearFieldQuantities() final override {
-    basefunctions_.reset();
-  };
+  aocommon::MC2x2 Response(const BaseFunctions& base_functions, int element_id,
+                           double frequency) const;
 
  private:
-  // Typdef of BaseFunctions as Eigen::Array type
-  typedef Eigen::Array<std::complex<double>, Eigen::Dynamic, 2> BaseFunctions;
-
-  /** The cached version of the base functions. */
-  mutable std::optional<BaseFunctions> basefunctions_;
-
   // Find the closest frequency
-  size_t FindFrequencyIdx(double f) const {
+  size_t FindFrequencyIndex(double f) const {
     auto is_closer = [f](int x, int y) { return abs(x - f) < abs(y - f); };
     auto result =
         std::min_element(frequencies_.begin(), frequencies_.end(), is_closer);

@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_BEAMFORMERLOFAR_H
@@ -94,8 +94,8 @@ class BeamFormerLofar : public Antenna {
       const Options& options, const std::vector<vector3r_t>& antenna_positions,
       const std::vector<std::array<bool, 2>>& antenna_enabled) const;
 
-  // Override of the LocalResponse method
-  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                real_t time, real_t freq,
                                 const vector3r_t& direction,
                                 const Options& options) const final override;
 

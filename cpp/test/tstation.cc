@@ -18,7 +18,8 @@ BOOST_AUTO_TEST_CASE(station) {
   std::shared_ptr<everybeam::Station> station =
       std::make_shared<everybeam::Station>(name, position, options);
 
-  auto element_response = station->GetElementResponse();
+  const everybeam::ElementResponse& element_response =
+      station->GetElementResponse();
 
   double freq = 50e6;
 
@@ -29,7 +30,7 @@ BOOST_AUTO_TEST_CASE(station) {
       double y = (2.0 * j) / (N - 1) - 1.0;
       double theta = asin(sqrt(x * x + y * y));
       double phi = atan2(y, x);
-      BOOST_REQUIRE_NO_THROW(element_response->Response(0, freq, theta, phi));
+      BOOST_REQUIRE_NO_THROW(element_response.Response(0, freq, theta, phi));
     }
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "beamformerlofar.h"
@@ -44,17 +44,17 @@ aocommon::MC2x2Diag BeamFormerLofar::FieldArrayFactor(
   return result;
 }
 
-aocommon::MC2x2 BeamFormerLofar::LocalResponse(real_t time, real_t freq,
-                                               const vector3r_t& direction,
-                                               const Options& options) const {
+aocommon::MC2x2 BeamFormerLofar::LocalResponse(
+    const ElementResponse& element_response, real_t time, real_t freq,
+    const vector3r_t& direction, const Options& options) const {
   // Compute the combined array factor
   const aocommon::MC2x2Diag array_factor =
       LocalArrayFactor(time, freq, direction, options);
 
   // NOTE: there are maybe some redundant transformations in element-> response
-  const aocommon::MC2x2 element_response =
-      element_->Response(time, freq, direction, options);
-  return array_factor * element_response;
+  const aocommon::MC2x2 response =
+      element_->Response(element_response, time, freq, direction, options);
+  return array_factor * response;
 }
 
 }  // namespace everybeam

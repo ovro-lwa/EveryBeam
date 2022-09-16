@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_ELEMENT_H
@@ -27,11 +27,8 @@ class Element : public Antenna {
    * @param element_response ElementResponseModel
    * @param id
    */
-  Element(const CoordinateSystem& coordinate_system,
-          ElementResponse::Ptr element_response, int id)
-      : Antenna(coordinate_system),
-        id_(id),
-        element_response_(element_response) {}
+  Element(const CoordinateSystem& coordinate_system, int id)
+      : Antenna(coordinate_system), id_(id) {}
 
   std::shared_ptr<Antenna> Clone() const override;
 
@@ -53,7 +50,8 @@ class Element : public Antenna {
    * @param options
    * @return aocommon::MC2x2 Jones matrix
    */
-  aocommon::MC2x2 ResponseID(real_t time, real_t freq,
+  aocommon::MC2x2 ResponseID(const ElementResponse& element_response,
+                             real_t time, real_t freq,
                              const vector3r_t& direction, size_t id,
                              const Options& options = {}) {
     // Transform direction and directions in options to local coordinatesystem
@@ -65,7 +63,8 @@ class Element : public Antenna {
     local_options.rotate = options.rotate;
     local_options.east = TransformToLocalDirection(options.east);
     local_options.north = TransformToLocalDirection(options.north);
-    return LocalResponse(time, freq, local_direction, id, local_options);
+    return LocalResponse(element_response, time, freq, local_direction, id,
+                         local_options);
   }
 
   /**
@@ -78,7 +77,8 @@ class Element : public Antenna {
    * @param options
    * @return aocommon::MC2x2
    */
-  virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  virtual aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                        real_t time, real_t freq,
                                         const vector3r_t& direction, size_t id,
                                         const Options& options) const;
 
@@ -93,14 +93,14 @@ class Element : public Antenna {
   };
 
  protected:
-  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                real_t time, real_t freq,
                                 const vector3r_t& direction,
                                 const Options& options) const override {
-    return LocalResponse(time, freq, direction, id_, options);
+    return LocalResponse(element_response, time, freq, direction, id_, options);
   };
 
   int id_;
-  ElementResponse::Ptr element_response_;
 };
 }  // namespace everybeam
 

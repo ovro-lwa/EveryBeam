@@ -6,8 +6,10 @@
 include_directories(${CMAKE_BINARY_DIR})
 
 #------------------------------------------------------------------------------
-add_library(lobes SHARED lobeselementresponse.cc
-                         ${CMAKE_SOURCE_DIR}/cpp/common/sphericalharmonics.cc)
+add_library(
+  lobes SHARED
+  lobeselementresponse.cc ${CMAKE_SOURCE_DIR}/cpp/common/sphericalharmonics.cc
+  ${CMAKE_SOURCE_DIR}/cpp/elementresponse.cc)
 target_include_directories(lobes PUBLIC ${HDF5_INCLUDE_DIRS})
 target_link_libraries(lobes PUBLIC ${HDF5_CXX_LIBRARIES})
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)

@@ -41,7 +41,7 @@ TelescopeType GetTelescopeType(const casacore::MeasurementSet& ms);
  *
  * @param ms MeasurementSet
  * @param options Options
- * @return std::unique_ptr<Telescope> Unique pointer to Telescope object
+ * @return Unique pointer to Telescope object
  */
 std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
                                            const Options& options);
@@ -52,7 +52,7 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
  *
  * @param ms MeasurementSet
  * @param options Options
- * @return td::unique_ptr<Telescope> Unique pointer to Telescope object
+ * @return Unique pointer to Telescope object
  */
 std::unique_ptr<telescope::Telescope> Load(const std::string& ms_name,
                                            const Options& options);

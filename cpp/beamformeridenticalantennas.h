@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_BEAMFORMERIDENTICALANTENNAS_H
@@ -48,7 +48,8 @@ class BeamFormerIdenticalAntennas : public BeamFormer {
  private:
   // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
   // and return (Jones) matrix of response
-  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                real_t time, real_t freq,
                                 const vector3r_t& direction,
                                 const Options& options) const override;
 };

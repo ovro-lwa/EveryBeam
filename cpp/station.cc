@@ -1,6 +1,6 @@
 // Station.cc: Representation of the station beam former.
 //
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "station.h"
@@ -87,8 +87,10 @@ aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
     options.north = north;
   }
 
-  return is_local ? element_->LocalResponse(time, freq, direction, id, options)
-                  : element_->ResponseID(time, freq, direction, id, options);
+  return is_local ? element_->LocalResponse(*element_response_, time, freq,
+                                            direction, id, options)
+                  : element_->ResponseID(*element_response_, time, freq,
+                                         direction, id, options);
 }
 
 aocommon::MC2x2 Station::ComputeElementResponse(real_t time, real_t freq,
@@ -118,7 +120,7 @@ aocommon::MC2x2 Station::Response(real_t time, real_t freq,
     options.north = north;
   }
 
-  return antenna_->Response(time, freq, direction, options);
+  return antenna_->Response(*element_response_, time, freq, direction, options);
 }
 
 aocommon::MC2x2Diag Station::ArrayFactor(real_t time, real_t freq,

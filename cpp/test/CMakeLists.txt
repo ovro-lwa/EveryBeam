@@ -44,12 +44,13 @@ set(LOBES_COEFF_PATH
 set(TEST_FILENAMES
     runtests.cc
     tatermconfig.cc
+    telementresponsefixeddirection.cc
     tgriddedresponse.cc
     tlofar_hba.cc
     tlofar_lba.cc
     tlofar_aartfaac.cc
-    toskar.cc
     tmwa.cc
+    toskar.cc
     tphasedarraypoint.cc
     tskamid.cc
     tstation.cc

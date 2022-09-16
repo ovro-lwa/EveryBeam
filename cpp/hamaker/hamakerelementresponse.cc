@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // hamakerelementresponse.cc:
@@ -117,11 +117,11 @@ aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
 
 HamakerElementResponseHBA::HamakerElementResponseHBA() {
   std::string path = GetPath("HamakerHBACoeff.h5");
-  coeffs_.reset(new HamakerCoefficients(path));
+  coeffs_ = std::make_unique<HamakerCoefficients>(path);
 }
 
 HamakerElementResponseLBA::HamakerElementResponseLBA() {
   std::string path = GetPath("HamakerLBACoeff.h5");
-  coeffs_.reset(new HamakerCoefficients(path));
+  coeffs_ = std::make_unique<HamakerCoefficients>(path);
 }
 }  // namespace everybeam

@@ -2,7 +2,7 @@
 // simulating the beam from phased array (LOFAR/OSKAR) observations stored in MS
 // format.
 //
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "msreadutils.h"
@@ -125,8 +125,7 @@ vector3r_t TransformToFieldCoordinates(
 }
 
 std::shared_ptr<BeamFormer> MakeTile(const vector3r_t& position,
-                                     const TileConfig& tile_config,
-                                     ElementResponse::Ptr element_response) {
+                                     const TileConfig& tile_config) {
   std::shared_ptr<BeamFormer> tile =
       std::make_shared<BeamFormerIdenticalAntennas>(position);
 
@@ -137,8 +136,8 @@ std::shared_ptr<BeamFormer> MakeTile(const vector3r_t& position,
     antenna_coordinate_system.origin = antenna_position;
     antenna_coordinate_system.axes = lofar_antenna_orientation;
 
-    std::shared_ptr<Antenna> antenna = std::make_shared<Element>(
-        antenna_coordinate_system, element_response, id);
+    std::shared_ptr<Antenna> antenna =
+        std::make_shared<Element>(antenna_coordinate_system, id);
     tile->AddAntenna(antenna);
   }
   return tile;
@@ -147,8 +146,7 @@ std::shared_ptr<BeamFormer> MakeTile(const vector3r_t& position,
 // Make a dedicated HBA "Hamaker" tile, saving only one element, and 16
 // element positions
 void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
-              const TileConfig& tile_config,
-              ElementResponse::Ptr element_response) {
+              const TileConfig& tile_config) {
   for (unsigned int id = 0; id < tile_config.size(); id++) {
     vector3r_t antenna_position = tile_config[id];
 
@@ -156,8 +154,8 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
     antenna_coordinate_system.origin = antenna_position;
     antenna_coordinate_system.axes = lofar_antenna_orientation;
 
-    std::shared_ptr<ElementHamaker> antenna = std::make_shared<ElementHamaker>(
-        antenna_coordinate_system, element_response, id);
+    std::shared_ptr<ElementHamaker> antenna =
+        std::make_shared<ElementHamaker>(antenna_coordinate_system, id);
 
     // Only element 1 needs to be stored as an element
     if (id == 0) {
@@ -170,7 +168,7 @@ void MakeTile(std::shared_ptr<BeamFormerLofarHBA> beamformer,
 
 std::shared_ptr<Antenna> ReadAntennaFieldLofar(
     const Table& table, unsigned int id,
-    ElementResponse::Ptr element_response) {
+    ElementResponseModel element_response_model) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, id);
 
@@ -195,19 +193,18 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
   std::shared_ptr<Antenna> beam_former;
   // Cast to the beam_former corresponding to the element response
   // model and LBA/HBA configuration
-  if (element_response->GetModel() == ElementResponseModel::kHamaker) {
+  if (element_response_model == ElementResponseModel::kHamaker) {
     if (name != "LBA") {
       // Then HBA, HBA0 or HBA1
       beam_former = std::make_shared<BeamFormerLofarHBA>(coordinate_system);
     } else {
       beam_former = std::make_shared<BeamFormerLofarLBA>(coordinate_system);
     }
-  } else if (element_response->GetModel() == ElementResponseModel::kLOBES) {
-    // BeamFormer is assigned a FieldResponse, for which common field quantities
-    // can be precomputed
-    beam_former = std::make_shared<BeamFormer>(
-        coordinate_system,
-        std::dynamic_pointer_cast<FieldResponse>(*element_response.get()));
+  } else if (element_response_model == ElementResponseModel::kLOBES) {
+    // BeamFormer should use ElementResponse direction fixing.
+    const bool kFixDirection = true;
+    beam_former =
+        std::make_shared<BeamFormer>(coordinate_system, kFixDirection);
   } else {
     // All Tiles / elements should be kept unique, so work with generic
     // BeamFormer
@@ -227,9 +224,8 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
         antenna_position, lofar_antenna_orientation};
 
     if (name == "LBA") {
-      antenna = std::make_shared<Element>(antenna_coordinate_system,
-                                          element_response, i);
-      if (element_response->GetModel() == ElementResponseModel::kHamaker) {
+      antenna = std::make_shared<Element>(antenna_coordinate_system, i);
+      if (element_response_model == ElementResponseModel::kHamaker) {
         // Cast to LOFAR LBA
         std::shared_ptr<BeamFormerLofarLBA> beam_former_lba =
             std::static_pointer_cast<BeamFormerLofarLBA>(beam_former);
@@ -253,7 +249,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
       }
     } else {
       // name is HBA, HBA0 or HBA1
-      if (element_response->GetModel() == ElementResponseModel::kHamaker) {
+      if (element_response_model == ElementResponseModel::kHamaker) {
         std::shared_ptr<BeamFormerLofarHBA> beam_former_hba =
             std::static_pointer_cast<BeamFormerLofarHBA>(beam_former);
 
@@ -262,7 +258,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
 
         // Store only one tile
         if (i == 0) {
-          MakeTile(beam_former_hba, tile_config, element_response);
+          MakeTile(beam_former_hba, tile_config);
         }
         // Tile enabled in x/y?
         beam_former_hba->AddTileEnabled(
@@ -270,7 +266,7 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
       } else {
         std::shared_ptr<BeamFormerIdenticalAntennas> beam_former_hba =
             std::static_pointer_cast<BeamFormerIdenticalAntennas>(beam_former);
-        antenna = MakeTile(antenna_position, tile_config, element_response);
+        antenna = MakeTile(antenna_position, tile_config);
         antenna->enabled_[0] = !aips_flag(0, i);
         antenna->enabled_[1] = !aips_flag(1, i);
         beam_former_hba->AddAntenna(antenna);
@@ -280,9 +276,8 @@ std::shared_ptr<Antenna> ReadAntennaFieldLofar(
   return beam_former;
 }
 
-std::shared_ptr<Element> AartfaacElement(
-    const MeasurementSet& ms, size_t station_id,
-    ElementResponse::Ptr element_response) {
+std::shared_ptr<Element> AartfaacElement(const MeasurementSet& ms,
+                                         size_t station_id) {
   Table table = common::GetSubTable(ms, "ANTENNA");
 
   ScalarColumn<String> antenna_type_column(ms.observation(),
@@ -294,15 +289,14 @@ std::shared_ptr<Element> AartfaacElement(
 
   const size_t id = 0;
   std::shared_ptr<Element> antenna =
-      std::make_shared<Element>(coordinate_system, element_response, id);
+      std::make_shared<Element>(coordinate_system, id);
   antenna->enabled_[0] = true;
   antenna->enabled_[1] = true;
   return antenna;
 }
 
-std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
-    const Table& table, size_t station_id,
-    ElementResponse::Ptr element_response) {
+std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(const Table& table,
+                                                 size_t station_id) {
   Antenna::CoordinateSystem coordinate_system =
       common::ReadCoordinateSystem(table, station_id);
   std::shared_ptr<BeamFormer> beam_former =
@@ -330,8 +324,7 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
     std::shared_ptr<Antenna> antenna;
     Antenna::CoordinateSystem antenna_coordinate_system{
         antenna_position, oskar_antenna_orientation};
-    antenna = std::make_shared<Element>(antenna_coordinate_system,
-                                        element_response, i);
+    antenna = std::make_shared<Element>(antenna_coordinate_system, i);
 
     antenna->enabled_[0] = !aips_flag(i, 0);
     antenna->enabled_[1] = !aips_flag(i, 1);
@@ -342,7 +335,8 @@ std::shared_ptr<BeamFormer> ReadAntennaFieldMSv3(
 
 std::shared_ptr<BeamFormer> LofarStationBeamFormer(
     const MeasurementSet& ms, size_t station_id,
-    const vector3r_t& phase_reference, ElementResponse::Ptr element_response) {
+    const vector3r_t& phase_reference,
+    ElementResponseModel element_response_model) {
   std::shared_ptr<BeamFormer> beam_former;
 
   Table tab_field = common::GetSubTable(ms, "LOFAR_ANTENNA_FIELD");
@@ -357,7 +351,7 @@ std::shared_ptr<BeamFormer> LofarStationBeamFormer(
 
   for (size_t i = 0; i < tab_field.nrow(); ++i) {
     beam_former->AddAntenna(
-        ReadAntennaFieldLofar(tab_field, i, element_response));
+        ReadAntennaFieldLofar(tab_field, i, element_response_model));
   }
 
   // TODO
@@ -380,15 +374,13 @@ vector3r_t ReadStationPhaseReference(const Table& table, unsigned int id) {
   return phase_reference;
 }
 
-std::shared_ptr<BeamFormer> MSv3StationBeamFormer(
-    const MeasurementSet& ms, size_t station_id,
-    ElementResponse::Ptr element_response) {
+std::shared_ptr<BeamFormer> MSv3StationBeamFormer(const MeasurementSet& ms,
+                                                  size_t station_id) {
   Table tab_phased_array = common::GetSubTable(ms, "PHASED_ARRAY");
 
   // The Station will consist of a BeamFormer that combines the fields
   // coordinate system is ITRF
-  auto beam_former =
-      ReadAntennaFieldMSv3(tab_phased_array, station_id, element_response);
+  auto beam_former = ReadAntennaFieldMSv3(tab_phased_array, station_id);
   return beam_former;
 }
 }  // namespace
@@ -424,19 +416,16 @@ std::unique_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
   // Set the top level beamformer (that might contain nested beam formers)
   if (telescope_type == TelescopeType::kOSKARTelescope) {
     // OSKAR telescope
-    auto beam_former =
-        MSv3StationBeamFormer(ms, id, station->GetElementResponse());
-    station->SetAntenna(beam_former);
+    station->SetAntenna(MSv3StationBeamFormer(ms, id));
   } else {
     // LOFAR Telescope or AARTFAAC
     station->SetPhaseReference(ReadStationPhaseReference(ms.antenna(), id));
     if (telescope_type == TelescopeType::kLofarTelescope) {
-      auto beam_former = LofarStationBeamFormer(
-          ms, id, station->GetPhaseReference(), station->GetElementResponse());
-      station->SetAntenna(beam_former);
+      station->SetAntenna(
+          LofarStationBeamFormer(ms, id, station->GetPhaseReference(),
+                                 station->GetElementResponse().GetModel()));
     } else if (telescope_type == TelescopeType::kAARTFAAC) {
-      auto element = AartfaacElement(ms, id, station->GetElementResponse());
-      station->SetAntenna(element);
+      station->SetAntenna(AartfaacElement(ms, id));
     }
   }
   return station;

@@ -1,6 +1,6 @@
 // station.h: Representation of the station beam former.
 //
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_STATION_H
@@ -261,7 +261,7 @@ class Station {
   // @}
 
   //! Returns a pointer to the ElementResponse class
-  const ElementResponse::Ptr GetElementResponse() { return element_response_; }
+  const ElementResponse& GetElementResponse() { return *element_response_; }
 
   /**
    * @brief Compute the Jones matrix for the element response
@@ -299,7 +299,7 @@ class Station {
   //! Specialized implementation of response function.
   aocommon::MC2x2 Response(real_t time, real_t freq,
                            const vector3r_t& direction) const {
-    return antenna_->Response(time, freq, direction);
+    return antenna_->Response(*element_response_, time, freq, direction);
   }
 
   //! Set antenna attribute, usually a BeamFormer, but can also be an Element

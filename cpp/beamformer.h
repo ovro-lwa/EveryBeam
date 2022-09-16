@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_BEAMFORMER_H
@@ -13,7 +13,6 @@
 #include "element.h"
 #include "common/types.h"
 #include "common/mathutils.h"
-#include "fieldresponse.h"
 
 namespace everybeam {
 /**
@@ -30,45 +29,39 @@ class BeamFormer : public Antenna {
    * @brief Construct a new BeamFormer object
    *
    */
-  BeamFormer(std::shared_ptr<FieldResponse> field_response = nullptr)
+  BeamFormer()
       : Antenna(),
         local_phase_reference_position_(
-            TransformToLocalPosition(phase_reference_position_)),
-        field_response_(field_response) {}
+            TransformToLocalPosition(phase_reference_position_)) {}
 
   /**
-   * @brief Construct a new BeamFormer object given a coordinate system.
+   * @brief Construct a new BeamFormer object.
    *
-   * @param coordinate_system
+   * @param coordinate_system The coordinate system for the BeamFormer.
+   * @param fixate_direction If true, create a fixed direction ElementResponse
+   *        object using ElementResponse::FixateDirection().
    */
   BeamFormer(const CoordinateSystem& coordinate_system,
-             std::shared_ptr<FieldResponse> field_response = nullptr)
+             bool fixate_direction = false)
       : Antenna(coordinate_system),
         local_phase_reference_position_(
             TransformToLocalPosition(phase_reference_position_)),
-        field_response_(field_response) {}
+        fixate_direction_(fixate_direction) {}
 
   /**
    * @brief Construct a new BeamFormer object given a coordinate system and a
    * phase reference position
-   *
-   * @param coordinate_system
-   * @param phase_reference_position
    */
   BeamFormer(CoordinateSystem coordinate_system,
-             const vector3r_t& phase_reference_position,
-             std::shared_ptr<FieldResponse> field_response = nullptr)
+             const vector3r_t& phase_reference_position)
       : Antenna(coordinate_system, phase_reference_position),
         local_phase_reference_position_(
-            TransformToLocalPosition(phase_reference_position_)),
-        field_response_(field_response) {}
+            TransformToLocalPosition(phase_reference_position_)) {}
 
-  BeamFormer(const vector3r_t& phase_reference_position,
-             std::shared_ptr<FieldResponse> field_response = nullptr)
+  BeamFormer(const vector3r_t& phase_reference_position)
       : Antenna(phase_reference_position),
         local_phase_reference_position_(
-            TransformToLocalPosition(phase_reference_position_)),
-        field_response_(field_response) {}
+            TransformToLocalPosition(phase_reference_position_)) {}
 
   std::shared_ptr<Antenna> Clone() const override;
 
@@ -118,9 +111,13 @@ class BeamFormer : public Antenna {
       const vector3r_t& direction);
 
  protected:
-  // Compute the BeamFormer response in certain direction of arrival (ITRF, m)
-  // and return (Jones) matrix of response
-  aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  /**
+   * Compute the BeamFormer response.
+   * @param direction Direction of arrival (ITRF, m)
+   * @return (Jones) matrix of response
+   */
+  aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                real_t time, real_t freq,
                                 const vector3r_t& direction,
                                 const Options& options) const override;
 
@@ -136,9 +133,6 @@ class BeamFormer : public Antenna {
   // List of antennas in BeamFormer
   std::vector<std::shared_ptr<Antenna>> antennas_;
   std::vector<vector3r_t> delta_phase_reference_positions_;
-
-  // (Optional) shared pointer to field response model (e.g. LOBES)
-  std::shared_ptr<FieldResponse> field_response_;
 
  private:
   /**
@@ -159,12 +153,7 @@ class BeamFormer : public Antenna {
   std::vector<aocommon::MC2x2Diag> ComputeWeightedResponses(
       const vector3r_t& direction) const;
 
-  /**
-   * @brief Mutex providing a locking mechanism in case field quantities can be
-   * precomputed (e.g. the basefunctions in a specific direction for the LOBEs
-   * model)
-   */
-  mutable std::mutex mtx_;
+  bool fixate_direction_ = false;
 };
 }  // namespace everybeam
 #endif

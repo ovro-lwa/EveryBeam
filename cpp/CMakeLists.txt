@@ -21,6 +21,7 @@ add_library(
   everybeam SHARED
   antenna.cc
   elementresponse.cc
+  elementresponsefactory.cc
   beamformer.cc
   beamformeridenticalantennas.cc
   beamformerlofar.cc
@@ -98,7 +99,6 @@ install(
         element.h
         elementhamaker.h
         elementresponse.h
-        fieldresponse.h
         msreadutils.h
         station.h
         load.h

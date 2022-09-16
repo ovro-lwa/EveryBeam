@@ -1,25 +1,24 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <cmath>
-
-#include "config.h"
-#include "lobeselementresponse.h"
-
-#include "../common/sphericalharmonics.h"
-
-#include <aocommon/throwruntimeerror.h>
-
-#include <H5Cpp.h>
-
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <charconv>
+#include <cmath>
 #include <complex>
 #include <filesystem>
 #include <map>
 #include <optional>
 #include <string_view>
+
+#include <aocommon/throwruntimeerror.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <H5Cpp.h>
+
+#include "../common/mathutils.h"
+#include "../common/sphericalharmonics.h"
+
+#include "config.h"
+#include "lobeselementresponse.h"
+#include "lobeselementresponsefixeddirection.h"
 
 // There are two main modi for the AARTFAAC telescope, AARTFAAC-6 and
 // AARTFAAC-12. To properly use AARTFAAC in LOBEs mode the coefficients of all
@@ -225,55 +224,58 @@ LOBESElementResponse::LOBESElementResponse(const std::string& name,
   dataset.read(nms_.data(), H5::PredType::NATIVE_INT);
 }
 
+std::shared_ptr<ElementResponse> LOBESElementResponse::FixateDirection(
+    const vector3r_t& direction) const {
+  const vector2r_t thetaphi = cart2thetaphi(direction);
+
+  return std::make_shared<LobesElementResponseFixedDirection>(
+      std::static_pointer_cast<const LOBESElementResponse>(shared_from_this()),
+      ComputeBaseFunctions(thetaphi[0], thetaphi[1]));
+}
+
 LOBESElementResponse::BaseFunctions LOBESElementResponse::ComputeBaseFunctions(
     double theta, double phi) const {
-  LOBESElementResponse::BaseFunctions base_functions(nms_.size(), 2);
-  base_functions.setZero();
+  BaseFunctions base_functions(nms_.size() * 2, 0.0);
 
   for (size_t i = 0; i < nms_.size(); ++i) {
-    auto nms = nms_[i];
-    std::complex<double> q2, q3;
+    const nms_t& nms = nms_[i];
+    std::complex<double> q2;
+    std::complex<double> q3;
     std::tie(q2, q3) =
         everybeam::common::F4far_new(nms.s, nms.m, nms.n, theta, phi);
-    base_functions(i, 0) = q2;
-    base_functions(i, 1) = q3;
+    base_functions[i * 2 + 0] = q2;
+    base_functions[i * 2 + 1] = q3;
   }
+
   return base_functions;
 }
 
-aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double freq,
+aocommon::MC2x2 LOBESElementResponse::Response(int element_id, double frequency,
                                                double theta, double phi) const {
   // Clip directions below the horizon.
   if (theta >= M_PI_2) {
     return aocommon::MC2x2::Zero();
   }
 
-  // When the objects basefunctions_ aren't initialized create our own copy.
-  // Note it's not possible to set the object's version since the function is
-  // called from multiple threads.
-  const BaseFunctions& basefunctions =
-      basefunctions_ ? *basefunctions_ : ComputeBaseFunctions(theta, phi);
+  return Response(ComputeBaseFunctions(theta, phi), element_id, frequency);
+}
 
-  const int freq_idx = FindFrequencyIdx(freq);
-  std::complex<double> xx = {0}, xy = {0}, yx = {0}, yy = {0};
+aocommon::MC2x2 LOBESElementResponse::Response(
+    const BaseFunctions& base_functions, int element_id,
+    double frequency) const {
+  const int frequency_index = FindFrequencyIndex(frequency);
+  aocommon::MC2x2 response = aocommon::MC2x2::Zero();
 
-  const int nr_rows = basefunctions.rows();
-  if (nr_rows == 0) {
-    throw std::runtime_error(
-        "Number of rows in basefunctions_ member is 0. Did you run "
-        "SetFieldQuantities?");
+  for (size_t i = 0; i < base_functions.size() / 2; ++i) {
+    const std::complex<double> q2 = base_functions[i * 2 + 0];
+    const std::complex<double> q3 = base_functions[i * 2 + 1];
+    response[0] += q2 * coefficients_(0, frequency_index, element_id, i);  // xx
+    response[1] += q3 * coefficients_(0, frequency_index, element_id, i);  // xy
+    response[2] += q2 * coefficients_(1, frequency_index, element_id, i);  // yx
+    response[3] += q3 * coefficients_(1, frequency_index, element_id, i);  // yy
   }
 
-  for (int i = 0; i < nr_rows; ++i) {
-    const std::complex<double> q2 = basefunctions(i, 0);
-    const std::complex<double> q3 = basefunctions(i, 1);
-    xx += q2 * coefficients_(0, freq_idx, element_id, i);
-    xy += q3 * coefficients_(0, freq_idx, element_id, i);
-    yx += q2 * coefficients_(1, freq_idx, element_id, i);
-    yy += q3 * coefficients_(1, freq_idx, element_id, i);
-  }
-
-  return aocommon::MC2x2(xx, xy, yx, yy);
+  return response;
 }
 
 std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(

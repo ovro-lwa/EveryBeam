@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef EVERYBEAM_ANTENNA_H
@@ -12,6 +12,7 @@
 #include <aocommon/matrix2x2diag.h>
 
 #include "common/types.h"
+#include "elementresponse.h"
 
 namespace everybeam {
 
@@ -74,10 +75,9 @@ class Antenna {
     real_t freq0;         //!< %Antenna reference frequency (Hz).
     vector3r_t station0;  //!< Reference direction (ITRF, m)
     vector3r_t tile0;     //!< Tile beam former reference direction (ITRF, m).
-    bool
-        rotate;  //!< Boolean deciding if paralactic rotation should be applied.
-    vector3r_t east;   //!< Eastward pointing unit vector
-    vector3r_t north;  //!< Northward pointing unit vector
+    bool rotate;          //!< If paralactic rotation should be applied.
+    vector3r_t east;      //!< Eastward pointing unit vector
+    vector3r_t north;     //!< Northward pointing unit vector
   };
 
   /**
@@ -158,7 +158,8 @@ class Antenna {
    * @param direction Direction of arrival (ITRF, m).
    * @param options
    */
-  virtual aocommon::MC2x2 Response(real_t time, real_t freq,
+  virtual aocommon::MC2x2 Response(const ElementResponse& element_response,
+                                   real_t time, real_t freq,
                                    const vector3r_t& direction,
                                    const Options& options = {}) const {
     // Transform direction and directions in options to local coordinatesystem
@@ -170,7 +171,8 @@ class Antenna {
     local_options.rotate = options.rotate;
     local_options.east = TransformToLocalDirection(options.east);
     local_options.north = TransformToLocalDirection(options.north);
-    return LocalResponse(time, freq, local_direction, local_options);
+    return LocalResponse(element_response, time, freq, local_direction,
+                         local_options);
   }
 
   /**
@@ -201,7 +203,8 @@ class Antenna {
   vector3r_t TransformToLocalDirection(const vector3r_t& direction) const;
 
  private:
-  virtual aocommon::MC2x2 LocalResponse(real_t time, real_t freq,
+  virtual aocommon::MC2x2 LocalResponse(const ElementResponse& element_response,
+                                        real_t time, real_t freq,
                                         const vector3r_t& direction,
                                         const Options& options) const = 0;
 

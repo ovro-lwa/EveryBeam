@@ -1,12 +1,21 @@
-// Copyright (C) 2021 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "elementresponse.h"
-#include "options.h"
+// Note: ElementResponse::GetInstance is implemented in
+// elementresponsefactory.cc instead of in this file. Putting it in a separate
+// file removes dependencies on HamakerElementResponse::GetInstance,
+// OSKARElementResponseDipole::GetInstance, LOBESElementResponse::GetInstance
+// etc, which allows linking adding elementreponse.cc to libeverybeam-oskar,
+// which does not link without elementreponse.cc.
+// TODO (AST-1021): Find a better way of handling library dependencies.
 
-#include "hamaker/hamakerelementresponse.h"
-#include "oskar/oskarelementresponse.h"
-#include "lobes/lobeselementresponse.h"
+#include "elementresponse.h"
+
+#include <algorithm>
+
+#include "common/mathutils.h"
+
+#include "elementresponsefixeddirection.h"
 
 namespace everybeam {
 
@@ -64,34 +73,11 @@ std::ostream& operator<<(std::ostream& os, ElementResponseModel model) {
   return os;
 }
 
-std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
-    ElementResponseModel model, const std::string& name,
-    const Options& options) {
-  switch (model) {
-    case ElementResponseModel::kHamaker:
-      return HamakerElementResponse::GetInstance(name);
-    case ElementResponseModel::kHamakerLba:
-      return HamakerElementResponse::GetLbaInstance();
-    case ElementResponseModel::kOSKARDipole:
-      return OSKARElementResponseDipole::GetInstance();
-    case ElementResponseModel::kOSKARSphericalWave:
-      return OSKARElementResponseSphericalWave::GetInstance();
-    case ElementResponseModel::kLOBES:
-      try {
-        return LOBESElementResponse::GetInstance(name, options);
-      } catch (const std::runtime_error& e) {
-        std::cout << "Creating LOBESElementResponse for station " << name
-                  << " failed because: " << std::endl;
-        std::cout << e.what() << std::endl;
-        std::cout << "Switching to HamakerElementResponse instead" << std::endl;
-        return GetInstance(ElementResponseModel::kHamaker, name, options);
-      }
-    default:
-      std::stringstream message;
-      message << "The requested element response model '" << model
-              << "' is not implemented.";
-      throw std::runtime_error(message.str());
-  }
+std::shared_ptr<ElementResponse> ElementResponse::FixateDirection(
+    const vector3r_t& direction) const {
+  const vector2r_t thetaphi = cart2thetaphi(direction);
+  return std::make_shared<ElementResponseFixedDirection>(
+      shared_from_this(), thetaphi[0], thetaphi[1]);
 }
 
 }  // namespace everybeam
