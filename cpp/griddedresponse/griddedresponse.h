@@ -140,9 +140,10 @@ class GriddedResponse {
    * @param undersampling_factor Undersampling factor that was used in the
    * response calculation call.
    */
-  void UpsampleResponse(float* destination, size_t element_index,
-                        const std::vector<aocommon::HMC4x4>& undersampled_beam,
-                        size_t undersampling_factor);
+  static void UpsampleResponse(
+      float* destination, size_t element_index, size_t width, size_t height,
+      const std::vector<aocommon::HMC4x4>& undersampled_beam,
+      size_t undersampling_factor);
 
   std::size_t GetStationBufferSize(std::size_t nstations) const {
     return nstations * width_ * height_ * 4u;

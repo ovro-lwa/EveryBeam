@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE(undersampled) {
 
   for (size_t element_index = 0; element_index != 16; ++element_index) {
     std::vector<float> result(width * height);
-    grid_response->UpsampleResponse(result.data(), element_index, undersampled,
-                                    sampling_factor);
+    GriddedResponse::UpsampleResponse(result.data(), element_index, width,
+                                      height, undersampled, sampling_factor);
     for (size_t i = 0; i != result.size(); ++i) {
       BOOST_CHECK_EQUAL(result[i],
                         reference_data[i + element_index * width * height]);

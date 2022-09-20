@@ -129,14 +129,14 @@ void GriddedResponse::IntegratedResponse(
 }
 
 void GriddedResponse::UpsampleResponse(
-    float* destination, size_t element_index,
+    float* destination, size_t element_index, size_t width, size_t height,
     const std::vector<aocommon::HMC4x4>& undersampled_beam,
     size_t undersampling_factor) {
-  const size_t undersampled_width = width_ / undersampling_factor;
-  const size_t undersampled_height = height_ / undersampling_factor;
+  const size_t undersampled_width = width / undersampling_factor;
+  const size_t undersampled_height = height / undersampling_factor;
 
-  common::FFTResampler resampler(undersampled_width, undersampled_height,
-                                 width_, height_);
+  common::FFTResampler resampler(undersampled_width, undersampled_height, width,
+                                 height);
   resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
   UVector<float> lowres_input(undersampled_width * undersampled_height);
 
