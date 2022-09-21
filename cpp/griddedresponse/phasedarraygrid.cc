@@ -17,7 +17,7 @@ namespace griddedresponse {
 
 PhasedArrayGrid::PhasedArrayGrid(
     const telescope::Telescope* telescope_ptr,
-    const coords::CoordinateSystem& coordinate_system)
+    const aocommon::CoordinateSystem& coordinate_system)
     : GriddedResponse(telescope_ptr, coordinate_system),
       PhasedArrayResponse(static_cast<const PhasedArray*>(telescope_ptr)) {
   // Compute and set number of threads
@@ -132,8 +132,8 @@ void PhasedArrayGrid::CalcThread(BeamMode beam_mode, bool apply_normalisation,
       double l, m, n;
       aocommon::ImageCoordinates::XYToLM(x, job.y, dl_, dm_, width_, height_, l,
                                          m);
-      l += phase_centre_dl_;
-      m += phase_centre_dm_;
+      l += l_shift_;
+      m += m_shift_;
       const double sqrt_term = 1.0 - l * l - m * m;
       if (sqrt_term >= 0.0) {
         n = std::sqrt(sqrt_term);

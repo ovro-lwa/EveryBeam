@@ -25,6 +25,7 @@
 #include <aocommon/matrix2x2.h>
 #include <aocommon/matrix2x2diag.h>
 
+using aocommon::CoordinateSystem;
 using everybeam::ATermSettings;
 using everybeam::BeamMode;
 using everybeam::BeamNormalisationMode;
@@ -36,7 +37,6 @@ using everybeam::Station;
 using everybeam::vector3r_t;
 using everybeam::aterms::ATermConfig;
 using everybeam::aterms::ParsetProvider;
-using everybeam::coords::CoordinateSystem;
 using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
@@ -93,8 +93,8 @@ struct HBAFixture {
     coord_system.dec = 0.8415521;
     coord_system.dl = 0.5 * M_PI / 180.;
     coord_system.dm = 0.5 * M_PI / 180.;
-    coord_system.phase_centre_dl = 0.;
-    coord_system.phase_centre_dm = 0.;
+    coord_system.l_shift = 0.;
+    coord_system.m_shift = 0.;
     grid_response = telescope->GetGriddedResponse(coord_system);
     point_response = telescope->GetPointResponse(time);
   }
@@ -103,7 +103,7 @@ struct HBAFixture {
   std::unique_ptr<Telescope> telescope;
   std::unique_ptr<GriddedResponse> grid_response;
   std::unique_ptr<PointResponse> point_response;
-  CoordinateSystem coord_system;
+  aocommon::CoordinateSystem coord_system;
 
   casacore::MeasurementSet ms;
   double time;
@@ -453,8 +453,8 @@ BOOST_AUTO_TEST_CASE(integrated_beam) {
                                       coord_system.dec,
                                       (0.25 * M_PI / 180.),
                                       (0.25 * M_PI / 180.),
-                                      coord_system.phase_centre_dl,
-                                      coord_system.phase_centre_dm};
+                                      coord_system.l_shift,
+                                      coord_system.m_shift};
 
   std::unique_ptr<GriddedResponse> grid_response_pb =
       telescope->GetGriddedResponse(coord_system_pb);

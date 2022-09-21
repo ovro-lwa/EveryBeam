@@ -10,11 +10,6 @@
 namespace everybeam {
 namespace coords {
 
-struct CoordinateSystem {
-  std::size_t width, height;
-  double ra, dec, dl, dm, phase_centre_dl, phase_centre_dm;
-};
-
 /**
  * @brief Convert Casacore itrfDir to vector3r_t
  *

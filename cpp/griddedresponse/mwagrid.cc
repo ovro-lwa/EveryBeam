@@ -46,8 +46,8 @@ void MWAGrid::Response(BeamMode /* beam_mode */, std::complex<float>* buffer,
     for (size_t x = 0; x != width_; ++x) {
       double l, m, ra, dec;
       aocommon::ImageCoordinates::XYToLM(x, y, dl_, dm_, width_, height_, l, m);
-      l += phase_centre_dl_;
-      m += phase_centre_dm_;
+      l += l_shift_;
+      m += m_shift_;
       aocommon::ImageCoordinates::LMToRaDec(l, m, ra_, dec_, ra, dec);
 
       aocommon::MC2x2 gain;

@@ -11,13 +11,14 @@
 #include "./../coords/itrfconverter.h"
 #include "../beammode.h"
 
-#include <aocommon/hmatrix4x4.h>
-
 #include <memory>
 #include <vector>
 #include <thread>
 
 #include <casacore/measures/Measures/MDirection.h>
+
+#include <aocommon/hmatrix4x4.h>
+#include <aocommon/coordinatesystem.h>
 
 namespace everybeam {
 
@@ -164,12 +165,9 @@ class GriddedResponse {
  protected:
   /**
    * @brief Construct a new Gridded Response object
-   *
-   * @param telescope_ptr Pointer to telescope::Telescope object
-   * @param coordinate_system CoordinateSystem struct
    */
   GriddedResponse(const telescope::Telescope* telescope_ptr,
-                  const coords::CoordinateSystem& coordinate_system)
+                  const aocommon::CoordinateSystem& coordinate_system)
       : telescope_(telescope_ptr),
         width_(coordinate_system.width),
         height_(coordinate_system.height),
@@ -177,8 +175,8 @@ class GriddedResponse {
         dec_(coordinate_system.dec),
         dl_(coordinate_system.dl),
         dm_(coordinate_system.dm),
-        phase_centre_dl_(coordinate_system.phase_centre_dl),
-        phase_centre_dm_(coordinate_system.phase_centre_dm){};
+        l_shift_(coordinate_system.l_shift),
+        m_shift_(coordinate_system.m_shift){};
 
   static void DoFFTResampling(float* destination, int width_in, int height_in,
                               int width_out, int height_out,
@@ -186,7 +184,7 @@ class GriddedResponse {
 
   const telescope::Telescope* telescope_;
   size_t width_, height_;
-  double ra_, dec_, dl_, dm_, phase_centre_dl_, phase_centre_dm_;
+  double ra_, dec_, dl_, dm_, l_shift_, m_shift_;
 
  private:
   /**

@@ -13,7 +13,7 @@ namespace aterms {
 
 EveryBeamATerm::EveryBeamATerm(
     const casacore::MeasurementSet& ms,
-    const coords::CoordinateSystem& coordinate_system, const Options& options)
+    const aocommon::CoordinateSystem& coordinate_system, const Options& options)
     : telescope_(Load(ms, options)),
       coordinate_system_(coordinate_system),
       beam_mode_(options.beam_mode) {}

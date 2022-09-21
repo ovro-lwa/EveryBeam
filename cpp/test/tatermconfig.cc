@@ -134,8 +134,7 @@ void GenerateAterms(const casacore::MeasurementSet& ms,
                     std::vector<std::complex<float>>& aterm_buffer,
                     double start_time, double time_step, double start_frequency,
                     double frequency_step, size_t n_antennas, size_t n_channels,
-                    size_t n_times,
-                    everybeam::coords::CoordinateSystem system) {
+                    size_t n_times, aocommon::CoordinateSystem system) {
   everybeam::ATermSettings aterm_settings;
   bool is_updated = false;
   ATermConfig aterm(n_antennas, system, aterm_settings);
@@ -201,7 +200,7 @@ BOOST_AUTO_TEST_CASE(combine_aterms) {
              boost::test_tools::tolerance(0.001));
 
   // Initialize coordinate system
-  const everybeam::coords::CoordinateSystem coord_system = {
+  const aocommon::CoordinateSystem coord_system = {
       screen_width, screen_height, ra, dec, dl, dm, -0.5 * dl, -0.5 * dm};
 
   // Create parset providers
@@ -276,8 +275,8 @@ BOOST_AUTO_TEST_CASE(fourierfit) {
   const double dm = 3.5 * M_PI / 180. / height;
 
   // Initialize coordinate system
-  const everybeam::coords::CoordinateSystem coord_system = {
-      width, height, ra, dec, dl, dm, 0., 0.};
+  const aocommon::CoordinateSystem coord_system = {width, height, ra, dec,
+                                                   dl,    dm,     0., 0.};
 
   // Create parset providers
   const MockParsetProvider provider_fourierfit(false, false, true, false);

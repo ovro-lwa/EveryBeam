@@ -25,7 +25,7 @@
 #include <aocommon/matrix2x2.h>
 #include <aocommon/matrix2x2diag.h>
 
-using everybeam::coords::CoordinateSystem;
+using aocommon::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE(undersampled) {
   coord_system.dec = 0.8415521;
   coord_system.dl = 0.05 * M_PI / 180.0;
   coord_system.dm = 0.05 * M_PI / 180.0;
-  coord_system.phase_centre_dl = 0.0;
-  coord_system.phase_centre_dm = 0.0;
+  coord_system.l_shift = 0.0;
+  coord_system.m_shift = 0.0;
 
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);

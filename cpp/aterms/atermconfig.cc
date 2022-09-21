@@ -27,8 +27,8 @@
 
 #include <algorithm>
 
+using aocommon::CoordinateSystem;
 using everybeam::ATermSettings;
-using everybeam::coords::CoordinateSystem;
 
 namespace everybeam {
 namespace aterms {

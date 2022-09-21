@@ -21,13 +21,13 @@
 
 #include "../oskar/oskarelementresponse.h"
 
+using aocommon::CoordinateSystem;
 using everybeam::BeamMode;
 using everybeam::BeamNormalisationMode;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::Options;
 using everybeam::Station;
-using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::OSKARGrid;
 using everybeam::pointresponse::OSKARPoint;
@@ -66,15 +66,15 @@ BOOST_AUTO_TEST_CASE(load_oskar) {
   std::size_t width(16), height(16);
   double dl(0.5 * M_PI / 180.), dm(0.5 * M_PI / 180.), shift_l(0.), shift_m(0.);
 
-  CoordinateSystem coord_system;
+  aocommon::CoordinateSystem coord_system;
   coord_system.width = width;
   coord_system.height = height;
   coord_system.ra = ra;
   coord_system.dec = dec;
   coord_system.dl = dl;
   coord_system.dm = dm;
-  coord_system.phase_centre_dl = shift_l;
-  coord_system.phase_centre_dm = shift_m;
+  coord_system.l_shift = shift_l;
+  coord_system.m_shift = shift_m;
 
   // Get GriddedResponse pointer
   std::unique_ptr<GriddedResponse> grid_response =
@@ -185,8 +185,8 @@ BOOST_AUTO_TEST_CASE(beam_normalisations) {
   coord_system.dec = dec;
   coord_system.dl = dl;
   coord_system.dm = dm;
-  coord_system.phase_centre_dl = shift_l;
-  coord_system.phase_centre_dm = shift_m;
+  coord_system.l_shift = shift_l;
+  coord_system.m_shift = shift_m;
 
   // Get GriddedResponse pointer
   std::unique_ptr<GriddedResponse> grid_response =

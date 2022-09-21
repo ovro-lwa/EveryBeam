@@ -18,7 +18,7 @@ namespace aterms {
 class FitsATermBase : public ATermBase {
  public:
   FitsATermBase(size_t n_antennas,
-                const coords::CoordinateSystem& coordinate_system,
+                const aocommon::CoordinateSystem& coordinate_system,
                 size_t max_support);
   ~FitsATermBase() override;
 
@@ -64,7 +64,7 @@ class FitsATermBase : public ATermBase {
   size_t NAntennas() const { return n_antennas_; }
   size_t NFrequencies() const { return n_frequencies_; }
   const Timestep& GetTimestep(size_t index) const { return timesteps_[index]; }
-  const coords::CoordinateSystem GetCoordinateSystem() const {
+  const aocommon::CoordinateSystem GetCoordinateSystem() const {
     return coordinate_system_;
   }
 
@@ -75,7 +75,7 @@ class FitsATermBase : public ATermBase {
   double cur_frequency_;
   size_t n_frequencies_;
   const size_t n_antennas_;
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
   ATermResampler resampler_;
 };
 }  // namespace aterms

@@ -10,9 +10,9 @@
 namespace everybeam {
 namespace aterms {
 
-FitsATermBase::FitsATermBase(size_t n_antennas,
-                             const coords::CoordinateSystem& coordinate_system,
-                             size_t max_support)
+FitsATermBase::FitsATermBase(
+    size_t n_antennas, const aocommon::CoordinateSystem& coordinate_system,
+    size_t max_support)
     : cache_(n_antennas * 4 * coordinate_system.width *
              coordinate_system.height),
       cur_timeindex_(0),

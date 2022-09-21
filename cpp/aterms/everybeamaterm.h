@@ -5,8 +5,11 @@
 #define EVERYBEAM_ATERMS_EVERYBEAMATERMS_H_
 
 #include "atermbeam.h"
-#include "../coords/coordutils.h"
 #include "../beammode.h"
+
+#include <memory>
+
+#include <aocommon/coordinatesystem.h>
 
 namespace casacore {
 class MeasurementSet;
@@ -27,7 +30,7 @@ namespace aterms {
 class EveryBeamATerm final : public ATermBeam {
  public:
   EveryBeamATerm(const casacore::MeasurementSet& ms,
-                 const coords::CoordinateSystem& coordinate_system,
+                 const aocommon::CoordinateSystem& coordinate_system,
                  const everybeam::Options& settings);
 
  private:
@@ -43,7 +46,7 @@ class EveryBeamATerm final : public ATermBeam {
                      size_t fieldId) final override;
 
   std::unique_ptr<telescope::Telescope> telescope_;
-  coords::CoordinateSystem coordinate_system_;
+  aocommon::CoordinateSystem coordinate_system_;
   BeamMode beam_mode_;
 
   size_t cached_field_id;

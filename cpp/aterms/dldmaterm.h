@@ -13,7 +13,8 @@ namespace aterms {
 
 class DLDMATerm final : public FitsATermBase {
  public:
-  DLDMATerm(size_t n_antenna, const coords::CoordinateSystem& coordinate_system,
+  DLDMATerm(size_t n_antenna,
+            const aocommon::CoordinateSystem& coordinate_system,
             size_t max_support);
 
   void Open(const std::vector<std::string>& filenames);

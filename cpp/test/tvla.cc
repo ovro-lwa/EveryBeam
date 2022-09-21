@@ -15,9 +15,9 @@
 #include <complex>
 #include <cmath>
 
+using aocommon::CoordinateSystem;
 using everybeam::Load;
 using everybeam::Options;
-using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::DishGrid;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::pointresponse::DishPoint;
@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   coord_system.dec = dec;
   coord_system.dl = dl;
   coord_system.dm = dm;
-  coord_system.phase_centre_dl = shift_l;
-  coord_system.phase_centre_dm = shift_m;
+  coord_system.l_shift = shift_l;
+  coord_system.m_shift = shift_m;
   std::unique_ptr<GriddedResponse> grid_response =
       telescope->GetGriddedResponse(coord_system);
   BOOST_CHECK(nullptr != dynamic_cast<DishGrid*>(grid_response.get()));

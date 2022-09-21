@@ -4,10 +4,12 @@
 #ifndef EVERYBEAM_ATERMS_KL_FITTING_ATERM_H_
 #define EVERYBEAM_ATERMS_KL_FITTING_ATERM_H_
 
-#include <schaapcommon/h5parm/h5parm.h>
-
 #include "atermbase.h"
-#include "../coords/coordutils.h"
+
+#include <memory>
+
+#include <schaapcommon/h5parm/h5parm.h>
+#include <aocommon/coordinatesystem.h>
 
 namespace everybeam {
 namespace aterms {
@@ -21,7 +23,7 @@ class KlFitter;
 class KlFittingATerm final : public ATermBase {
  public:
   KlFittingATerm(const std::vector<std::string>& station_names_ms,
-                 const coords::CoordinateSystem& coordinate_system, int order,
+                 const aocommon::CoordinateSystem& coordinate_system, int order,
                  bool use_phasor_fit = true);
 
   // The destructor is declared here and defined in klfittingaterm.cc, to
@@ -69,7 +71,7 @@ class KlFittingATerm final : public ATermBase {
 
  private:
   std::vector<std::string> station_names_ms_;
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
   int order_;
   schaapcommon::h5parm::SolTab phase_soltab_;
   double update_interval_;

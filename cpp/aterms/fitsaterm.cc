@@ -6,7 +6,7 @@
 using everybeam::aterms::FitsATerm;
 
 FitsATerm::FitsATerm(size_t nAntenna,
-                     const coords::CoordinateSystem& coordinate_system,
+                     const aocommon::CoordinateSystem& coordinate_system,
                      size_t max_support)
     : FitsATermBase(nAntenna, coordinate_system, max_support) {}
 

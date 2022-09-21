@@ -13,11 +13,11 @@
 #include "../elementresponse.h"
 #include "../load.h"
 
+using aocommon::CoordinateSystem;
 using everybeam::BeamMode;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::Options;
-using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::AartfaacGrid;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::pointresponse::AartfaacPoint;

@@ -19,7 +19,7 @@ namespace griddedresponse {
 class DishGrid : public GriddedResponse {
  public:
   DishGrid(const telescope::Telescope* telescope_ptr,
-           const coords::CoordinateSystem coordinate_system)
+           const aocommon::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 
   void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,

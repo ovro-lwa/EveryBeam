@@ -19,12 +19,12 @@
 
 #include <aocommon/matrix2x2.h>
 
+using aocommon::CoordinateSystem;
 using everybeam::ElementResponseModel;
 using everybeam::Load;
 using everybeam::Options;
 using everybeam::Station;
 using everybeam::vector3r_t;
-using everybeam::coords::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::telescope::LOFAR;

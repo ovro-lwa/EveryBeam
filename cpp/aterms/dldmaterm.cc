@@ -10,7 +10,7 @@ namespace everybeam {
 namespace aterms {
 
 DLDMATerm::DLDMATerm(size_t n_antennas,
-                     const coords::CoordinateSystem& coordinate_system,
+                     const aocommon::CoordinateSystem& coordinate_system,
                      size_t max_support)
     : FitsATermBase(n_antennas, coordinate_system, max_support),
       update_interval_(60),
@@ -92,13 +92,13 @@ void DLDMATerm::EvaluateDLDM(std::complex<float>* dest, const float* dl,
   const double u = uvw_in_l[0];
   const double v = uvw_in_l[1];
   const double w = uvw_in_l[2];
-  const coords::CoordinateSystem& cs = GetCoordinateSystem();
+  const aocommon::CoordinateSystem& cs = GetCoordinateSystem();
   for (size_t y = 0; y != Height(); ++y) {
     for (size_t x = 0; x != Width(); ++x) {
       double l, m;
       ImageCoordinates::XYToLM(x, y, cs.dl, cs.dm, cs.width, cs.height, l, m);
-      l += cs.phase_centre_dl;
-      m += cs.phase_centre_dm;
+      l += cs.l_shift;
+      m += cs.m_shift;
       const double lproj = l + (*dl);
       const double mproj = m + (*dm);
       const double lm_sq = l * l + m * m;

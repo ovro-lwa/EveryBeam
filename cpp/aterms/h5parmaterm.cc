@@ -14,7 +14,7 @@ namespace everybeam {
 namespace aterms {
 
 H5ParmATerm::H5ParmATerm(const std::vector<std::string>& station_names_ms,
-                         const coords::CoordinateSystem& coordinate_system)
+                         const aocommon::CoordinateSystem& coordinate_system)
     : station_names_ms_(station_names_ms),
       coordinate_system_(coordinate_system),
       update_interval_(0),
@@ -109,8 +109,8 @@ bool H5ParmATerm::Calculate(std::complex<float>* buffer, double time,
             x, y, coordinate_system_.dl, coordinate_system_.dm,
             coordinate_system_.width, coordinate_system_.height, l, m);
 
-        l += coordinate_system_.phase_centre_dl;
-        m += coordinate_system_.phase_centre_dm;
+        l += coordinate_system_.l_shift;
+        m += coordinate_system_.m_shift;
 
         const size_t offset = station_offset + y * coordinate_system_.width + x;
         const std::complex<float> output =

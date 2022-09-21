@@ -13,8 +13,8 @@
 
 #include <aocommon/fits/fitsreader.h>
 
+using aocommon::CoordinateSystem;
 using everybeam::aterms::KlFittingATerm;
-using everybeam::coords::CoordinateSystem;
 
 BOOST_AUTO_TEST_SUITE(klfittingaterm)
 

@@ -31,7 +31,7 @@ Dish::Dish(const casacore::MeasurementSet& ms,
 }
 
 std::unique_ptr<GriddedResponse> Dish::GetGriddedResponse(
-    const coords::CoordinateSystem& coordinate_system) const {
+    const aocommon::CoordinateSystem& coordinate_system) const {
   return std::make_unique<DishGrid>(this, coordinate_system);
 }
 

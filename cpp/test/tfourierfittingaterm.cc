@@ -13,8 +13,8 @@
 #include <complex>
 #include <math.h>
 
+using aocommon::CoordinateSystem;
 using everybeam::aterms::FourierFittingATerm;
-using everybeam::coords::CoordinateSystem;
 
 BOOST_AUTO_TEST_SUITE(tfourierfittingaterm)
 

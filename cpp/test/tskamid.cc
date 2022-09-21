@@ -14,7 +14,7 @@
 
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
 
-using everybeam::coords::CoordinateSystem;
+using aocommon::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::SkaMidGrid;
 using everybeam::pointresponse::PointResponse;

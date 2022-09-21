@@ -13,6 +13,7 @@
 #include <cassert>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/ms/MeasurementSets/MSAntennaColumns.h>
+#include <aocommon/coordinatesystem.h>
 
 namespace everybeam {
 
@@ -22,10 +23,6 @@ class GriddedResponse;
 
 namespace pointresponse {
 class PointResponse;
-}
-
-namespace coords {
-struct CoordinateSystem;
 }
 
 namespace telescope {
@@ -45,7 +42,7 @@ class Telescope {
    * @return GriddedResponse::Ptr
    */
   virtual std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem& coordinate_system) const = 0;
+      const aocommon::CoordinateSystem& coordinate_system) const = 0;
 
   /**
    * @brief Get the Point Response object

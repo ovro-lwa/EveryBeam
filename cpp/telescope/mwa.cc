@@ -37,7 +37,7 @@ MWA::MWA(const casacore::MeasurementSet& ms, const Options& options)
 }
 
 std::unique_ptr<GriddedResponse> MWA::GetGriddedResponse(
-    const coords::CoordinateSystem& coordinate_system) const {
+    const aocommon::CoordinateSystem& coordinate_system) const {
   return std::make_unique<MWAGrid>(this, coordinate_system);
 }
 

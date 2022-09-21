@@ -17,7 +17,7 @@ namespace aterms {
 
 FourierFittingATerm::FourierFittingATerm(
     const std::vector<std::string>& station_names_ms,
-    const coords::CoordinateSystem& coordinate_system, int support)
+    const aocommon::CoordinateSystem& coordinate_system, int support)
     : fourier_fitter_(),
       station_names_ms_(station_names_ms),
       coordinate_system_(coordinate_system),

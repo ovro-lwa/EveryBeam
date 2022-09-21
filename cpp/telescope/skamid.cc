@@ -36,7 +36,7 @@ SkaMid::SkaMid(const casacore::MeasurementSet& ms, const Options& options)
 }
 
 std::unique_ptr<griddedresponse::GriddedResponse> SkaMid::GetGriddedResponse(
-    const coords::CoordinateSystem& coordinate_system) const {
+    const aocommon::CoordinateSystem& coordinate_system) const {
   return std::make_unique<griddedresponse::SkaMidGrid>(this, coordinate_system,
                                                        element_response_model_);
 }

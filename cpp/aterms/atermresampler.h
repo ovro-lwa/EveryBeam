@@ -6,8 +6,7 @@
 
 #include "atermbase.h"
 
-#include "../coords/coordutils.h"
-
+#include <aocommon/coordinatesystem.h>
 #include <aocommon/uvector.h>
 #include <aocommon/windowfunction.h>
 
@@ -25,7 +24,7 @@ namespace aterms {
 
 class ATermResampler {
  public:
-  ATermResampler(const coords::CoordinateSystem& coordinate_system,
+  ATermResampler(const aocommon::CoordinateSystem& coordinate_system,
                  size_t max_support);
   ~ATermResampler();
 
@@ -63,7 +62,7 @@ class ATermResampler {
   void regrid(const aocommon::FitsReader& reader, float* dest,
               const float* source, double stretch_factor);
 
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
   size_t allocated_width_;
   size_t allocated_height_;
   std::unique_ptr<common::FFTResampler> resampler_;

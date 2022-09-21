@@ -57,7 +57,7 @@ OSKAR::OSKAR(const MeasurementSet& ms, const Options& options)
 }
 
 std::unique_ptr<GriddedResponse> OSKAR::GetGriddedResponse(
-    const coords::CoordinateSystem& coordinate_system) const {
+    const aocommon::CoordinateSystem& coordinate_system) const {
   return std::make_unique<OSKARGrid>(this, coordinate_system);
 }
 

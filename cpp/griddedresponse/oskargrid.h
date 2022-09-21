@@ -25,7 +25,7 @@ class OSKARGrid final : public PhasedArrayGrid {
    * @param coordinate_system CoordinateSystem struct
    */
   OSKARGrid(const telescope::Telescope* telescope_ptr,
-            const coords::CoordinateSystem& coordinate_system)
+            const aocommon::CoordinateSystem& coordinate_system)
       : PhasedArrayGrid(telescope_ptr, coordinate_system) {
     // NOTE: for OSKAR, it always holds that:
     use_channel_frequency_ = true;

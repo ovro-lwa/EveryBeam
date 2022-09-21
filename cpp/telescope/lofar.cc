@@ -124,7 +124,7 @@ LOFAR::LOFAR(const casacore::MeasurementSet& ms, const Options& options)
 }
 
 std::unique_ptr<GriddedResponse> LOFAR::GetGriddedResponse(
-    const coords::CoordinateSystem& coordinate_system) const {
+    const aocommon::CoordinateSystem& coordinate_system) const {
   if (is_aartfaac_) {
     return std::make_unique<AartfaacGrid>(this, coordinate_system);
   } else {

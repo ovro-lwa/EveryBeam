@@ -23,7 +23,7 @@ namespace aterms {
 class FitsATerm final : public FitsATermBase {
  public:
   FitsATerm(size_t n_antennas,
-            const coords::CoordinateSystem& coordinate_system,
+            const aocommon::CoordinateSystem& coordinate_system,
             size_t max_support);
   ~FitsATerm() override;
 

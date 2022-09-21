@@ -12,7 +12,10 @@
 #include "common/mathutils.h"
 #include "coords/coordutils.h"
 
+#include <aocommon/coordinatesystem.h>
+
 namespace py = pybind11;
+using aocommon::CoordinateSystem;
 using everybeam::BeamMode;
 using everybeam::BeamNormalisationMode;
 using everybeam::cart2thetaphi;
@@ -22,7 +25,6 @@ using everybeam::ParseBeamNormalisationMode;
 using everybeam::thetaphi2cart;
 using everybeam::vector2r_t;
 using everybeam::vector3r_t;
-using everybeam::coords::CoordinateSystem;
 
 namespace {
 // Convert pyarray of size 3 to vector3r_t
@@ -124,11 +126,11 @@ void init_utils(py::module& m) {
         double: Grid spacing in Dec direction [rad], where
         dm is the direction cosine of the delta declination.
        )pbdoc")
-      .def_readwrite("l_shift", &CoordinateSystem::phase_centre_dl,
+      .def_readwrite("l_shift", &CoordinateSystem::l_shift,
                      R"pbdoc(
         double: Shift in l from pointing direction to grid center [rad].
        )pbdoc")
-      .def_readwrite("m_shift", &CoordinateSystem::phase_centre_dm,
+      .def_readwrite("m_shift", &CoordinateSystem::m_shift,
                      R"pbdoc(
         double: Shift in m from pointing direction to grid center [rad].
        )pbdoc");

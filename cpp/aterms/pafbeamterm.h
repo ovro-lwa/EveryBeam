@@ -21,7 +21,7 @@ namespace aterms {
  */
 class PAFBeamTerm final : public ATermBase {
  public:
-  PAFBeamTerm(const coords::CoordinateSystem& coordinate_system,
+  PAFBeamTerm(const aocommon::CoordinateSystem& coordinate_system,
               size_t max_support);
 
   bool Calculate(std::complex<float>* buffer, double time, double frequency,
@@ -54,7 +54,7 @@ class PAFBeamTerm final : public ATermBase {
 
  private:
   std::vector<aocommon::FitsReader> readers_;
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
   ATermResampler resampler_;
   size_t n_antennas_;
   size_t n_frequencies_;

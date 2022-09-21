@@ -37,7 +37,7 @@ class MWA final : public Telescope {
   MWA(const casacore::MeasurementSet& ms, const Options& options);
 
   std::unique_ptr<griddedresponse::GriddedResponse> GetGriddedResponse(
-      const coords::CoordinateSystem& coordinate_system) const override;
+      const aocommon::CoordinateSystem& coordinate_system) const override;
 
   std::unique_ptr<pointresponse::PointResponse> GetPointResponse(
       double time) const override;

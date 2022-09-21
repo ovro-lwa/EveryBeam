@@ -6,12 +6,13 @@
 
 #include "atermbase.h"
 #include "atermbeam.h"
-#include "../coords/coordutils.h"
 #include "../options.h"
 
-#include <aocommon/uvector.h>
 #include <string>
 #include <vector>
+
+#include <aocommon/coordinatesystem.h>
+#include <aocommon/uvector.h>
 
 namespace casacore {
 class MeasurementSet;
@@ -25,7 +26,7 @@ class ParsetProvider;
 class ATermConfig final : public ATermBase {
  public:
   ATermConfig(size_t n_antennas,
-              const coords::CoordinateSystem& coordinate_system,
+              const aocommon::CoordinateSystem& coordinate_system,
               const everybeam::ATermSettings& settings)
       : n_antennas_(n_antennas),
         coordinate_system_(coordinate_system),
@@ -70,7 +71,7 @@ class ATermConfig final : public ATermBase {
    */
   static std::unique_ptr<ATermBeam> GetATermBeam(
       const casacore::MeasurementSet& ms,
-      const coords::CoordinateSystem& coordinate_system,
+      const aocommon::CoordinateSystem& coordinate_system,
       const ATermSettings& settings, bool frequency_interpolation,
       const std::string& beam_normalisation_mode, bool use_channel_frequency,
       const std::string& element_response_model,
@@ -97,7 +98,7 @@ class ATermConfig final : public ATermBase {
 
  private:
   const size_t n_antennas_;
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
   const ATermSettings settings_;
   std::vector<std::unique_ptr<ATermBase>> aterms_;
   std::vector<aocommon::UVector<std::complex<float>>> previous_aterm_values_;

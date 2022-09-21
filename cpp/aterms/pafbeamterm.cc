@@ -10,7 +10,7 @@
 namespace everybeam {
 namespace aterms {
 
-PAFBeamTerm::PAFBeamTerm(const coords::CoordinateSystem& coordinate_system,
+PAFBeamTerm::PAFBeamTerm(const aocommon::CoordinateSystem& coordinate_system,
                          size_t max_support)
     : coordinate_system_(coordinate_system),
       resampler_(coordinate_system, max_support),

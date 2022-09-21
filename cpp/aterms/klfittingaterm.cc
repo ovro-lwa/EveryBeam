@@ -16,7 +16,7 @@ namespace aterms {
 
 KlFittingATerm::KlFittingATerm(
     const std::vector<std::string>& station_names_ms,
-    const coords::CoordinateSystem& coordinate_system, int order,
+    const aocommon::CoordinateSystem& coordinate_system, int order,
     bool use_phasor_fit)
     : station_names_ms_(station_names_ms),
       coordinate_system_(coordinate_system),
@@ -72,8 +72,8 @@ void KlFittingATerm::Open(const std::string& filename) {
                                           float(coordinate_system_.dec), l, m);
     float x, y;
     aocommon::ImageCoordinates::LMToXYfloat(
-        float(l - coordinate_system_.phase_centre_dl),
-        float(m - coordinate_system_.phase_centre_dm),
+        float(l - coordinate_system_.l_shift),
+        float(m - coordinate_system_.m_shift),
         -float(coordinate_system_
                    .dl),  // LMToXYfloat already applies a minus sign to the
                           // l-axis. For the usual l,m coordinate system, dl is

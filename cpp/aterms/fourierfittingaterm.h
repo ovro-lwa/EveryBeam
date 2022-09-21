@@ -9,13 +9,13 @@
 #include <memory>
 #include <vector>
 
+#include <aocommon/coordinatesystem.h>
 #include <aocommon/uvector.h>
 #include <schaapcommon/h5parm/h5parm.h>
 #include <numeric>
 
 #include "atermbase.h"
 #include "cache.h"
-#include "../coords/coordutils.h"
 
 namespace everybeam {
 namespace aterms {
@@ -38,7 +38,7 @@ class FourierFittingATerm final : public ATermBase {
    * @param support support of the aterm in the Fourier domain
    */
   FourierFittingATerm(const std::vector<std::string>& station_names_ms,
-                      const coords::CoordinateSystem& coordinate_system,
+                      const aocommon::CoordinateSystem& coordinate_system,
                       int support);
 
   // The destructor is declared here and defined in fourierfittingaterm.cc, to
@@ -87,7 +87,7 @@ class FourierFittingATerm final : public ATermBase {
  private:
   std::unique_ptr<FourierFitter> fourier_fitter_;
   const std::vector<std::string> station_names_ms_;
-  const coords::CoordinateSystem coordinate_system_;
+  const aocommon::CoordinateSystem coordinate_system_;
 
   schaapcommon::h5parm::SolTab phase_soltab_;
   int support_;

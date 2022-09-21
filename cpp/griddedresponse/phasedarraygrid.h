@@ -21,7 +21,7 @@ namespace griddedresponse {
 class PhasedArrayGrid : public GriddedResponse, protected PhasedArrayResponse {
  public:
   PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
-                  const coords::CoordinateSystem& coordinate_system);
+                  const aocommon::CoordinateSystem& coordinate_system);
 
   void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
                 double frequency, size_t station_idx,

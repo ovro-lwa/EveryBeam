@@ -26,11 +26,11 @@ namespace py = pybind11;
 
 using casacore::MeasurementSet;
 
+using aocommon::CoordinateSystem;
 using everybeam::BeamMode;
 using everybeam::BeamNormalisationMode;
 using everybeam::Options;
 using everybeam::vector3r_t;
-using everybeam::coords::CoordinateSystem;
 using everybeam::coords::ITRFConverter;
 using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;

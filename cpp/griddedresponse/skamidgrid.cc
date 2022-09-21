@@ -12,7 +12,7 @@ namespace everybeam {
 namespace griddedresponse {
 
 SkaMidGrid::SkaMidGrid(const telescope::Telescope* telescope_ptr,
-                       const coords::CoordinateSystem coordinate_system,
+                       const aocommon::CoordinateSystem coordinate_system,
                        ElementResponseModel element_response_model)
     : DishGrid(telescope_ptr, coordinate_system),
       element_response_model_(element_response_model) {
@@ -41,8 +41,7 @@ void SkaMidGrid::Response([[maybe_unused]] BeamMode beam_mode,
   double pdir_dec;
   std::tie(pdir_ra, pdir_dec) = ska_mid_telescope.GetFieldPointing()[field_id];
   ska_mid_response_->Render(buffer, width_, height_, dl_, dm_, ra_, dec_,
-                            pdir_ra, pdir_dec, phase_centre_dl_,
-                            phase_centre_dm_, frequency);
+                            pdir_ra, pdir_dec, l_shift_, m_shift_, frequency);
 }
 
 }  // namespace griddedresponse

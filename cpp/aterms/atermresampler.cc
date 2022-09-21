@@ -14,7 +14,7 @@ namespace everybeam {
 namespace aterms {
 
 ATermResampler::ATermResampler(
-    const coords::CoordinateSystem& coordinate_system, size_t max_support)
+    const aocommon::CoordinateSystem& coordinate_system, size_t max_support)
     : coordinate_system_(coordinate_system),
       allocated_width_(max_support),
       allocated_height_(max_support),
@@ -106,8 +106,8 @@ void ATermResampler::regrid(const aocommon::FitsReader& reader, float* dest,
       double l, m;
       ImageCoordinates::XYToLM(x, y, aterm_dl, aterm_dm, out_width, out_width,
                                l, m);
-      l += coordinate_system_.phase_centre_dl;
-      m += coordinate_system_.phase_centre_dm;
+      l += coordinate_system_.l_shift;
+      m += coordinate_system_.m_shift;
       if (!same_plane) {
         double pixra, pixdec;
         ImageCoordinates::LMToRaDec(l, m, coordinate_system_.ra,

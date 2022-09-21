@@ -39,7 +39,7 @@ void DishGrid::Response([[maybe_unused]] BeamMode beam_mode,
       dish_telescope.GetDishCoefficients()->GetCoefficients(frequency);
   vp.EvaluatePolynomial(coefs_vec, false);
   vp.Render(buffer, width_, height_, dl_, dm_, ra_, dec_, pdir_ra, pdir_dec,
-            phase_centre_dl_, phase_centre_dm_, frequency);
+            l_shift_, m_shift_, frequency);
 }
 
 void DishGrid::ResponseAllStations(BeamMode beam_mode,

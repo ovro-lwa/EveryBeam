@@ -20,7 +20,7 @@ namespace griddedresponse {
 class SkaMidGrid final : public DishGrid {
  public:
   SkaMidGrid(const telescope::Telescope* telescope_ptr,
-             const coords::CoordinateSystem coordinate_system,
+             const aocommon::CoordinateSystem coordinate_system,
              ElementResponseModel element_response_model);
 
   void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
