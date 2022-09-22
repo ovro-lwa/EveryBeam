@@ -61,7 +61,7 @@ void InitElementResponse(py::module& m) {
       m, "ElementResponse")
       .def_static(
           "create",
-          [](const ElementResponseModel model, const std::string& name = "") {
+          [](const ElementResponseModel model, const std::string& name) {
             return ElementResponse::GetInstance(model, name,
                                                 everybeam::Options());
           },
@@ -82,9 +82,8 @@ void InitElementResponse(py::module& m) {
           py::arg("model"), py::arg("name") = "")
       .def_static(
           "create",
-          [](const std::string& model,
-             const std::string& name) -> const ElementResponse& {
-            return *ElementResponse::GetInstance(
+          [](const std::string& model, const std::string& name) {
+            return ElementResponse::GetInstance(
                 everybeam::ElementResponseModelFromString(model), name,
                 everybeam::Options());
           },
