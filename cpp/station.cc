@@ -24,14 +24,6 @@ Station::Station(const std::string& name, const vector3r_t& position,
   ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
 }
 
-void Station::SetResponseModel(const ElementResponseModel model) {
-  element_response_.set(ElementResponse::GetInstance(model, name_, options_));
-}
-
-void Station::SetResponse(std::shared_ptr<ElementResponse> element_response) {
-  element_response_.set(element_response);
-}
-
 const std::string& Station::GetName() const { return name_; }
 
 const vector3r_t& Station::GetPosition() const { return position_; }

@@ -11,15 +11,9 @@
 
 #include <aocommon/matrix2x2.h>
 
-#include "common/mutable_ptr.h"
 #include "common/types.h"
 
 namespace everybeam {
-
-namespace common {
-template <typename T>
-class MutablePtr;
-}
 
 struct Options;
 
@@ -59,9 +53,6 @@ ElementResponseModel ElementResponseModelFromString(
 class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
  public:
   virtual ~ElementResponse() {}
-
-  typedef common::MutablePtr<ElementResponse>
-      Ptr;  //!< Pointer to ElementResponse object
 
   virtual ElementResponseModel GetModel() const = 0;
 

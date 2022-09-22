@@ -35,8 +35,6 @@ class Station {
   Station(const std::string& name, const vector3r_t& position,
           const Options& options = Options());
 
-  void SetResponse(std::shared_ptr<ElementResponse> element_response);
-
   //! Return the name of the station.
   const std::string& GetName() const;
 
@@ -262,7 +260,7 @@ class Station {
 
   //! Returns a pointer to the ElementResponse class
   std::shared_ptr<const ElementResponse> GetElementResponse() const {
-    return *element_response_.get();
+    return element_response_;
   }
 
   /**
@@ -310,8 +308,6 @@ class Station {
   std::shared_ptr<Antenna> GetAntenna() const { return antenna_; }
 
  private:
-  void SetResponseModel(const ElementResponseModel model);
-
   vector3r_t NCP(real_t time) const;
   vector3r_t NCPPol0(real_t time) const;
 
@@ -319,7 +315,7 @@ class Station {
   vector3r_t position_;
   Options options_;
   vector3r_t phase_reference_;
-  ElementResponse::Ptr element_response_;
+  std::shared_ptr<const ElementResponse> element_response_;
   // element_ either refers to antenna_ or an Element inside antenna_.
   // Besides Station, no one has (shared) ownership of antenna_.
   std::shared_ptr<Element> element_;
