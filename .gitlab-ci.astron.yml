@@ -9,7 +9,7 @@ include: .gitlab-ci.common.yml
 deploy-package-2204:
   stage: deploy
   needs: ["versioning","build-package-2204"]
-  image: $EVERYBEAM_IMAGE
+  image: $BASE_IMAGE_2204
   allow_failure: true
   variables:
     GIT_SUBMODULE_STRATEGY: normal
@@ -19,7 +19,7 @@ deploy-package-2204:
     - echo UPLOADING files $FILES
     # The following example command must be executed first or else the update will fail because there is no repository
     # create_repo.py -a amd64 -c testing -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap
-    - ../external/schaap-packaging/update_repo.py --cleanup -d bionic --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap ${FILES}
+    - ../external/schaap-packaging/update_repo.py --cleanup -d jammy --gpg-key ${GPG_KEY} --gpg-passphrase ${GPG_PASS} schaap ${FILES}
   rules:
     # Only deploy packages when building the default branch or a tag, or when UPLOAD_PACKAGE is set manually.
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
