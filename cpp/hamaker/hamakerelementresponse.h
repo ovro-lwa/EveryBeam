@@ -14,6 +14,8 @@ namespace everybeam {
 //! Implementation of the Hamaker response model
 class HamakerElementResponse : public ElementResponse {
  public:
+  explicit HamakerElementResponse(const std::string& name);
+
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kHamaker;
   }
@@ -26,29 +28,11 @@ class HamakerElementResponse : public ElementResponse {
    */
   static std::shared_ptr<HamakerElementResponse> GetLbaInstance();
 
-  /**
-   * @brief Get instance of HamakerElementResponse, infer type (LBA/HBA)
-   * from station name.
-   *
-   * @param name Station Name
-   */
-  static std::shared_ptr<HamakerElementResponse> GetInstance(
-      const std::string& name);
-
- protected:
-  std::string GetPath(const char*) const;
-
-  std::unique_ptr<HamakerCoefficients> coeffs_;
-};
-
-class HamakerElementResponseHBA : public HamakerElementResponse {
- public:
-  HamakerElementResponseHBA();
-};
-
-class HamakerElementResponseLBA : public HamakerElementResponse {
- public:
-  HamakerElementResponseLBA();
+ private:
+  // Since coefficients are equal for all LBA and HBA instances, share them.
+  static std::weak_ptr<const HamakerCoefficients> cached_lba_coefficients_;
+  static std::weak_ptr<const HamakerCoefficients> cached_hba_coefficients_;
+  std::shared_ptr<const HamakerCoefficients> coefficients_;
 };
 
 }  // namespace everybeam

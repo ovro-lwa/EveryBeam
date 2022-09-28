@@ -5,6 +5,7 @@
 #define EVERYBEAM_ELEMENTRESPONSE_H
 
 #include <complex>
+#include <filesystem>
 #include <memory>
 #include <ostream>
 #include <vector>
@@ -97,9 +98,18 @@ class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
     return Response(freq, theta, phi);
   }
 
-  static std::shared_ptr<ElementResponse> GetInstance(
+  static std::shared_ptr<const ElementResponse> GetInstance(
       ElementResponseModel model, const std::string& name,
       const Options& options);
+
+ protected:
+  /**
+   * Get the path to an EveryBeam data file or directory.
+   * @param relative_path A path relative to the EveryBeam data directory.
+   * @return The full path of the data file or data directory.
+   */
+  static std::filesystem::path GetPath(
+      const std::filesystem::path& relative_path);
 };
 }  // namespace everybeam
 #endif

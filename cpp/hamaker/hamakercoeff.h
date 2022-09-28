@@ -21,7 +21,7 @@ class HamakerCoefficients {
   HamakerCoefficients();
 
   //! Constructor for reading coeff from file
-  HamakerCoefficients(std::string& filename);
+  HamakerCoefficients(const std::string& filename);
 
   //! Constructor for writing coeff to file
   HamakerCoefficients(const double freq_center, const double freq_range,
@@ -60,19 +60,19 @@ class HamakerCoefficients {
 
   void GetCoefficient(
       unsigned int n, unsigned int t, unsigned int f,
-      std::pair<std::complex<double>, std::complex<double>>& value);
+      std::pair<std::complex<double>, std::complex<double>>& value) const;
 
   // HDF5 I/O
-  void ReadCoefficients(std::string& filename);
+  void ReadCoefficients(const std::string& filename);
 
-  void WriteCoefficients(std::string& filename);
+  void WriteCoefficients(const std::string& filename);
 
   // Debugging
   void PrintCoefficients();
 
  private:
   // Methods
-  size_t GetIndex(unsigned int n, unsigned int t, unsigned int f);
+  size_t GetIndex(unsigned int n, unsigned int t, unsigned int f) const;
 
   // Parameters
   double freq_center_;

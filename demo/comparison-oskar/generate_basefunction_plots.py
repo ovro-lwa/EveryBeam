@@ -90,7 +90,7 @@ for em_idx in range(2):
             )
 
         subprocess.check_call(
-            ["oskar_csv_to_hdf5.py", "telescope.tm", "oskar.h5"]
+            ["oskar_csv_to_hdf5.py", "telescope.tm", "oskar-comparison.h5"]
         )
         subprocess.check_call(["make_element_response_image", str(npixels)])
 

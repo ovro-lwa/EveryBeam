@@ -15,18 +15,18 @@
 
 namespace everybeam {
 
-std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
+std::shared_ptr<const ElementResponse> ElementResponse::GetInstance(
     ElementResponseModel model, const std::string& name,
     const Options& options) {
   switch (model) {
     case ElementResponseModel::kHamaker:
-      return HamakerElementResponse::GetInstance(name);
+      return std::make_shared<HamakerElementResponse>(name);
     case ElementResponseModel::kHamakerLba:
-      return HamakerElementResponse::GetLbaInstance();
+      return std::make_shared<HamakerElementResponse>("LBA");
     case ElementResponseModel::kOSKARDipole:
-      return OSKARElementResponseDipole::GetInstance();
+      return std::make_shared<OSKARElementResponseDipole>();
     case ElementResponseModel::kOSKARSphericalWave:
-      return OSKARElementResponseSphericalWave::GetInstance();
+      return std::make_shared<OSKARElementResponseSphericalWave>();
     case ElementResponseModel::kLOBES:
       try {
         return LOBESElementResponse::GetInstance(name, options);
@@ -35,7 +35,7 @@ std::shared_ptr<ElementResponse> ElementResponse::GetInstance(
                   << " failed because: " << std::endl;
         std::cout << e.what() << std::endl;
         std::cout << "Switching to HamakerElementResponse instead" << std::endl;
-        return GetInstance(ElementResponseModel::kHamaker, name, options);
+        return std::make_shared<HamakerElementResponse>(name);
       }
     default:
       std::stringstream message;

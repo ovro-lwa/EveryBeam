@@ -12,12 +12,12 @@ H5::CompType GetComplexDoubleType() {
 }
 
 size_t HamakerCoefficients::GetIndex(unsigned int n, unsigned int t,
-                                     unsigned int f) {
+                                     unsigned int f) const {
   return (n * nPowerTheta_ + t) * nPowerFreq_ * nInner_ + f * nInner_;
 }
 
 // Constructor for reading coeff from file
-HamakerCoefficients::HamakerCoefficients(std::string& filename) {
+HamakerCoefficients::HamakerCoefficients(const std::string& filename) {
   ReadCoefficients(filename);
 }
 
@@ -58,13 +58,13 @@ void HamakerCoefficients::SetCoefficients(
 
 void HamakerCoefficients::GetCoefficient(
     unsigned int n, unsigned int t, unsigned int f,
-    std::pair<std::complex<double>, std::complex<double>>& value) {
+    std::pair<std::complex<double>, std::complex<double>>& value) const {
   size_t index = GetIndex(n, t, f);
   value.first = coeff_[index];
   value.second = coeff_[index + 1];
 }
 
-void HamakerCoefficients::ReadCoefficients(std::string& filename) {
+void HamakerCoefficients::ReadCoefficients(const std::string& filename) {
   // Open file
   H5::H5File file(filename, H5F_ACC_RDONLY);
 
@@ -94,7 +94,7 @@ void HamakerCoefficients::ReadCoefficients(std::string& filename) {
   dataset.read(coeff_.data(), data_type, dataspace);
 }
 
-void HamakerCoefficients::WriteCoefficients(std::string& filename) {
+void HamakerCoefficients::WriteCoefficients(const std::string& filename) {
   // Open file
   H5::H5File file(filename, H5F_ACC_TRUNC);
 

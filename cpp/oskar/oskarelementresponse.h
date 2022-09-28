@@ -5,7 +5,6 @@
 #define OSKAR_ELEMENTRESPONSE_H
 
 #include "../elementresponse.h"
-#include "../common/singleton.h"
 
 #include "oskardatafile.h"
 
@@ -16,10 +15,6 @@ namespace everybeam {
 //! Implementation of the OSKAR dipole response model
 class OSKARElementResponseDipole : public ElementResponse {
  public:
-  static std::shared_ptr<OSKARElementResponseDipole> GetInstance() {
-    return common::Singleton<OSKARElementResponseDipole>::GetInstance();
-  }
-
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kOSKARDipole;
   }
@@ -31,24 +26,14 @@ class OSKARElementResponseDipole : public ElementResponse {
 //! Implementation of the OSKAR spherical wave response model
 class OSKARElementResponseSphericalWave : public ElementResponse {
  public:
-  /**
-   * A constructor-like static method to instantiate the class
-   *
-   * returns a globally shared instance of the class that is instantiated
-   * in the first call
-   */
-  static std::shared_ptr<OSKARElementResponseSphericalWave> GetInstance() {
-    return common::Singleton<OSKARElementResponseSphericalWave>::GetInstance();
-  }
-
   /** Constructor loading the default coefficients file */
   OSKARElementResponseSphericalWave();
 
-  /** Constructor loading a custom coefficients file
-   *
-   * @param path Path to the coefficients file to load
+  /**
+   * Constructor loading a custom coefficients file
+   * @param filename Filename of HDF5 file with coefficients.
    */
-  OSKARElementResponseSphericalWave(const std::string& path);
+  OSKARElementResponseSphericalWave(const std::string& filename);
 
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kOSKARSphericalWave;
@@ -60,10 +45,10 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
   aocommon::MC2x2 Response(int element_id, double freq, double theta,
                            double phi) const final override;
 
- protected:
-  std::string GetPath(const char*) const;
-
-  std::unique_ptr<Datafile> datafile_;
+ private:
+  // This weak pointer allows reusing the default coefficients.
+  static std::weak_ptr<Datafile> cached_datafile_;
+  std::shared_ptr<Datafile> datafile_;
 };
 
 }  // namespace everybeam

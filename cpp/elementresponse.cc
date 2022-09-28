@@ -13,6 +13,8 @@
 
 #include <algorithm>
 
+#include "config.h"
+
 #include "common/mathutils.h"
 
 #include "elementresponsefixeddirection.h"
@@ -78,6 +80,12 @@ std::shared_ptr<ElementResponse> ElementResponse::FixateDirection(
   const vector2r_t thetaphi = cart2thetaphi(direction);
   return std::make_shared<ElementResponseFixedDirection>(
       shared_from_this(), thetaphi[0], thetaphi[1]);
+}
+
+std::filesystem::path ElementResponse::GetPath(
+    const std::filesystem::path& relative_path) {
+  // TODO (AST-803) Allow specifying a different data directory at run time.
+  return std::filesystem::path(EVERYBEAM_DATA_DIR) / relative_path;
 }
 
 }  // namespace everybeam

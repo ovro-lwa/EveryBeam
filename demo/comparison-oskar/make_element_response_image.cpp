@@ -10,7 +10,8 @@
 #include "../../external/npy.hpp"  // to save arrays in numpy format
 
 int main(int argc, char** argv) {
-  everybeam::OSKARElementResponseSphericalWave element_response("oskar.h5");
+  everybeam::OSKARElementResponseSphericalWave element_response(
+      "oskar-comparison.h5");
   double freq = 50e6;
 
   int N;

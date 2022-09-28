@@ -71,27 +71,6 @@ static std::optional<AartfaacStation> GetAartfaacStation(
 
 namespace everybeam {
 
-namespace {
-/**
- * @brief Search for LOBES h5 coefficient file
- * on the suggested path \param search_path. Returns
- * an empty string if the file cannot be found.
- *
- * @param search_path Search path
- * @param station_name Station name, as read from MS
- * @return std::string Path to file or empty string if file cannot be found
- */
-std::filesystem::path FindCoeffFile(const std::string& search_path,
-                                    std::string_view station_name) {
-  const std::string station_file = "LOBES_" + std::string{station_name} + ".h5";
-  return search_path.empty()
-             ? std::filesystem::path(std::string{EVERYBEAM_DATA_DIR} +
-                                     std::string{"/lobes"}) /
-                   station_file
-             : std::filesystem::path(search_path) / station_file;
-}
-}  // namespace
-
 static const H5::CompType kH5Dcomplex = [] {
   const std::string REAL("r");
   const std::string IMAG("i");
@@ -163,8 +142,13 @@ LOBESElementResponse::LOBESElementResponse(const std::string& name,
   const std::optional<AartfaacStation> aartfaac_station =
       GetAartfaacStation(name, AartfaacElements::kInner);
 
-  std::filesystem::path coeff_file_path = FindCoeffFile(
-      options.coeff_path, aartfaac_station ? aartfaac_station->station : name);
+  const std::filesystem::path search_path =
+      options.coeff_path.empty() ? GetPath("lobes")
+                                 : std::filesystem::path(options.coeff_path);
+  const std::string_view station_name =
+      aartfaac_station ? aartfaac_station->station : name;
+  const std::string station_file = "LOBES_" + std::string(station_name) + ".h5";
+  const std::filesystem::path coeff_file_path = search_path / station_file;
   H5::H5File h5file;
 
   if (!std::filesystem::exists(coeff_file_path)) {
@@ -278,17 +262,28 @@ aocommon::MC2x2 LOBESElementResponse::Response(
   return response;
 }
 
-std::shared_ptr<LOBESElementResponse> LOBESElementResponse::GetInstance(
+std::shared_ptr<const LOBESElementResponse> LOBESElementResponse::GetInstance(
     const std::string& name, const Options& options) {
-  static std::map<std::string, std::shared_ptr<LOBESElementResponse>>
+  // Using a single LOBESElementResponse object for each name reduces memory
+  // usage since the coefficients are only loaded once.
+  // Using weak pointers in this map ensures that LOBESElementResponse objects,
+  // are deleted when they are no longer used, which saves memory.
+  static std::map<std::string, std::weak_ptr<const LOBESElementResponse>>
       name_response_map;
+  std::shared_ptr<const LOBESElementResponse> instance;
 
   auto entry = name_response_map.find(name);
   if (entry == name_response_map.end()) {
-    entry = name_response_map.insert(
-        entry, {name, std::make_shared<LOBESElementResponse>(name, options)});
+    instance = std::make_shared<const LOBESElementResponse>(name, options);
+    name_response_map.insert({name, instance});
+  } else {
+    instance = entry->second.lock();
+    if (!instance) {
+      instance = std::make_shared<const LOBESElementResponse>(name, options);
+      entry->second = instance;
+    }
   }
-  return entry->second;
+  return instance;
 }
 
 }  // namespace everybeam

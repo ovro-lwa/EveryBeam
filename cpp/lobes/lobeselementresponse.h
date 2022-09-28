@@ -68,9 +68,8 @@ class LOBESElementResponse : public ElementResponse {
    * @brief Create LOBESElementResponse
    *
    * @param name Station name, e.g. CS302LBA
-   * @return std::shared_ptr<LOBESElementResponse>
    */
-  static std::shared_ptr<LOBESElementResponse> GetInstance(
+  static std::shared_ptr<const LOBESElementResponse> GetInstance(
       const std::string& name, const Options& options);
 
   /**

@@ -28,15 +28,17 @@ aocommon::MC2x2 OSKARElementResponseDipole::Response(double freq, double theta,
   return response;
 }
 
-OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave() {
-  std::string path = GetPath("oskar.h5");
-  datafile_.reset(new Datafile(path));
+OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave()
+    : datafile_(cached_datafile_.lock()) {
+  if (!datafile_) {
+    datafile_ = std::make_shared<Datafile>(GetPath("oskar.h5"));
+    cached_datafile_ = datafile_;
+  }
 }
 
 OSKARElementResponseSphericalWave::OSKARElementResponseSphericalWave(
-    const std::string& path) {
-  datafile_.reset(new Datafile(path));
-}
+    const std::string& filename)
+    : datafile_(std::make_shared<Datafile>(filename)) {}
 
 aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(
     [[maybe_unused]] double freq, [[maybe_unused]] double theta,
@@ -76,12 +78,6 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
   return response;
 }
 
-std::string OSKARElementResponseSphericalWave::GetPath(
-    const char* filename) const {
-  std::stringstream ss;
-  ss << EVERYBEAM_DATA_DIR << "/";
-  ss << filename;
-  return ss.str();
-}
+std::weak_ptr<Datafile> OSKARElementResponseSphericalWave::cached_datafile_;
 
 }  // namespace everybeam

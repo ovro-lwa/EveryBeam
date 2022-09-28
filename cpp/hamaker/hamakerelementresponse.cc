@@ -10,35 +10,30 @@
 #include "config.h"
 
 #include "hamakerelementresponse.h"
-#include "../common/singleton.h"
 
 #include <aocommon/matrix2x2.h>
 
 namespace everybeam {
 
-std::shared_ptr<HamakerElementResponse>
-HamakerElementResponse::GetLbaInstance() {
-  return common::Singleton<HamakerElementResponseLBA>::GetInstance();
-}
-
-std::shared_ptr<HamakerElementResponse> HamakerElementResponse::GetInstance(
-    const std::string& name) {
+HamakerElementResponse::HamakerElementResponse(const std::string& name) {
   if (name.find("LBA") != std::string::npos) {
-    return common::Singleton<HamakerElementResponseLBA>::GetInstance();
+    coefficients_ = cached_lba_coefficients_.lock();
+    if (!coefficients_) {
+      const std::string path = GetPath("HamakerLBACoeff.h5");
+      coefficients_ = std::make_shared<HamakerCoefficients>(path);
+      cached_lba_coefficients_ = coefficients_;
+    }
+  } else if (name.find("HBA") != std::string::npos) {
+    coefficients_ = cached_hba_coefficients_.lock();
+    if (!coefficients_) {
+      const std::string path = GetPath("HamakerHBACoeff.h5");
+      coefficients_ = std::make_shared<HamakerCoefficients>(path);
+      cached_hba_coefficients_ = coefficients_;
+    }
+  } else {
+    throw std::invalid_argument(
+        "HamakerElementResponse: name should end in either 'LBA' or 'HBA'");
   }
-  if (name.find("HBA") != std::string::npos) {
-    return common::Singleton<HamakerElementResponseHBA>::GetInstance();
-  }
-  throw std::invalid_argument(
-      "HamakerElementResponse::GetInstance: name should end in either 'LBA' or "
-      "'HBA'");
-}
-
-std::string HamakerElementResponse::GetPath(const char* filename) const {
-  std::stringstream ss;
-  ss << EVERYBEAM_DATA_DIR << "/";
-  ss << filename;
-  return ss.str();
 }
 
 aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
@@ -50,11 +45,11 @@ aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
     return response;
   }
 
-  const double freq_center = coeffs_->GetFreqCenter();
-  const double freq_range = coeffs_->GetFreqRange();
-  const unsigned int nHarmonics = coeffs_->Get_nHarmonics();
-  const unsigned int nPowerTheta = coeffs_->Get_nPowerTheta();
-  const unsigned int nPowerFreq = coeffs_->Get_nPowerFreq();
+  const double freq_center = coefficients_->GetFreqCenter();
+  const double freq_range = coefficients_->GetFreqRange();
+  const unsigned int nHarmonics = coefficients_->Get_nHarmonics();
+  const unsigned int nPowerTheta = coefficients_->Get_nPowerTheta();
+  const unsigned int nPowerFreq = coefficients_->Get_nPowerFreq();
 
   // The model is parameterized in terms of a normalized frequency in the
   // range [-1, 1]. The appropriate conversion is taken care of below.
@@ -78,19 +73,20 @@ aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
     // start indexing the block of coefficients at the last element
 
     // Evaluate the highest order term.
-    coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1, P);
+    coefficients_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - 1, P);
 
     for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-      coeffs_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2, Pk);
+      coefficients_->GetCoefficient(k, nPowerTheta - 1, nPowerFreq - i - 2, Pk);
       P.first = P.first * freq + Pk.first;
       P.second = P.second * freq + Pk.second;
     }
 
     // Evaluate the remaining terms.
     for (unsigned int j = 0; j < nPowerTheta - 1; ++j) {
-      coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1, Pj);
+      coefficients_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - 1, Pj);
       for (unsigned int i = 0; i < nPowerFreq - 1; ++i) {
-        coeffs_->GetCoefficient(k, nPowerTheta - j - 2, nPowerFreq - i - 2, Pk);
+        coefficients_->GetCoefficient(k, nPowerTheta - j - 2,
+                                      nPowerFreq - i - 2, Pk);
         Pj.first = Pj.first * freq + Pk.first;
         Pj.second = Pj.second * freq + Pk.second;
       }
@@ -115,13 +111,9 @@ aocommon::MC2x2 HamakerElementResponse::Response(double freq, double theta,
   return response;
 }
 
-HamakerElementResponseHBA::HamakerElementResponseHBA() {
-  std::string path = GetPath("HamakerHBACoeff.h5");
-  coeffs_ = std::make_unique<HamakerCoefficients>(path);
-}
+std::weak_ptr<const HamakerCoefficients>
+    HamakerElementResponse::cached_lba_coefficients_;
+std::weak_ptr<const HamakerCoefficients>
+    HamakerElementResponse::cached_hba_coefficients_;
 
-HamakerElementResponseLBA::HamakerElementResponseLBA() {
-  std::string path = GetPath("HamakerLBACoeff.h5");
-  coeffs_ = std::make_unique<HamakerCoefficients>(path);
-}
 }  // namespace everybeam
