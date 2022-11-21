@@ -250,7 +250,7 @@ aocommon::MC2x2 LOBESElementResponse::Response(
   const int frequency_index = FindFrequencyIndex(frequency);
   aocommon::MC2x2 response = aocommon::MC2x2::Zero();
 
-  for (size_t i = 0; i < base_functions.size() / 2; ++i) {
+  for (int i = 0; i < static_cast<int>(base_functions.size() / 2); ++i) {
     const std::complex<double> q2 = base_functions[i * 2 + 0];
     const std::complex<double> q3 = base_functions[i * 2 + 1];
     response[0] += q2 * coefficients_(0, frequency_index, element_id, i);  // xx
