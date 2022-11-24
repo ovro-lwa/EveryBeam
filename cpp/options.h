@@ -6,6 +6,7 @@
 #ifndef EVERYBEAM_OPTIONS_H_
 #define EVERYBEAM_OPTIONS_H_
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -56,5 +57,22 @@ struct ATermSettings {
   size_t padded_image_width = 0, padded_image_height = 0,
          trimmed_image_width = 0, trimmed_image_height = 0;
 };
+
+/**
+ * Get the path prefix to the EveryBeam data directory.
+ * Which path is returned depends on your environment, and the way that
+ * @c EveryBeam was built. If at CMake configure-time an absolute path was
+ * given to @c EVERYBEAM_DATADIR, then this absolute path will be returned
+ * as prefix. Otherwise, the following @a environment variables will be
+ * checked, in the given order:
+ * - @c EVERYBEAM_DATADIR: path prefix set by a user;
+ * - @c CONDA_PREFIX: set when running in a Conda environment;
+ * - @c VIRTUAL_ENV: set when running inside a Python virtual environment
+ * If none of these environment variables are set, then the full path that
+ * was set at compile-time is returned.
+ * @return Path prefix to the EveryBeam data directory.
+ */
+std::filesystem::path GetDataDirectory();
+
 }  // namespace everybeam
 #endif  // EVERYBEAM_OPTIONS_H_

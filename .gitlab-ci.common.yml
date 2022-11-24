@@ -282,3 +282,18 @@ deploy-image-2204:
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "schedule"'
     # For testing this job on a branch, set the DEPLOY_IMAGE variable to true.
     - if: '$DEPLOY_IMAGE'
+
+python-wheel-2204:
+  extends: .needs-base-2204
+  stage: deploy
+  image: $BASE_IMAGE_2204
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - python3 setup.py bdist_wheel
+    - pip install --user dist/*whl
+    - python3 -c "import everybeam"
+  artifacts:
+    paths:
+      - dist/everybeam-0.4.0-cp39-cp39-linux_x86_64.whl
+

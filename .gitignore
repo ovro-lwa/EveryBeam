@@ -1,4 +1,6 @@
 .vscode/
 build/
 builds/
+dist/
+venv/
 __pycache__/

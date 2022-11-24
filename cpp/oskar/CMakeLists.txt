@@ -7,9 +7,8 @@ include_directories(${CMAKE_BINARY_DIR})
 
 #------------------------------------------------------------------------------
 # build libeverybeam-oskar.so
-add_library(
-  oskar SHARED oskarelementresponse.cc oskardatafile.cc oskardataset.cc
-               ${CMAKE_SOURCE_DIR}/cpp/elementresponse.cc)
+add_library(oskar SHARED oskarelementresponse.cc oskardatafile.cc
+                         oskardataset.cc)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} projectname)
 set_target_properties(oskar PROPERTIES LIBRARY_OUTPUT_NAME
@@ -23,7 +22,7 @@ target_include_directories(
 #------------------------------------------------------------------------------
 # Link against HDF5 and OpenMP
 target_link_libraries(oskar PUBLIC ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES}
-                                   ${OpenMP_CXX_FLAGS})
+                                   ${OpenMP_CXX_FLAGS} everybeam-core)
 target_link_libraries(oskar PRIVATE oskar_beam_utils)
 
 #------------------------------------------------------------------------------

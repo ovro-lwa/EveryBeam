@@ -12,8 +12,10 @@
 #include "elementresponse.h"
 
 #include <algorithm>
+#include <cstdlib>
 
 #include "config.h"
+#include "options.h"
 
 #include "common/mathutils.h"
 
@@ -84,8 +86,7 @@ std::shared_ptr<ElementResponse> ElementResponse::FixateDirection(
 
 std::filesystem::path ElementResponse::GetPath(
     const std::filesystem::path& relative_path) {
-  // TODO (AST-803) Allow specifying a different data directory at run time.
-  return std::filesystem::path(EVERYBEAM_DATA_DIR) / relative_path;
+  return GetDataDirectory() / relative_path;
 }
 
 }  // namespace everybeam

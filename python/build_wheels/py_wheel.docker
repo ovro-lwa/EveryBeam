@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: LGPL-3.0-only
+
+ARG PY_VERSION
+
+FROM quay.io/casacore/casacore:master_wheel${PY_VERSION}
+
+ADD . /build/everybeam
+
+WORKDIR /build/everybeam
+
+# Build FFTW3. The default version is too old.
+ENV FFTW_DIR /opt/fftw3
+ENV FFTW_VERSION 3.3.8
+RUN python/build_wheels/install_fftw.sh
+
+# Build HDF5. The default version is too old.
+ENV HDF5_DIR /opt/hdf5
+ENV HDF5_VERSION 1.12.2
+RUN python/build_wheels/install_hdf5.sh
+
+# Prevent build to find libpython (which is not even included in the manylinux images).
+RUN sed -i '/find_package(PythonLibs 3 REQUIRED)/d' python/CMakeLists.txt
+
+# EveryBeam requires `wget` to be installed
+RUN yum -y install wget
+
+# Make sure CMake can find FFTW3 and HDF5 that we just built.
+ENV CMAKE_ARGS="-DCMAKE_PREFIX_PATH='${FFTW_DIR};${HDF5_DIR}'"
+
+# Build the binary wheel and place it in /dist
+RUN /opt/python/${TARGET}/bin/python ./setup.py build_ext -j${THREADS}
+RUN /opt/python/${TARGET}/bin/python ./setup.py bdist_wheel -d .
+RUN auditwheel repair --plat manylinux2014_x86_64 -w /dist *.whl

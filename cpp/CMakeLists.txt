@@ -17,6 +17,9 @@ add_subdirectory(skamidbeam)
 add_subdirectory(telescope)
 
 #------------------------------------------------------------------------------
+add_library(everybeam-core SHARED elementresponse.cc options.cc)
+target_include_directories(everybeam-core PRIVATE "${CMAKE_BINARY_DIR}")
+
 add_library(
   everybeam SHARED
   antenna.cc
@@ -30,6 +33,7 @@ add_library(
   element.cc
   elementhamaker.cc
   load.cc
+  options.cc
   # aterms
   # From CMake 3.12 onwards, the line below can be replaced by
   # target_link_libraries(everybeam aterms)
@@ -85,7 +89,7 @@ target_link_libraries(everybeam PRIVATE schaapcommon Threads::Threads
                                         ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 install(
-  TARGETS everybeam
+  TARGETS everybeam everybeam-core
   EXPORT EveryBeamTargets
   DESTINATION lib)
 
