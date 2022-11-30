@@ -6,11 +6,14 @@
 
 #include "../elementresponse.h"
 
-#include "oskardatafile.h"
-
 #include <memory>
 
 namespace everybeam {
+
+// Use a forward declaration instead of including internal libeverybeam-oskar
+// headers. The internal headers use OSKAR headers, which are not available
+// outside the library.
+class Datafile;
 
 //! Implementation of the OSKAR dipole response model
 class OSKARElementResponseDipole : public ElementResponse {

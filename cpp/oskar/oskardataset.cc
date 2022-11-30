@@ -90,14 +90,8 @@ Dataset::Dataset(H5::H5File& h5_file, const unsigned int freq) {
   dataset.read(data_.data(), data_type, dataspace);
 }
 
-size_t Dataset::GetIndex(const unsigned int element) const {
-  return element * nr_coeffs_ * 4;
-}
-
-const std::complex<double>* Dataset::GetAlphaPtr(
-    const unsigned int element) const {
+const oskar::Double4C* Dataset::GetAlphaPtr(const unsigned int element) const {
   assert(element < GetNrElements());
-  size_t index = GetIndex(element);
-  return data_.data() + index;
+  return data_.data() + element * nr_coeffs_;
 }
 }  // namespace everybeam

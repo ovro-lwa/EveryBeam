@@ -7,10 +7,12 @@
 
 #include "config.h"
 
+#include "oskardatafile.h"
+
 #include <oskar_beam_utils.h>
 
-using oskar::beam_utils::oskar_evaluate_dipole_pattern_double;
-using oskar::beam_utils::oskar_evaluate_spherical_wave_sum_double;
+using oskar::beam_utils::evaluate_dipole_pattern_double;
+using oskar::beam_utils::evaluate_spherical_wave_sum_double;
 
 namespace everybeam {
 
@@ -21,10 +23,10 @@ aocommon::MC2x2 OSKARElementResponseDipole::Response(double freq, double theta,
 
   double phi_x = phi;
   double phi_y = phi + M_PI_2;
-  oskar_evaluate_dipole_pattern_double(1, &theta, &phi_x, freq, dipole_length_m,
-                                       response.Data());
-  oskar_evaluate_dipole_pattern_double(1, &theta, &phi_y, freq, dipole_length_m,
-                                       response.Data() + 2);
+  evaluate_dipole_pattern_double(1, &theta, &phi_x, freq, dipole_length_m,
+                                 response.Data());
+  evaluate_dipole_pattern_double(1, &theta, &phi_y, freq, dipole_length_m,
+                                 response.Data() + 2);
   return response;
 }
 
@@ -56,12 +58,12 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
                                                             double freq,
                                                             double theta,
                                                             double phi) const {
-  aocommon::MC2x2 response = aocommon::MC2x2::Zero();
+  oskar::Double4C response{0.0, 0.0, 0.0, 0.0};
 
   const Dataset& dataset = datafile_->Get(freq);
   const size_t l_max = dataset.GetLMax();
 
-  const std::complex<double>* alpha_ptr = dataset.GetAlphaPtr(element_id);
+  const oskar::Double4C* alpha_ptr = dataset.GetAlphaPtr(element_id);
 
   double phi_x = phi;
   double phi_y = phi;
@@ -73,9 +75,9 @@ aocommon::MC2x2 OSKARElementResponseSphericalWave::Response(int element_id,
   // That case needs to be detected when the coefficients are read,
   // and here phi_y needs to be set accordingly.
 
-  oskar_evaluate_spherical_wave_sum_double(theta, phi_x, phi_y, l_max,
-                                           alpha_ptr, response.Data());
-  return response;
+  evaluate_spherical_wave_sum_double(theta, phi_x, phi_y, l_max, alpha_ptr,
+                                     &response);
+  return aocommon::MC2x2(response.a, response.b, response.c, response.d);
 }
 
 std::weak_ptr<Datafile> OSKARElementResponseSphericalWave::cached_datafile_;
