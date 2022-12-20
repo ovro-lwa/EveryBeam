@@ -8,6 +8,8 @@
 #include <complex>
 #include <vector>
 
+#include <xtensor/xadapt.hpp>
+
 #include <aocommon/matrix2x2.h>
 #include <aocommon/parallelfor.h>
 #include <aocommon/system.h>
@@ -20,10 +22,10 @@ void calculateStationBeams(
     vector3r_t tileDirection, unsigned int subgrid_size,
     std::vector<std::complex<float>>& buffer, double time, double frequency) {
   const size_t n_stations = stations.size();
+  const std::array<size_t, 4> shape{n_stations, subgrid_size, subgrid_size, 4};
+  auto data = xt::adapt(buffer, shape);
   aocommon::ParallelFor<size_t> loop(aocommon::system::ProcessorCount());
   loop.Run(0, stations.size(), [&, subgrid_size, n_stations](size_t s) {
-    using Data = std::complex<float>[n_stations][subgrid_size][subgrid_size][4];
-    Data* data_ptr = (Data*)buffer.data();
     for (unsigned y = 0; y < subgrid_size; y++) {
       for (unsigned x = 0; x < subgrid_size; x++) {
         auto direction = itrfDirections[y * subgrid_size + x];
@@ -32,7 +34,7 @@ void calculateStationBeams(
             stations[s]->Response(time, frequency, direction, freq_beamformer,
                                   stationDirection, tileDirection);
 
-        std::complex<float>* antBufferPtr = (*data_ptr)[s][y][x];
+        std::complex<float>* antBufferPtr = &data(s, y, x, 0);
         gainMatrix.AssignTo(antBufferPtr);
       }
     }

@@ -104,12 +104,13 @@ set_tests_properties(download_mocks PROPERTIES FIXTURES_SETUP mocks)
 add_executable(unittests ${TEST_FILENAMES})
 target_link_libraries(unittests everybeam ${Boost_LIBRARIES} schaapcommon)
 
+# Required to get the config.h header
+target_include_directories(unittests PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(
-  unittests
-  PRIVATE "${CMAKE_BINARY_DIR}" # Required to get the config.h header
-          "${CMAKE_SOURCE_DIR}/external/xtensor/include/"
-          "${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include/"
-          "${CMAKE_SOURCE_DIR}/external/xtl/include/")
+  unittests SYSTEM
+  PRIVATE ${CMAKE_SOURCE_DIR}/external/xtensor/include
+          ${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include
+          ${CMAKE_SOURCE_DIR}/external/xtl/include)
 
 set_property(TARGET unittests PROPERTY CXX_STANDARD 17)
 

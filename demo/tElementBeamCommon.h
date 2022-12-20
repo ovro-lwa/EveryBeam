@@ -8,6 +8,8 @@
 #include <complex>
 #include <vector>
 
+#include <xtensor/xadapt.hpp>
+
 #include <aocommon/matrix2x2.h>
 #include <aocommon/parallelfor.h>
 #include <aocommon/system.h>
@@ -19,11 +21,11 @@ void calculateElementBeams(const everybeam::ElementResponse& elementResponse,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double frequency,
                            std::vector<std::complex<float>>& buffer) {
+  const std::array<size_t, 4> shape{nr_antennas, subgrid_size, subgrid_size, 4};
+  auto data = xt::adapt(buffer, shape);
+
   aocommon::ParallelFor<size_t> loop(aocommon::system::ProcessorCount());
   loop.Run(0, nr_antennas, [&, nr_antennas, subgrid_size](size_t a) {
-    using Data =
-        std::complex<float>[nr_antennas][subgrid_size][subgrid_size][4];
-    Data* data_ptr = (Data*)buffer.data();
     for (unsigned y = 0; y < subgrid_size; y++) {
       for (unsigned x = 0; x < subgrid_size; x++) {
         // Get theta, phi
@@ -40,7 +42,7 @@ void calculateElementBeams(const everybeam::ElementResponse& elementResponse,
         }
 
         // Store gain
-        std::complex<float>* antBufferPtr = (*data_ptr)[a][y][x];
+        std::complex<float>* antBufferPtr = &data(a, y, x, 0);
         gainMatrix.AssignTo(antBufferPtr);
       }
     }
@@ -52,11 +54,11 @@ void calculateElementBeams(const everybeam::Station& station,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double time, double frequency,
                            std::vector<std::complex<float>>& buffer) {
+  const std::array<size_t, 4> shape{nr_antennas, subgrid_size, subgrid_size, 4};
+  auto data = xt::adapt(buffer, shape);
+
   aocommon::ParallelFor<size_t> loop(aocommon::system::ProcessorCount());
   loop.Run(0, nr_antennas, [&](size_t a) {
-    using Data =
-        std::complex<float>[nr_antennas][subgrid_size][subgrid_size][4];
-    Data* data_ptr = (Data*)buffer.data();
     for (unsigned y = 0; y < subgrid_size; y++) {
       for (unsigned x = 0; x < subgrid_size; x++) {
         // Get direction
@@ -70,7 +72,7 @@ void calculateElementBeams(const everybeam::Station& station,
         }
 
         // Store gain
-        std::complex<float>* antBufferPtr = (*data_ptr)[a][y][x];
+        std::complex<float>* antBufferPtr = &data(a, y, x, 0);
         gainMatrix.AssignTo(antBufferPtr);
       }
     }

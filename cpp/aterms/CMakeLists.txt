@@ -25,13 +25,11 @@ set_property(TARGET aterms PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET aterms PROPERTY CXX_STANDARD 17)
 
 target_include_directories(
-  aterms PRIVATE "${CMAKE_SOURCE_DIR}/external/xtensor/include/")
-target_include_directories(
-  aterms PRIVATE "${CMAKE_SOURCE_DIR}/external/xtensor-blas/include/")
-target_include_directories(
-  aterms PRIVATE "${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include/")
-target_include_directories(aterms
-                           PRIVATE "${CMAKE_SOURCE_DIR}/external/xtl/include/")
+  aterms SYSTEM
+  PRIVATE ${CMAKE_SOURCE_DIR}/external/xtensor/include
+          ${CMAKE_SOURCE_DIR}/external/xtensor-blas/include
+          ${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include
+          ${CMAKE_SOURCE_DIR}/external/xtl/include)
 
 install(
   FILES atermconfig.h

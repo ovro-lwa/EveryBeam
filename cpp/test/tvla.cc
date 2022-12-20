@@ -109,20 +109,22 @@ BOOST_AUTO_TEST_CASE(load_vla) {
   BOOST_CHECK(nullptr != dynamic_cast<DishPoint*>(point_response.get()));
 
   // Use ComputeAllStations (should be a repetitive call to CalculateStation)
-  std::complex<float> point_response_buffer[4 * telescope->GetNrStations()];
-  point_response->ResponseAllStations(everybeam::BeamMode::kFull,
-                                      point_response_buffer, coord_system.ra,
-                                      coord_system.dec, frequency, 0);
+  std::vector<std::complex<float>> point_response_buffer(
+      4 * telescope->GetNrStations());
+  point_response->ResponseAllStations(
+      everybeam::BeamMode::kFull, point_response_buffer.data(), coord_system.ra,
+      coord_system.dec, frequency, 0);
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer,
-                                point_response_buffer + 4,
+  BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer.begin(),
+                                point_response_buffer.begin() + 4,
                                 antenna_buffer.begin() + offset_88,
                                 antenna_buffer.begin() + offset_88 + 4);
   // Check if point response equal for all stations
   for (size_t i = 0; i < telescope->GetNrStations(); ++i) {
-    BOOST_CHECK_EQUAL_COLLECTIONS(
-        point_response_buffer + i * 4, point_response_buffer + 4 * (i + 1),
-        point_response_buffer, point_response_buffer + 4);
+    BOOST_CHECK_EQUAL_COLLECTIONS(point_response_buffer.begin() + i * 4,
+                                  point_response_buffer.begin() + 4 * (i + 1),
+                                  point_response_buffer.begin(),
+                                  point_response_buffer.begin() + 4);
   }
 }
 
