@@ -321,7 +321,7 @@ class Station {
   std::shared_ptr<Element> element_;
   std::shared_ptr<Antenna> antenna_;
 
-  coords::ITRFDirection::Ptr ncp_;
+  coords::ITRFDirection ncp_;
   /** Reference direction for NCP observations.
    *
    * NCP pol0 is the direction used as reference in the coordinate system
@@ -332,7 +332,7 @@ class Station {
    *
    * Added by Maaijke Mevius, December 2018.
    */
-  coords::ITRFDirection::Ptr ncp_pol0_;
+  coords::ITRFDirection ncp_pol0_;
 };
 
 // ------------------------------------------------------------------------- //

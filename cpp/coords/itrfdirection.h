@@ -22,9 +22,6 @@ namespace everybeam {
 namespace coords {
 class ITRFDirection {
  public:
-  typedef std::shared_ptr<ITRFDirection> Ptr;
-  typedef std::shared_ptr<const ITRFDirection> ConstPtr;
-
   ITRFDirection(const vector3r_t& position, const vector2r_t& direction);
   ITRFDirection(const vector3r_t& position, const vector3r_t& direction);
   ITRFDirection(const vector2r_t& direction);

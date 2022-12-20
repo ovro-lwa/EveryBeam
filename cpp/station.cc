@@ -17,12 +17,9 @@ Station::Station(const std::string& name, const vector3r_t& position,
       options_(options),
       phase_reference_(position),
       element_response_(ElementResponse::GetInstance(
-          options.element_response_model, name_, options_)) {
-  const vector3r_t ncp = {0.0, 0.0, 1.0};
-  ncp_.reset(new coords::ITRFDirection(ncp));
-  const vector3r_t ncppol0 = {1.0, 0.0, 0.0};
-  ncp_pol0_.reset(new coords::ITRFDirection(ncppol0));
-}
+          options.element_response_model, name_, options_)),
+      ncp_(vector3r_t{0.0, 0.0, 1.0}),
+      ncp_pol0_(vector3r_t{1.0, 0.0, 0.0}) {}
 
 const std::string& Station::GetName() const { return name_; }
 
@@ -127,6 +124,6 @@ aocommon::MC2x2Diag Station::ArrayFactor(real_t time, real_t freq,
   return antenna_->ArrayFactor(time, freq, direction, options);
 }
 
-vector3r_t Station::NCP(real_t time) const { return ncp_->at(time); }
+vector3r_t Station::NCP(real_t time) const { return ncp_.at(time); }
 
-vector3r_t Station::NCPPol0(real_t time) const { return ncp_pol0_->at(time); }
+vector3r_t Station::NCPPol0(real_t time) const { return ncp_pol0_.at(time); }
