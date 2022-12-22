@@ -57,30 +57,31 @@ std::unique_ptr<telescope::Telescope> Load(const casacore::MeasurementSet& ms,
   switch (telescope_name) {
     case kAARTFAAC:
     case kLofarTelescope:
-      telescope.reset(new telescope::LOFAR(ms, options));
+      telescope = std::make_unique<telescope::LOFAR>(ms, options);
       break;
     case kATCATelescope: {
       auto coefs = std::make_unique<circularsymmetric::ATCACoefficients>();
-      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+      telescope =
+          std::make_unique<telescope::Dish>(ms, std::move(coefs), options);
     } break;
     case kGMRTTelescope: {
       auto coefs = std::make_unique<circularsymmetric::GMRTCoefficients>();
-      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+      telescope =
+          std::make_unique<telescope::Dish>(ms, std::move(coefs), options);
     } break;
     case kVLATelescope: {
       auto coefs = std::make_unique<circularsymmetric::VLACoefficients>("");
-      telescope.reset(new telescope::Dish(ms, std::move(coefs), options));
+      telescope =
+          std::make_unique<telescope::Dish>(ms, std::move(coefs), options);
     } break;
-    case kMWATelescope: {
-      telescope.reset(new telescope::MWA(ms, options));
+    case kMWATelescope:
+      telescope = std::make_unique<telescope::MWA>(ms, options);
       break;
-    }
-    case kOSKARTelescope: {
-      telescope.reset(new telescope::OSKAR(ms, options));
+    case kOSKARTelescope:
+      telescope = std::make_unique<telescope::OSKAR>(ms, options);
       break;
-    }
     case kSkaMidTelescope:
-      telescope.reset(new telescope::SkaMid(ms, options));
+      telescope = std::make_unique<telescope::SkaMid>(ms, options);
       break;
     default:
       casacore::ScalarColumn<casacore::String> telescope_name_col(

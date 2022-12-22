@@ -7,7 +7,6 @@
 #define EVERYBEAM_GRIDDEDRESPONSE_LOFARGRID_H_
 
 #include "phasedarraygrid.h"
-#include "../telescope/lofar.h"
 
 namespace everybeam {
 namespace griddedresponse {

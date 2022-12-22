@@ -26,7 +26,9 @@ using everybeam::griddedresponse::LOFARGrid;
 using everybeam::pointresponse::AartfaacPoint;
 using everybeam::pointresponse::LOFARPoint;
 using everybeam::pointresponse::PointResponse;
-using everybeam::telescope::LOFAR;
+
+namespace everybeam {
+namespace telescope {
 
 LOFAR::LOFAR(const casacore::MeasurementSet& ms, const Options& options)
     : PhasedArray(ms, options) {
@@ -139,3 +141,6 @@ std::unique_ptr<PointResponse> LOFAR::GetPointResponse(double time) const {
     return std::make_unique<LOFARPoint>(this, time);
   }
 }
+
+}  // namespace telescope
+}  // namespace everybeam

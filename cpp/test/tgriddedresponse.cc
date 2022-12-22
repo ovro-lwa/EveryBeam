@@ -12,7 +12,6 @@
 #include "../elementresponse.h"
 #include "../station.h"
 #include "../common/types.h"
-#include "../telescope/lofar.h"
 #include "../aterms/atermconfig.h"
 #include "../aterms/parsetprovider.h"
 #include "../msreadutils.h"
@@ -27,7 +26,6 @@
 using aocommon::CoordinateSystem;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
-using everybeam::telescope::LOFAR;
 using everybeam::telescope::Telescope;
 
 BOOST_AUTO_TEST_SUITE(gridded_response)

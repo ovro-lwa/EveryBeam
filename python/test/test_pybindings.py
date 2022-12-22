@@ -196,7 +196,7 @@ def test_lofar(ref, differential_beam):
     telescope = load_telescope(
         ms_path, use_differential_beam=differential_beam
     )
-    assert isinstance(telescope, LOFAR)
+    assert type(telescope) is LOFAR
     assert telescope.station_name(0) == ref["station0_name"]
     assert (
         telescope.station_element_response(0).model

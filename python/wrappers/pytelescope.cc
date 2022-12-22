@@ -140,59 +140,6 @@ class PyTelescope : public Telescope {
   }
 };
 
-/**
- * @brief Create a telescope object. As soon as the pybindings
- * support all the telescopes that are supported by the C++-interface,
- * this function becomes obsolete, and \c everybeam::Load() can be
- * used instead.
- *
- * @param name Path to MSet
- * @param options Options
- * @return std::unique_ptr<Telescope>
- */
-std::unique_ptr<Telescope> create_telescope(const std::string& name,
-                                            const everybeam::Options& options) {
-  MeasurementSet ms(name);
-  std::unique_ptr<Telescope> telescope;
-  const everybeam::TelescopeType telescope_name =
-      everybeam::GetTelescopeType(ms);
-  switch (telescope_name) {
-    case everybeam::TelescopeType::kAARTFAAC:
-    case everybeam::TelescopeType::kLofarTelescope:
-      telescope.reset(new LOFAR(ms, options));
-      break;
-    case everybeam::TelescopeType::kOSKARTelescope:
-      telescope.reset(new OSKAR(ms, options));
-      break;
-    case everybeam::TelescopeType::kSkaMidTelescope:
-      telescope.reset(new SkaMid(ms, options));
-      break;
-    default:
-      throw std::runtime_error(
-          "Currently, pybindings are only available for LOFAR and OSKAR "
-          "MSets.");
-  }
-  return telescope;
-}
-
-std::unique_ptr<LOFAR> create_lofar(const std::string& name,
-                                    const everybeam::Options& options) {
-  return std::unique_ptr<LOFAR>{
-      static_cast<LOFAR*>(create_telescope(name, options).release())};
-}
-
-std::unique_ptr<OSKAR> create_oskar(const std::string& name,
-                                    const everybeam::Options& options) {
-  return std::unique_ptr<OSKAR>{
-      static_cast<OSKAR*>(create_telescope(name, options).release())};
-}
-
-std::unique_ptr<SkaMid> CreateSkaMid(const std::string& name,
-                                     const everybeam::Options& options) {
-  return std::unique_ptr<SkaMid>{
-      static_cast<SkaMid*>(create_telescope(name, options).release())};
-}
-
 void init_telescope(py::module& m) {
   py::class_<Telescope, PyTelescope>(m, "Telescope")
       .def_property_readonly("is_time_relevant", &Telescope::GetIsTimeRelevant,
@@ -981,39 +928,13 @@ void init_telescope(py::module& m) {
                                  R"pbdoc(
         Class to get beam responses for LOFAR observations.
         Inherits from :func:`~everybeam.PhasedArray`.
-        )pbdoc")
-      .def(py::init(&create_lofar),
-           R"pbdoc(
-        Initializes a LOFAR telescope.
-
-        Parameters
-        ----------
-        ms: str
-            Path to (LOFAR) Measurement Set
-        options: everybeam.Options
-            Struct specifying (beam) options for the provided
-            Measurment Set
-        )pbdoc",
-           py::arg("ms"), py::arg("options"));
+        )pbdoc");
 
   py::class_<OSKAR, PhasedArray>(m, "OSKAR",
                                  R"pbdoc(
         Class to get beam responses for (simulated) SKA-LOW observations.
         Inherits from :func:`~everybeam.PhasedArray`.
-        )pbdoc")
-      .def(py::init(&create_oskar),
-           R"pbdoc(
-        Initializes an OSKAR telescope.
-
-        Parameters
-        ----------
-        ms: str
-            Path to (LOFAR) Measurement Set
-        options: everybeam.Options
-            Struct specifying (beam) options for the provided
-            Measurment Set
-        )pbdoc",
-           py::arg("ms"), py::arg("options"));
+        )pbdoc");
 
   // TODO: other telescopes:
   // py::class_<MWA, Telescope>(m, "MWA");
@@ -1026,19 +947,6 @@ void init_telescope(py::module& m) {
         Class to get beam responses for (simulated) SKA-MID observations.
         Inherits from :func:`~everybeam.Telescope`.
         )pbdoc")
-      .def(py::init(&CreateSkaMid),
-           R"pbdoc(
-        Initializes a SKA-MID telescope.
-
-        Parameters
-        ----------
-        ms: str
-            Path to (LOFAR) Measurement Set
-        options: everybeam.Options
-            Struct specifying (beam) options for the provided
-            Measurment Set
-        )pbdoc",
-           py::arg("ms"), py::arg("options"))
       .def_property_readonly("diameter", &SkaMid::GetDiameter,
                              R"pbdoc(
         Returns

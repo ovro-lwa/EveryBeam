@@ -7,7 +7,6 @@
 #define EVERYBEAM_POINTRESPONSE_LOFARPOINT_H_
 
 #include "phasedarraypoint.h"
-#include "../telescope/lofar.h"
 
 namespace everybeam {
 namespace pointresponse {
