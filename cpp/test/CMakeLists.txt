@@ -69,33 +69,31 @@ set(TEST_FILENAMES
 set_source_files_properties(${TEST_FILENAMES} PROPERTIES COMPILE_DEFINITIONS
                                                          "BOOST_TEST_DYN_LINK")
 
-ExternalProject_Add(
-  download_mock_aartfaac_6_lba
-  EXCLUDE_FROM_ALL TRUE
-  URL https://support.astron.nl/software/ci_data/EveryBeam/AARTFAAC_6_LBA_MOCK.ms.tar.gz
-  URL_HASH
-    SHA256=8d7f93ce089b3a29c4d0ee8b367d27a821175d0626793b16be1643ee9bcdc6a5
-  SOURCE_DIR ${DATA_DIR}/AARTFAAC_6_LBA_MOCK.ms
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
-  INSTALL_COMMAND "")
-
 add_custom_target(
   download_mocks
   WORKING_DIRECTORY ${DATA_DIR}
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_hba_ms.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_lofar_lba_ms.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_aartfaac_lba_ms.sh
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh lba.MS.tar.bz2
+          LOFAR_LBA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
+          L258627-one-timestep.tar.bz2 LOFAR_HBA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh aartfaac.MS.tgz
+          AARTFAAC_LBA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
+          AARTFAAC_6_LBA_MOCK.ms.tar.gz AARTFAAC_6_LBA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
+          OSKAR-single-timeslot.tar.bz2 OSKAR_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
+          SKA_MID_SIM-1channel-1timestep.tar.bz2 SKA_MID_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh MWA-single-timeslot.tar.bz2
+          MWA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh small-vla-set.tar.bz2
+          VLA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh screentest_ms.tar.gz
+          SCREEN_FITTING.ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_h5_solutions.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_oskar_ms.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ska_mid_ms.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_vla_ms.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_ms.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mwa_coeff.sh
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_mock_h5parm.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_kl_fits_screen.sh
-  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_screen_fitting_ms.sh
-  DEPENDS download_mock_aartfaac_6_lba)
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_kl_fits_screen.sh)
 add_test(NAME download_mocks
          COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target
                  download_mocks)
