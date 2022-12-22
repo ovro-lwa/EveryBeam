@@ -6,7 +6,6 @@
 #ifndef EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 #define EVERYBEAM_GRIDDEDRESPONSE_GRIDDEDRESPONSE_H_
 
-#include "./../coords/coordutils.h"
 #include "./../coords/itrfdirection.h"
 #include "./../coords/itrfconverter.h"
 #include "../beammode.h"

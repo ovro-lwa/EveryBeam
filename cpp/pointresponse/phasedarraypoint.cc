@@ -5,7 +5,6 @@
 #include "../telescope/phasedarray.h"
 #include "../common/types.h"
 
-#include "./../coords/coordutils.h"
 #include "./../coords/itrfdirection.h"
 #include "./../coords/itrfconverter.h"
 
@@ -119,28 +118,19 @@ void PhasedArrayPoint::UpdateITRFVectors(double ra, double dec) {
   // The lock prevents different PhasedArrayPoints to calculate the
   // the station response simultaneously
   std::unique_lock<std::mutex> lock(mutex_);
-  coords::ITRFConverter itrf_converter(time_ + 0.5 * update_interval_);
-  coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
-  coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
-
-  const casacore::Unit rad_unit("rad");
-
-  // Only n_dir relevant for a single point
-  casacore::MDirection n_dir(
-      casacore::MVDirection(casacore::Quantity(ra, rad_unit),
-                            casacore::Quantity(dec, rad_unit)),
-      casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.ToDirection(n_dir), itrf_direction_);
-
-  coords::SetITRFVector(itrf_converter.ToDirection(preapplied_beam_dir_),
-                        diff_beam_centre_);
+  const coords::ItrfConverter itrf_converter(time_ + 0.5 * update_interval_);
+  station0_ = itrf_converter.ToItrf(delay_dir_);
+  tile0_ = itrf_converter.ToItrf(tile_beam_dir_);
+  // Only the n vector is relevant for a single point. l and m are not.
+  itrf_direction_ = itrf_converter.RaDecToItrf(ra, dec);
+  diff_beam_centre_ = itrf_converter.ToItrf(preapplied_beam_dir_);
 }
 
 void PhasedArrayPoint::UpdateITRFVectors(std::mutex& mutex) {
   std::unique_lock<std::mutex> lock(mutex);
-  coords::ITRFConverter itrf_converter(time_);
-  coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
-  coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
+  const coords::ItrfConverter itrf_converter(time_);
+  station0_ = itrf_converter.ToItrf(delay_dir_);
+  tile0_ = itrf_converter.ToItrf(tile_beam_dir_);
 }
 
 }  // namespace pointresponse

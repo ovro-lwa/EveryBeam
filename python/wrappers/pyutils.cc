@@ -10,7 +10,6 @@
 #include "beammode.h"
 #include "beamnormalisationmode.h"
 #include "common/mathutils.h"
-#include "coords/coordutils.h"
 
 #include <aocommon/coordinatesystem.h>
 

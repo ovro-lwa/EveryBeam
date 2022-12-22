@@ -89,32 +89,14 @@ void PhasedArrayGrid::ResponseAllStations(BeamMode beam_mode,
 }
 
 void PhasedArrayGrid::SetITRFVectors(double time) {
-  coords::ITRFConverter itrf_converter(time);
-  coords::SetITRFVector(itrf_converter.ToDirection(delay_dir_), station0_);
-  coords::SetITRFVector(itrf_converter.ToDirection(tile_beam_dir_), tile0_);
+  const coords::ItrfConverter itrf_converter(time);
+  station0_ = itrf_converter.ToItrf(delay_dir_);
+  tile0_ = itrf_converter.ToItrf(tile_beam_dir_);
 
-  const casacore::Unit rad_unit("rad");
-
-  casacore::MDirection l_dir(
-      casacore::MVDirection(casacore::Quantity(ra_ + M_PI / 2, rad_unit),
-                            casacore::Quantity(0, rad_unit)),
-      casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.ToDirection(l_dir), l_vector_itrf_);
-
-  casacore::MDirection m_dir(
-      casacore::MVDirection(casacore::Quantity(ra_, rad_unit),
-                            casacore::Quantity(dec_ + M_PI / 2, rad_unit)),
-      casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.ToDirection(m_dir), m_vector_itrf_);
-
-  casacore::MDirection n_dir(
-      casacore::MVDirection(casacore::Quantity(ra_, rad_unit),
-                            casacore::Quantity(dec_, rad_unit)),
-      casacore::MDirection::J2000);
-  coords::SetITRFVector(itrf_converter.ToDirection(n_dir), n_vector_itrf_);
-
-  coords::SetITRFVector(itrf_converter.ToDirection(preapplied_beam_dir_),
-                        diff_beam_centre_);
+  l_vector_itrf_ = itrf_converter.RaDecToItrf(ra_ + M_PI / 2.0, 0);
+  m_vector_itrf_ = itrf_converter.RaDecToItrf(ra_, dec_ + M_PI / 2.0);
+  n_vector_itrf_ = itrf_converter.RaDecToItrf(ra_, dec_);
+  diff_beam_centre_ = itrf_converter.ToItrf(preapplied_beam_dir_);
 }
 
 void PhasedArrayGrid::CalcThread(BeamMode beam_mode, bool apply_normalisation,

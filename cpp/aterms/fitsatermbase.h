@@ -7,7 +7,6 @@
 #include "atermbase.h"
 #include "atermresampler.h"
 #include "cache.h"
-#include "../coords/coordutils.h"
 
 #include <aocommon/fits/fitsreader.h>
 #include <aocommon/windowfunction.h>

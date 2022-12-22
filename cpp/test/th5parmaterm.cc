@@ -5,7 +5,6 @@
 
 #include "config.h"
 #include "../aterms/h5parmaterm.h"
-#include "../coords/coordutils.h"
 
 #include <aocommon/uvector.h>
 #include <aocommon/imagecoordinates.h>

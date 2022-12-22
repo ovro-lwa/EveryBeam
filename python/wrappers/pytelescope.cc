@@ -12,7 +12,6 @@
 #include "griddedresponse/griddedresponse.h"
 #include "pointresponse/phasedarraypoint.h"
 #include "common/types.h"
-#include "coords/coordutils.h"
 #include "coords/itrfconverter.h"
 #include "coords/itrfdirection.h"
 #include "telescope/phasedarray.h"
@@ -31,8 +30,7 @@ using everybeam::BeamMode;
 using everybeam::BeamNormalisationMode;
 using everybeam::Options;
 using everybeam::vector3r_t;
-using everybeam::coords::ITRFConverter;
-using everybeam::coords::SetITRFVector;
+using everybeam::coords::ItrfConverter;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::pointresponse::PhasedArrayPoint;
 using everybeam::pointresponse::PointResponse;
@@ -451,11 +449,9 @@ void init_telescope(py::module& m) {
           [](PhasedArray& self, double time, size_t idx, double freq,
              bool rotate) -> py::array_t<std::complex<double>> {
             check_station_index(idx, self.GetNrStations(), "station_response");
-            vector3r_t direction;
-            ITRFConverter itrf_converter(time);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                direction);
+            const ItrfConverter itrf_converter(time);
+            const vector3r_t direction =
+                itrf_converter.ToItrf(self.GetPreappliedBeamDirection());
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
@@ -635,11 +631,9 @@ void init_telescope(py::module& m) {
             // correctly.
             if (self.GetOptions().beam_normalisation_mode ==
                 BeamNormalisationMode::kPreApplied) {
-              vector3r_t diff_beam_centre;
-              ITRFConverter itrf_converter(time);
-              SetITRFVector(
-                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                  diff_beam_centre);
+              const ItrfConverter itrf_converter(time);
+              const vector3r_t diff_beam_centre =
+                  itrf_converter.ToItrf(self.GetPreappliedBeamDirection());
 
               aocommon::MC2x2 response_diff_beam =
                   phased_array_point.UnnormalisedResponse(
@@ -784,11 +778,9 @@ void init_telescope(py::module& m) {
 
             if (self.GetOptions().beam_normalisation_mode ==
                 BeamNormalisationMode::kPreApplied) {
-              vector3r_t diff_beam_centre;
-              ITRFConverter itrf_converter(time);
-              SetITRFVector(
-                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                  diff_beam_centre);
+              const ItrfConverter itrf_converter(time);
+              const vector3r_t diff_beam_centre =
+                  itrf_converter.ToItrf(self.GetPreappliedBeamDirection());
               aocommon::MC2x2 response_diff_beam =
                   phased_array_point.ElementResponse(
                       idx, freq, diff_beam_centre, element_idx);
@@ -846,23 +838,19 @@ void init_telescope(py::module& m) {
 
             // Avoid any beam normalisations, so compute station0 and tile0
             // manually
-            ITRFConverter itrf_converter(time);
-            vector3r_t station0;
-            vector3r_t tile0;
-            SetITRFVector(itrf_converter.ToDirection(self.GetDelayDirection()),
-                          station0);
-            SetITRFVector(
-                itrf_converter.ToDirection(self.GetTileBeamDirection()), tile0);
+            const ItrfConverter itrf_converter(time);
+            const vector3r_t station0 =
+                itrf_converter.ToItrf(self.GetDelayDirection());
+            const vector3r_t tile0 =
+                itrf_converter.ToItrf(self.GetTileBeamDirection());
             const aocommon::MC2x2 response =
                 phased_array_point.UnnormalisedResponse(
                     BeamMode::kElement, idx, freq, direction, station0, tile0);
 
             if (self.GetOptions().beam_normalisation_mode ==
                 BeamNormalisationMode::kPreApplied) {
-              vector3r_t diff_beam_centre;
-              SetITRFVector(
-                  itrf_converter.ToDirection(self.GetPreappliedBeamDirection()),
-                  diff_beam_centre);
+              const vector3r_t diff_beam_centre =
+                  itrf_converter.ToItrf(self.GetPreappliedBeamDirection());
 
               aocommon::MC2x2 response_diff_beam =
                   phased_array_point.UnnormalisedResponse(

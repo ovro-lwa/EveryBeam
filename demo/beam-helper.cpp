@@ -81,45 +81,20 @@ void GetITRFDirections(vector3r_t* itrfDirections, size_t subgrid_size,
       m += pdm;
       n = sqrt(1.0 - l * l - m * m);
 
-      vector3r_t _l_vector_itrf;
-      vector3r_t _m_vector_itrf;
-      vector3r_t _n_vector_itrf;
+      const coords::ItrfConverter itrf_converter(time);
 
-      const casacore::Unit radUnit("rad");
+      const vector3r_t l_vector_itrf =
+          itrf_converter.RaDecToItrf(ra + M_PI / 2.0, 0);
+      const vector3r_t m_vector_itrf =
+          itrf_converter.RaDecToItrf(ra, dec + M_PI / 2.0);
+      const vector3r_t n_vector_itrf = itrf_converter.RaDecToItrf(ra, dec);
 
-      coords::ITRFConverter itrfConverter(time);
+      const vector3r_t itrf_direction{
+          l * l_vector_itrf[0] + m * m_vector_itrf[0] + n * n_vector_itrf[0],
+          l * l_vector_itrf[1] + m * m_vector_itrf[1] + n * n_vector_itrf[1],
+          l * l_vector_itrf[2] + m * m_vector_itrf[2] + n * n_vector_itrf[2]};
 
-      casacore::MDirection lDir(
-          casacore::MVDirection(casacore::Quantity(ra + M_PI / 2, radUnit),
-                                casacore::Quantity(0, radUnit)),
-          casacore::MDirection::J2000);
-      everybeam::coords::SetITRFVector(itrfConverter.ToDirection(lDir),
-                                       _l_vector_itrf);
-
-      casacore::MDirection mDir(
-          casacore::MVDirection(casacore::Quantity(ra, radUnit),
-                                casacore::Quantity(dec + M_PI / 2, radUnit)),
-          casacore::MDirection::J2000);
-      everybeam::coords::SetITRFVector(itrfConverter.ToDirection(mDir),
-                                       _m_vector_itrf);
-
-      casacore::MDirection nDir(
-          casacore::MVDirection(casacore::Quantity(ra, radUnit),
-                                casacore::Quantity(dec, radUnit)),
-          casacore::MDirection::J2000);
-      everybeam::coords::SetITRFVector(itrfConverter.ToDirection(nDir),
-                                       _n_vector_itrf);
-
-      vector3r_t itrfDirection;
-
-      itrfDirection[0] =
-          l * _l_vector_itrf[0] + m * _m_vector_itrf[0] + n * _n_vector_itrf[0];
-      itrfDirection[1] =
-          l * _l_vector_itrf[1] + m * _m_vector_itrf[1] + n * _n_vector_itrf[1];
-      itrfDirection[2] =
-          l * _l_vector_itrf[2] + m * _m_vector_itrf[2] + n * _n_vector_itrf[2];
-
-      itrfDirections[y * subgrid_size + x] = itrfDirection;
+      itrfDirections[y * subgrid_size + x] = itrf_direction;
     }
   }
 }

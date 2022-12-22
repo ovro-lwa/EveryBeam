@@ -295,5 +295,4 @@ python-wheel-2204:
     - python3 -c "import everybeam"
   artifacts:
     paths:
-      - dist/everybeam-0.4.0-cp39-cp39-linux_x86_64.whl
-
+      - dist/everybeam-0.5.0-cp39-cp39-linux_x86_64.whl

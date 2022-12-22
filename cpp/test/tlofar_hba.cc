@@ -10,7 +10,6 @@
 #include "../griddedresponse/lofargrid.h"
 #include "../pointresponse/lofarpoint.h"
 #include "../elementresponse.h"
-#include "../coords/coordutils.h"
 #include "../station.h"
 #include "../common/types.h"
 #include "../telescope/lofar.h"
@@ -37,7 +36,6 @@ using everybeam::Station;
 using everybeam::vector3r_t;
 using everybeam::aterms::ATermConfig;
 using everybeam::aterms::ParsetProvider;
-using everybeam::coords::SetITRFVector;
 using everybeam::griddedresponse::GriddedResponse;
 using everybeam::griddedresponse::LOFARGrid;
 using everybeam::pointresponse::LOFARPoint;
@@ -130,11 +128,12 @@ BOOST_AUTO_TEST_CASE(tile_beam_direction) {
   auto lofar_telescope = dynamic_cast<LOFAR*>(telescope.get());
   // Check consistency of the different methods for computing
   // the tile beam direction
-  vector3r_t tile_beam_dir_0, tile_beam_dir_1;
-  SetITRFVector(lofar_telescope->GetTileBeamDirection(), tile_beam_dir_0);
-  SetITRFVector(ReadTileBeamDirection(ms), tile_beam_dir_1);
+  const casacore::MDirection tile_beam_dir_0 =
+      lofar_telescope->GetTileBeamDirection();
+  const casacore::MDirection tile_beam_dir_1 = ReadTileBeamDirection(ms);
   for (size_t i = 0; i < 3; ++i) {
-    BOOST_CHECK_CLOSE(tile_beam_dir_0[i], tile_beam_dir_1[i], 1e-4);
+    BOOST_CHECK_CLOSE(tile_beam_dir_0.getValue().getValue()[i],
+                      tile_beam_dir_1.getValue().getValue()[i], 1e-4);
   }
 }
 

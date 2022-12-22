@@ -9,7 +9,6 @@
 
 #include "config.h"
 #include "../aterms/klfittingaterm.h"
-#include "../coords/coordutils.h"
 
 #include <aocommon/fits/fitsreader.h>
 

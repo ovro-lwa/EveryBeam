@@ -16,7 +16,7 @@ namespace coords {
 // specific directions.
 //      Needed for wslean as well as for the makeeverybeam executable.
 
-ITRFConverter::ITRFConverter(real_t time) {
+ItrfConverter::ItrfConverter(real_t time) {
   // create ITRF Direction from fixed stationposition
   casacore::MVPosition mv_position(ITRFDirection::LOFARPosition()[0],
                                    ITRFDirection::LOFARPosition()[1],
@@ -32,54 +32,19 @@ ITRFConverter::ITRFConverter(real_t time) {
       casacore::MDirection::Ref(casacore::MDirection::ITRF, frame_));
 }
 
-void ITRFConverter::SetTime(real_t time) {
-  // Cannot use MeasFrame::resetEpoch(Double), because that assumes the
-  // argument is UTC in (fractional) days (MJD).
-  frame_.resetEpoch(casacore::Quantity(time, "s"));
+vector3r_t ItrfConverter::RaDecToItrf(const double ra, const double dec) const {
+  const casacore::Unit rad_unit("rad");
+  const casacore::MVDirection mv_direction(casacore::Quantity(ra, rad_unit),
+                                           casacore::Quantity(dec, rad_unit));
+  const casacore::MDirection m_direction(mv_direction,
+                                         casacore::MDirection::J2000);
+  return ToItrf(m_direction);
 }
 
-vector3r_t ITRFConverter::j2000ToITRF(const vector2r_t& j2000Direction) const {
-  casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1]);
-  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
-  const casacore::MVDirection mvITRF = converter_(m_direction).getValue();
-
-  return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
-}
-
-vector3r_t ITRFConverter::j2000ToITRF(const vector3r_t& j2000Direction) const {
-  casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1],
-                                     j2000Direction[2]);
-  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
-
-  const casacore::MVDirection mvITRF = converter_(m_direction).getValue();
-
-  return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
-}
-
-vector3r_t ITRFConverter::ToITRF(const casacore::MDirection& direction) const {
+vector3r_t ItrfConverter::ToItrf(const casacore::MDirection& direction) const {
   const casacore::MVDirection mvITRF = converter_(direction).getValue();
   return vector3r_t{{mvITRF(0), mvITRF(1), mvITRF(2)}};
 }
 
-casacore::MDirection ITRFConverter::ToDirection(
-    const vector2r_t& j2000Direction) const {
-  casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1]);
-  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
-  return converter_(m_direction);
-}
-
-casacore::MDirection ITRFConverter::ToDirection(
-    const vector3r_t& j2000Direction) const {
-  casacore::MVDirection mv_direction(j2000Direction[0], j2000Direction[1],
-                                     j2000Direction[2]);
-  casacore::MDirection m_direction(mv_direction, casacore::MDirection::J2000);
-
-  return converter_(m_direction);
-}
-
-casacore::MDirection ITRFConverter::ToDirection(
-    const casacore::MDirection& direction) const {
-  return converter_(direction);
-}
 }  // namespace coords
 }  // namespace everybeam

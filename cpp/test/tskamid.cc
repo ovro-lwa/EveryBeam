@@ -8,7 +8,6 @@
 #include "../options.h"
 #include "../griddedresponse/skamidgrid.h"
 #include "../pointresponse/skamidpoint.h"
-#include "../coords/coordutils.h"
 
 #include <aocommon/imagecoordinates.h>
 

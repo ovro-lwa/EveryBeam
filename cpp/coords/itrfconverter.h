@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2022 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // itrfconverter.h: Convert time to an ITRF direction.
@@ -15,8 +15,6 @@
 #include <casacore/measures/Measures/MeasConvert.h>
 #include <casacore/measures/Measures/MCDirection.h>
 
-#include <memory>
-
 namespace everybeam {
 namespace coords {
 /**
@@ -25,17 +23,12 @@ namespace coords {
  * NOTE: this class is not thread-safe due to casacore dependencies.
  *
  */
-class ITRFConverter {
+class ItrfConverter {
  public:
-  ITRFConverter(real_t time);
+  ItrfConverter(real_t time);
 
-  void SetTime(real_t time);
-  vector3r_t j2000ToITRF(const vector2r_t& j2000Direction) const;
-  vector3r_t j2000ToITRF(const vector3r_t& j2000Direction) const;
-  vector3r_t ToITRF(const casacore::MDirection& direction) const;
-  casacore::MDirection ToDirection(const vector2r_t& j2000Direction) const;
-  casacore::MDirection ToDirection(const vector3r_t& j2000Direction) const;
-  casacore::MDirection ToDirection(const casacore::MDirection& direction) const;
+  vector3r_t RaDecToItrf(double ra, double dec) const;
+  vector3r_t ToItrf(const casacore::MDirection& direction) const;
 
  private:
   casacore::MeasFrame frame_;
