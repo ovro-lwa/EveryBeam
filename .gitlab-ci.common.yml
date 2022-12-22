@@ -291,8 +291,8 @@ python-wheel-2204:
     GIT_SUBMODULE_STRATEGY: normal
   script:
     - python3 setup.py bdist_wheel
-    - pip install --user dist/*whl
+    - pip install --user dist/*.whl
     - python3 -c "import everybeam"
   artifacts:
     paths:
-      - dist/everybeam-0.5.0-cp39-cp39-linux_x86_64.whl
+      - dist/*.whl
