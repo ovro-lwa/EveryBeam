@@ -563,7 +563,8 @@ void init_telescope(py::module& m) {
 
             const vector3r_t direction = np2vector3r_t(pydirection);
             const vector3r_t station0 = np2vector3r_t(pystation0);
-            const vector3r_t tile0 = np2vector3r_t(pytile0);
+            const vector3r_t tile0 =
+                pytile0.shape()[0] == 0 ? station0 : np2vector3r_t(pytile0);
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
@@ -609,8 +610,8 @@ void init_telescope(py::module& m) {
             Direction of arrival (ITRF, m)
         station0: np.1darray
             Station beam former reference direction (ITRF, m)
-        tile0: np.1darray
-            Tile beam former reference direction (ITRF, m)
+        tile0: np.1darray, optional
+            Tile beam former reference direction (ITRF, m). Defaults to ``station0``.
         rotate: bool, optional
             Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
 
@@ -621,46 +622,7 @@ void init_telescope(py::module& m) {
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"),
-          py::arg("tile0_direction"), py::arg("rotate") = true)
-      // Same as previous, but station0 direction and
-      // tile0 direction coincide.
-      .def(
-          "station_response",
-          [](PhasedArray& self, double time, size_t idx, double freq,
-             const py::array_t<double> pydirection,
-             const py::array_t<double> pystation0,
-             bool rotate) -> py::array_t<std::complex<double>> {
-            py::object py_station_response =
-                py::cast(self).attr("station_response");
-            return py_station_response(time, idx, freq, pydirection, pystation0,
-                                       pystation0, rotate);
-          },
-          R"pbdoc(
-        Get station response in user-specified direction
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        station_idx: int
-            station index
-        freq: float
-            Frequency of the plane wave (Hz)
-        direction: np.1darray
-            Direction of arrival (ITRF, m)
-        station0: np.1darray
-            Station beam former reference direction (ITRF, m)
-        rotate: bool, optional
-            Apply paralactic angle rotation? ``[True/False]`` Defaults to ``True``
-
-        Returns
-        -------
-        np.ndarray
-            Response (Jones) matrix
-       )pbdoc",
-          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
-          py::arg("direction"), py::arg("station0_direction"),
+          py::arg("tile0_direction") = py::array_t<double>(),
           py::arg("rotate") = true)
       .def(
           "station_response",
@@ -847,7 +809,8 @@ void init_telescope(py::module& m) {
             check_station_index(idx, self.GetNrStations(), "array_factor");
             const vector3r_t direction = np2vector3r_t(pydirection);
             const vector3r_t station0 = np2vector3r_t(pystation0);
-            const vector3r_t tile0 = np2vector3r_t(pytile0);
+            const vector3r_t tile0 =
+                pytile0.shape()[0] == 0 ? station0 : np2vector3r_t(pytile0);
 
             std::unique_ptr<PointResponse> point_response =
                 self.GetPointResponse(time);
@@ -878,8 +841,8 @@ void init_telescope(py::module& m) {
             Direction of arrival in ITRF (m)
         station0_direction: np.1darray
             Station beam former reference direction (ITRF, m)
-        tile0_direction: np.1darray
-            Tile beam former reference direction (ITRF, m)
+        tile0_direction: np.1darray, optional
+            Tile beam former reference direction (ITRF, m). Defaults to station0.
 
         Returns
         -------
@@ -888,41 +851,7 @@ void init_telescope(py::module& m) {
        )pbdoc",
           py::arg("time"), py::arg("station_idx"), py::arg("freq"),
           py::arg("direction"), py::arg("station0_direction"),
-          py::arg("tile0_direction"))
-      .def(
-          "array_factor",
-          [](PhasedArray& self, double time, size_t idx, double freq,
-             const py::array_t<double> pydirection,
-             const py::array_t<double> pystation0)
-              -> py::array_t<std::complex<double>> {
-            py::object py_array_factor = py::cast(self).attr("array_factor");
-            return py_array_factor(time, idx, freq, pydirection, pystation0,
-                                   pystation0);
-          },
-          R"pbdoc(
-        Get array factor for a given station in prescribed direction.
-
-        Parameters
-        ----------
-        time: double
-            Evaluation response at time.
-            Time in modified Julian date, UTC, in seconds (MJD(UTC), s)
-        station_idx: int
-            station index
-        freq: float
-            Frequency of the plane wave (Hz)
-        direction: np.1darray
-            Direction of arrival in ITRF (m)
-        station0_direction: np.1darray
-            Station beam former reference direction (ITRF, m)
-
-        Returns
-        -------
-        np.ndarray
-            Response diagonal (Jones) matrix
-       )pbdoc",
-          py::arg("time"), py::arg("station_idx"), py::arg("freq"),
-          py::arg("direction"), py::arg("station0_direction"));
+          py::arg("tile0_direction") = py::array_t<double>());
 
   py::class_<LOFAR, PhasedArray>(m, "LOFAR",
                                  R"pbdoc(

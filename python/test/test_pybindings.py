@@ -233,7 +233,6 @@ def test_lofar(ref, differential_beam):
         freq,
         ref["station0"],
         ref["station0"],
-        ref["station0"],
     )
     np.testing.assert_allclose(
         array_factor_I, np.eye(2, dtype=np.complex64), rtol=1e-6
