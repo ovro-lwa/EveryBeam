@@ -37,19 +37,14 @@ void PhasedArrayPoint::Response(BeamMode beam_mode, std::complex<float>* buffer,
     has_partial_itrf_update_ = false;
   }
 
-  const PhasedArray& phased_array =
-      static_cast<const PhasedArray&>(*telescope_);
-
   aocommon::MC2x2F inverse_central_gain;
   const bool apply_normalisation = CalculateBeamNormalisation(
       beam_mode, time_, freq, station_idx, inverse_central_gain);
-  const double sb_freq = use_channel_frequency_ ? freq : subband_frequency_;
 
-  const aocommon::MC2x2F gain_matrix =
-      aocommon::MC2x2F(phased_array.GetStation(station_idx)
-                           .Response(beam_mode, time_, freq, itrf_direction_,
-                                     sb_freq, station0_, tile0_)
-                           .Data());
+  const aocommon::MC2x2F gain_matrix(
+      UnnormalisedResponse(beam_mode, station_idx, freq, itrf_direction_,
+                           station0_, tile0_)
+          .Data());
 
   if (apply_normalisation) {
     aocommon::MC2x2F::ATimesB(buffer, inverse_central_gain, gain_matrix);
