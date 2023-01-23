@@ -801,13 +801,65 @@ void init_telescope(py::module& m) {
           py::arg("rotate") = true)
       .def(
           "array_factor",
-          [](PhasedArray& self, double time, size_t idx, double freq,
-             const py::array_t<double> pydirection,
+          [](PhasedArray& self, double time,
+             py::array_t<size_t, py::array::c_style | py::array::forcecast>
+                 station_indices,
+             py::array_t<double, py::array::c_style> frequencies,
+             const py::array_t<double, py::array::c_style> directions,
              const py::array_t<double> pystation0,
              const py::array_t<double> pytile0)
               -> py::array_t<std::complex<double>> {
-            check_station_index(idx, self.GetNrStations(), "array_factor");
-            const vector3r_t direction = np2vector3r_t(pydirection);
+            if (directions.shape(directions.ndim() - 1) != 3) {
+              throw std::runtime_error(
+                  "array_factor: Directions should have three values (x,y,z) "
+                  "in the last dimension.");
+            }
+
+            if (station_indices.size() == 0) {
+              station_indices.resize({self.GetNrStations()});
+              for (size_t i = 0; i < self.GetNrStations(); ++i) {
+                station_indices.mutable_data()[i] = i;
+              }
+            } else {
+              const size_t n_station_indices = station_indices.size();
+              for (size_t i = 0; i < n_station_indices; ++i) {
+                check_station_index(station_indices.data()[i],
+                                    self.GetNrStations(), "array_factor");
+              }
+            }
+
+            if (frequencies.size() == 0) {
+              frequencies.resize({self.GetNrChannels()});
+              for (size_t i = 0; i < self.GetNrChannels(); ++i) {
+                frequencies.mutable_data()[i] = self.GetChannelFrequency(i);
+              }
+            }
+
+            // Compose the output shape. When the station index or frequency
+            // argument is a single scalar, the number of dimensions is zero.
+            std::vector<size_t> output_shape;
+            for (int d = 0; d < station_indices.ndim(); ++d) {
+              output_shape.push_back(station_indices.shape()[d]);
+            }
+            for (int d = 0; d < frequencies.ndim(); ++d) {
+              output_shape.push_back(frequencies.shape()[d]);
+            }
+            size_t n_directions = 1;
+            for (int d = 0; d < directions.ndim() - 1; ++d) {
+              output_shape.push_back(directions.shape()[d]);
+              n_directions *= directions.shape()[d];
+            }
+            output_shape.push_back(2);
+            output_shape.push_back(2);
+
+            py::array_t<std::complex<double>> response(output_shape);
+            static_assert(sizeof(aocommon::MC2x2) ==
+                          2 * 2 * sizeof(std::complex<double>));
+            aocommon::MC2x2* response_ptr =
+                reinterpret_cast<aocommon::MC2x2*>(response.mutable_data());
+            const vector3r_t* direction_ptr =
+                reinterpret_cast<const vector3r_t*>(directions.data());
+
             const vector3r_t station0 = np2vector3r_t(pystation0);
             const vector3r_t tile0 =
                 pytile0.shape()[0] == 0 ? station0 : np2vector3r_t(pytile0);
@@ -817,12 +869,19 @@ void init_telescope(py::module& m) {
             PhasedArrayPoint& phased_array_point =
                 static_cast<PhasedArrayPoint&>(*point_response);
 
-            // Diagonal to 2x2 matrix
-            const aocommon::MC2x2 response(
-                phased_array_point.UnnormalisedResponse(BeamMode::kArrayFactor,
-                                                        idx, freq, direction,
-                                                        station0, tile0));
-            return cast_matrix(response);
+            for (int s = 0; s < station_indices.size(); ++s) {
+              for (int f = 0; f < frequencies.size(); ++f) {
+                for (size_t d = 0; d < n_directions; ++d) {
+                  // Diagonal to 2x2 matrix
+                  *response_ptr = phased_array_point.UnnormalisedResponse(
+                      BeamMode::kArrayFactor, station_indices.data()[s],
+                      frequencies.data()[f], direction_ptr[d], station0, tile0);
+                  ++response_ptr;
+                }
+              }
+            }
+
+            return response;
           },
           R"pbdoc(
         Get array factor for a given station in prescribed direction, with user-defined

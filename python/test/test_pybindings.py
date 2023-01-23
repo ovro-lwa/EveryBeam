@@ -129,6 +129,71 @@ def check_consistency_station_response(telescope, time):
             np.testing.assert_allclose(freq_single, channel_single)
 
 
+def check_array_factor_vector(telescope, time, direction, station0, tile0):
+    frequencies = np.array([100e6, 110e6, 120e6])
+    station_indices = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
+    directions = np.stack([direction, direction, direction])
+    directions[1, 0] *= -1.0
+    directions[2, 1] *= -1.0
+
+    all_array_factors = telescope.array_factor(
+        time, station_indices, frequencies, directions, station0, tile0
+    )
+    assert (
+        all_array_factors.shape
+        == station_indices.shape
+        + frequencies.shape
+        + directions.shape[:-1]
+        + (2, 2)
+    )
+    for f in range(frequencies.size):
+        for s0 in range(station_indices.shape[0]):
+            for s1 in range(station_indices.shape[1]):
+                for d in range(directions.shape[0]):
+                    single_array_factor = telescope.array_factor(
+                        time,
+                        station_indices[s0, s1],
+                        frequencies[f],
+                        directions[d],
+                        station0,
+                        tile0,
+                    )
+                    assert single_array_factor.shape == (2, 2)
+                    np.testing.assert_allclose(
+                        all_array_factors[s0, s1, f, d, :, :],
+                        single_array_factor,
+                    )
+
+
+def check_array_factor_all_stations_all_frequencies(
+    telescope, time, direction, station0, tile0
+):
+    all_array_factors = telescope.array_factor(
+        time, [], [], direction, station0, tile0
+    )
+    assert all_array_factors.shape == (
+        telescope.nr_stations,
+        telescope.nr_channels,
+        2,
+        2,
+    )
+    for s in range(telescope.nr_stations):
+        for f in range(telescope.nr_channels):
+            single_array_factor = telescope.array_factor(
+                time,
+                s,
+                telescope.channel_frequency(f),
+                direction,
+                station0,
+                tile0,
+            )
+            assert single_array_factor.shape == (2, 2)
+            np.testing.assert_allclose(
+                all_array_factors[s, f, :, :],
+                single_array_factor,
+            )
+
+
 def check_reference_solution(
     telescope,
     time,
@@ -215,6 +280,13 @@ def test_lofar(ref, differential_beam):
     )
 
     check_consistency_station_response(telescope, time)
+    check_array_factor_vector(
+        telescope, time, direction, ref["station0"], ref["tile0"]
+    )
+    check_array_factor_all_stations_all_frequencies(
+        telescope, time, direction, ref["station0"], ref["tile0"]
+    )
+
     check_reference_solution(
         telescope,
         time,
@@ -324,7 +396,7 @@ def test_lofar_integrated_beam(ref):
     telescope = load_telescope(ms_path)
 
     nbaselines = telescope.nr_stations * (telescope.nr_stations + 1) // 2
-    baseline_weights = np.ones(nbaselines, dtype=np.float)
+    baseline_weights = np.ones(nbaselines, dtype=float)
     undersampling = 2
 
     # Provide single time
@@ -333,7 +405,7 @@ def test_lofar_integrated_beam(ref):
     )
 
     # Vector of times
-    baseline_weights = np.ones(nbaselines * 2, dtype=np.float)
+    baseline_weights = np.ones(nbaselines * 2, dtype=float)
     undersampled_response_1 = telescope.undersampled_response(
         ref["coordinate_system"],
         np.array([ref["time"], ref["time"]]),
