@@ -52,11 +52,27 @@ aocommon::UVector<std::complex<double>> BeamFormer::ComputeGeometricResponse(
   // Allocate and fill result vector by looping over antennas
   aocommon::UVector<std::complex<double>> result(
       phase_reference_positions.size());
+  std::vector<double> dl(phase_reference_positions.size());
+  std::vector<double> sin_phase(phase_reference_positions.size());
+  std::vector<double> cos_phase(phase_reference_positions.size());
+#pragma GCC ivdep
   for (size_t i = 0; i < phase_reference_positions.size(); ++i) {
-    const double dl = dot(direction, phase_reference_positions[i]);
-    // Note that the frequency is (and should be!) implicit in dl!
-    const double phase = two_pi_over_c * dl;
-    result[i] = {std::cos(phase), std::sin(phase)};
+    dl[i] = two_pi_over_c * dot(direction, phase_reference_positions[i]);
+  }
+// Note that sincos() does not vectorize yet, and
+// separate sin() cos() is merged to sincos() by the compiler.
+// Hence split the loop into separate sin(), cos() loops.
+#pragma GCC ivdep
+  for (size_t i = 0; i < phase_reference_positions.size(); ++i) {
+    sin_phase[i] = std::sin(dl[i]);
+  }
+#pragma GCC ivdep
+  for (size_t i = 0; i < phase_reference_positions.size(); ++i) {
+    cos_phase[i] = std::cos(dl[i]);
+  }
+#pragma GCC ivdep
+  for (size_t i = 0; i < phase_reference_positions.size(); ++i) {
+    result[i] = {cos_phase[i], sin_phase[i]};
   }
   return result;
 }
