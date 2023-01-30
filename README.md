@@ -4,10 +4,11 @@ This package can be used to compute the beam response for a variety of
 radio telescopes, i.e.:
 
 * LOFAR
-* OSKAR
-* MWA
-* VLA
+* SKA/OSKAR
 * ATCA
+* GMRT
+* VLA
+* MWA
 
 This package also provides an abstract interface to a selection of beam responses for apperture arrays (LOFAR/OSKAR), and beamformed versions thereof. Currently implemented are:
 

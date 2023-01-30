@@ -5,6 +5,6 @@
 
 namespace everybeam {
 namespace circularsymmetric {
-constexpr std::array<double, 15> GMRTCoefficients::coefficients_;
+constexpr std::array<double, 20> GMRTCoefficients::coefficients_;
 }
 }  // namespace everybeam
