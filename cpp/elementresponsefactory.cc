@@ -31,10 +31,15 @@ std::shared_ptr<const ElementResponse> ElementResponse::GetInstance(
       try {
         return LOBESElementResponse::GetInstance(name, options);
       } catch (const std::runtime_error& e) {
-        std::cout << "Creating LOBESElementResponse for station " << name
-                  << " failed because: " << std::endl;
-        std::cout << e.what() << std::endl;
-        std::cout << "Switching to HamakerElementResponse instead" << std::endl;
+        static bool first_time = true;
+        if (first_time) {
+          std::cout << "Creating LOBESElementResponse for station " << name
+                    << " failed because: \n"
+                    << e.what() << '\n'
+                    << "Switching to HamakerElementResponse instead. Further "
+                       "warnings of this type will be suppressed.\n";
+          first_time = false;
+        }
         return std::make_shared<HamakerElementResponse>(name);
       }
     default:

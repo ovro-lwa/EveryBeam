@@ -152,14 +152,14 @@ LOBESElementResponse::LOBESElementResponse(const std::string& name,
   H5::H5File h5file;
 
   if (!std::filesystem::exists(coeff_file_path)) {
-    throw std::runtime_error("LOBES coeffcients file: " +
+    throw std::runtime_error("LOBES coefficients file: " +
                              coeff_file_path.string() + " does not exists");
   }
 
   try {
     h5file.openFile(coeff_file_path.c_str(), H5F_ACC_RDONLY);
   } catch (const H5::FileIException& e) {
-    throw std::runtime_error("Could not open LOBES coeffcients file: " +
+    throw std::runtime_error("Could not open LOBES coefficients file: " +
                              coeff_file_path.string());
   }
 
