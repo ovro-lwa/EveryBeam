@@ -63,7 +63,6 @@ if debug:
 
 # Parse all freqs
 for freq in tqdm(freqs):
-
     A = None
 
     for i, pol in enumerate(("x", "y")):

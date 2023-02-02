@@ -105,7 +105,6 @@ def F41(m, n, theta, phi, beta):
 
 
 def F42(m, n, theta, phi, beta):
-
     if m != 0:
         C = (
             beta

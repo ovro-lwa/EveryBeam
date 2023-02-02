@@ -19,9 +19,9 @@ coords = loadmat("CS302_coords")
 
 simdata = loadmat("LBA_CS302_fine")
 
-#%
-#% Compensate phase for element position
-#%
+# %
+# % Compensate phase for element position
+# %
 
 P = coords["LBA"]["P"][0, 0][:, 0]
 Q = coords["LBA"]["Q"][0, 0][:, 0]
@@ -119,7 +119,7 @@ with h5py.File("LBA_CS302.hdf5", "w") as f:
 # Erecon=F*Q;
 # E=reshape(E,length(Theta),length(Phi),2);
 # Erecon=reshape(Erecon,length(Theta),length(Phi),2);
-#%
+# %
 # h1=figure;
 # plot(Theta,20.*log10(abs(E(:,Phi==45,1))),'b')
 # grid on
@@ -152,7 +152,7 @@ with h5py.File("LBA_CS302.hdf5", "w") as f:
 # xlabel('Theta (degrees)')
 # ylabel('degrees')
 # title({['EEP element 1, \phi=135 deg., freq. ' num2str(Freq(FreqN)./1e6) ' MHz'],'\phi-component (phase)'})
-#%
+# %
 # Diff=Erecon./E;
 # h5=figure;
 # plot(Theta,20.*log10(abs(Diff(:,Phi==45,1))),'b')
@@ -174,7 +174,7 @@ with h5py.File("LBA_CS302.hdf5", "w") as f:
 # legend('\theta-comp., \phi=45^\circ','\phi-comp., \phi=135^\circ')
 # title({'Difference between original and','reconstructed EEP (phase)', ...
 # ['Element ' num2str(El) ', freq. ' num2str(Freq(FreqN)./1e6) ' MHz']})
-#%
+# %
 # figure(h1)
 # legend('original','reconstructed')
 # figure(h2)
@@ -188,7 +188,7 @@ with h5py.File("LBA_CS302.hdf5", "w") as f:
 # grid on
 # xlabel('Index number')
 # title('Absolute value of calculated coefficients')
-#%
+# %
 # disp(['Least square error = ' num2str(norm(E(:)-F*pinv(F)*E(:),2))])
 # disp(['Condition number F = ' num2str(cond(F))])
 # disp(['Size F = ' num2str(size(F))])

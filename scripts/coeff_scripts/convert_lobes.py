@@ -504,7 +504,10 @@ def main():
             element_select=element_select,
         )
         # Please note that freqs have to be converted from MHz to Hz!
-        F, pT, = fit_and_write_lobes_coeffs(
+        (
+            F,
+            pT,
+        ) = fit_and_write_lobes_coeffs(
             h5data["theta"],
             h5data["phi"],
             h5data["freq"] * 1e6,
@@ -536,7 +539,10 @@ def main():
         positions = read_lofar_antenna_positions(f"{station}LBA")
         simdata = read_simulation_files(path)
 
-        F, pT, = fit_and_write_lobes_coeffs(
+        (
+            F,
+            pT,
+        ) = fit_and_write_lobes_coeffs(
             simdata["theta"],
             simdata["phi"],
             simdata["freq"],
