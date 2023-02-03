@@ -14,3 +14,4 @@ the element and station response for a LOFAR observation.
    demos/oskar-point-response
    demos/lofar-grid-response
    demos/lofar-lobes
+   demos/lofar-array-factor
