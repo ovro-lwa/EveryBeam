@@ -132,19 +132,25 @@ void GriddedResponse::UpsampleResponse(
     float* destination, size_t element_index, size_t width, size_t height,
     const std::vector<aocommon::HMC4x4>& undersampled_beam,
     size_t undersampling_factor) {
-  const size_t undersampled_width = width / undersampling_factor;
-  const size_t undersampled_height = height / undersampling_factor;
+  if (undersampling_factor != 1) {
+    const size_t undersampled_width = width / undersampling_factor;
+    const size_t undersampled_height = height / undersampling_factor;
 
-  common::FFTResampler resampler(undersampled_width, undersampled_height, width,
-                                 height);
-  resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
-  UVector<float> lowres_input(undersampled_width * undersampled_height);
+    common::FFTResampler resampler(undersampled_width, undersampled_height,
+                                   width, height);
+    resampler.SetWindowFunction(aocommon::WindowFunction::RaisedHann, true);
+    UVector<float> lowres_input(undersampled_width * undersampled_height);
 
-  for (size_t i = 0; i != undersampled_width * undersampled_height; ++i) {
-    lowres_input[i] = undersampled_beam[i].Data(element_index);
+    for (size_t i = 0; i != undersampled_width * undersampled_height; ++i) {
+      lowres_input[i] = undersampled_beam[i].Data(element_index);
+    }
+    // Resample and write to the "element_index-th image" in the output buffer
+    resampler.Resample(lowres_input.data(), destination);
+  } else {
+    for (size_t i = 0; i != width * height; ++i) {
+      destination[i] = undersampled_beam[i].Data(element_index);
+    }
   }
-  // Resample and write to the "element_index-th image" in the output buffer
-  resampler.Resample(lowres_input.data(), destination);
 }
 
 void GriddedResponse::MakeIntegratedSnapshot(

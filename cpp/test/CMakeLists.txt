@@ -13,6 +13,7 @@ set(MOCK_MS
     LOFAR_LBA_MOCK
     AARTFAAC_LBA_MOCK
     AARTFAAC_6_LBA_MOCK
+    GMRT_MOCK
     OSKAR_MOCK
     SCREEN_FITTING
     SKA_MID_MOCK
@@ -45,6 +46,7 @@ set(TEST_FILENAMES
     runtests.cc
     tatermconfig.cc
     telementresponsefixeddirection.cc
+    tgmrt.cc
     tgriddedresponse.cc
     tlofar_hba.cc
     tlofar_lba.cc
@@ -80,6 +82,8 @@ add_custom_target(
           AARTFAAC_LBA_MOCK.ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
           AARTFAAC_6_LBA_MOCK.ms.tar.gz AARTFAAC_6_LBA_MOCK.ms
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh GMRT_MOCK.tar.bz2
+          GMRT_MOCK.ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh
           OSKAR-single-timeslot.tar.bz2 OSKAR_MOCK.ms
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/download_ms.sh

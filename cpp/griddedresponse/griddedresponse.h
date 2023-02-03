@@ -37,8 +37,8 @@ class GriddedResponse {
 
   /**
    * @brief Compute the beam for a single station, given a prescribed beam mode.
-   * Result is stored in the output buffer, which should accommodate a Jones
-   * matrix (4 complex floats per pixel.
+   * Result is stored in the output buffer, which should allow storing Jones
+   * matrices (4 complex floats per pixel).
    *
    * @param beam_mode Selects beam mode (BeamMode::kElement,
    * BeamMode::kArrayFactor or BeamMode::kFull)
