@@ -70,7 +70,7 @@ endif()
 
 # Include aocommon/eigen3/pybind11 headers
 include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
-include_directories("${CMAKE_SOURCE_DIR}/external/eigen/")
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/external/eigen/")
 # Find python with cmake to convince pybind11 to use right python path
 # This can go when we're using CMake >= 3.12:
 # https://pybind11.readthedocs.io/en/stable/compiling.html#findpython-mode
@@ -98,7 +98,7 @@ find_package(Threads REQUIRED)
 # Find and include Casacore
 set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
 find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
-include_directories(${CASACORE_INCLUDE_DIRS})
+include_directories(SYSTEM ${CASACORE_INCLUDE_DIRS})
 
 # Find and include Boost headers (boost::math required for MWA beam)
 find_package(Boost REQUIRED)
@@ -136,7 +136,17 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
-add_compile_options("${OpenMP_CXX_FLAGS}" -Wall)
+add_compile_options(
+  "${OpenMP_CXX_FLAGS}"
+  -Wall
+  -Wnon-virtual-dtor
+  -Wzero-as-null-pointer-constant
+  -Wduplicated-branches
+  -Wundef
+  -Wvla
+  -Wpointer-arith
+  -Wextra
+  -Wno-unused-parameter)
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

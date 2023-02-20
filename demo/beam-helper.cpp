@@ -150,16 +150,13 @@ void StoreBeam(const std::string& filename, const std::complex<float>* buffer,
             << " x " << ny << ")\n";
   std::vector<double> img(nx * ny * width * height, 0.0);
   for (size_t ant = 0; ant != nStations; ++ant) {
-    typedef std::complex<float> Data[nStations][height][width][4];
-    Data* data_ptr = (Data*)buffer;
-
     size_t xCorner = (ant % nx) * width, yCorner = (ant / nx) * height;
     for (size_t y = 0; y != height; ++y) {
       for (size_t x = 0; x != width; ++x) {
         std::complex<float> response = 0;
         for (auto pol = 0; pol < 4; pol++) {
-          std::complex<float> value = (*data_ptr)[ant][y][x][pol];
-          response += value * std::conj(value);
+          response += *buffer * std::conj(*buffer);
+          ++buffer;
         }
         img[(yCorner + y) * width * nx + x + xCorner] = abs(response) / 2;
       }
