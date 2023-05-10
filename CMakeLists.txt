@@ -76,7 +76,7 @@ include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/external/eigen/")
 # https://pybind11.readthedocs.io/en/stable/compiling.html#findpython-mode
 find_package(PythonInterp 3)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/pybind11")
-include_directories(${pybind11_INCLUDE_DIRS})
+include_directories(SYSTEM ${pybind11_INCLUDE_DIRS})
 
 # Include schaapcommon
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/schaapcommon")
@@ -91,7 +91,7 @@ find_package(
   COMPONENTS C CXX
   REQUIRED)
 add_definitions(${HDF5_DEFINITIONS} -DH5_USE_110_API)
-include_directories(${HDF5_INCLUDE_DIRS})
+include_directories(SYSTEM ${HDF5_INCLUDE_DIRS})
 
 find_package(Threads REQUIRED)
 
@@ -102,14 +102,14 @@ include_directories(SYSTEM ${CASACORE_INCLUDE_DIRS})
 
 # Find and include Boost headers (boost::math required for MWA beam)
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # Find and include FFTW3 float libraries
 find_package(
   FFTW3
   COMPONENTS single
   REQUIRED)
-include_directories(${FFTW3_INCLUDE_DIR})
+include_directories(SYSTEM ${FFTW3_INCLUDE_DIR})
 
 # Find BLAS and LAPACK, needed for everybeam::aterms only
 find_package(BLAS REQUIRED)
@@ -117,7 +117,7 @@ find_package(LAPACK REQUIRED)
 
 # Find CFITSIO, needed for everybeam::aterms only
 find_package(CFITSIO REQUIRED)
-include_directories(${CFITSIO_INCLUDE_DIRS})
+include_directories(SYSTEM ${CFITSIO_INCLUDE_DIRS})
 
 #------------------------------------------------------------------------------
 # Set CMake and compiler options
