@@ -33,7 +33,8 @@ class Cache {
   Cache& operator=(const Cache&) = delete;
   Cache& operator=(Cache&&) = default;
 
-  static const size_t kNotFound;  // = std::numeric_limits<size_t>::max();
+  [[gnu::visibility("default")]] static const size_t
+      kNotFound;  // = std::numeric_limits<size_t>::max();
 
   /**
    * Clears all stored values, such that e.g. the cache is ready for a new

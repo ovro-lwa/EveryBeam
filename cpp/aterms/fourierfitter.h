@@ -14,7 +14,7 @@
 namespace everybeam {
 namespace aterms {
 
-class FourierFitter {
+class [[gnu::visibility("default")]] FourierFitter {
  public:
   FourierFitter(std::size_t subgrid_size, std::size_t support,
                 const std::vector<std::pair<float, float>>& directions);

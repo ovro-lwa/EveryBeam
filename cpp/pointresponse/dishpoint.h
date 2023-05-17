@@ -17,18 +17,18 @@ namespace pointresponse {
  * e.g. VLA, ATCA.
  *
  */
-class DishPoint : public PointResponse {
+class [[gnu::visibility("default")]] DishPoint : public PointResponse {
  public:
   DishPoint(const telescope::Telescope* telescope_ptr, double time)
       : PointResponse(telescope_ptr, time){};
 
-  void Response(BeamMode beam_mode, std::complex<float>* buffer, double ra,
-                double dec, double freq, size_t station_idx,
-                size_t field_id) override;
+  void Response(BeamMode beam_mode, std::complex<float> * buffer, double ra,
+                double dec, double freq, size_t station_idx, size_t field_id)
+      override;
 
-  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double ra, double dec, double freq,
-                           size_t field_id) final override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float> * buffer,
+                           double ra, double dec, double freq, size_t field_id)
+      final override;
 };
 }  // namespace pointresponse
 }  // namespace everybeam

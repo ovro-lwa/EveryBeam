@@ -8,19 +8,27 @@
 #include <complex>
 #include <vector>
 
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
+
 #include <xtensor/xadapt.hpp>
 
 #include <aocommon/matrix2x2.h>
 #include <aocommon/parallelfor.h>
 #include <aocommon/system.h>
 
+#include "../cpp/msreadutils.h"
+#include "../cpp/options.h"
+#include "../cpp/station.h"
+
 #include "beam-helper.h"
 
 void calculateStationBeams(
     std::vector<std::shared_ptr<everybeam::Station>>& stations,
-    std::vector<vector3r_t>& itrfDirections, vector3r_t stationDirection,
-    vector3r_t tileDirection, unsigned int subgrid_size,
-    std::vector<std::complex<float>>& buffer, double time, double frequency) {
+    std::vector<everybeam::vector3r_t>& itrfDirections,
+    everybeam::vector3r_t stationDirection, everybeam::vector3r_t tileDirection,
+    unsigned int subgrid_size, std::vector<std::complex<float>>& buffer,
+    double time, double frequency) {
   const size_t n_stations = stations.size();
   const std::array<size_t, 4> shape{n_stations, subgrid_size, subgrid_size, 4};
   auto data = xt::adapt(buffer, shape);
@@ -78,9 +86,9 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read stations
   std::vector<std::shared_ptr<everybeam::Station>> stations;
   stations.resize(nr_stations);
-  Options options;
+  everybeam::Options options;
   options.element_response_model = elementResponseModel;
-  ReadAllStations(ms, stations.begin(), options);
+  everybeam::ReadAllStations(ms, stations.begin(), options);
 
   // Imaging parameters
   float image_size = 0.5;    // in radians
@@ -88,16 +96,17 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
 
   // Evaluate beam directions in ITRF coordinates
   std::cout << ">>> Computing directions to evaluate beam" << std::endl;
-  std::vector<vector3r_t> itrfDirections(subgrid_size * subgrid_size);
+  std::vector<everybeam::vector3r_t> itrfDirections(subgrid_size *
+                                                    subgrid_size);
   GetITRFDirections(itrfDirections.data(), subgrid_size, image_size,
                     currentTime, phaseCentreRA, phaseCentreDec);
 
   // Set station beam direction to centre of field
-  vector3r_t stationDirection =
+  everybeam::vector3r_t stationDirection =
       itrfDirections[(subgrid_size / 2) * subgrid_size + (subgrid_size / 2)];
 
   // Set tile beam direction equal to station direction
-  vector3r_t tileDirection = stationDirection;
+  everybeam::vector3r_t tileDirection = stationDirection;
 
   // Compute station beams
   std::cout << ">>> Computing station beams" << std::endl;

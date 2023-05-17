@@ -17,7 +17,8 @@ namespace skamidbeam {
  */
 class SkaMidAnalyticalResponse final : public SkaMidResponse {
  public:
-  SkaMidAnalyticalResponse(double diameter, double blockage);
+  [[gnu::visibility("default")]] SkaMidAnalyticalResponse(double diameter,
+                                                          double blockage);
 
   void Render(std::complex<float>* aterm, size_t width, size_t height,
               double pixel_scale_x, double pixel_scale_y,

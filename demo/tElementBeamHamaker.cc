@@ -1,11 +1,13 @@
 // Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "../cpp/elementresponse.h"
+
 #include "config.h"
 
 #include "tElementBeamCommon.h"
 
-using namespace everybeam;
+using everybeam::ElementResponseModel;
 
 int main() {
   ElementResponseModel model(ElementResponseModel::kHamaker);

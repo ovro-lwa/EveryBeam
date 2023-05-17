@@ -28,7 +28,8 @@ class FourierFitter;
  * leading to aterms that have both limited support and
  * an exact reconstruction at the points of interest.
  */
-class FourierFittingATerm final : public ATermBase {
+class [[gnu::visibility("default")]] FourierFittingATerm final
+    : public ATermBase {
  public:
   /**
    * @brief Constructs FourierFittingATerm
@@ -65,7 +66,7 @@ class FourierFittingATerm final : public ATermBase {
    * @return true Results are updated
    * @return false No need to update the result, cached result can be used
    */
-  bool Calculate(std::complex<float>* buffer, double time, double frequency,
+  bool Calculate(std::complex<float> * buffer, double time, double frequency,
                  size_t field_id, const double* uvw_in_m) override;
 
   /**

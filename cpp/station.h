@@ -24,7 +24,7 @@
 
 namespace everybeam {
 
-class Station {
+class [[gnu::visibility("default")]] Station {
  public:
   /*!
    *  \brief Construct a new Station instance.
@@ -142,10 +142,9 @@ class Station {
    *  point \e from the ground \e towards the direction from which the plane
    *  wave arrives.
    */
-  aocommon::MC2x2Diag ArrayFactor(real_t time, real_t freq,
-                                  const vector3r_t& direction, real_t freq0,
-                                  const vector3r_t& station0,
-                                  const vector3r_t& tile0) const;
+  aocommon::MC2x2Diag ArrayFactor(
+      real_t time, real_t freq, const vector3r_t& direction, real_t freq0,
+      const vector3r_t& station0, const vector3r_t& tile0) const;
 
   /*!
    *  \name Convenience member functions
@@ -251,10 +250,10 @@ class Station {
    *  real_t freq0, const vector3r_t &station0, const vector3r_t &tile0) const
    */
   template <typename T, typename U>
-  void ArrayFactor(unsigned int count, real_t time, T freq,
-                   const vector3r_t& direction, T freq0,
-                   const vector3r_t& station0, const vector3r_t& tile0,
-                   U buffer) const;
+  void ArrayFactor(
+      unsigned int count, real_t time, T freq, const vector3r_t& direction,
+      T freq0, const vector3r_t& station0, const vector3r_t& tile0, U buffer)
+      const;
 
   // @}
 

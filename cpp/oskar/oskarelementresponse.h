@@ -16,18 +16,20 @@ namespace everybeam {
 class Datafile;
 
 //! Implementation of the OSKAR dipole response model
-class OSKARElementResponseDipole : public ElementResponse {
+class [[gnu::visibility("default")]] OSKARElementResponseDipole
+    : public ElementResponse {
  public:
   ElementResponseModel GetModel() const final override {
     return ElementResponseModel::kOSKARDipole;
   }
 
-  aocommon::MC2x2 Response(double freq, double theta,
-                           double phi) const final override;
+  aocommon::MC2x2 Response(double freq, double theta, double phi)
+      const final override;
 };
 
 //! Implementation of the OSKAR spherical wave response model
-class OSKARElementResponseSphericalWave : public ElementResponse {
+class [[gnu::visibility("default")]] OSKARElementResponseSphericalWave
+    : public ElementResponse {
  public:
   /** Constructor loading the default coefficients file */
   OSKARElementResponseSphericalWave();
@@ -42,8 +44,8 @@ class OSKARElementResponseSphericalWave : public ElementResponse {
     return ElementResponseModel::kOSKARSphericalWave;
   }
 
-  aocommon::MC2x2 Response(double freq, double theta,
-                           double phi) const final override;
+  aocommon::MC2x2 Response(double freq, double theta, double phi)
+      const final override;
 
   aocommon::MC2x2 Response(int element_id, double freq, double theta,
                            double phi) const final override;

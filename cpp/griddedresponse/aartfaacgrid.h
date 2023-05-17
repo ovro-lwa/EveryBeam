@@ -19,7 +19,8 @@ namespace griddedresponse {
  * fact that the station response is identical for all stations
  * within an AARTFAAC observation.
  */
-class AartfaacGrid final : public PhasedArrayGrid {
+class [[gnu::visibility("default")]] AartfaacGrid final
+    : public PhasedArrayGrid {
  public:
   /**
    * @brief Construct a new AartfaacGrid object
@@ -31,15 +32,15 @@ class AartfaacGrid final : public PhasedArrayGrid {
                const aocommon::CoordinateSystem& coordinate_system)
       : PhasedArrayGrid(telescope_ptr, coordinate_system){};
 
-  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double time, double frequency,
-                           size_t field_id) override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float> * buffer,
+                           double time, double frequency, size_t field_id)
+      override;
 
  private:
   // Override MakeIntegratedSnapshot for efficiency.
   // Implementation is similar to MWAGrid::MakeIntegratedSnapshot
   void MakeIntegratedSnapshot(BeamMode beam_mode,
-                              std::vector<aocommon::HMC4x4>& matrices,
+                              std::vector<aocommon::HMC4x4> & matrices,
                               double time, double frequency, size_t field_id,
                               const double* baseline_weights_interval) override;
 };

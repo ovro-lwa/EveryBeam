@@ -23,7 +23,7 @@ namespace coords {
  * NOTE: this class is not thread-safe due to casacore dependencies.
  *
  */
-class ItrfConverter {
+class [[gnu::visibility("default")]] ItrfConverter {
  public:
   ItrfConverter(real_t time);
 

@@ -14,7 +14,7 @@
 namespace everybeam {
 namespace aterms {
 
-class KlFitter {
+class [[gnu::visibility("default")]] KlFitter {
  public:
   KlFitter(std::size_t subgrid_size, int order,
            const std::vector<std::pair<float, float>>& directions);

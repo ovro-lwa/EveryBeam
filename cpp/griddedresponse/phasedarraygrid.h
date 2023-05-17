@@ -18,18 +18,20 @@ class Lane;
 
 namespace everybeam {
 namespace griddedresponse {
-class PhasedArrayGrid : public GriddedResponse, protected PhasedArrayResponse {
+class [[gnu::visibility("default")]] PhasedArrayGrid
+    : public GriddedResponse,
+      protected PhasedArrayResponse {
  public:
   PhasedArrayGrid(const telescope::Telescope* telescope_ptr,
                   const aocommon::CoordinateSystem& coordinate_system);
 
-  void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
-                double frequency, size_t station_idx,
-                size_t field_id) final override;
+  void Response(BeamMode beam_mode, std::complex<float> * buffer, double time,
+                double frequency, size_t station_idx, size_t field_id)
+      final override;
 
-  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double time, double frequency,
-                           size_t field_id) override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float> * buffer,
+                           double time, double frequency, size_t field_id)
+      override;
 
  private:
   vector3r_t l_vector_itrf_;

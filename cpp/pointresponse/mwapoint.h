@@ -15,7 +15,7 @@
 namespace everybeam {
 namespace pointresponse {
 
-class MWAPoint final : public PointResponse {
+class [[gnu::visibility("default")]] MWAPoint final : public PointResponse {
  public:
   MWAPoint(const telescope::Telescope* telescope_ptr, double time)
       : PointResponse(telescope_ptr, time){};
@@ -35,13 +35,13 @@ class MWAPoint final : public PointResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void Response(BeamMode beam_mode, std::complex<float>* buffer, double ra,
-                double dec, double freq, size_t station_idx,
-                size_t field_id) override;
+  void Response(BeamMode beam_mode, std::complex<float> * buffer, double ra,
+                double dec, double freq, size_t station_idx, size_t field_id)
+      override;
 
-  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double ra, double dec, double freq,
-                           size_t field_id) override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float> * buffer,
+                           double ra, double dec, double freq, size_t field_id)
+      override;
 
  private:
   void SetJ200Vectors();

@@ -19,7 +19,9 @@
 namespace everybeam {
 namespace pointresponse {
 
-class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
+class [[gnu::visibility("default")]] PhasedArrayPoint
+    : public PointResponse,
+      protected PhasedArrayResponse {
  public:
   PhasedArrayPoint(const telescope::Telescope* telescope_ptr, double time);
 
@@ -41,7 +43,7 @@ class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
    * @param station_idx Station index
    * @param field_id
    */
-  void Response(BeamMode beam_mode, std::complex<float>* response_matrix,
+  void Response(BeamMode beam_mode, std::complex<float> * response_matrix,
                 double ra, double dec, double freq, size_t station_idx,
                 size_t field_id) final override;
 
@@ -60,8 +62,8 @@ class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
    * @return aocommon::MC2x2
    */
   aocommon::MC2x2 Response(BeamMode beam_mode, size_t station_idx, double freq,
-                           const vector3r_t& direction,
-                           std::mutex* mutex) final override;
+                           const vector3r_t& direction, std::mutex* mutex)
+      final override;
 
   /**
    * @brief Compute the unnormalised response.
@@ -114,7 +116,7 @@ class PhasedArrayPoint : public PointResponse, protected PhasedArrayResponse {
    * direction. Member function leaves the responsibility for providing the
    * mutex to the caller.
    */
-  void UpdateITRFVectors(std::mutex& mutex);
+  void UpdateITRFVectors(std::mutex & mutex);
 
   vector3r_t itrf_direction_;
   double ra_, dec_;

@@ -31,7 +31,7 @@ namespace griddedresponse {
  * @brief Virtual base class to compute the gridded response
  *
  */
-class GriddedResponse {
+class [[gnu::visibility("default")]] GriddedResponse {
  public:
   virtual ~GriddedResponse() {}
 
@@ -49,7 +49,7 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void Response(BeamMode beam_mode, std::complex<float>* destination,
+  virtual void Response(BeamMode beam_mode, std::complex<float> * destination,
                         double time, double freq, size_t station_idx,
                         size_t field_id) = 0;
 
@@ -64,10 +64,9 @@ class GriddedResponse {
    * @param time Time, modified Julian date, UTC, in seconds (MJD(UTC), s).
    * @param frequency Frequency (Hz)
    */
-  virtual void ResponseAllStations(BeamMode beam_mode,
-                                   std::complex<float>* destination,
-                                   double time, double frequency,
-                                   size_t field_id) = 0;
+  virtual void ResponseAllStations(
+      BeamMode beam_mode, std::complex<float> * destination, double time,
+      double frequency, size_t field_id) = 0;
 
   /**
    * @brief Calculate integrated/undersampled beam for a single time step.
@@ -111,11 +110,10 @@ class GriddedResponse {
    * (Telescope::GetNrStations() *  (Telescope::GetNrStations() + 1)/2) *
    * time_array.size()
    */
-  virtual void IntegratedResponse(BeamMode beam_mode, float* destination,
-                                  const std::vector<double>& time_array,
-                                  double frequency, size_t field_id,
-                                  size_t undersampling_factor,
-                                  const std::vector<double>& baseline_weights);
+  virtual void IntegratedResponse(
+      BeamMode beam_mode, float* destination,
+      const std::vector<double>& time_array, double frequency, size_t field_id,
+      size_t undersampling_factor, const std::vector<double>& baseline_weights);
 
   /**
    * Same as @ref IntegratedResponse(), but without performing the upsampling.
@@ -192,11 +190,10 @@ class GriddedResponse {
    * perform a weighted average. (Partly) homogenous arrays may implement a
    * faster implementation by overriding this method.
    */
-  virtual void MakeIntegratedSnapshot(BeamMode beam_mode,
-                                      std::vector<aocommon::HMC4x4>& matrices,
-                                      double time, double frequency,
-                                      size_t field_id,
-                                      const double* baseline_weights_interval);
+  virtual void MakeIntegratedSnapshot(
+      BeamMode beam_mode, std::vector<aocommon::HMC4x4> & matrices, double time,
+      double frequency, size_t field_id,
+      const double* baseline_weights_interval);
 };
 }  // namespace griddedresponse
 }  // namespace everybeam

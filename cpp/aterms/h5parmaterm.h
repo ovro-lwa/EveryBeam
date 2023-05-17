@@ -162,7 +162,7 @@ class LagrangePolynomial {
  * has at least the following axes ("ant", "time", "dir"). The polynomial
  * coefficients are stored along the "dir" axis
  */
-class H5ParmATerm final : public ATermBase {
+class [[gnu::visibility("default")]] H5ParmATerm final : public ATermBase {
  public:
   H5ParmATerm(const std::vector<std::string>& station_names_ms,
               const aocommon::CoordinateSystem& coordinate_system);
@@ -185,7 +185,7 @@ class H5ParmATerm final : public ATermBase {
    * @return true Results are updated
    * @return false No need to update the result, cached result can be used
    */
-  bool Calculate(std::complex<float>* buffer, double time, double frequency,
+  bool Calculate(std::complex<float> * buffer, double time, double frequency,
                  size_t field_id, const double* uvw_in_m) override;
 
   /**
@@ -212,7 +212,7 @@ class H5ParmATerm final : public ATermBase {
 
   // Read coefficients from solution tab, for given
   // time index(frequency not relevant, as yet)
-  static void ReadCoeffs(schaapcommon::h5parm::SolTab& soltab,
+  static void ReadCoeffs(schaapcommon::h5parm::SolTab & soltab,
                          const std::string& station_name,
                          std::vector<float>& coeffs, hsize_t time_index);
 

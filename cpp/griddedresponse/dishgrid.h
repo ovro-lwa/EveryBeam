@@ -16,18 +16,18 @@ namespace griddedresponse {
  * e.g. VLA, ATCA, GMRT, SKA-MID
  *
  */
-class DishGrid : public GriddedResponse {
+class [[gnu::visibility("default")]] DishGrid : public GriddedResponse {
  public:
   DishGrid(const telescope::Telescope* telescope_ptr,
            const aocommon::CoordinateSystem coordinate_system)
       : GriddedResponse(telescope_ptr, coordinate_system){};
 
-  void Response(BeamMode beam_mode, std::complex<float>* buffer, double time,
+  void Response(BeamMode beam_mode, std::complex<float> * buffer, double time,
                 double frequency, size_t station_idx, size_t field_id) override;
 
-  void ResponseAllStations(BeamMode beam_mode, std::complex<float>* buffer,
-                           double time, double frequency,
-                           size_t field_id) final override;
+  void ResponseAllStations(BeamMode beam_mode, std::complex<float> * buffer,
+                           double time, double frequency, size_t field_id)
+      final override;
 
   void IntegratedResponse(
       BeamMode beam_mode, float* buffer, double time, double frequency,
@@ -57,7 +57,7 @@ class DishGrid : public GriddedResponse {
    * @param frequency Frequency (Hz)
    * @param field_id Field id
    */
-  void MakeIntegratedDishSnapshot(std::vector<aocommon::HMC4x4>& matrices,
+  void MakeIntegratedDishSnapshot(std::vector<aocommon::HMC4x4> & matrices,
                                   double frequency, size_t field_id);
 };
 }  // namespace griddedresponse

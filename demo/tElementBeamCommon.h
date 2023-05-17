@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ASTRON (Netherlands Institute for Radio Astronomy)
+// Copyright (C) 2023 ASTRON (Netherlands Institute for Radio Astronomy)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef DEMO_ELEMENT_BEAM_COMMON_H_
@@ -14,13 +14,18 @@
 #include <aocommon/parallelfor.h>
 #include <aocommon/system.h>
 
+#include "../cpp/elementresponse.h"
+#include "../cpp/options.h"
+#include "../cpp/msreadutils.h"
+#include "../cpp/station.h"
+
 #include "beam-helper.h"
 
-void calculateElementBeams(const everybeam::ElementResponse& elementResponse,
-                           std::vector<vector2r_t>& thetaPhiDirections,
-                           size_t nr_antennas, unsigned int subgrid_size,
-                           double frequency,
-                           std::vector<std::complex<float>>& buffer) {
+void calculateElementBeams(
+    const everybeam::ElementResponse& elementResponse,
+    std::vector<everybeam::vector2r_t>& thetaPhiDirections, size_t nr_antennas,
+    unsigned int subgrid_size, double frequency,
+    std::vector<std::complex<float>>& buffer) {
   const std::array<size_t, 4> shape{nr_antennas, subgrid_size, subgrid_size, 4};
   auto data = xt::adapt(buffer, shape);
 
@@ -50,7 +55,7 @@ void calculateElementBeams(const everybeam::ElementResponse& elementResponse,
 }
 
 void calculateElementBeams(const everybeam::Station& station,
-                           std::vector<vector3r_t>& itrfDirections,
+                           std::vector<everybeam::vector3r_t>& itrfDirections,
                            size_t nr_antennas, unsigned int subgrid_size,
                            double time, double frequency,
                            std::vector<std::complex<float>>& buffer) {
@@ -100,9 +105,9 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
   // Read station
   size_t field_id = 0;
   size_t station_id = 0;
-  Options options;
+  everybeam::Options options;
   options.element_response_model = elementResponseModel;
-  auto station = ReadSingleStation(ms, station_id, options);
+  auto station = everybeam::ReadSingleStation(ms, station_id, options);
   auto field_name = GetFieldName(ms, field_id);
   auto station_name = GetStationName(ms, station_id);
   auto nr_antennas = GetNrAntennas(ms, field_id);
@@ -122,7 +127,8 @@ void run(everybeam::ElementResponseModel elementResponseModel, double frequency,
 
   // Compute element beams from theta, phi
   std::cout << ">>> Computing element beams theta, phi" << std::endl;
-  std::vector<vector2r_t> thetaPhiDirections(subgrid_size * subgrid_size);
+  std::vector<everybeam::vector2r_t> thetaPhiDirections(subgrid_size *
+                                                        subgrid_size);
   GetThetaPhiDirectionsZenith(thetaPhiDirections.data(), subgrid_size);
   std::vector<std::complex<float>> beam_thetaphi(subgrid_size * subgrid_size *
                                                  4 * nr_antennas);

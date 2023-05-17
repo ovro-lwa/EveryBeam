@@ -3,12 +3,28 @@
 
 #include "beam-helper.h"
 
+#include <limits>
+
+#include <casacore/casa/Arrays/Matrix.h>
+#include <casacore/casa/Quanta/MVDirection.h>
+#include <casacore/measures/Measures/MeasFrame.h>
+#include <casacore/measures/Measures/MEpoch.h>
+#include <casacore/measures/Measures/MPosition.h>
+#include <casacore/measures/TableMeasures/ArrayQuantColumn.h>
+#include <casacore/measures/TableMeasures/ScalarMeasColumn.h>
+#include <casacore/ms/MeasurementSets/MSAntenna.h>
+#include <casacore/ms/MeasurementSets/MSAntennaEnums.h>
+#include <casacore/tables/Tables/Table.h>
+#include <casacore/tables/Tables/TableRecord.h>
+
 #include <aocommon/imagecoordinates.h>
 #include <fitsio.h>
 
 #include "./../cpp/common/mathutils.h"
-// #include "./../cpp/coords/itrfdirection.h"
 #include "./../cpp/coords/itrfconverter.h"
+
+using everybeam::vector2r_t;
+using everybeam::vector3r_t;
 
 void GetPhaseCentreInfo(casacore::MeasurementSet& ms, size_t fieldId,
                         double& ra, double& dec) {
@@ -48,7 +64,7 @@ void GetThetaPhiDirectionsZenith(vector2r_t* thetaPhiDirections,
       if (std::isfinite(n)) {
         // Convert direction to theta, phi
         vector3r_t direction_xyz = {(double)l, (double)m, n};
-        direction_thetaphi = cart2thetaphi(direction_xyz);
+        direction_thetaphi = everybeam::cart2thetaphi(direction_xyz);
       } else {
         auto nan = std::numeric_limits<double>::quiet_NaN();
         direction_thetaphi = {nan, nan};
@@ -81,7 +97,7 @@ void GetITRFDirections(vector3r_t* itrfDirections, size_t subgrid_size,
       m += pdm;
       n = sqrt(1.0 - l * l - m * m);
 
-      const coords::ItrfConverter itrf_converter(time);
+      const everybeam::coords::ItrfConverter itrf_converter(time);
 
       const vector3r_t l_vector_itrf =
           itrf_converter.RaDecToItrf(ra + M_PI / 2.0, 0);

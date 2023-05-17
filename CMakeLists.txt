@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.8)
 
 #------------------------------------------------------------------------------
 # Set version name and project number
-set(EVERYBEAM_VERSION 0.5.0)
+set(EVERYBEAM_VERSION 0.5.1)
 if(EVERYBEAM_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)")
   set(EVERYBEAM_VERSION_MAJOR "${CMAKE_MATCH_1}")
   set(EVERYBEAM_VERSION_MINOR "${CMAKE_MATCH_2}")
@@ -32,6 +32,7 @@ include(ExternalProject)
 
 # Configure directory for data files
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
+set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
 # Note: Use type `STRING` here, instead of `PATH`. Because, if the user
 # specified a _relative_ path on the command-line without specifying the type
@@ -69,8 +70,8 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 # Include aocommon/eigen3/pybind11 headers
-include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include/")
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/external/eigen/")
+include_directories("${CMAKE_SOURCE_DIR}/external/aocommon/include")
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/external/eigen")
 # Find python with cmake to convince pybind11 to use right python path
 # This can go when we're using CMake >= 3.12:
 # https://pybind11.readthedocs.io/en/stable/compiling.html#findpython-mode

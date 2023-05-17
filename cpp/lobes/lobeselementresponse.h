@@ -69,8 +69,9 @@ class LOBESElementResponse : public ElementResponse {
    *
    * @param name Station name, e.g. CS302LBA
    */
-  static std::shared_ptr<const LOBESElementResponse> GetInstance(
-      const std::string& name, const Options& options);
+  [[gnu::visibility(
+      "default")]] static std::shared_ptr<const LOBESElementResponse>
+  GetInstance(const std::string& name, const Options& options);
 
   /**
    * Creates a LobesElementResponseForDirection object with the field quantities

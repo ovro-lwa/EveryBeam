@@ -23,7 +23,7 @@ namespace aterms {
 
 class ParsetProvider;
 
-class ATermConfig final : public ATermBase {
+class [[gnu::visibility("default")]] ATermConfig final : public ATermBase {
  public:
   ATermConfig(size_t n_antennas,
               const aocommon::CoordinateSystem& coordinate_system,
@@ -45,7 +45,7 @@ class ATermConfig final : public ATermBase {
             const std::string& ms_filename = "");
 
   /** Reimplemented from ATermBase */
-  bool Calculate(std::complex<float>* buffer, double time, double frequency,
+  bool Calculate(std::complex<float> * buffer, double time, double frequency,
                  size_t fieldId, const double* uvwInM) override;
 
   /** Reimplemented from ATermBase */

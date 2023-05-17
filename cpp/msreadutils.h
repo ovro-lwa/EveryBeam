@@ -31,9 +31,9 @@ const std::string kAartfaacAntennaTypeName = "AARTFAAC_ANTENNA_TYPE";
  * @return A Station object representing the station that was read.
 
  */
-std::unique_ptr<Station> ReadSingleStation(const casacore::MeasurementSet& ms,
-                                           unsigned int id,
-                                           const Options& options = Options());
+[[gnu::visibility("default")]] std::unique_ptr<Station> ReadSingleStation(
+    const casacore::MeasurementSet& ms, unsigned int id,
+    const Options& options = Options());
 
 /**
  * @brief Read multiple stations from measurment set into buffer out_it
@@ -55,6 +55,7 @@ inline void ReadAllStations(const casacore::MeasurementSet& ms, T out_it,
 
 // Read the tile beam direction from a LOFAR MS. If it is not defined,
 // this function returns the delay center.
-casacore::MDirection ReadTileBeamDirection(const casacore::MeasurementSet& ms);
+[[gnu::visibility("default")]] casacore::MDirection ReadTileBeamDirection(
+    const casacore::MeasurementSet& ms);
 }  // namespace everybeam
 #endif  // EVERYBEAM_MSREADUTILS_H_

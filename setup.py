@@ -131,7 +131,7 @@ for root, _, files in os.walk("coeffs"):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="everybeam",
-    version="0.5.0",
+    version="0.5.1",
     author="André Offringa",
     author_email="offringa@astron.nl",
     description="EveryBeam",

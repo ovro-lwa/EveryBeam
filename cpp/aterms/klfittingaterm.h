@@ -20,7 +20,7 @@ class KlFitter;
  * Class that reads in H5Parm solution files and
  * fits Karhunen-Loève base functions to them\
  */
-class KlFittingATerm final : public ATermBase {
+class [[gnu::visibility("default")]] KlFittingATerm final : public ATermBase {
  public:
   KlFittingATerm(const std::vector<std::string>& station_names_ms,
                  const aocommon::CoordinateSystem& coordinate_system, int order,
@@ -50,7 +50,7 @@ class KlFittingATerm final : public ATermBase {
    * @return true Results are updated
    * @return false No need to update the result, cached result can be used
    */
-  bool Calculate(std::complex<float>* buffer, double time, double frequency,
+  bool Calculate(std::complex<float> * buffer, double time, double frequency,
                  size_t field_id, const double* uvw_in_m) override;
 
   /**

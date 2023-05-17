@@ -38,10 +38,11 @@ enum class ElementResponseModel {
   kAartfaacOuter = 8
 };
 
-std::ostream& operator<<(std::ostream& os, ElementResponseModel model);
+[[gnu::visibility("default")]] std::ostream& operator<<(
+    std::ostream& os, ElementResponseModel model);
 
-ElementResponseModel ElementResponseModelFromString(
-    const std::string& element_response);
+[[gnu::visibility("default")]] ElementResponseModel
+ElementResponseModelFromString(const std::string& element_response);
 
 /**
  * @brief Abstract class for the element response model. All the
@@ -51,7 +52,8 @@ ElementResponseModel ElementResponseModelFromString(
  * LobesElementResponseFixedDirection stores a pointer to the wrapped class,
  * which is already owned elsewhere (typically by Station).
  */
-class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
+class [[gnu::visibility("default")]] ElementResponse
+    : public std::enable_shared_from_this<ElementResponse> {
  public:
   virtual ~ElementResponse() {}
 
@@ -80,8 +82,8 @@ class ElementResponse : public std::enable_shared_from_this<ElementResponse> {
    * @param phi Angle in the xy-plane wrt. x-axis  (rad)
    * @return A 2x2 array containing the Jones matrix.
    */
-  virtual aocommon::MC2x2 Response(double freq, double theta,
-                                   double phi) const = 0;
+  virtual aocommon::MC2x2 Response(double freq, double theta, double phi)
+      const = 0;
 
   /**
    * @brief Virtual implementation of Response method
