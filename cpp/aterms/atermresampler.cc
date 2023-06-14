@@ -74,8 +74,8 @@ void ATermResampler::regrid(const aocommon::FitsReader& reader, float* dest,
   const size_t in_height = reader.ImageHeight();
   const double in_pixel_size_x = reader.PixelSizeX() / stretch_factor;
   const double in_pixel_size_y = reader.PixelSizeY() / stretch_factor;
-  const double in_phase_centre_dl = reader.PhaseCentreDL();
-  const double in_phase_centre_dm = reader.PhaseCentreDM();
+  const double in_phase_centre_dl = reader.LShift();
+  const double in_phase_centre_dm = reader.MShift();
   const double in_phase_centre_ra =
       override_fits_phase_centre_ ? override_ra_ : reader.PhaseCentreRA();
   const double in_phase_centre_dec =

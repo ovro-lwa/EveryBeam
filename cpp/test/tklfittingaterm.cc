@@ -30,8 +30,8 @@ BOOST_AUTO_TEST_CASE(verify, *boost::unit_test::tolerance(1e-8)) {
   const size_t n_corr = reader.NMatrixElements();
   const double ra = reader.PhaseCentreRA();
   const double dec = reader.PhaseCentreDec();
-  const double dl = reader.PhaseCentreDL();
-  const double dm = reader.PhaseCentreDM();
+  const double dl = reader.LShift();
+  const double dm = reader.MShift();
 
   const double start_time = reader.TimeDimensionStart();
   const double time_step = reader.TimeDimensionIncr();

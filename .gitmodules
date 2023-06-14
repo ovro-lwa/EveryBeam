@@ -16,15 +16,9 @@
 [submodule "external/oskar"]
 	path = external/oskar
 	url = https://gitlab.com/ska-telescope/sim/oskar.git
-[submodule "external/xtensor"]
-	path = external/xtensor
-	url = https://github.com/xtensor-stack/xtensor.git
 [submodule "external/xtensor-blas"]
 	path = external/xtensor-blas
 	url = https://github.com/xtensor-stack/xtensor-blas.git
-[submodule "external/xtl"]
-	path = external/xtl
-	url = https://github.com/xtensor-stack/xtl.git
 [submodule "external/xtensor-fftw"]
 	path = external/xtensor-fftw
 	url = https://github.com/xtensor-stack/xtensor-fftw.git

@@ -46,11 +46,8 @@ if(CFITSIO_FOUND)
       tElementBeamOSKARDipole tElementBeamOSKARSphericalWave)
   foreach(TEST ${CFITSIO_TESTS})
     add_executable(${TEST} ${TEST}.cc)
-    target_link_libraries(${TEST} PUBLIC beamhelper)
+    target_link_libraries(${TEST} PUBLIC beamhelper xtensor)
     target_include_directories(${TEST} PUBLIC ${CMAKE_BINARY_DIR})
-    target_include_directories(
-      ${TEST} SYSTEM PRIVATE ${CMAKE_SOURCE_DIR}/external/xtensor/include
-                             ${CMAKE_SOURCE_DIR}/external/xtl/include)
 
     # These are not "tests" in the strict sense of the word, so don't add them to test stack
     # NOTE: tests should go to cpp/test

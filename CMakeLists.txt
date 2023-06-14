@@ -101,6 +101,9 @@ set(CASACORE_MAKE_REQUIRED_EXTERNALS_OPTIONAL TRUE)
 find_package(Casacore REQUIRED COMPONENTS casa ms tables measures fits)
 include_directories(SYSTEM ${CASACORE_INCLUDE_DIRS})
 
+# Fetch XTensor and related libraries.
+include(external/aocommon/CMake/FetchXTensor.cmake)
+
 # Find and include Boost headers (boost::math required for MWA beam)
 find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})

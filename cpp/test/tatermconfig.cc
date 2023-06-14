@@ -187,8 +187,8 @@ BOOST_AUTO_TEST_CASE(combine_aterms) {
   const size_t n_antennas = fitsreader.NAntennas();
   const double ra = fitsreader.PhaseCentreRA();
   const double dec = fitsreader.PhaseCentreDec();
-  const double dl = fitsreader.PhaseCentreDL();
-  const double dm = fitsreader.PhaseCentreDM();
+  const double dl = fitsreader.LShift();
+  const double dm = fitsreader.MShift();
   const size_t screen_width = fitsreader.ImageWidth();
   const size_t screen_height = fitsreader.ImageHeight();
 

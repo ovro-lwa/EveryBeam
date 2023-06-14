@@ -5,7 +5,7 @@ This directory contains the python bindings for everybeam, along with a couple o
 
     -DBUILD_WITH_PYTHON=On
 
-Once installed, make sure that the installed `everybeam.cpython` shared object is on you `PYTHONPATH`. Check if everything works by running 
+Once installed, make sure that the installed `everybeam.cpython` shared object is on your `PYTHONPATH`. Check if everything works by running
 
     python3 -c "import everybeam"
 

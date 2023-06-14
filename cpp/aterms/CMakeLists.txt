@@ -22,14 +22,13 @@ add_library(
 # Compilation must therefore generate relocatable code
 set_property(TARGET aterms PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set_property(TARGET aterms PROPERTY CXX_STANDARD 17)
+# Link to XTensor, which is loaded using FetchXTensor.cmake.
+target_link_libraries(aterms xtensor)
 
+# Add the XTensor dependencies that use submodules.
 target_include_directories(
-  aterms SYSTEM
-  PRIVATE ${CMAKE_SOURCE_DIR}/external/xtensor/include
-          ${CMAKE_SOURCE_DIR}/external/xtensor-blas/include
-          ${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include
-          ${CMAKE_SOURCE_DIR}/external/xtl/include)
+  aterms SYSTEM PRIVATE ${CMAKE_SOURCE_DIR}/external/xtensor-blas/include
+                        ${CMAKE_SOURCE_DIR}/external/xtensor-fftw/include)
 
 install(
   FILES atermconfig.h
