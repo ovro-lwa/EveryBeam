@@ -127,7 +127,7 @@ test-and-coverage-2204:
     - ninja install
     - ctest -j`nproc` --output-on-failure -T test
     # Capture coverage
-    - gcovr -j`nproc` -r .. -e '.*/external/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json run-unit.json --xml coverage.xml
+    - gcovr -j`nproc` -r .. -e '../external/.*' -e '_deps/.*' -e '.*/CompilerIdCXX/.*' -e '.*/test/.*' -e '.*/demo/.*' --json run-unit.json --xml coverage.xml
     - gcovr -j`nproc` --add-tracefile run-unit.json
     # Check whether pyeverybeam modules can be found from home directory after setting the PYTHONPATH
     - PYVERSION=`python3 --version | grep -P -o ".*\s\K\d+\.\d+(?=\.\d+)"`
